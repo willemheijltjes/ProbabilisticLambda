@@ -132,25 +132,19 @@
 
 \begin{document}
 
-%\maketitle
+\maketitle
 
-\thispagestyle{empty}
 
-\vspace*{-20pt}
 
 \[
-\scalebox{2}{$
 	M,N \quad\coloneqq\quad x ~\mid~ \lambda x.N ~\mid~ NM ~\mid~ \trm{N +a M} ~\mid~ \trm{!a N}
-$}
 \]
 
-\bigskip
-\bigskip
-\bigskip
-
+\[
+	\trm{N +{} M} \quad\stackrel\Delta=\quad \trm{!a \, N +a M}
+\]
 
 \[
-\scalebox{2}{$
 \begin{aligned}
 	(\lambda x.N)M 		&\rw_{\mathrlap\beta}~ N[M/x]
 \\
@@ -161,17 +155,21 @@ $}
 \\	\trm{(N +a M) +b P}			&\rw~ \trm{(N +b P) +a (M +b P)} & (a\smallbin<b)
 \\	\trm{N +a (M +a P)}			&\rw~ \trm{N +a P}					\vphantom{\trm{+b}}
 \\	\trm{(N +a M) +a P}			&\rw~ \trm{N +a P}					\vphantom{\trm{+b}}
-%\\	\trm{!b (N +a M)}			&\rw~ \trm{(!b N) +a (!c M[c/b])}	\vphantom{\trm{+b}}
+\\	\trm{!b (N +a M)}			&\rw~ \trm{(!b N) +a (!c M[c/b])}	\vphantom{\trm{+b}}
 \\
 \\	\trm{\lambda x.!a N} 	&\rw~ \trm{!a \lambda x. N}
 \\	\trm{(!a N)M}			&\rw~ \trm{!a (NM)}				\vphantom{\trm{+b}}
-\\	\trm{(!a N) +b M}		&\rw~ \trm{!a (N +b M)}
-\\	\trm{N +b (!a M)}		&\rw~ \trm{!a (N +b M)}
+\\	\trm{!a N}				&\rw~ N & (a\notin N)
 \end{aligned}
-$}
 \]
 
-\vspace*{-20pt}
+\[
+\begin{array}{ccc@{~}c@{~}c}
+	N_0 &\coloneqq& N_1 &\mid& \trm{N_0 +{} N_0}
+\\	N_1	&\coloneqq& N_2 &\mid& \lambda x.N_1
+\\	N_2 &\coloneqq& x	&\mid& N_2\,N_0
+\end{array}
+\]
 
 %\[
 %	\trm{\lambda x.!a !b N +a !f M : A*B}
