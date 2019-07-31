@@ -1,0 +1,183 @@
+\documentclass{article}
+
+\usepackage{amsmath,amssymb,amsthm,mathtools,stmaryrd}
+
+\usepackage{fullpage}
+
+\usepackage{xcolor}
+\usepackage{tikz}
+
+\makeatletter
+
+
+% coloneqq
+\newcommand*\coloneq{
+ \mathrel{%
+  \rlap{\raisebox{0.3ex}{$\m@th\cdot$}}%
+        \raisebox{-0.3ex}{$\m@th\cdot$}%
+ {=}}}
+\newcommand*\coloneqq{
+ \mathrel{%
+  \rlap{\raisebox{0.3ex}{$\m@th\cdot$}}%
+        \raisebox{-0.3ex}{$\m@th\cdot$}%
+  \rlap{\raisebox{0.3ex}{$\m@th\cdot$}}%
+        \raisebox{-0.3ex}{$\m@th\cdot$}%
+ {=}}}
+
+% Small operators:
+
+\newcommand\smallbin[1]{\mathchoice
+      {\mathbin{\raise.2ex \hbox{$\scriptstyle      #1$}}}%
+      {\mathbin{\raise.2ex \hbox{$\scriptstyle      #1$}}}%
+      {\mathbin{\raise.12ex\hbox{$\scriptscriptstyle#1$}}}%
+      {\mathbin{           \hbox{$\scriptscriptstyle#1$}}}}%
+
+\newcommand\Con{\wedge}
+\newcommand\Imp{\rightarrow}
+
+\newcommand\con{\kern1pt{\smallbin\Con}\kern1pt}
+\newcommand\imp{\kern1pt{\smallbin\Imp}}
+
+
+
+\newcommand\fv[1]{\mathsf{fv}(\trm{#1})}
+
+
+% ===== TERMS AND TYPES
+
+% colours
+\colorlet{mgray}{black!40}
+\colorlet{lgray}{black!25}
+\colorlet{llgray}{black!15}
+
+\colorlet{dblue}{blue!80!black}
+\colorlet{dred}{red!80!black}
+
+\colorlet{typecolor}{dblue}
+\colorlet{termcolor}{dred}
+
+\newcommand\typecolor{\color{typecolor}}
+\newcommand\termcolor{\color{termcolor}}
+
+\newcommand\black{\color{black}}
+\newcommand\dblue{\color{dblue}}
+\newcommand\dred{\color{dred}}
+
+
+% types
+\newcommand\type[1]{{\let\type@sup@color\termcolor\typecolor\typ{#1}}}
+\newcommand\typ[1]{%
+  %\vphantom J%
+  \let\type@loop=\type@next%
+  \type@loop#1,%
+}
+\newcommand\type@next[1]{%
+  \ifx#1,\let\type@loop\type@end\else%
+  \ifx#1_\let\type@loop\type@sub\else%
+  \ifx#1^\let\type@loop\type@sup\else%
+  \ifx#1*\con\else%
+  \ifx#1-\kern1pt{\imp}\else%
+  #1%
+  \fi\fi\fi\fi\fi%
+  \type@loop%
+}
+\newcommand\type@sup@color{}
+\newcommand\type@sub[1]{_{#1}\let\type@loop\type@next\type@loop}
+\newcommand\type@sup[1]{^{{\type@sup@color #1}}\let\type@loop\type@next\type@loop}
+\newcommand\type@vec[1]{\vec{\kern.5pt#1\kern.5pt}\let\type@loop\type@next\type@loop}
+\newcommand\type@end{\let\type@sup@color\relax}
+
+% terms
+\newcommand\term[1]{{\let\term@typecolor\typecolor\termcolor\trm{#1}}}
+\newcommand\trm[1]{%
+  \vphantom(%
+  \let\term@loop=\term@next%
+  \term@loop#1,%
+}
+\newcommand\term@next[1]{%
+  \ifx#1,\let\term@loop\term@end\else
+  \ifx#1:\black\colon\term@typecolor\let\term@loop\term@type\else%
+  \ifx#1_\let\term@loop\term@sub\else%
+  \ifx#1^\let\term@loop\term@sup\else%
+  \ifx#1!\let\term@loop\term@box\else%
+  \ifx#1+\let\term@loop\term@prob\else%
+  #1%
+  \fi\fi\fi\fi\fi\fi%
+  \term@loop%
+}
+\newcommand\term@typecolor{}
+\newcommand\term@end{\let\term@typecolor\relax}
+\newcommand\term@sub[1]{_{#1}\let\term@loop\term@next\term@loop}
+\newcommand\term@sup[1]{^{#1}\let\term@loop\term@next\term@loop}
+\newcommand\term@vec[1]{\vec{\kern.5pt#1\kern.5pt}\let\term@loop\term@next\term@loop}
+\newcommand\term@prob[1]{\stackrel{#1}{\smallbin\oplus}\let\term@loop\term@next\term@loop}
+\newcommand\term@type{\let\type@loop=\type@next\type@loop}
+\newcommand\term@box[1]{\probox{#1}.\let\term@loop\term@next\term@loop}
+
+\newcommand\probox[1]{\tikz[baseline=(a.base)]\node[draw,line width=.6pt,inner sep=2pt,minimum height=10pt,minimum width=10pt](a){\makebox[0pt][c]{$\scriptstyle #1\vphantom)$}};}
+
+% rewriting
+\newcommand\rw{\rightsquigarrow}
+
+\makeatother
+
+
+%============================================================ FRONTMATTER
+
+\title{Decomposing probabilistic lambda-calculus}
+
+\author{Ugo Dal Lago, Giulio Guerrieri, and Willem Heijltjes}
+
+%============================================================ DOCUMENT
+
+\begin{document}
+
+%\maketitle
+
+\thispagestyle{empty}
+
+\vspace*{-20pt}
+
+\[
+\scalebox{2}{$
+	M,N \quad\coloneqq\quad x ~\mid~ \lambda x.N ~\mid~ NM ~\mid~ \trm{N +a M} ~\mid~ \trm{!a N}
+$}
+\]
+
+\bigskip
+\bigskip
+\bigskip
+
+
+\[
+\scalebox{2}{$
+\begin{aligned}
+	(\lambda x.N)M 		&\rw_{\mathrlap\beta}~ N[M/x]
+\\
+\\	\trm{\lambda x.(N +a M)}	&\rw~ \trm{(\lambda x.N) +a (\lambda x.N)}
+\\	\trm{N (M +a P)}			&\rw~ \trm{(NM) +a (NP)}			\vphantom{\trm{+b}}
+\\	\trm{(N +a M) P}			&\rw~ \trm{(NP) +a (MP)}			\vphantom{\trm{+b}}
+\\	\trm{N +b (M +a P)}			&\rw~ \trm{(N +b M) +a (N +b P)} & (a\smallbin<b)
+\\	\trm{(N +a M) +b P}			&\rw~ \trm{(N +b P) +a (M +b P)} & (a\smallbin<b)
+\\	\trm{N +a (M +a P)}			&\rw~ \trm{N +a P}					\vphantom{\trm{+b}}
+\\	\trm{(N +a M) +a P}			&\rw~ \trm{N +a P}					\vphantom{\trm{+b}}
+%\\	\trm{!b (N +a M)}			&\rw~ \trm{(!b N) +a (!c M[c/b])}	\vphantom{\trm{+b}}
+\\
+\\	\trm{\lambda x.!a N} 	&\rw~ \trm{!a \lambda x. N}
+\\	\trm{(!a N)M}			&\rw~ \trm{!a (NM)}				\vphantom{\trm{+b}}
+\\	\trm{(!a N) +b M}		&\rw~ \trm{!a (N +b M)}
+\\	\trm{N +b (!a M)}		&\rw~ \trm{!a (N +b M)}
+\end{aligned}
+$}
+\]
+
+\vspace*{-20pt}
+
+%\[
+%	\trm{\lambda x.!a !b N +a !f M : A*B}
+%\]
+
+\end{document}
+
+%============================================================
+
