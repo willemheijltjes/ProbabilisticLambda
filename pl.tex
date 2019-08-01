@@ -173,12 +173,13 @@
 \begin{aligned}
 	(\x.N)M 				&\rw_\beta N[M/x]
 \\
-\\	\trm{N +a N}			&\rw_\prob N	
-\\	\trm{\x.(N +a M)}		&\rw_\prob \trm{(\x.N) +a (\x.M)}		\rstrut
-\\	\trm{N (M +a P)}		&\rw_\prob \trm{(NM) +a (NP)}			\rstrut
-\\	\trm{(N +a M) P}		&\rw_\prob \trm{(NP) +a (MP)}			\rstrut
+\\	\trm{N +a N}			&\rw_\prob N
 \\	\trm{N +a (M +a P)}		&\rw_\prob \trm{N +a P}					\rstrut
 \\	\trm{(N +a M) +a P}		&\rw_\prob \trm{N +a P}					\rstrut
+\\
+\\	\trm{\x.(N +a M)}		&\rw_\prob \trm{(\x.N) +a (\x.M)}
+\\	\trm{N (M +a P)}		&\rw_\prob \trm{(NM) +a (NP)}			\rstrut
+\\	\trm{(N +a M) P}		&\rw_\prob \trm{(NP) +a (MP)}			\rstrut
 \\	\trm{N +b (M +a P)}		&\rw_\prob \trm{(N +b M) +a (N +b P)} 	\rstrut	&& (a\smallbin<b)
 \\	\trm{(N +a M) +b P}		&\rw_\prob \trm{(N +b P) +a (M +b P)} 	\rstrut	&& (a\smallbin<b)
 \\	\trm{!b (N +a M)}		&\rw_\prob \trm{(!b N) +a (!c M[c/b])}	\rstrut	&& (a\neq b)
@@ -198,13 +199,78 @@
 \]
 
 
+%\end{document}
+
+
+\begin{lemma}
+The reduction $\rw_\prob$ is strongly normalizing.
+\end{lemma}
+
+\begin{proof}
+The following measure reduces for every step. Order constructors by
+\[
+	\trm{+a}<\trm{+b} 
+	\quad\text{if}\quad
+	a<b~,
+	\quad\text{and}\quad
+	\trm{+a}<\probox b< \x, @ 
+\]
+(where $a\neq b$ and $@$ stands for application). To each path in the syntax tree of a term, assign the measure of \emph{disorder} as the number of pairs of constructors that are not ordered as above. Let the \emph{disorder} of a term be the multiset of the disorder of its paths. The disorder of a term reduces under $\rw_\prob$.
+\end{proof}
+
+
+\begin{lemma}
+The normal forms of $\rw_\prob$ are given by the grammar
 \[
 \begin{array}{ccc@{~}c@{~}c@{}l}
 	P_0 &\coloneqq& P_1 &\mid& \trm{P_0 +{} P_0}
-\\	P_1	&\coloneqq& x   &\mid& \x.P_1 			 &~\mid~ P_1\,P_0
+\\	P_1	&\coloneqq& x   &\mid& \x.P_1 			 &~\mid~ P_1\,P_0~.
+\end{array}
+\]
+\end{lemma}
+
+\begin{proof}
+By inspection of the rules.
+\end{proof}
+
+\begin{lemma}
+Reduction $\rw_\prob$ is confluent.
+\end{lemma}
+
+\begin{proof}
+\begin{itemize}
+	\item $\trm{N +a N}\rw N$.
+
+\[
+	\trm{N +a (M +a M)} \begin{array}{c}\rw\\[-6pt]\rw\end{array} \trm{N +a M}
+\qquad
+\begin{array}{c@{~}c@{~}c}
+	\trm{(N +a M) +a (N +a M)} &\rw& \trm{N+a M}
+\\	\dw & \rotatebox[origin=c]{30}{$\rw$}
+\\	\trm{(N +a M) +a M}
+\end{array}
+\qquad
+\begin{array}{c@{~}c@{~}c}
+	\trm{C[N +a N]}	&\rw& C[N]
+\\	\dw & \rotatebox[origin=c]{30}{$\rw$}
+\\	\trm{C[N] +a C[N]}
 \end{array}
 \]
 
+	\item $\trm{N +a (M +a P)}\rw\trm{N +a P}$.
+
+\[
+\begin{array}{c@{~}c@{~}c}
+	\trm{C[N +a (M +a P)]} &\rw& \trm{C[N+a M]}
+\\	\dw
+\\	\trm{C[N] +a C[M+a P]} && \dw
+\\	\dw
+\\	\trm{C[N] +a (C[M] +a C[P])} &\rw& \trm{C[N] +a C[M]}
+\end{array}	
+\]
+
+\end{itemize}
+\end{proof}
 
 \end{document}
 
