@@ -9,6 +9,19 @@
 
 \makeatletter
 
+% theorem environments
+
+\theoremstyle{definition}
+\newtheorem{definition}{Definition}
+%%
+\theoremstyle{plain}
+\newtheorem{conjecture} [definition]{Conjecture}
+\newtheorem{corollary}  [definition]{Corollary}
+\newtheorem{lemma}      [definition]{Lemma}	
+\newtheorem{proposition}[definition]{Proposition}
+\newtheorem{theorem}    [definition]{Theorem}
+%%
+\newtheorem*{remark}{Remark}
 
 % coloneqq
 \newcommand*\coloneq{
@@ -88,6 +101,10 @@
 \newcommand\type@end{\let\type@sup@color\relax}
 
 % terms
+\newcommand\x{\lambda x}
+\newcommand\y{\lambda y}
+\newcommand\z{\lambda z}
+
 \newcommand\term[1]{{\let\term@typecolor\typecolor\termcolor\trm{#1}}}
 \newcommand\trm[1]{%
   \vphantom(%
@@ -101,8 +118,11 @@
   \ifx#1^\let\term@loop\term@sup\else%
   \ifx#1!\let\term@loop\term@box\else%
   \ifx#1+\let\term@loop\term@prob\else%
+%  \ifx#1\x\lambda x\else%
+%  \ifx#1\y\lambda y\else%
+%  \ifx#1\z\lambda z\else%
   #1%
-  \fi\fi\fi\fi\fi\fi%
+  \fi\fi\fi\fi\fi\fi%\fi\fi\fi%
   \term@loop%
 }
 \newcommand\term@typecolor{}
@@ -110,7 +130,7 @@
 \newcommand\term@sub[1]{_{#1}\let\term@loop\term@next\term@loop}
 \newcommand\term@sup[1]{^{#1}\let\term@loop\term@next\term@loop}
 \newcommand\term@vec[1]{\vec{\kern.5pt#1\kern.5pt}\let\term@loop\term@next\term@loop}
-\newcommand\term@prob[1]{\stackrel{#1}{\smallbin\oplus}\let\term@loop\term@next\term@loop}
+\newcommand\term@prob[1]{\kern1pt\overset{#1}{{\smallbin\oplus}}\kern1pt\let\term@loop\term@next\term@loop}
 \newcommand\term@type{\let\type@loop=\type@next\type@loop}
 \newcommand\term@box[1]{\probox{#1}.\let\term@loop\term@next\term@loop}
 
@@ -118,6 +138,11 @@
 
 % rewriting
 \newcommand\rw{\rightsquigarrow}
+\newcommand\dw{\rotatebox[origin=c]{270}{$\rw$}}
+
+\newcommand\prob{\mathsf p}
+
+\newcommand\confluence[4]{\begin{array}{ccc} \trm{#1} & \rw & \trm{#2} \\ \dw && \dw \\ \trm{#3} & \rw & \trm{#4} \end{array}}
 
 \makeatother
 
@@ -134,45 +159,105 @@
 
 \maketitle
 
-
-
 \[
-	M,N \quad\coloneqq\quad x ~\mid~ \lambda x.N ~\mid~ NM ~\mid~ \trm{N +a M} ~\mid~ \trm{!a N}
+	M,N \quad\coloneqq\quad x ~\mid~ \x.N ~\mid~ NM ~\mid~ \trm{N +a M} ~\mid~ \trm{!a N}
 \]
 
 \[
 	\trm{N +{} M} \quad\stackrel\Delta=\quad \trm{!a \, N +a M}
 \]
 
+
 \[
+\newcommand\rstrut{\rule{0pt}{13pt}}
 \begin{aligned}
-	(\lambda x.N)M 		&\rw_{\mathrlap\beta}~ N[M/x]
+	(\x.N)M 				&\rw_\beta N[M/x]
 \\
-\\	\trm{\lambda x.(N +a M)}	&\rw~ \trm{(\lambda x.N) +a (\lambda x.N)}
-\\	\trm{N (M +a P)}			&\rw~ \trm{(NM) +a (NP)}			\vphantom{\trm{+b}}
-\\	\trm{(N +a M) P}			&\rw~ \trm{(NP) +a (MP)}			\vphantom{\trm{+b}}
-\\	\trm{N +b (M +a P)}			&\rw~ \trm{(N +b M) +a (N +b P)} & (a\smallbin<b)
-\\	\trm{(N +a M) +b P}			&\rw~ \trm{(N +b P) +a (M +b P)} & (a\smallbin<b)
-\\	\trm{N +a (M +a P)}			&\rw~ \trm{N +a P}					\vphantom{\trm{+b}}
-\\	\trm{(N +a M) +a P}			&\rw~ \trm{N +a P}					\vphantom{\trm{+b}}
-\\	\trm{!b (N +a M)}			&\rw~ \trm{(!b N) +a (!c M[c/b])}	\vphantom{\trm{+b}}
+\\	\trm{N +a N}			&\rw_\prob N	
+\\	\trm{\x.(N +a M)}		&\rw_\prob \trm{(\x.N) +a (\x.N)}		\rstrut
+\\	\trm{N (M +a P)}		&\rw_\prob \trm{(NM) +a (NP)}			\rstrut
+\\	\trm{(N +a M) P}		&\rw_\prob \trm{(NP) +a (MP)}			\rstrut
+\\	\trm{N +a (M +a P)}		&\rw_\prob \trm{N +a P}					\rstrut
+\\	\trm{(N +a M) +a P}		&\rw_\prob \trm{N +a P}					\rstrut
+\\	\trm{N +b (M +a P)}		&\rw_\prob \trm{(N +b M) +a (N +b P)} 	\rstrut	&& (a\smallbin<b)
+\\	\trm{(N +a M) +b P}		&\rw_\prob \trm{(N +b P) +a (M +b P)} 	\rstrut	&& (a\smallbin<b)
+\\	\trm{!b (N +a M)}		&\rw_\prob \trm{(!b N) +a (!c M[c/b])}	\rstrut	&& (a\neq b)
 \\
-\\	\trm{\lambda x.!a N} 	&\rw~ \trm{!a \lambda x. N}
-\\	\trm{(!a N)M}			&\rw~ \trm{!a (NM)}				\vphantom{\trm{+b}}
-\\	\trm{!a N}				&\rw~ N & (a\notin N)			\vphantom{\trm{+b}}
+\\	\trm{!a N}				&\rw_\prob N 									&& (a\notin N)				
+\\	\trm{\x.!a N} 			&\rw_\prob \trm{!a \x. N}				\rstrut
+\\	\trm{(!a N)M}			&\rw_\prob \trm{!a (NM)}				\rstrut
 \end{aligned}
 \]
 
 \[
 \begin{array}{ccc@{~}c@{~}c}
 	N_0 &\coloneqq& N_1 &\mid& \trm{N_0 +{} N_0}
-\\	N_1	&\coloneqq& N_2 &\mid& \lambda x.N_1
+\\	N_1	&\coloneqq& N_2 &\mid& \x.N_1
 \\	N_2 &\coloneqq& x	&\mid& N_2\,N_0
 \end{array}
 \]
 
+
+\[
+\begin{array}{ccc@{~}c@{~}c@{}l}
+	P_0 &\coloneqq& P_1 &\mid& \trm{P_0 +{} P_0}
+\\	P_1	&\coloneqq& x   &\mid& \x.P_1 			 &~\mid~ P_1\,P_0
+\end{array}
+\]
+
+
+\end{document}
+
+\[
+\begin{array}{ccc}
+	\trm{(N+aM)+a(P+aQ)} & \rw & \trm{(N+aM)+a Q}
+\\	\dw && \dw
+\\	\trm{N +a (P+aQ)} & \rw & \trm{N+aQ}
+\end{array}{ccc}
+\]
+
+
+\[
+\begin{array}{ccc}
+	\trm{(\x.N +a M)P} &\rw& \trm{(N +a M)[P/x]}
+\\	\dw
+\\	\trm{((\x.N) +a (\x.M)) P} && =
+\\	\dw
+\\	\trm{(\x.N)P +a (\x.M)P} &\rw^*& \trm{N[P/x] +a M[P/x]}
+\end{array}
+\]
+
+\[
+{(\x.N)(M +a P)} {N[M +a P/x]}
+{(\x.N)M +a (\x.N)P} {N[M/x] +a N[P/x]}
+\]
+
+\[
+\trm{(N+aM)(P+aQ)} \trm{N(P+aQ) +a M(P+aQ)} \trm{(NP +a NQ) +a (MP +a MQ)}
+\trm{(N+aM)P +a (N+aM)Q} 
+\trm{(NP +a MP) +a (
+\]
+
+
+\begin{lemma}
+$\trm{N[P+aQ/x]}\rw^*\trm{N[P/x] +a N[Q/x]}$.
+\end{lemma}
+
+\begin{proof}
+$\trm{x[P+aQ/x]}=\trm{P+aQ}=\trm{x[P/x] +a x[Q/x]}$\\
+$\trm{y[P+aQ/x]}=\trm{y}=\trm{y +a y}=\trm{y[P/x] +a y[Q/x]}$\\
+
+$\trm{(\x.N)[P+aQ/x]}=\trm{\x.N}=\trm{(\x.N) +a (\x.N)} = \trm{(\x.N)[P/x] +a (\x.N)[Q/x]}$
+$\trm{(\y.N)[P+aQ/x]}=\trm{\x.(N[P+Q/x])}\rw^*\trm{\x.(N[P/x] +a N[Q/x])} \rw \trm{(\x.N)[P/x] +a (\x.N)[Q/x]}$
+
+$\trm{(NM)[P+aQ/x]}=\trm(N[P+aQ/x])(M[P+aQ/x])}\rw^*\trm{(N[P/x] +a N[Q/x])\,(M[P/x] +a M[Q/x])
+
+
+
+\end{proof}
+
 %\[
-%	\trm{\lambda x.!a !b N +a !f M : A*B}
+%	\trm{\x.!a !b N +a !f M : A*B}
 %\]
 
 \end{document}
