@@ -45,6 +45,8 @@
       {\mathbin{\raise.12ex\hbox{$\scriptscriptstyle#1$}}}%
       {\mathbin{           \hbox{$\scriptscriptstyle#1$}}}}%
 
+\newcommand\smallsquare{\mathchoice{{\scriptstyle\square}}{{\scriptstyle\square}}{{\scriptscriptstyle\square}}{{\scriptscriptstyle\square}}}
+
 \newcommand\Con{\wedge}
 \newcommand\Imp{\rightarrow}
 
@@ -121,8 +123,9 @@
 %  \ifx#1\x\lambda x\else%
 %  \ifx#1\y\lambda y\else%
 %  \ifx#1\z\lambda z\else%
+  \ifx#1=\kern1pt{\smallbin=}\kern1pt\else
   #1%
-  \fi\fi\fi\fi\fi\fi%\fi\fi\fi%
+  \fi\fi\fi\fi\fi\fi\fi%\fi\fi\fi%
   \term@loop%
 }
 \newcommand\term@typecolor{}
@@ -137,12 +140,14 @@
 \newcommand\probox[1]{\tikz[baseline=(a.base)]\node[draw,line width=.6pt,inner sep=2pt,minimum height=10pt,minimum width=10pt](a){\makebox[0pt][c]{$\scriptstyle #1\vphantom)$}};}
 
 % rewriting
-\newcommand\rw{\rightsquigarrow}
+\newcommand\rw[1][{}]{\stackrel{#1}\rightsquigarrow}
 \newcommand\dw{\rotatebox[origin=c]{270}{$\rw$}}
 
 \newcommand\prob{\mathsf p}
 
 \newcommand\confluence[4]{\begin{array}{ccc} \trm{#1} & \rw & \trm{#2} \\ \dw && \dw \\ \trm{#3} & \rw & \trm{#4} \end{array}}
+
+\newcommand\rstrut{\rule{0pt}{13pt}}
 
 \makeatother
 
@@ -159,78 +164,103 @@
 
 \maketitle
 
+
+\begin{definition}
 \[
 	M,N \quad\coloneqq\quad x ~\mid~ \x.N ~\mid~ NM ~\mid~ \trm{N +a M} ~\mid~ \trm{!a N}
 \]
+\end{definition}
 
 \[
 	\trm{N +{} M} \quad\stackrel\Delta=\quad \trm{!a \, N +a M}
 \]
 
+\newcommand\idem{\ensuremath{\mathsf i}}
+\newcommand\cancelL{\ensuremath{\mathsf c_1}}
+\newcommand\cancelR{\ensuremath{\mathsf c_2}}
+\newcommand\plusAbs{\ensuremath{{\smallbin\oplus}\lambda}}
+\newcommand\plusArg{\ensuremath{{\smallbin\oplus}\mathsf a}}
+\newcommand\plusFun{\ensuremath{{\smallbin\oplus}\mathsf f}}
+\newcommand\plusL{\ensuremath{\mathsf d_1}}
+\newcommand\plusR{\ensuremath{\mathsf d_2}}
+\newcommand\plusBox{\ensuremath{{\smallbin{\oplus}\smallsquare}}}
+\newcommand\boxVoid{\ensuremath{\not{\!\smallsquare}}}
+\newcommand\boxAbs{\ensuremath{\smallsquare\lambda}}
+\newcommand\boxFun{\ensuremath{\smallsquare\mathsf f}}
 
+\begin{figure}[!h]
+\begin{align}
+	(\x.N)M 				&\rw_\beta N[M/x]													\notag
+\\																								\notag
+\\	\trm{N +a N}			&\rw_\prob N														\tag{\idem}
+\\	\trm{(N +a M) +a P}		&\rw_\prob \trm{N +a P}					\rstrut						\tag{\cancelL}
+\\	\trm{N +a (M +a P)}		&\rw_\prob \trm{N +a P}					\rstrut						\tag{\cancelR}
+\\																								\notag
+\\	\trm{\x.(N +a M)}		&\rw_\prob \trm{(\x.N) +a (\x.M)}									\tag{\plusAbs}
+\\	\trm{(N +a M) P}		&\rw_\prob \trm{(NP) +a (MP)}			\rstrut						\tag{\plusFun}
+\\	\trm{N (M +a P)}		&\rw_\prob \trm{(NM) +a (NP)}			\rstrut						\tag{\plusArg}
+\\	\trm{(N +a M) +b P}		&\rw_\prob \trm{(N +b P) +a (M +b P)} 	\rstrut	&& (a\smallbin<b)	\tag{\plusL}
+\\	\trm{N +b (M +a P)}		&\rw_\prob \trm{(N +b M) +a (N +b P)} 	\rstrut	&& (a\smallbin<b)	\tag{\plusR}
+\\	\trm{!b (N +a M)}		&\rw_\prob \trm{(!b N) +a (!c M[c/b])}	\rstrut	&& (a\neq b)		\tag{\plusBox}
+\\																								\notag
+\\	\trm{!a N}				&\rw_\prob N 									&& (a\notin N)		\tag{\boxVoid}
+\\	\trm{\x.!a N} 			&\rw_\prob \trm{!a \x. N}				\rstrut						\tag{\boxAbs}
+\\	\trm{(!a N)M}			&\rw_\prob \trm{!a (NM)}				\rstrut						\tag{\boxFun}
+\end{align}
+
+\caption{Reduction rules}
+\label{fig:reduction rules}
+\end{figure}
+
+\begin{definition}
+The $a$-\emph{projections} $N[a_i]$ for $i\in\{0,1\}$ of a term $N$ are as follows.
 \[
-\newcommand\rstrut{\rule{0pt}{13pt}}
-\begin{aligned}
-	(\x.N)M 				&\rw_\beta N[M/x]
-\\
-\\	\trm{N +a N}			&\rw_\prob N
-\\	\trm{N +a (M +a P)}		&\rw_\prob \trm{N +a P}					\rstrut
-\\	\trm{(N +a M) +a P}		&\rw_\prob \trm{N +a P}					\rstrut
-\\
-\\	\trm{\x.(N +a M)}		&\rw_\prob \trm{(\x.N) +a (\x.M)}
-\\	\trm{N (M +a P)}		&\rw_\prob \trm{(NM) +a (NP)}			\rstrut
-\\	\trm{(N +a M) P}		&\rw_\prob \trm{(NP) +a (MP)}			\rstrut
-\\	\trm{N +b (M +a P)}		&\rw_\prob \trm{(N +b M) +a (N +b P)} 	\rstrut	&& (a\smallbin<b)
-\\	\trm{(N +a M) +b P}		&\rw_\prob \trm{(N +b P) +a (M +b P)} 	\rstrut	&& (a\smallbin<b)
-\\	\trm{!b (N +a M)}		&\rw_\prob \trm{(!b N) +a (!c M[c/b])}	\rstrut	&& (a\neq b)
-\\
-\\	\trm{!a N}				&\rw_\prob N 									&& (a\notin N)				
-\\	\trm{\x.!a N} 			&\rw_\prob \trm{!a \x. N}				\rstrut
-\\	\trm{(!a N)M}			&\rw_\prob \trm{!a (NM)}				\rstrut
-\end{aligned}
+		\trm{x[a_i]}	 	~=~ x
+\qquad	\trm{(\x.N)[a_i]}	~=~ \trm{\x.(N[a_i])}
+\qquad	\trm{(NM)[a_i]}		~=~ \trm{(N[a_i])(M[a_i])}
+\]
+\[
+		\trm{(N_0 +a N_1)[a_i]} ~=~ N_i 
+\qquad	\trm{(N +b M)[a_i]} ~=~ \trm{(N[a_i]) +b (M[a_i])}
+\qquad	\trm{(!b N)[a_i]}   ~=~ \trm{!b (N[a_i])}
 \]
 
+The \emph{slices} $S(N)$ of a term $N$ is the set of lambda-terms given by
 \[
-\begin{array}{ccc@{~}c@{~}c}
-	N_0 &\coloneqq& N_1 &\mid& \trm{N_0 +{} N_0}
-\\	N_1	&\coloneqq& N_2 &\mid& \x.N_1
-\\	N_2 &\coloneqq& x	&\mid& N_2\,N_0
-\end{array}
+	S(\trm{!a N}) = \{ \trm{M[a_i]} \mid M\in S(N)~,~i\in\{0,1\}~\}~.
 \]
-
-
-%\end{document}
-
+\end{definition}
 
 \begin{lemma}
 The reduction $\rw_\prob$ is strongly normalizing.
 \end{lemma}
 
-\begin{proof}
-The following measure reduces for every step. Order constructors by
-\[
-	\trm{+a}<\trm{+b} 
-	\quad\text{if}\quad
-	a<b~,
-	\quad\text{and}\quad
-	\trm{+a}<\probox b< \x, @ 
-\]
-(where $a\neq b$ and $@$ stands for application). To each path in the syntax tree of a term, assign the measure of \emph{disorder} as the number of pairs of constructors that are not ordered as above. Let the \emph{disorder} of a term be the multiset of the disorder of its paths. The disorder of a term reduces under $\rw_\prob$.
-\end{proof}
+%
+%\begin{proof}[Sketch]
+%The following measure reduces for every step. Order constructors by
+%\[
+%			\trm{+a}
+%\smallbin<	\trm{+b}
+%\smallbin<	\probox c
+%\qquad
+%(a\smallbin<b\smallbin<c)
+%\]
+%(where $@$ stands for application). We consider sequences of these, ordered lexicographically. 
+%\end{proof}
 
 
 \begin{lemma}
-The normal forms of $\rw_\prob$ are given by the grammar
+The normal forms $P_0$ of $\rw_\prob$ are given by the following grammars
 \[
 \begin{array}{ccc@{~}c@{~}c@{}l}
 	P_0 &\coloneqq& P_1 &\mid& \trm{P_0 +{} P_0}
-\\	P_1	&\coloneqq& x   &\mid& \x.P_1 			 &~\mid~ P_1\,P_0~.
+\\	P_1	&\coloneqq& x   &\mid& \x.P_1 			 &~\mid~ P_1\,P_0
 \end{array}
 \]
 \end{lemma}
 
 \begin{proof}
-By inspection of the rules.
+By inspection of the rules in Figure~\ref{fig:reduction rules}.
 \end{proof}
 
 \begin{lemma}
@@ -238,6 +268,7 @@ Reduction $\rw_\prob$ is confluent.
 \end{lemma}
 
 \begin{proof}
+We consider each reduction rule against those lower down in the table in Figure~\ref{fig:reduction rules}.
 \begin{itemize}
 	\item $\trm{N +a N}\rw N$.
 
@@ -247,19 +278,25 @@ Reduction $\rw_\prob$ is confluent.
 \begin{array}{c@{~}c@{~}c}
 	\trm{(N +a M) +a (N +a M)} &\rw& \trm{N+a M}
 \\	\dw & \rotatebox[origin=c]{30}{$\rw$}
-\\	\trm{(N +a M) +a M}
+\\	\trm{(N +a M) +a M}\rstrut
 \end{array}
 \qquad
 \begin{array}{c@{~}c@{~}c}
 	\trm{C[N +a N]}	&\rw& C[N]
 \\	\dw & \rotatebox[origin=c]{30}{$\rw$}
-\\	\trm{C[N] +a C[N]}
+\\	\trm{C[N] +a C[N]}\rstrut
 \end{array}
 \]
 
 	\item $\trm{N +a (M +a P)}\rw\trm{N +a P}$.
 
 \[
+\begin{array}{c@{~}c@{~}c}
+	\trm{(N+aM)+a(P+aQ)} & \rw & \trm{(N+aM)+a Q}
+\\	\dw && \dw
+\\	\trm{N +a (P+aQ)} & \rw & \trm{N+aQ} \rstrut
+\end{array}
+\qquad
 \begin{array}{c@{~}c@{~}c}
 	\trm{C[N +a (M +a P)]} &\rw& \trm{C[N+a M]}
 \\	\dw
@@ -269,62 +306,66 @@ Reduction $\rw_\prob$ is confluent.
 \end{array}	
 \]
 
-\end{itemize}
-\end{proof}
-
-\end{document}
-
 \[
-\begin{array}{ccc}
-	\trm{(N+aM)+a(P+aQ)} & \rw & \trm{(N+aM)+a Q}
+\begin{array}{c@{~}c@{~}c}
+	\trm{(N+aM)+b(P+bQ)} & \rw & \trm{(N+aM)+b Q}
 \\	\dw && \dw
-\\	\trm{N +a (P+aQ)} & \rw & \trm{N+aQ}
-\end{array}{ccc}
-\]
-
-
-\[
-\begin{array}{ccc}
-	\trm{(\x.N +a M)P} &\rw& \trm{(N +a M)[P/x]}
-\\	\dw
-\\	\trm{((\x.N) +a (\x.M)) P} && =
-\\	\dw
-\\	\trm{(\x.N)P +a (\x.M)P} &\rw^*& \trm{N[P/x] +a M[P/x]}
+\\	\trm{(N+b(P+bQ))+a(N+b(P+bQ))} & \rw^* & \trm{(N+bQ)+a(M+bQ)} \rstrut
 \end{array}
 \]
 
-\[
-{(\x.N)(M +a P)} {N[M +a P/x]}
-{(\x.N)M +a (\x.N)P} {N[M/x] +a N[P/x]}
+	\item $\trm{C[N+aM]}\rw\trm{C[N]+a C[M]}$.
+	
+\[	
+\begin{array}{c@{~}c@{~}c}	
+	\trm{C[N +a (M +b P)]} &\rw& \trm{C[N]+a C[M+b P]}
+\\	\dw && \dw	
+\\	\trm{C[(N+a M)+b(N+a P)]} && \trm{C[N]+a (C[M] +b C[P]} \rstrut
+\\	\dw && \dw
+\\	\trm{C[N+a M]+b[N+a P]}	&\rw& \trm{(C[N]+a C[M])+b(C[N]+aC[P]]} \rstrut
+\end{array}
 \]
 
+
+	\item $\trm{N +b (M +a P)}\rw\trm{(N +b M) +a (N +b P)}$.
+
 \[
-\trm{(N+aM)(P+aQ)} \trm{N(P+aQ) +a M(P+aQ)} \trm{(NP +a NQ) +a (MP +a MQ)}
-\trm{(N+aM)P +a (N+aM)Q} 
-\trm{(NP +a MP) +a (
+\begin{array}{c@{~}c@{~}c}	
+	\trm{(N+a Q)+b(M+a P)} &\rw& \trm{((N+a Q) +b M) +a ((N+a Q) +b P)}
+\\	\dw && \dw_*
+\\	\trm{(N+b(M+a P))+a(Q+b(M+a P))} && \trm{((N +b M)+a (Q +b M)) +a ((N +b P)+a(Q +b P))} \rstrut
+\\	\dw_* && \dw_*
+\\	\trm{((N+b M) +a (N+b P)) +a ((Q +b M) +a (Q +b P))} &\rw^*& \trm{(N+b M)+a(Q+b P)} \rstrut
+\end{array}
 \]
+
+	\item $\trm{!b (N +a M)} \rw \trm{(!b N) +a (!c M[c/b])}$
+	
+\[
+\begin{array}{c@{~}c@{~}c}	
+	\trm{!b (N +a M)} &\rw& \trm{(!b N) +a (!c M)}
+\\	\dw & \rotatebox[origin=c]{210}{$\rw_*$}
+\\	\trm{N +a M} && (b \notin\trm{N+a M})
+\end{array}
+\]
+
+\end{itemize}
+\end{proof}
 
 
 \begin{lemma}
-$\trm{N[P+aQ/x]}\rw^*\trm{N[P/x] +a N[Q/x]}$.
+The normal forms $N_0$ of $\rw$ are given by the following grammars.
+\[
+\begin{array}{ccc@{~}c@{~}c}
+	N_0 &\coloneqq& N_1 &\mid& \trm{N_0 +{} N_0}
+\\	N_1	&\coloneqq& N_2 &\mid& \x.N_1
+\\	N_2 &\coloneqq& x	&\mid& N_2\,N_0
+\end{array}
+\]
 \end{lemma}
 
-\begin{proof}
-$\trm{x[P+aQ/x]}=\trm{P+aQ}=\trm{x[P/x] +a x[Q/x]}$\\
-$\trm{y[P+aQ/x]}=\trm{y}=\trm{y +a y}=\trm{y[P/x] +a y[Q/x]}$\\
-
-$\trm{(\x.N)[P+aQ/x]}=\trm{\x.N}=\trm{(\x.N) +a (\x.N)} = \trm{(\x.N)[P/x] +a (\x.N)[Q/x]}$
-$\trm{(\y.N)[P+aQ/x]}=\trm{\x.(N[P+Q/x])}\rw^*\trm{\x.(N[P/x] +a N[Q/x])} \rw \trm{(\x.N)[P/x] +a (\x.N)[Q/x]}$
-
-$\trm{(NM)[P+aQ/x]}=\trm(N[P+aQ/x])(M[P+aQ/x])}\rw^*\trm{(N[P/x] +a N[Q/x])\,(M[P/x] +a M[Q/x])
 
 
-
-\end{proof}
-
-%\[
-%	\trm{\x.!a !b N +a !f M : A*B}
-%\]
 
 \end{document}
 
