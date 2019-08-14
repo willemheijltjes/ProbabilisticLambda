@@ -1,5 +1,6 @@
 import System.Random
 
+t0 = Node 4 (Node 3 (Node 1 (Leaf 0) (Leaf 0)) (Node 0 (Leaf 0) (Leaf 0))) (Node 2 (Leaf 0) (Leaf 0))
 
 ---------- Trees
 
@@ -13,6 +14,15 @@ instance Show Tree where
       show' (Node i s t) = "(" ++ show' s ++ [['a'..'z'] !! i] ++ show' t ++ ")"
 
 ---------- Tree functions
+
+leaf :: Tree
+leaf = Leaf 0
+
+node :: Int -> [Tree] -> Tree
+node i []     = Node i leaf leaf
+node i [x]    = Node i x leaf
+node i [x,y]  = Node i x y
+node i (x:xs) = Node i x (node i xs)
 
 newleaves :: Tree -> Tree
 newleaves = snd . f 1 where
