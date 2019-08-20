@@ -1,0 +1,194 @@
+
+----------
+
+Our probabilistic lambda-calculus splits probabilistic choice
+
+  N + M
+
+into 1) generating a coin flip with the operator [a], where the variable a represents the result; 2) using this coin flip as N a M, meaning "if a then M else N", to determine a choice between terms N and M.
+
+We get the calculus
+
+  M,N  ::=  x | \x.N | NM | [a].N | MaN
+
+with the following rewrite rules.
+
+  (\x.M)N   ~>  M[N/x]
+
+  Ma(NaP)   ~>  MaP
+  (MaN)aP   ~>  MaP
+  C[MaN]    ~>  C[M] a C[N]   (conditions apply)
+
+  [a].N     ~>  N   (a not in N)
+  \x.[a].N  ~>  [a].\x.N
+  ([a].M)N  ~>  [a].MN
+
+Then probabilistic choice is captured as follows.
+
+  N + M  :=  [a].MaN
+
+The resulting calculus is confluent, and it evaluates effects purely by rewriting (which is slightly non-local, though), by bubbling choice to the surface.
+
+We want to see if this idea generalises to other effects.
+  
+----------
+
+First, some observations.
+
+* The effect [a] is a "read" operation, which (probabilistically) receives an input 0 or 1. We may expect other "read" operations, such as I/O input and reading from state, to behave analogously. We may further expect corresponding "write" operations <0> and <1>.
+
+* The operator [a] in [a].N is a binder: it binds every variable a in N. A difference with \x.N is the type of the variable: a is a boolean, x represents any subterm. But, if we expect to read from memory using [a].N, then a should be able to represent any term, as well.
+
+* With <0> and <1> as write operations and [a] as a read operation that binds a, we may give an alternative set of rewrite rules for the calculus. The obvious interaction of read and write would be:
+
+  <0>.[a].N  ~>  N[0/a]
+  <1>.[a].N  ~>  N[1/a]
+
+with the equations or substitution rules
+
+  N 0 M = N
+  N 1 M = M .
+
+We would then only need the following rules.
+
+  (\x.M)N   ~>  M[N/x]
+
+  \x.[a].N  ~>  [a].\x.N
+  ([a].M)N  ~>  [a].MN
+
+The evaluation of a term would be given by placing it in an environment that generates coin flips, i.e., a stream of <0> and <1> operators.
+
+* The rewrite rules 
+
+  Ma(NaP)   ~>  MaP
+  (MaN)aP   ~>  MaP
+  C[MaN]    ~>  C[M] a C[N]   (conditions apply)
+
+  [a].N     ~>  N   (a not in N)
+
+become obsolete. This is consistent and natural: the first three are a reflection of the nature of (labelled) sums in general, and do not depend on [a]. The fourth is simply an instance of the new evaluation rule.
+
+----------
+
+To capture other effects, such as state or I/O, we need to distinguish our probabilistic read/write operators from, for instance, read/write for a given memory location or global variable. That is, we need names, or channels. Using i,j,k etc. we get the following extension of our calculus:
+
+  M,N  ::=  x | \x.N | NM | [a]i.N | <N>i.M
+
+The meaning of the new constructs is:
+
+ [a]i.N  =>  Read from the channel i and use this as a in N
+ <N>i.M  =>  Write N to the channel i and continue with M
+
+Since we are generalising from reading/writing bits <0>, <1> to any term <N>, we may drop the construction N a M. Instead, our probabilistic channel, which we may give a reserved name "p" as [a]p, can then become a stream of projections rather than bits, i.e. <N>p must be one of
+
+  <\x.\y.x>p  or  <\x.\y.y>p .
+
+Then we can use 
+
+  M + N = [a].a N M  
+
+similar to what we had before. We should not admit <N>p within the calculus, though: this operation should be reserved to the evaluation context, which supplies a stream of them.
+
+We can similarly imagine reading from standard I/O as a reserved channel r, admitting read operations [a]r in the calculus but with the evaluation context providing write operations <N>r. Dually, writing to standard I/O could be the reserved channel w, with <N>w in the calculus but no accompanying read operation [a]w.
+
+----------
+
+For computation with state, we may simply let any non-reserved channel name represent a global variable. The interaction on variable i, 
+
+  <N>i.[a]i.M  ~>  M[N/a]
+
+is then almost as expected: we don't want reading to be destructive. That is, we would expect instead
+
+?? <N>i.[a]i.M  ~>  <N>i.M[N/a] .
+
+But that is OK: we can simulate a non-destructive read operation  with a quick shorthand,
+
+  read a from i. M  :=  [a]i.<a>i.M
+
+which reinstates the write operation (the interacting pairs are underlined):
+
+     <N>i. read a from i. M
+  =  <N>i.[a]i.<a>i.M
+     ---------
+  ~>           <N>i.M[N/a]
+
+Writing to a global variable is also slightly different: we expect it to be destructive. That is, we expect the following rewrite rule.
+
+?? <N>i.<M>i.P  ~>  <M>i.P
+
+Again, we can easily simulate a destructive write operation by introducing a "dummy" (destructive) read operation, where _ is a special non-binding variable (any non-occurring variable would do, though).
+
+  write N to i. M  :=  [_]i.<N>i.M
+
+As expected:
+
+     write N to i. write M to i. P
+  =  [_]i.<N>i.[_]i.<M>i.P
+          ---------
+  ~> [_]i.          <M>i.P
+  =  write M to i. P
+
+Interestingly, we can make use of the non-destructive nature of <N>i to implement the idea of "new" variable names, as programming languages do. This is subtle, though: what we're trying to do is implement local variable names, with their own name-spaces. That means we also need to be able to "end" a name-space, and revert to the previous one. For instance, for the simple imperative program
+
+  new i = 12;
+  for j = 1 , j++ , j < 5 {
+    new i = 7;
+    i++;
+    print i;
+  }
+  print i;
+
+we expect to get the output sequence 8 8 8 8 8 12. So, the following is speculative, but we might do the following:
+
+  new i. N  ~>  <_>i.N'
+
+where N' is N with every free variable x replaced with [_]i.x. In other words, the name space generated by "new i. N" extends into N, but not into anything that will be substituted into N.
+
+----------
+
+Observe! If our name space is the singleton {*} (which we omit, writing [a]* as [a] and <N>* as <N>) then the interaction of <N> and <a> is just the lambda-calculus! That is:
+
+  \x.N  :=  [x].N'
+  NM    :=  <N'>.M'
+
+where N' and M' are the recursive translations of N and M. We get just beta-reduction:
+
+     (\x.N)M
+  =  <N'>.[x].M'
+  ~> M'[N'/x]
+  =  M[N/x]'
+
+We can thus reduce our syntax, if we reserve a name * for lambda-abstraction:
+
+  M,N  ::=  x | [x]i.N | <N>i.M
+
+How simple!
+
+----------
+
+The interaction between different channels is simple:
+
+  <M>j.[x]i.N  ~>  [x]i.<M>j.N   if i /= j, avoiding capture
+  [y]j.[x]i.N  ~>  [x]i.[y]j.N   if i < j
+
+where i < j means that the last write operation on i or j is one on i.
+
+Alternatively, read/write interaction could be "at-a-distance":
+
+  <N>i. (...) [x]i.M  ~>  (...) M[N/x]
+
+if there are no actions on the channel i in (...).
+
+----------
+
+The terminology read/write for [.] and <.> is not great, since they are not like stateful read/write operations, for which we have defined shortcuts. They are rather pop/push stack operations.
+
+The expected operational semantics is akin to a generalised Krivine machine, where we may omit the environment in favour of direct substitution, and instead of one stack we have one for every name i.
+
+----------
+
+Much of this is reminiscent also of pi-calculus. I don't know to what extent it is the same.
+
+----------
+
+I have not had time to consider typing. The obvious corresponding annotation of the type system with channel names might just work, or it might not.
