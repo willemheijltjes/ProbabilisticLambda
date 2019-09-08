@@ -252,6 +252,9 @@ From now on, we consider only labeled-closed terms.
 	The reduction $\rw_\prob$ is strongly normalizing.
 \end{lemma}
 
+\begin{proof}
+	It is possible to define a well-founded recursive path ordering $>$ in the sense of \cite[p. 289]{Dershowitz82} such that $\trm{M \rw_\prob N}$ implies $\trm{M>N}$.
+\end{proof}
 
 \begin{lemma}
 The normal forms $P_0$ of $\rw_\prob$ are given by the following grammars
@@ -398,6 +401,22 @@ a<b
 \end{array}
 \]
 
+\textcolor{red}{\footnotesize
+\[
+a<c<b
+\begin{array}{c@{~}c@{~}c}	
+\trm{(N+a Q)+b(M+c P)} &\rw& \trm{((N+a Q) +b M) +c ((N+a Q) +b P)}
+\\	\dw && \dw_*
+\\	\trm{(N +b(M+c P))+a(Q+b(M+c P))} && \trm{((N +b M)+a (Q +b M)) +c ((N +b P)+a(Q +b P))} \rstrut
+\\	\dw_* && \dw_*
+\\\trm{((N +b M) +c (N +b P)) +a ((Q +b M) +c (Q +b P))} && \trm{((N +b M) +c ((N +b P)+a(Q +b P))) +a ((Q +b M) +c ((N +b P)+a(Q +b P)))} \rstrut
+\\	 & \rotatebox[origin=c]{155}{$\rw_*$}& \dw_*
+\\	 && \trm{(((N +b M) +c (N +b P)) +a ((N +b M) +c (Q +b P))) +a (((Q +b M) +c (N +b P)) +a ((Q +b M) +c (Q +b P)))} \rstrut
+\end{array}
+\]
+}
+
+
 	\item $\trm{N (M +a P)}\rw\trm{(NM) +a (NP)}$.
 
 \[
@@ -410,7 +429,7 @@ a<b
 \end{array}
 \]
 
-\textcolor{red}{
+\textcolor{red}{\small
 \[
 a<b
 \begin{array}{c@{~}c@{~}c}	
@@ -419,8 +438,8 @@ a<b
 \\	\trm{(N(M+b P))+a(Q(M+b P))} && \trm{((N M)+a (Q M)) +b ((N P)+a(Q P))} \rstrut
 \\	\dw_* && \dw_*
 \\	\trm{((NM) +b (N P)) +a ((Q M) +b (Q P))} && \trm{((N M) +b ((N P)+a(Q P))) +a ((Q M) +b ((N P)+a(Q P)))} \rstrut
-\\	 && \dw_*
-\\	 & \rotatebox[origin=c]{155}{$\rw_*$} & \trm{(((N M) +b (N P)) +a((N M) +b(Q P))) +a (((Q M) +b (N P)) +a ((Q M) +b(Q P)))} \rstrut
+\\	 &\rotatebox[origin=c]{155}{$\rw_*$} & \dw_*
+\\	 && \trm{(((N M) +b (N P)) +a((N M) +b(Q P))) +a (((Q M) +b (N P)) +a ((Q M) +b(Q P)))} \rstrut
 \end{array}
 \]
 }
