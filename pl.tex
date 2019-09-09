@@ -193,6 +193,8 @@ The \emph{probabilistic event $\lambda$-calculus} (\PEL) is given by the followi
 \]
 \end{definition}
 
+In a term of the form $\trm{\x.M}$ (resp.~$\trm{!a M}$), the abstraction $\trm{\x}$ (resp.~the box $\probox a$) is a binder for the free occurrences of the variable $x$ (resp.~the label $a$) in their scope $\trm{M}$.
+
 The calculus features a decomposition of the usual probabilistic sum $\trm{+{}}$, as follows,
 \[
 	\trm{N +{} M} \quad\stackrel\Delta=\quad \trm{!a \, N +a M}
@@ -209,10 +211,21 @@ where the name $a$ represents an \emph{event}, a binary value $\{0,1\}$, probabi
 	A term $\trm{M}$ is \emph{label-closed} if $\fl{M} = \emptyset$. 
 \end{definition}
 
-From now on, we consider only label-closed terms.
+From now on, we consider only label-closed terms (and we implicitly assume this, unless otherwise stated).
+All terms are identified up to renaming of their bound variables and labels.
+We talk of a \emph{representative} $\trm{M}$ of a term when $\trm{M}$ is not considered up to such a renaming.
+A representative $\trm{M}$ of a term is \emph{well-labeled} if
+%for every sub-term $\trm{!a N}$ of $\trm{M}$, the label $a$ may occur only in $\trm{N}$ (if at all). 
+for every occurrence of $\probox a$ in $\trm{M}$ there is no $\probox a$ occurring in its scope.
+
+\begin{definition}[Order for labels]
+	Let $\trm{M}$ be a well-labeled representative of a term.
+	We define an \emph{order} $<_{{\trm{M}}}$ for the labels occurring in $\trm{M}$ as follows: $a <_{\trm{M}} b$ if and only if $\probox b$ occurs in the scope of $\probox a$.
+\end{definition}
+
 
 \begin{definition}
-\emph{Reduction} $\rw$ in \PEL\ consists of \emph{beta-reduction} $\rw_\beta$ and \emph{probabilistic} or \emph{p-reduction} $\rw_\prob$, both given in Figure~\ref{fig:reduction rules}.
+\emph{Reduction} $\rw$ in \PEL\ consists of \emph{$\beta$-reduction} $\rw_\beta$ and \emph{probabilistic} or \emph{p-reduction} $\rw_\prob$, both given in Figure~\ref{fig:reduction rules}.
 %\[
 %\begin{array}{rcl}
 %	C[(\lambda x.N)M] &\rw_\beta& C[M[N/x]]
@@ -255,23 +268,6 @@ From now on, we consider only label-closed terms.
 
 \begin{proof}
 	The set \PEL\ enowed with $\rw_\prob$ is a first-order term rewriting system for which it is possible to define a well-founded recursive path ordering $>$ in the sense of \cite[p. 289]{Dershowitz82} such that $\trm{M \rw_\prob N}$ implies $\trm{M>N}$.
-\end{proof}
-
-\begin{lemma}[Substitution for $\rw_\prob$]
-	\label{lemma:substitution}
-	\hfill
-	\begin{enumerate}
-		\item If $\trm{N \rw_\prob N'}$ then $\trm{M[N/x] \rw_\prob^* M[N'/x]}$.
-		\item If $\trm{M \rw_\prob M'}$ then $\trm{M[N/x] \rw_\prob M'[N/x]}$.
-	\end{enumerate}
-\end{lemma}
-
-\begin{proof}\hfill
-	\begin{enumerate}
-		\item By induction on $\trm{M}$.
-		\item By induction on the definition of $\trm{M \rw_\prob M'}$.
-		\qedhere
-	\end{enumerate}
 \end{proof}
 	
 The normal forms $P_0$ of $\rw_\prob$ are given by the following grammars
@@ -384,22 +380,24 @@ We consider each reduction rule against those lower down in the table in Figure~
 \]
 
 \[
+a<b
 \begin{array}{c@{~}c@{~}c}
 	\trm{(N+aM)+b(P+bQ)} & \rw & \trm{(N+aM)+b Q}
 \\	\dw && \dw
-\\	\trm{(N+b(P+bQ))+a(N+b(P+bQ))} & \rw^* & \trm{(N+bQ)+a(M+bQ)} \rstrut
+\\	\trm{(N+b(P+bQ))+a(M+b(P+bQ))} & \rw^* & \trm{(N+bQ)+a(M+bQ)} \rstrut
 \end{array}
 \]
 
 	\item $\trm{C[N+aM]}\rw\trm{C[N]+a C[M]}$.
 	
 \[	
+a < b \quad 
 \begin{array}{c@{~}c@{~}c}	
-	\trm{C[N +a (M +b P)]} &\rw& \trm{C[N]+a C[M+b P]}
+	\trm{C[N +b (M +a P)]} &\rw& \trm{C[N]+b C[M+a P]}
 \\	\dw && \dw	
-\\	\trm{C[(N+a M)+b(N+a P)]} && \trm{C[N]+a (C[M] +b C[P]} \rstrut
+\\	\trm{C[(N +b M) +a (N+b P)]} && \trm{C[N]+b (C[M] +a C[P]} \rstrut
 \\	\dw && \dw
-\\	\trm{C[N+a M]+b[N+a P]}	&\rw& \trm{(C[N]+a C[M])+b(C[N]+aC[P]]} \rstrut
+\\	\trm{C[N +b M] +a [N +b P]}	&\rw& \trm{(C[N]+b C[M])+a(C[N]+bC[P]]} \rstrut
 \end{array}
 \]
 
@@ -417,6 +415,7 @@ a<b
 \end{array}
 \]
 
+{\footnotesize
 \[
 a<c<b
 \begin{array}{c@{~}c@{~}c}	
@@ -429,6 +428,7 @@ a<c<b
 \\	 && \trm{(((N +b M) +c (N +b P)) +a ((N +b M) +c (Q +b P))) +a (((Q +b M) +c (N +b P)) +a ((Q +b M) +c (Q +b P)))} \rstrut
 \end{array}
 \]
+}
 
 
 	\item $\trm{N (M +a P)}\rw\trm{(NM) +a (NP)}$.
@@ -443,6 +443,7 @@ a<c<b
 \end{array}
 \]
 
+{\footnotesize
 \[
 a<b
 \begin{array}{c@{~}c@{~}c}	
@@ -455,20 +456,39 @@ a<b
 \\	 && \trm{(((N M) +b (N P)) +a((N M) +b(Q P))) +a (((Q M) +b (N P)) +a ((Q M) +b(Q P)))} \rstrut
 \end{array}
 \]
+}
 
-	\item $\trm{!b (N +a M)} \rw \trm{(!b N) +a (!c M[c/b])}$
+	\item $\trm{!b (N +a M)} \rw \trm{(!b N) +a (!b M)}$ %(!c M[c/b])}$
 	
 \[
+a \neq b, \ b \notin\trm{N+a M} \
 \begin{array}{c@{~}c@{~}c}	
-	\trm{!b (N +a M)} &\rw& \trm{(!b N) +a (!c M)}
+	\trm{!b (N +a M)} &\rw& \trm{(!b N) +a (!b M)}
 \\	\dw & \rotatebox[origin=c]{210}{$\rw_*$}
-\\	\trm{N +a M} && (b \notin\trm{N+a M})
+\\	\trm{N +a M} && 
 \end{array}
 \]
 
-
-
 \end{itemize}
+\end{proof}
+
+We aim to prove that $\rw$ is confluent.
+
+\begin{lemma}[Substitution for $\rw_\prob$]
+	\label{lemma:substitution}
+	\hfill
+	\begin{enumerate}
+		\item If $\trm{N \rw_\prob N'}$ then $\trm{M[N/x] \rw_\prob^* M[N'/x]}$.
+		\item If $\trm{M \rw_\prob M'}$ then $\trm{M[N/x] \rw_\prob M'[N/x]}$.
+	\end{enumerate}
+\end{lemma}
+
+\begin{proof}\hfill
+	\begin{enumerate}
+		\item By induction on $\trm{M}$.
+		\item By induction on the definition of $\trm{M \rw_\prob M'}$.
+		\qedhere
+	\end{enumerate}
 \end{proof}
 
 
