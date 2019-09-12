@@ -150,7 +150,8 @@
 % rewriting
 \newcommand\rw[1][{}]{\stackrel{#1}\rightsquigarrow}
 \newcommand\dw{\rotatebox[origin=c]{270}{$\rw$}}
-
+\newcommand\lw{\rotatebox[origin=c]{180}{$\rw$}}
+\newcommand\lrw{\rotatebox[origin=c]{180}{$\lw\!\rw$}}
 \newcommand\prob{\mathsf p}
 
 \newcommand\confluence[4]{\begin{array}{ccc} \trm{#1} & \rw & \trm{#2} \\ \dw && \dw \\ \trm{#3} & \rw & \trm{#4} \end{array}}
@@ -484,6 +485,7 @@ We aim to prove that $\rw$ is confluent.
 	\begin{enumerate}
 		\item If $\trm{N \rw_\prob N'}$ then $\trm{M[N/x] \rw_\prob^* M[N'/x]}$.
 		\item If $\trm{M \rw_\prob M'}$ then $\trm{M[N/x] \rw_\prob M'[N/x]}$.
+		\item If $\trm{x \in {\fv{M}}}$ then $\trm{M[N +a P/x]} \rw_\prob^* \trm{M[N/x] +a M[P/x]}$.
 	\end{enumerate}
 \end{lemma}
 
@@ -491,15 +493,40 @@ We aim to prove that $\rw$ is confluent.
 	\begin{enumerate}
 		\item By induction on $\trm{M}$.
 		\item By induction on the definition of $\trm{M \rw_\prob M'}$.
-		\qedhere
+		\item By induction on $\trm{M}$.
+		Cases:
+		\begin{itemize}
+			\item \emph{Variable}, \ie\ $\trm{M = x}$ (as $\trm{x} \in \fv{M}$), and then $\trm{M[N +a P/x]} = \trm{N +a P} = \trm{M[N/x] +a M[P/x]}$.
+			
+			\item \emph{Application}, \ie\ $\trm{M = M_1M_2}$. 
+			Since $\trm{x \in {\fv{M}}}$ there are three cases:
+			\begin{itemize}
+				\item $\trm{x \in {\fv{M_1}} \cup \fv{M_2}}$ and then, by \ih, $\trm{M_i[N +a P/x]} \rw_\prob^* \trm{M_i[N/x] +a M_i[P/x]}$ for all $i \in \{1,2\}$.
+				So, 
+				$\trm{M[N +a P/x]} = \trm{M_1[N +a P/x] M_2[N +a P/x]} \rw_\prob^* \trm{(M_1[N/x] +a M_1[P/x])(M_2[N/x] +a M_2[P/x])} \allowbreak\rw_\prob^* \trm{M_1[N/x]M_2[N/x] +a M_1[P/x]M_2[P/x]} = \trm{M[N/x] +a M[P/x]}$.
+				
+				\item $\trm{x \in {\fv{M_{1}}}}$ and $\trm{x \notin {\fv{M_2}}}$ and then, by \ih, $\trm{M_1[N +a P/x]} \rw_\prob^* \trm{M_1[N/x] +a M_1[P/x]}$.
+				So, 
+				$\trm{M[N +a P/x]} = \trm{M_1[N +a P/x] M_2} \rw_\prob^* \trm{(M_1[N/x] +a M_1[P/x])M_2} \allowbreak\rw_\prob^* \trm{M_1[N/x]M_2 +a M_1[P/x]M_2} = \trm{M[N/x] +a M[P/x]}$.
+				
+				$\trm{x \notin {\fv{M_{1}}}}$ and $\trm{x \in {\fv{M_2}}}$: analogous to the previous case.
+			\end{itemize} 
+		
+			\item \emph{Abstraction}, \ie\ $\trm{M = \y.M'}$. 
+			By \ih, since $\trm{x \in {\fv{M}} \subseteq \fv{M'}}$ $\trm{M'[N +a P/x]} \rw_\prob^* \trm{M'[N/x] +a M'[P/x]}$ 
+			So, $\trm{M [N +a P/x] = \y.(M'[N +a P/x]) \rw_\prob^* \y.(M'[N/x] +a M'[P/x]) \rw_\prob \y.(M'[N/x]) +a \y.(M'[P/x])}$ $= \trm{M[N/x] +a M[P/x]}$
+			\qedhere
+		\end{itemize}
 	\end{enumerate}
-\end{proof}
+\end{proof} 
 
 \begin{remark}
-	In general, $\trm{M[N +a P/x] \not\rw_\prob^* M[N/x] +a M[P/x]}$. For instance, take $\trm{M} = \trm{x} \neq \trm{y}$: then, $\trm{M[N +a P/x]} = y \neq \trm{y +a y} = \trm{M[N/x] +a M[P/x]}$.
+	If $\trm{x \notin {\fv{M}}}$ then $\trm{M[N +a P/x] \not\rw_\prob^* M[N/x] +a M[P/x]}$. 
+	For instance, take $\trm{M} = \trm{y} \neq \trm{x}$: then, $\trm{M[N +a P/x]} \allowbreak= y \neq \trm{y +a y} = \trm{M[N/x] +a M[P/x]}$ where $\trm{y}$ is $\prob$-normal.
+	In fact, if $\trm{x \notin {\fv{M}}}$ then $\trm{M[N/x] +a M[P/x] = M +a M \rw_\prob M = M[N +a P/x]}$. 
 \end{remark}
 Two problematic cases to join critical pairs: the first one means that we cannot use commutation and Hindley--Rosen lemma to prove that $\rw$ is confluent;
-the second one seems to suggest that likely $\rw$ is not locally confluent or at least the proof of local confluence of $\rw$ is delicate (take $\trm{M} = y \neq x$ and see the remark above); 
+the second suggests that the proof of confluence of $\rw$ is delicate (see the remark above); 
 
 $
 \begin{array}{c@{~}c@{~}c}	
@@ -511,14 +538,20 @@ $
 \end{array}
 $
 \quad
-$
+$x \in \fv{M}
 \begin{array}{c@{~}c@{~}c}	
 \trm{(\x.M)(N +a P)} &\rw_\prob & \trm{((\x.M)N) +a ((\x. M)P)}
 \\	\dw_\beta && \dw_{\beta^+}
-\\ \trm{M[(N +a P)/x]} & \not\rw_\prob^* & \trm{M[N/x] +a M[P/x]}
+\\ \trm{M[(N +a P)/x]} & \rw_\prob^* & \trm{M[N/x] +a M[P/x]}
 \end{array}$
 
-A solution to the second problem is to drop the rule $\trm{M(N +a P)} \rw_\prob \trm{MN +a MP}$ or restraint it to special cases of $\trm{M}$, for instance $M$ should be inert (\ie\ $\trm{M} \Coloneqq \trm{x} \mid \trm{M \x.N}$).  
+$$x \notin \fv{M}
+\begin{array}{c@{~}c@{~}c}	
+\trm{(\x.M)(N +a P)} &\rw_\prob & \trm{((\x.M)N) +a ((\x. M)P)}
+\\	\dw_\beta && \dw_{\beta^+}
+\\ \trm{M} & \lw_\prob & \trm{M +a M}
+\end{array}
+$$
 
 
 \begin{lemma}
