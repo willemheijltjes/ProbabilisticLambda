@@ -27,6 +27,10 @@
 %%
 \newtheorem*{remark}{Remark}
 
+%text
+\newcommand{\ie}{\textit{i.e.}}
+\newcommand{\ih}{\textit{i.h.}}
+
 % coloneqq
 \newcommand*\coloneq{
  \mathrel{%
@@ -490,6 +494,31 @@ We aim to prove that $\rw$ is confluent.
 		\qedhere
 	\end{enumerate}
 \end{proof}
+
+\begin{remark}
+	In general, $\trm{M[N +a P/x] \not\rw_\prob^* M[N/x] +a M[P/x]}$. For instance, take $\trm{M} = \trm{x} \neq \trm{y}$: then, $\trm{M[N +a P/x]} = y \neq \trm{y +a y} = \trm{M[N/x] +a M[P/x]}$.
+\end{remark}
+Two problematic cases to join critical pairs: the first one means that we cannot use commutation and Hindley--Rosen lemma to prove that $\rw$ is confluent;
+the second one means that $\rw$ is not locally confluent (take $\trm{M} = y \neq x$ and see the remark above); 
+
+$
+\begin{array}{c@{~}c@{~}c}	
+\trm{(\x.(N +a M))P} &\rw_\prob & \trm{((\x.N) +a (\x. M))P}
+\\	\dw_\beta && \dw_\prob
+\\ \trm{(N +a M)[P/x]} & & \trm{(\x.N)P +a (\x. M)P}
+\\	= & \rotatebox[origin=c]{210}{$\rw_\beta^+$}
+\\	\trm{N +a M} && 
+\end{array}
+$
+\quad
+$
+\begin{array}{c@{~}c@{~}c}	
+\trm{(\x.M)(N +a P)} &\rw_\prob & \trm{((\x.M)N) +a ((\x. M)P)}
+\\	\dw_\beta && \dw_{\beta^+}
+\\ \trm{M[(N +a P)/x]} & \not\rw_\prob^* & \trm{M[N/x] +a M[P/x]}
+\end{array}$
+
+A solution to the second problem is to drop the rule $\trm{M(N +a P)} \rw_\prob \trm{MN +a MP}$ or restraint it to special cases of $\trm{M}$, for instance $M$ should be inert (\ie\ $\trm{M} \Coloneqq \trm{x} \mid \trm{M \x.N}$).  
 
 
 \begin{lemma}
