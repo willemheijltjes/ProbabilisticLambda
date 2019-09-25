@@ -302,7 +302,7 @@ P_0 &\coloneqq& P_1 &\mid& \trm{P_0 +{} P_0}
 		\item the binary function symbol $\trm{+a}$, for any label $a$;
 		\item the unary function symbol $\trm{!a}$, for any label $a$;
 		\item the unary function symbol $\trm{\x}$, for any variable $x$;
-		\item the binary function symbol $\trm{@}$ (omitted in terms to improve the readability).
+		\item the binary function symbol $\trm{@}$ ($@(\trm{M},\trm{N})$ stands for $MN$).
 	\end{itemize}
 \end{remark}
 
@@ -554,8 +554,12 @@ We aim to prove that $\rw = \rw_\beta \cup \rw_\prob$ is confluent.
 			\end{itemize} 
 		
 			\item \emph{Abstraction}, \ie\ $\trm{M = \y.M'}$. 
-			By \ih, since $\trm{x \in {\fv{M}} \subseteq \fv{M'}}$ $\trm{M'[N +a P/x]} \rw_\prob^* \trm{M'[N/x] +a M'[P/x]}$ 
-			So, $\trm{M [N +a P/x] = \y.(M'[N +a P/x]) \rw_\prob^* \y.(M'[N/x] +a M'[P/x]) \rw_\prob \y.(M'[N/x]) +a \y.(M'[P/x])}$ $= \trm{M[N/x] +a M[P/x]}$
+			By \ih, as $\trm{x \in {\fv{M}} \subseteq \fv{M'}}$ $\trm{M'[N +a P/x]} \rw_\prob^* \trm{M'[N/x] +a M'[P/x]}$ 
+			So, $\trm{M [N +a P/x] = \y.(M'[N +a P/x]) \rw_\prob^* \y.(M'[N/x] +a M'[P/x]) \rw_\prob \y.(M'[N/x]) +a \y.(M'[P/x])}$ $= \trm{M[N/x] +a M[P/x]}$.
+			
+			\item \emph{Superposition}, \ie\ 
+			
+			\item \emph{Box}, \ie\ 
 			\qedhere
 		\end{itemize}
 	\end{enumerate}
@@ -566,9 +570,19 @@ We aim to prove that $\rw = \rw_\beta \cup \rw_\prob$ is confluent.
 	For instance, take $\trm{M} = \trm{y} \neq \trm{x}$: then, $\trm{M[N +a P/x]} \allowbreak= y \neq \trm{y +a y} = \trm{M[N/x] +a M[P/x]}$ where $\trm{y}$ is $\prob$-normal.
 	In fact, if $\trm{x \notin {\fv{M}}}$ then $\trm{M[N/x] +a M[P/x] \allowbreak= M +a M \rw_\prob M = M[N +a P/x]}$. 
 \end{remark}
-Two problematic cases to join critical pairs: the first one means that we cannot use commutation and Hindley--Rosen lemma to prove that $\rw$ is confluent;
-the second suggests that the proof of confluence of $\rw$ is delicate (see the remark above); 
+Two problematic cases to join critical pairs: the first two ones mean that we cannot use commutation and Hindley--Rosen lemma to prove that $\rw$ is confluent;
+the second two ones suggest that the proof of confluence of $\rw$ is delicate (see the remark above); 
 
+$
+\begin{array}{c@{~}c@{~}c}	
+\trm{(\x.!a M)P} &\rw_\prob & \trm{(!a (\x. M))P}
+\\	\dw_\beta && \dw_\prob
+\\ \trm{(!a M)[P/x]} & & \trm{!a (\x. M)P}
+\\	= & \rotatebox[origin=c]{210}{$\rw_\beta^+$}
+\\	\trm{!a M[P/x]} && 
+\end{array}
+$
+\qquad
 $
 \begin{array}{c@{~}c@{~}c}	
 \trm{(\x.(N +a M))P} &\rw_\prob & \trm{((\x.N) +a (\x. M))P}
@@ -578,21 +592,21 @@ $
 \\	\trm{N[P/x] +a M[P/x]} && 
 \end{array}
 $
-\quad
-$x \in \fv{M}
+
+\begin{align*}
+\trm{x \in {\fv{M}}} \qquad & & & \qquad \trm{x \notin {\fv{M}}} \\
 \begin{array}{c@{~}c@{~}c}	
 \trm{(\x.M)(N +a P)} &\rw_\prob & \trm{((\x.M)N) +a ((\x. M)P)}
 \\	\dw_\beta && \dw_{\beta^+}
 \\ \trm{M[(N +a P)/x]} & \rw_\prob^* & \trm{M[N/x] +a M[P/x]}
-\end{array}$
-
-$$x \notin \fv{M}
+\end{array}
+&&&
 \begin{array}{c@{~}c@{~}c}	
 \trm{(\x.M)(N +a P)} &\rw_\prob & \trm{((\x.M)N) +a ((\x. M)P)}
 \\	\dw_\beta && \dw_{\beta^+}
 \\ \trm{M} & \lw_\prob & \trm{M +a M}
 \end{array}
-$$
+\end{align*}
 
 
 
