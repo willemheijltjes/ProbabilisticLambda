@@ -122,7 +122,7 @@
   \term@loop#1,%
 }
 \newcommand\term@next[1]{%
-  \ifx#1,\let\term@loop\term@end\else
+  \ifx#1,\let\term@loop\term@end\else%
   \ifx#1:\black\colon\term@typecolor\let\term@loop\term@type\else%
   \ifx#1_\let\term@loop\term@sub\else%
   \ifx#1^\let\term@loop\term@sup\else%
