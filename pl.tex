@@ -128,12 +128,15 @@
   \ifx#1^\let\term@loop\term@sup\else%
   \ifx#1!\let\term@loop\term@box\else%
   \ifx#1+\let\term@loop\term@prob\else%
+  \ifx#1*^\lab\else%
+  \ifx#1<\lfloor\else%
+  \ifx#1>\rfloor\else%
 %  \ifx#1\x\lambda x\else%
 %  \ifx#1\y\lambda y\else%
 %  \ifx#1\z\lambda z\else%
   \ifx#1=\kern1pt{\smallbin=}\kern1pt\else
   #1%
-  \fi\fi\fi\fi\fi\fi\fi%\fi\fi\fi%
+  \fi\fi\fi\fi\fi\fi\fi\fi\fi\fi%\fi\fi\fi%
   \term@loop%
 }
 \newcommand\term@typecolor{}
@@ -609,6 +612,34 @@ $
 \end{align*}
 
 
+\hrule
+
+\newcommand\lab{\bullet}
+
+
+\begin{definition}
+A \emph{labelled} term $\trm{N*}$ is a term $N$ with chosen redexes annotated as $\trm{(\x.M)*P}$. The \emph{labelled reduct} $\trm{<N*>}$ of a labelled term is defined inductively as follows.
+\begin{align*}
+	\trm{<(\x.N)*M>} &= \trm{<N>[<M>/x]}
+\\	\trm{<x>}		&= x
+\\	\trm{<\x.N>}	&= \trm{\x.<N>}
+\\	\trm{<NM>} 		&= \trm{<N><M>}
+\\	\trm{<N+aM>}	&= \trm{<N>+a<M>}
+\\	\trm{<!a N>}	&= \trm{!a<N>}
+\end{align*}
+A \emph{parallel $\beta$-step} is a $\beta$-reduction $N\rw_\beta^*\trm{<N*>}$ for some labelling $\trm{N*}$ of $N$.
+\end{definition}
+
+\begin{definition}
+A \emph{labelled} $p$-reduction $\trm{N*}\rw_p^*\trm{M*}$ is one of the form
+\begin{align*}
+	\trm{(\x.N+aM)*P} &\rw^*_p \trm{(\x.N)*P+a(\x.M)*P}
+\\	\trm{\x.N+aM} &\rw_p \trm{(\x.N)+a(\x.N)}
+\\	\trm{(N+aM)P} &\rw_p \trm{NP+aMP}
+\\	\trm{N(M+aP)} &\rw_p \trm{NM+aNP}
+\\	\trm{!b N+aM} &\rw_p \trm{(!bN)+a(!bM)}
+\end{align*}
+\end{definition}
 
 
 \end{document}
