@@ -170,11 +170,15 @@
 \tikzstyle{rws}=[line width=.5pt,rwhead,->.>]
 \tikzstyle{rwn}=[line width=.5pt,rwhead,->.>{|[length=40pt]}]
 \tikzstyle{rwp}=[line width=.5pt,rwhead,->,double]
+\tikzstyle{rwc}=[line width=.5pt,rwhead,->|,double]
 
 \renewcommand\rw{\mathrel{\tikz\draw[rw](0,0)--(10pt,0pt);}}
 \newcommand\rws{\mathrel{\tikz\draw[rws](0,0)--(10pt,0pt);}}
 \newcommand\rwn{\mathrel{\tikz\draw[rwn](0,0)--(10pt,0pt);}}
 \newcommand\rwp{\mathrel{\tikz\draw[rwp](0,0)--(10pt,0pt);}}
+\newcommand\rwc{\mathrel{\tikz\draw[rwc](0,0)--(10pt,0pt);}}
+
+\newcommand\rwcleft{\mathrel{\tikz\draw[rwc](10pt,0pt)--(0,0);}}
 
 % rule names
 
@@ -548,6 +552,9 @@ a \neq b, \ b \notin\trm{N+a M} \
 \end{itemize}
 \end{proof}
 
+\begin{definition}
+We denote the unique $\prob$-normal form of a term $N$ by $N^\prob$.
+\end{definition}
 
 \subsection{Confluence}
 
@@ -668,8 +675,14 @@ A \emph{labelled} term $\trm{N*}$ is a term $N$ with chosen redexes annotated as
 \\	\trm{<N+aM>}	&= \trm{<N>+a<M>}
 \\	\trm{<!a.N>}	&= \trm{!a.<N>}
 \end{align*}
-A \emph{parallel $\beta$-step} $N\rwp\trm{<N*>}$ or $\trm{N*}\rwp\trm{<N*>}$ is a $\beta$-reduction $N\rws_\beta \trm{<N*>}$ for some labelling $\trm{N*}$ of $N$.
+A \emph{parallel $\beta$-step} is a reduction $N\rwp_\beta\trm{<N*>}$ for some labelling $\trm{N*}$ of $N$.
 \end{definition}
+
+We write $\trm{N*}\rwp_\beta\trm{<N*>}$ for the specific parallel step indicated by the labelling $\trm{N*}$. Observe that $\trm{<N*>}$ is a regular unlabelled term, since all labels are removed in the reduction.
+
+\begin{lemma}
+A parallel $\beta$-step $N\rwp_\beta M$ is a $\beta$-reduction $N\rws_\beta M$.
+\end{lemma}
 
 \begin{definition}
 A \emph{labelled} $\prob$-reduction $\trm{N*}\rwp_\prob\trm{M*}$ is a $\prob$-reduction of one of the forms
@@ -704,9 +717,27 @@ Using Lemma~\ref{lem:parallel p-reduction} we decompose $\trm{N*}\rwn_\prob\trm{
 for which Lemma~\ref{lem:parallel p - parallel beta} gives $\trm{<N_i*>}=_\prob\trm{<N_{i+1}*>}$.
 \end{proof}
 
+\begin{definition}
+A \emph{complete} reduction step $\rwc$ is a parallel $\beta$-step followed by $\prob$-reduction to normal form:
 \[
-\text{Lemma~\ref{lem:parallel p - parallel beta}}
-\quad
+	N\rwc M^\prob \quad\coloneq\quad N\rwp_\beta M\rwn_\prob M^\prob~.
+\]
+\end{definition}
+
+\begin{lemma}
+\label{lem:complete diamond}
+Complete reduction has the diamond property: if $P\rwcleft N\rwc M$ then $P\rwc Q\rwcleft M$ for some $Q$.
+\end{lemma}
+
+\begin{lemma}
+\label{lem:p to complete reduction}
+Any reduction step $N\rw M$ maps onto a complete step $N^\prob\rwc M^\prob$.
+\end{lemma}
+
+
+
+\[
+\begin{array}{cccc}
 \vcenter{\hbox{\begin{tikzpicture}
 	\matrix (m) [matrix of math nodes] {
 	  \trm{N*} && \trm{M*} \\[20pt] \\ \trm{<N>*} & =_\prob & \trm{<M>*} \\
@@ -715,18 +746,43 @@ for which Lemma~\ref{lem:parallel p - parallel beta} gives $\trm{<N_i*>}=_\prob\
 	\draw[rwp] (m-1-1) --node[left] {$\scriptstyle\beta$} (m-3-1);
 	\draw[rwp] (m-1-3) --node[right]{$\scriptstyle\beta$} (m-3-3);
 \end{tikzpicture}}}
-\qquad
-\text{Lemma~\ref{lem:exhaustive p - parallel beta}}
-\quad
+&
 \vcenter{\hbox{\begin{tikzpicture}
 	\matrix (m) [matrix of math nodes] {
-	  \trm{N*} && \trm{M*} \\[20pt] \trm{<N>*} & =_\prob & \trm{<M>*} \\
+	  \trm{N*} && \trm{M*} \\[20pt] \\ \trm{<N>*} & =_\prob & \trm{<M>*} \\
 	};
 	\draw[rwn] (m-1-1) --node[above]{$\scriptstyle\prob$} (m-1-3);
 	\draw[rwp] (m-1-1) --node[left] {$\scriptstyle\beta$} (m-3-1);
 	\draw[rwp] (m-1-3) --node[right]{$\scriptstyle\beta$} (m-3-3);
 \end{tikzpicture}}}
+&
+\vcenter{\hbox{\begin{tikzpicture}
+	\matrix (m) [matrix of math nodes] {
+	  \trm{N} &[20pt] & \trm{M} \\[20pt] \\ \trm{P} && \trm{Q} \\
+	};
+	\draw[rwc] (m-1-1) -- (m-1-3);
+	\draw[rwc] (m-1-1) -- (m-3-1);
+	\draw[rwc] (m-1-3) -- (m-3-3);
+	\draw[rwc] (m-3-1) -- (m-3-3);
+\end{tikzpicture}}}
+&
+\vcenter{\hbox{\begin{tikzpicture}
+	\matrix (m) [matrix of math nodes] {
+	  \trm{N} &[20pt] & \trm{M} \\[20pt] \\ N^\prob && M^\prob \\
+	};
+	\draw[rw]  (m-1-1) -- (m-1-3);
+	\draw[rwn] (m-1-1) --node[left] {$\scriptstyle\prob$} (m-3-1);
+	\draw[rwn] (m-1-3) --node[right]{$\scriptstyle\prob$} (m-3-3);
+	\draw[rwc] (m-3-1) -- (m-3-3);
+\end{tikzpicture}}}
+\\ \\
+  \text{Lemma~\ref{lem:parallel p - parallel beta}}
+& \text{Lemma~\ref{lem:exhaustive p - parallel beta}}
+& \text{Lemma~\ref{lem:complete diamond}}
+& \text{Lemma~\ref{lem:p to complete reduction}}
+\end{array}
 \]
+
 
 
 \[
