@@ -255,6 +255,7 @@ where the name $a$ represents an \emph{event}, a binary value $\{0,1\}$, probabi
 
 From now on, we consider only label-closed terms (and we implicitly assume this, unless otherwise stated).
 All terms are identified up to renaming of their bound variables and labels.
+Given some terms $\trm{M}$ and $\trm{N}$ and a variable $\trm{x}$, $\trm{M[N/x]}$ stands for the capture-avoiding (for both variables and labels) substitution of $\trm{N}$ for the free occurrences of $\trm{x}$ in $\trm{M}$.
 We talk of a \emph{representative} $\trm{M}$ of a term when $\trm{M}$ is not considered up to such a renaming.
 A representative $\trm{M}$ of a term is \emph{well-labeled} if
 %for every sub-term $\trm{!a.N}$ of $\trm{M}$, the label $a$ may occur only in $\trm{N}$ (if at all).
@@ -566,7 +567,7 @@ We aim to prove that $\rw \,=\, \rw_\beta \cup \rw_\prob$ is confluent.
 	\begin{enumerate}
 		\item If $\trm{N \rw_\prob N'}$ then $\trm{M[N/x] \rw_\prob^* M[N'/x]}$.
 		\item If $\trm{M \rw_\prob M'}$ then $\trm{M[N/x] \rw_\prob M'[N/x]}$.
-		\item If $\trm{x \in {\fv{M}}}$ then $\trm{M[N +a P/x]} \rw_\prob^* \trm{M[N/x] +a M[P/x]}$.
+		\item If $\trm{x \in {\fv{M}}}$ and $a <_M b$ for any $\trm{b \in {\fl{M}}}$ then $\trm{M[N +a P/x]} \rw_\prob^* \trm{M[N/x] +a M[P/x]}$.
 	\end{enumerate}
 \end{lemma}
 
@@ -596,32 +597,16 @@ We aim to prove that $\rw \,=\, \rw_\beta \cup \rw_\prob$ is confluent.
 			\item \emph{Abstraction}, \ie\ $\trm{M = \y.M'}$.
 			By \ih, as $\trm{x \in {\fv{M}} \subseteq \fv{M'}}$ $\trm{M'[N +a P/x]} \rw_\prob^* \trm{M'[N/x] +a M'[P/x]}$
 			So, $\trm{M [N +a P/x] = \y.(M'[N +a P/x]) \rw_\prob^* \y.(M'[N/x] +a M'[P/x]) \rw_\prob \y.(M'[N/x]) +a \y.(M'[P/x])}$ $= \trm{M[N/x] +a M[P/x]}$.
-<<<<<<< HEAD
 			
 			\item \emph{Superposition}, \ie\ $\trm{M = M_1 +b M_2}$. 
 			By \ih, $\trm{M_i[N +a P/x]} \rw_\prob^* \trm{M_i[N/x] +a M_i[P/x]}$ for all $i \in \{1,2\}$.
-			Since $\trm{x \in {\fv{M}}}$ there are two cases:
-			\begin{itemize}
-				\item 
-				So, 
-				$\trm{M[N +a P/x]} = \trm{M_1[N +a P/x] +b M_2[N +a P/x]} \rw_\prob^* \trm{(M_1[N/x] +a M_1[P/x]) +b (M_2[N/x] +a M_2[P/x])} \allowbreak\rw_\prob^* \trm{M_1[N/x]M_2[N/x] +a M_1[P/x]M_2[P/x]} = \trm{M[N/x] +a M[P/x]}$.
-				
-=======
-
-			\item \emph{Superposition}, \ie\ $\trm{M = M_1 +b M_2}$.
-			Since $\trm{x \in {\fv{M}}}$ there are three cases:
-			\begin{itemize}
-				\item $\trm{x \in {\fv{M_1}} \cup \fv{M_2}}$ and then, by \ih, $\trm{M_i[N +a P/x]} \rw_\prob^* \trm{M_i[N/x] +a M_i[P/x]}$ for all $i \in \{1,2\}$.
-				So,
-				$\trm{M[N +a P/x]} = \trm{M_1[N +a P/x] M_2[N +a P/x]} \rw_\prob^* \trm{(M_1[N/x] +a M_1[P/x])(M_2[N/x] +a M_2[P/x])} \allowbreak\rw_\prob^* \trm{M_1[N/x]M_2[N/x] +a M_1[P/x]M_2[P/x]} = \trm{M[N/x] +a M[P/x]}$.
-
->>>>>>> b329c3f81376286b914563816c577c0c451bc205
-				\item $\trm{x \in {\fv{M_{1}}}}$ and $\trm{x \notin {\fv{M_2}}}$ and then, by \ih, $\trm{M_1[N +a P/x]} \rw_\prob^* \trm{M_1[N/x] +a M_1[P/x]}$.
-				So,
-				$\trm{M[N +a P/x]} = \trm{M_1[N +a P/x] M_2} \rw_\prob^* \trm{(M_1[N/x] +a M_1[P/x])M_2} \allowbreak\rw_\prob^* \trm{M_1[N/x]M_2 +a M_1[P/x]M_2} = \trm{M[N/x] +a M[P/x]}$.
-
-				\item $\trm{x \notin {\fv{M_{1}}}}$ and $\trm{x \in {\fv{M_2}}}$: analogous to the previous case.
-			\end{itemize}
+			Since $a <_M b$ by hypothesis, $\trm{M[N +a P/x]} = \trm{M_1[N +a P/x] +b M_2[N +a P/x]} \rw_\prob^* \trm{(M_1[N/x] +a M_1[P/x]) 
+				\allowbreak+b (M_2[N/x] +a M_2[P/x])} \rw_\prob
+			\trm{((M_1[N/x] +a M_1[P/x]) \allowbreak+b M_2[N/x]) +a ((M_1[N/x] +a M_1[P/x]) \allowbreak+b M_2[P/x])}
+			\allowbreak\rw_\prob^* 
+			\trm{((M_1[N/x]\allowbreak+b M_2[N/x]) +a (M_1[P/x] \allowbreak+b M_2[N/x]))  +a ((M_1[N/x] \allowbreak+b M_2[P/x]) +a (M_1[P/x] \allowbreak+b M_2[P/x])) }
+			\allowbreak\rw_\prob^*
+			\trm{(M_1[N/x] +b M_2[N/x]) +a (M_1[P/x] +b M_2[P/x])} = \trm{M[N/x] +a M[P/x]}$.
 
 			\item \emph{Box}, \ie\
 			\qedhere
