@@ -166,19 +166,23 @@
 % new rewriting
 
 \tikzstyle{rwhead}=[>/.tip={Triangle[open,length=2.5pt,width=4.5pt]},|/.tip={Rectangle[length=.5pt,width=4.5pt]}]
+\tikzstyle{rwblack}=[>/.tip={Triangle[length=2.5pt,width=4.5pt]},|/.tip={Rectangle[length=.5pt,width=4.5pt]}]
 \tikzstyle{rw} =[line width=.5pt,rwhead,->]
+\tikzstyle{rwb}=[line width=.5pt,rwblack,->]
 \tikzstyle{rws}=[line width=.5pt,rwhead,->.>]
-\tikzstyle{rwn}=[line width=.5pt,rwhead,->.>{|[length=40pt]}]
+\tikzstyle{rwn}=[line width=.5pt,rwhead,->.>|]
 \tikzstyle{rwp}=[line width=.5pt,rwhead,->,double]
-\tikzstyle{rwc}=[line width=.5pt,rwhead,->|,double]
+\tikzstyle{rwx}=[line width=.5pt,rwhead,->.>,double]
 
 \renewcommand\rw{\mathrel{\tikz\draw[rw](0,0)--(10pt,0pt);}}
+\newcommand\rwb{\mathrel{\tikz\draw[rwb](0,0)--(10pt,0pt);}}
 \newcommand\rws{\mathrel{\tikz\draw[rws](0,0)--(10pt,0pt);}}
 \newcommand\rwn{\mathrel{\tikz\draw[rwn](0,0)--(10pt,0pt);}}
 \newcommand\rwp{\mathrel{\tikz\draw[rwp](0,0)--(10pt,0pt);}}
-\newcommand\rwc{\mathrel{\tikz\draw[rwc](0,0)--(10pt,0pt);}}
+\newcommand\rwx{\mathrel{\tikz\draw[rwx](0,0)--(10pt,0pt);}}
 
-\newcommand\rwcleft{\mathrel{\tikz\draw[rwc](10pt,0pt)--(0,0);}}
+\newcommand\rwpleft{\mathrel{\tikz\draw[rwp](10pt,0pt)--(0,0);}}
+\newcommand\rwxleft{\mathrel{\tikz\draw[rwx](10pt,0pt)--(0,0);}}
 
 % rule names
 
@@ -217,7 +221,7 @@
 \\
 	N\rwn_\prob M
 \\
-	N\rwp_\prob M
+	N\rwb_\prob M
 \end{array}
 \]
 
@@ -685,7 +689,7 @@ A parallel $\beta$-step $N\rwp_\beta M$ is a $\beta$-reduction $N\rws_\beta M$.
 \end{lemma}
 
 \begin{definition}
-A \emph{labelled} $\prob$-reduction $\trm{N*}\rwp_\prob\trm{M*}$ is a $\prob$-reduction of one of the forms
+A \emph{labelled} $\prob$-reduction $\trm{N*}\rwb_\prob\trm{M*}$ is a $\prob$-reduction of one of the forms
 \[
 	\trm{(\x.N+aM)*P} \rws_\prob \trm{(\x.N)*P+a(\x.M)*P}
 \qquad
@@ -696,12 +700,12 @@ or a single $\prob$-step on unlabelled constructors in $\trm{N*}$.
 
 \begin{lemma}
 \label{lem:parallel p-reduction}
-Reduction to normal form in $\rwp_\prob$ is equal to $\rwn_\prob$.
+Reduction to normal form in $\rwb_\prob$ is equal to $\rwn_\prob$.
 \end{lemma}
 
 \begin{lemma}
 \label{lem:parallel p - parallel beta}
-If $\trm{N*}\rwp_\prob\trm{M*}$ then $\trm{<N*>}=_\prob\trm{<M*>}$.
+If $\trm{N*}\rwb_\prob\trm{M*}$ then $\trm{<N*>}=_\prob\trm{<M*>}$.
 \end{lemma}
 
 \begin{lemma}
@@ -712,58 +716,76 @@ If $\trm{N*}\rwn_\prob\trm{M*}$ then $\trm{<N*>}=_\prob\trm{<M*>}$
 \begin{proof}
 Using Lemma~\ref{lem:parallel p-reduction} we decompose $\trm{N*}\rwn_\prob\trm{M*}$ as
 \[
-	\trm{N*}=\trm{N_1*}\rwp_\prob\trm{N_2*}\rwp_\prob \dots \rwp_\prob \trm{N_n*}=\trm{M*}
+	\trm{N*}=\trm{N_1*}\rwb_\prob\trm{N_2*}\rwb_\prob \dots \rwb_\prob \trm{N_n*}=\trm{M*}
 \]
 for which Lemma~\ref{lem:parallel p - parallel beta} gives $\trm{<N_i*>}=_\prob\trm{<N_{i+1}*>}$.
 \end{proof}
 
 \begin{definition}
-A \emph{complete} reduction step $\rwc$ is a parallel $\beta$-step followed by $\prob$-reduction to normal form:
+A \emph{complete} reduction step $\rwp$ is a parallel $\beta$-step followed by $\prob$-reduction to normal form:
 \[
-	N\rwc M^\prob \quad\coloneq\quad N\rwp_\beta M\rwn_\prob M^\prob~.
+	N\rwp M^\prob \quad\coloneq\quad N\rwp_\beta M\rwn_\prob M^\prob~.
 \]
 \end{definition}
 
 \begin{lemma}
-\label{lem:complete diamond}
-Complete reduction has the diamond property: if $P\rwcleft N\rwc M$ then $P\rwc Q\rwcleft M$ for some $Q$.
+\label{lem:p to complete reduction}
+Any reduction step $N\rw M$ maps onto a complete step $N^\prob\rwp M^\prob$ on $\prob$-normal forms.
 \end{lemma}
+
+\begin{proof}
+The case of a $\prob$-step $N\rw_\prob M$ is immediate, since $N^\prob=M^\prob$. For a $\beta$-step $N\rw_\beta M$ we label the reduced redex in $N$ to get $\trm{N*}\rwp_\beta\trm{<N*>}=M$. Let $\trm{P*}=(\trm{N*})^\prob$ be the (labelled) $\prob$-normal form of $\trm{N*}$. Then Lemma~\ref{lem:exhaustive p - parallel beta} gives $M=\trm{<N*>}=_\prob\trm{<P*>}$. By confluence and strong normalization of $\rw_\prob$ then $\trm{<P*>}^\prob=M^\prob$. The complete reduction $N^\prob\rwp M^\prob$ is then given by $N^\prob\rwp_\beta\trm{<P*>}\rwn_\prob M^\prob$.
+\end{proof}
 
 \begin{lemma}
-\label{lem:p to complete reduction}
-Any reduction step $N\rw M$ maps onto a complete step $N^\prob\rwc M^\prob$.
+\label{lem:complete diamond}
+Complete reduction has the diamond property: if $P\rwpleft N\rwp M$ then $P\rwp Q\rwpleft M$ for some $Q$.
 \end{lemma}
 
+\begin{theorem}
+\label{thm:confluence}
+Reduction $\rw$ is confluent.
+\end{theorem}
 
+\begin{proof}
+By the following diagram. For the top and left areas, by Lemma~\ref{lem:p to complete reduction} any reduction path $N\rws M$ maps onto one $N^\prob \rwx M^\prob$. The main square follows by the diamond property of complete reduction, Lemma~\ref{lem:complete diamond}.
+\[
+\begin{tikzpicture}
+	\matrix (m) [matrix of math nodes] {
+	  N &[12pt] &[18pt] M &[12pt] \\[12pt] & N^\prob && M^\prob \\[18pt] P \\[12pt] & P^\prob && Q \\
+	};
+	\draw[rws] (m-1-1) -- (m-1-3);
+	\draw[rws] (m-1-1) -- (m-3-1);
+	\draw[rwn] (m-1-1) --node[below left =-2pt] {$\scriptstyle\prob$} (m-2-2);
+	\draw[rwn] (m-1-3) --node[above right=-2pt]{$\scriptstyle\prob$} (m-2-4);
+	\draw[rwn] (m-3-1) --node[below left =-2pt] {$\scriptstyle\prob$} (m-4-2);
+	\draw[rwx] (m-2-2) -- (m-2-4);
+	\draw[rwx] (m-2-2) -- (m-4-2);
+	\draw[rwx] (m-2-4) -- (m-4-4);
+	\draw[rwx] (m-4-2) -- (m-4-4);
+\end{tikzpicture}
+\]
+\end{proof}
 
+\begin{figure}
 \[
 \begin{array}{cccc}
 \vcenter{\hbox{\begin{tikzpicture}
 	\matrix (m) [matrix of math nodes] {
-	  \trm{N*} && \trm{M*} \\[20pt] \\ \trm{<N>*} & =_\prob & \trm{<M>*} \\
+	  \trm{N*} && \trm{M*} \\[20pt] \\ \trm{<N*>} & =_\prob & \trm{<M*>} \\
 	};
-	\draw[rwp] (m-1-1) --node[above]{$\scriptstyle\prob$} (m-1-3);
+	\draw[rwb] (m-1-1) --node[above]{$\scriptstyle\prob$} (m-1-3);
 	\draw[rwp] (m-1-1) --node[left] {$\scriptstyle\beta$} (m-3-1);
 	\draw[rwp] (m-1-3) --node[right]{$\scriptstyle\beta$} (m-3-3);
 \end{tikzpicture}}}
 &
 \vcenter{\hbox{\begin{tikzpicture}
 	\matrix (m) [matrix of math nodes] {
-	  \trm{N*} && \trm{M*} \\[20pt] \\ \trm{<N>*} & =_\prob & \trm{<M>*} \\
+	  \trm{N*} && \trm{M*} \\[20pt] \\ \trm{<N*>} & =_\prob & \trm{<M*>} \\
 	};
 	\draw[rwn] (m-1-1) --node[above]{$\scriptstyle\prob$} (m-1-3);
 	\draw[rwp] (m-1-1) --node[left] {$\scriptstyle\beta$} (m-3-1);
 	\draw[rwp] (m-1-3) --node[right]{$\scriptstyle\beta$} (m-3-3);
-\end{tikzpicture}}}
-&
-\vcenter{\hbox{\begin{tikzpicture}
-	\matrix (m) [matrix of math nodes] {
-	  \trm{N} &[20pt] & \trm{M} \\[20pt] \\ \trm{P} && \trm{Q} \\
-	};
-	\draw[rwc] (m-1-1) -- (m-1-3);
-	\draw[rwc] (m-1-1) -- (m-3-1);
-	\draw[rwc] (m-1-3) -- (m-3-3);
-	\draw[rwc] (m-3-1) -- (m-3-3);
 \end{tikzpicture}}}
 &
 \vcenter{\hbox{\begin{tikzpicture}
@@ -773,15 +795,28 @@ Any reduction step $N\rw M$ maps onto a complete step $N^\prob\rwc M^\prob$.
 	\draw[rw]  (m-1-1) -- (m-1-3);
 	\draw[rwn] (m-1-1) --node[left] {$\scriptstyle\prob$} (m-3-1);
 	\draw[rwn] (m-1-3) --node[right]{$\scriptstyle\prob$} (m-3-3);
-	\draw[rwc] (m-3-1) -- (m-3-3);
+	\draw[rwx] (m-3-1) -- (m-3-3);
+\end{tikzpicture}}}
+&
+\vcenter{\hbox{\begin{tikzpicture}
+	\matrix (m) [matrix of math nodes] {
+	  \trm{N} &[20pt] & \trm{M} \\[20pt] \\ \trm{P} && \trm{Q} \\
+	};
+	\draw[rwp] (m-1-1) -- (m-1-3);
+	\draw[rwp] (m-1-1) -- (m-3-1);
+	\draw[rwp] (m-1-3) -- (m-3-3);
+	\draw[rwp] (m-3-1) -- (m-3-3);
 \end{tikzpicture}}}
 \\ \\
   \text{Lemma~\ref{lem:parallel p - parallel beta}}
 & \text{Lemma~\ref{lem:exhaustive p - parallel beta}}
-& \text{Lemma~\ref{lem:complete diamond}}
 & \text{Lemma~\ref{lem:p to complete reduction}}
+& \text{Lemma~\ref{lem:complete diamond}}
 \end{array}
 \]
+\caption{Diagrams for the lemmata leading up to confluence}
+\label{fig:confluence diagrams}
+\end{figure}
 
 
 
@@ -789,11 +824,15 @@ Any reduction step $N\rw M$ maps onto a complete step $N^\prob\rwc M^\prob$.
 \begin{array}{l}
 	N\rw M
 \\
+	N\rwb M
+\\
 	N\rws M
 \\
 	N\rwn M
 \\
 	N\rwp M
+\\
+	N\rwx M
 \end{array}
 \]
 
