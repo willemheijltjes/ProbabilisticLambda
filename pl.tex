@@ -600,6 +600,17 @@ We aim to prove that $\rw \,=\, \rw_\beta \cup \rw_\prob$ is confluent.
 			\item \emph{Abstraction}, \ie\ $\trm{M = \y.M'}$.
 			By \ih, as $\trm{x \in {\fv{M}} \subseteq \fv{M'}}$ $\trm{M'[N +a P/x]} \rw_\prob^* \trm{M'[N/x] +a M'[P/x]}$
 			So, $\trm{M [N +a P/x] = \y.(M'[N +a P/x]) \rw_\prob^* \y.(M'[N/x] +a M'[P/x]) \rw_\prob \y.(M'[N/x]) +a \y.(M'[P/x])}$ $= \trm{M[N/x] +a M[P/x]}$.
+<<<<<<< HEAD
+			
+			\item \emph{Superposition}, \ie\ $\trm{M = M_1 +b M_2}$. 
+			By \ih, $\trm{M_i[N +a P/x]} \rw_\prob^* \trm{M_i[N/x] +a M_i[P/x]}$ for all $i \in \{1,2\}$.
+			Since $\trm{x \in {\fv{M}}}$ there are two cases:
+			\begin{itemize}
+				\item 
+				So, 
+				$\trm{M[N +a P/x]} = \trm{M_1[N +a P/x] +b M_2[N +a P/x]} \rw_\prob^* \trm{(M_1[N/x] +a M_1[P/x]) +b (M_2[N/x] +a M_2[P/x])} \allowbreak\rw_\prob^* \trm{M_1[N/x]M_2[N/x] +a M_1[P/x]M_2[P/x]} = \trm{M[N/x] +a M[P/x]}$.
+				
+=======
 
 			\item \emph{Superposition}, \ie\ $\trm{M = M_1 +b M_2}$.
 			Since $\trm{x \in {\fv{M}}}$ there are three cases:
@@ -608,6 +619,7 @@ We aim to prove that $\rw \,=\, \rw_\beta \cup \rw_\prob$ is confluent.
 				So,
 				$\trm{M[N +a P/x]} = \trm{M_1[N +a P/x] M_2[N +a P/x]} \rw_\prob^* \trm{(M_1[N/x] +a M_1[P/x])(M_2[N/x] +a M_2[P/x])} \allowbreak\rw_\prob^* \trm{M_1[N/x]M_2[N/x] +a M_1[P/x]M_2[P/x]} = \trm{M[N/x] +a M[P/x]}$.
 
+>>>>>>> b329c3f81376286b914563816c577c0c451bc205
 				\item $\trm{x \in {\fv{M_{1}}}}$ and $\trm{x \notin {\fv{M_2}}}$ and then, by \ih, $\trm{M_1[N +a P/x]} \rw_\prob^* \trm{M_1[N/x] +a M_1[P/x]}$.
 				So,
 				$\trm{M[N +a P/x]} = \trm{M_1[N +a P/x] M_2} \rw_\prob^* \trm{(M_1[N/x] +a M_1[P/x])M_2} \allowbreak\rw_\prob^* \trm{M_1[N/x]M_2 +a M_1[P/x]M_2} = \trm{M[N/x] +a M[P/x]}$.
