@@ -175,15 +175,19 @@
 \tikzstyle{rwblack}=[>/.tip={Triangle[length=2.5pt,width=4.5pt]},|/.tip={Rectangle[length=.5pt,width=4.5pt]}]
 \tikzstyle{rw} =[line width=.5pt,rwhead,->]
 \tikzstyle{rwb}=[line width=.5pt,rwblack,->]
+\tikzstyle{rwbs}=[line width=.5pt,rwblack,->.>]
 \tikzstyle{rws}=[line width=.5pt,rwhead,->.>]
 \tikzstyle{rwn}=[line width=.5pt,rwhead,->.>|]
+\tikzstyle{rwbn}=[line width=.5pt,rwblack,->.>|]
 \tikzstyle{rwp}=[line width=.5pt,rwhead,->,double]
 \tikzstyle{rwx}=[line width=.5pt,rwhead,->.>,double]
 
 \renewcommand\rw{\mathrel{\tikz\draw[rw](0,0)--(10pt,0pt);}}
 \newcommand\rwb{\mathrel{\tikz\draw[rwb](0,0)--(10pt,0pt);}}
+\newcommand\rwbs{\mathrel{\tikz\draw[rwbs](0,0)--(10pt,0pt);}}
 \newcommand\rws{\mathrel{\tikz\draw[rws](0,0)--(10pt,0pt);}}
 \newcommand\rwn{\mathrel{\tikz\draw[rwn](0,0)--(10pt,0pt);}}
+\newcommand\rwbn{\mathrel{\tikz\draw[rwbn](0,0)--(10pt,0pt);}}
 \newcommand\rwp{\mathrel{\tikz\draw[rwp](0,0)--(10pt,0pt);}}
 \newcommand\rwx{\mathrel{\tikz\draw[rwx](0,0)--(10pt,0pt);}}
 
@@ -361,7 +365,7 @@ P_0 &\coloneqq& P_1 &\mid& \trm{P_0 +{} P_0}
 \end{lemma}
 
 \begin{proof}
-	For the first-order term rewriting system $(\PEL, \rw_\prob)$  it can be defined a well-founded recursive path ordering $>$ in the sense of \cite[p. 289]{Dershowitz82} such that $\trm{M \rw_\prob N}$ implies $\trm{M>N}$.
+	For the first-order term rewriting system $(\PEL, \rw_\prob)$  it can be defined a well-founded recursive path ordering $>$ in the sense of \cite[p. 289]{Dershowitz82} such that $\trm{M \rw_\prob N}$ implies $\trm{M}>\trm{N}$.
 \end{proof}
 
 
@@ -815,21 +819,32 @@ We aim to prove that $\rw \,=\, \rw_\beta \cup \rw_\prob$ is confluent.
 			\allowbreak\rw_\prob^*
 			\trm{(M_1[N/x] +b M_2[N/x]) +a (M_1[P/x] +b M_2[P/x])} = \trm{M[N/x] +a M[P/x]}$.
 
-%			\item \emph{Superposition}, \ie\ $\trm{M = M_1 +b M_2}$.
-%			Since $\trm{x \in {\fv{M}}}$ there are three cases:
-%			\begin{itemize}
-%				\item $\trm{x \in {\fv{M_1}} \cup \fv{M_2}}$ and then, by \ih, $\trm{M_i[N +a P/x]} \rw_\prob^* \trm{M_i[N/x] +a M_i[P/x]}$ for all $i \in \{1,2\}$.
-%				So,
-%				$\trm{M[N +a P/x]} = \trm{M_1[N +a P/x] M_2[N +a P/x]} \rw_\prob^* \trm{(M_1[N/x] +a M_1[P/x])(M_2[N/x] +a M_2[P/x])} \allowbreak\rw_\prob^* \trm{M_1[N/x]M_2[N/x] +a M_1[P/x]M_2[P/x]} = \trm{M[N/x] +a M[P/x]}$.
-%
-%				\item $\trm{x \in {\fv{M_{1}}}}$ and $\trm{x \notin {\fv{M_2}}}$ and then, by \ih, $\trm{M_1[N +a P/x]} \rw_\prob^* \trm{M_1[N/x] +a M_1[P/x]}$.
-%				So,
-%				$\trm{M[N +a P/x]} = \trm{M_1[N +a P/x] M_2} \rw_\prob^* \trm{(M_1[N/x] +a M_1[P/x])M_2} \allowbreak\rw_\prob^* \trm{M_1[N/x]M_2 +a M_1[P/x]M_2} = \trm{M[N/x] +a M[P/x]}$.
-%
-%				\item $\trm{x \notin {\fv{M_{1}}}}$ and $\trm{x \in {\fv{M_2}}}$: analogous to the previous case.
-%			\end{itemize}
+			\item \emph{Superposition}, \ie\ $\trm{M = M_1 +b M_2}$.
+			Since $\trm{x \in {\fv{M}}}$ there are three cases:
+			\begin{itemize}
+				\item $\trm{x \in {\fv{M_1}} \cup \fv{M_2}}$ and then, by \ih, $\trm{M_i[N +a P/x]} \rw_\prob^* \trm{M_i[N/x] +a M_i[P/x]}$ for all $i \in \{1,2\}$.
+				Since $a <_M b$ by hypothesis, $\trm{M[N +a P/x]} = \trm{M_1[N +a P/x] +b M_2[N +a P/x]} \rw_\prob^* \trm{(M_1[N/x] +a M_1[P/x]) 
+					\allowbreak+b (M_2[N/x] +a M_2[P/x])} \rw_\prob
+				\trm{((M_1[N/x] +a M_1[P/x]) \allowbreak+b M_2[N/x]) +a ((M_1[N/x] +a M_1[P/x]) \allowbreak+b M_2[P/x])}
+				\allowbreak\rw_\prob^* 
+				\trm{((M_1[N/x]\allowbreak+b M_2[N/x]) +a (M_1[P/x] \allowbreak+b M_2[N/x]))  +a ((M_1[N/x] \allowbreak+b M_2[P/x]) +a (M_1[P/x] \allowbreak+b M_2[P/x])) }
+				\allowbreak\rw_\prob^*
+				\trm{(M_1[N/x] +b M_2[N/x]) +a (M_1[P/x] +b M_2[P/x])} = \trm{M[N/x] +a M[P/x]}$.
+				
+				\item $\trm{x \in {\fv{M_{1}}}}$ and $\trm{x \notin {\fv{M_2}}}$ and then, by \ih, $\trm{M_1[N +a P/x]} \rw_\prob^* \trm{M_1[N/x] +a M_1[P/x]}$.
+				
+				Since $a <_M b$ by hypothesis, $\trm{M[N +a P/x]} = \trm{M_1[N +a P/x] +b M_2} \rw_\prob^* \trm{(M_1[N/x] +a M_1[P/x]) 
+					\allowbreak+b M_2} \rw_\prob
+				\trm{((M_1[N/x]\allowbreak+b M_2) +a (M_1[P/x] \allowbreak+b M_2) }
+				= \trm{M[N/x] +a M[P/x]}$.
 
-			\item \emph{Box}, \ie\
+				\item $\trm{x \notin {\fv{M_{1}}}}$ and $\trm{x \in {\fv{M_2}}}$: analogous to the previous case.
+			\end{itemize}
+
+			\item \emph{Box}, \ie\ $\trm{M} = \trm{!b.M'}$. 
+			We can suppose without loss of generality that $b \neq a$.
+			By \ih, as $\trm{x \in {\fv{M}} = \fv{M'}}$ $\trm{M'[N +a P/x]} \rw_\prob^* \trm{M'[N/x] +a M'[P/x]}$
+			So, $\trm{M [N +a P/x] = !b.(M'[N +a P/x]) \rw_\prob^* !b.(M'[N/x] +a M'[P/x]) \rw_\prob !b.(M'[N/x]) +a !b.(M'[P/x])}$ $= \trm{M[N/x] +a M[P/x]}$.
 			\qedhere
 		\end{itemize}
 	\end{enumerate}
@@ -906,7 +921,7 @@ $
 \hrule
 
 \begin{definition}
-A \emph{labelled} term $\trm{N*}$ is a term $N$ with chosen redexes annotated as $\trm{(\x.M)*P}$. The \emph{labelled reduct} $\trm{<N*>}$ of a labelled term is defined inductively as follows.
+A \emph{labelled} term $\trm{N*}$ is a term $N$ with chosen $\beta$-redexes annotated as $\trm{(\x.M)*P}$. The \emph{labeled reduct} $\trm{<N*>}$ of a labeled term is defined by induction on $N$ as follows:
 \begin{align*}
 	\trm{<(\x.N)*M>} &= \trm{<N>[<M>/x]}
 \\	\trm{<x>}		&= x
@@ -918,11 +933,51 @@ A \emph{labelled} term $\trm{N*}$ is a term $N$ with chosen redexes annotated as
 A \emph{parallel $\beta$-step} is a reduction $N\rwp_\beta\trm{<N*>}$ for some labelling $\trm{N*}$ of $N$.
 \end{definition}
 
-We write $\trm{N*}\rwp_\beta\trm{<N*>}$ for the specific parallel step indicated by the labelling $\trm{N*}$. Observe that $\trm{<N*>}$ is a regular unlabelled term, since all labels are removed in the reduction.
+We write $\trm{N*}\rwp_\beta\trm{<N*>}$ for the specific parallel step indicated by the labeling $\trm{N*}$. Observe that $\trm{<N*>}$ is a regular unlabeled term, since all labels are removed in the reduction.
+
+\begin{remark}[Reflexivity of $\rwp_\beta$]
+\label{rmk:reflexivity}
+	For every term $\trm{N}$, one has $\trm{N} \rwp_\beta \trm{N}$. 
+	Indeed, if $\trm{N*}$ is the empty labeling (which does not annotate any $\beta$-redex), then $\trm{N} = \trm{<N*>}$.
+\end{remark}
 
 \begin{lemma}
 A parallel $\beta$-step $N\rwp_\beta M$ is a $\beta$-reduction $N\rws_\beta M$.
 \end{lemma}
+
+\begin{proof}
+	Since $N\rwp_\beta M$ means that $\trm{M} = \trm{<N*>}$ for some labeling $\trm{N*}$ of $\trm{N}$, we prove that $\trm{N} \rws_\beta \trm{<N*>}$ for any labeling $\trm{N*}$ of $\trm{N}$, by induction on $\trm{N}$.
+	Cases:
+	\begin{itemize}
+		\item \emph{Variable}, \ie\ $\trm{N} = x$. 
+		Then $\trm{x*} = x$ and $\trm{<x*>} = x$.
+		Therefore, $N = x = \trm{<N*>}$ and so $N \rws_\beta \trm{<N*>}$.
+		
+		\item \emph{Abstraction}, \ie\ $\trm{N} = \trm{\x.M}$.
+		Then $\trm{N*} = \trm{\x.M*}$ and $\trm{<N*>} = \trm{\x.<M*>}$.
+		By \ih, $\trm{M} \rws_\beta \trm{<M*>}$ and so $\trm{N} = \trm{\x.M} \rws_\beta \trm{\x.<M*>} = \trm{<N*>}$.
+		
+		\item \emph{Application}, \ie\ $\trm{N} = \trm{MP}$.
+		There are two sub-cases:
+		\begin{itemize}
+			\item $\trm{M} \neq \trm{(\x.Q)*}$. 
+			Then $\trm{N*} = \trm{M*P*}$ and $\trm{<N*>} = \trm{<M*><P*>}$.
+			By \ih, $\trm{M} \rws_\beta \trm{<M*>}$ and $\trm{P} \rws_\beta \trm{<P*>}$, so $\trm{N} = \trm{MP} \rws_\beta \trm{<M*><P*>} = \trm{<N*>}$.
+			
+			\item $\trm{M} = \trm{(\x.Q)*}$.
+			Then $\trm{N*} = \trm{(\x.Q*)*P*}$ and $\trm{<N*>} = \trm{<Q*>[<P*>/x]}$.
+			By \ih, $\trm{Q} \rws_\beta \trm{<Q*>}$ and $\trm{P} \rws_\beta \trm{<P*>}$, so $\trm{N} = \trm{(\x.Q)P} \rw_\beta \trm{Q[P/x]} \rws_\beta \trm{<Q*>[<P*>/x]} = \trm{<N*>}$.
+		\end{itemize}
+	
+		\item \emph{Superposition}, \ie\ $\trm{N} = \trm{M +a P}$.
+		Then $\trm{N*} = \trm{M* +a P*}$ and $\trm{<N*>} = \trm{<M*>+a<P*>}$.
+		By \ih, $\trm{M} \rws_\beta \trm{<M*>}$ and $\trm{P} \rws_\beta \trm{<P*>}$, so $\trm{N} = \trm{M +a P} \rws_\beta \trm{<M*> +a <P*>} = \trm{<N*>}$.
+		
+		\item \emph{Box}, \ie\ $\trm{N} = \trm{!a. M}$. 
+		Analogous to the abstraction case.
+		\qedhere
+	\end{itemize}
+\end{proof}
 
 \begin{definition}
 A \emph{labelled} $\prob$-reduction $\trm{N*}\rwb_\prob\trm{M*}$ is a $\prob$-reduction of one of the forms
@@ -931,13 +986,18 @@ A \emph{labelled} $\prob$-reduction $\trm{N*}\rwb_\prob\trm{M*}$ is a $\prob$-re
 \qquad
 	\trm{(\x.!a.N)*M} \rws_\prob \trm{!a.(\x.N)*M}
 \]
-or a single $\prob$-step on unlabelled constructors in $\trm{N*}$.
+or a single $\prob$-step $\rw_\prob$ on unlabeled constructors in $\trm{N*}$.
 \end{definition}
 
 \begin{lemma}
 \label{lem:parallel p-reduction}
 Reduction to normal form in $\rwb_\prob$ is equal to $\rwn_\prob$.
 \end{lemma}
+
+\begin{proof}
+	On labeled terms, $\rw_\prob \,\subseteq\, \rwb_\prob \,\subseteq\, \rws_\prob$ and hence $\rwbs_\prob \,=\, \rws_\prob$.
+	In particular, $\trm{N*} \rwbn_\prob \trm{M*}$ if and only if $\trm{N*} \rwn_\prob \trm{M*}$.
+\end{proof}
 
 \begin{lemma}
 \label{lem:parallel p - parallel beta}
@@ -970,7 +1030,8 @@ Any reduction step $N\rw M$ maps onto a complete step $N^\prob\rwp M^\prob$ on $
 \end{lemma}
 
 \begin{proof}
-The case of a $\prob$-step $N\rw_\prob M$ is immediate, since $N^\prob=M^\prob$. For a $\beta$-step $N\rw_\beta M$ we label the reduced redex in $N$ to get $\trm{N*}\rwp_\beta\trm{<N*>}=M$. Let $\trm{P*}=(\trm{N*})^\prob$ be the (labelled) $\prob$-normal form of $\trm{N*}$. Then Lemma~\ref{lem:exhaustive p - parallel beta} gives $M=\trm{<N*>}=_\prob\trm{<P*>}$, illustrated below.
+The case of a $\prob$-step $N\rw_\prob M$ is immediate, since $N^\prob=M^\prob$ and $\rwp_\beta$ is reflexive (\Cref{rmk:reflexivity}). 
+For a $\beta$-step $N\rw_\beta M$ we label the reduced redex in $N$ to get $\trm{N*}\rwp_\beta\trm{<N*>}=M$. Let $\trm{P*}=(\trm{N*})^\prob$ be the (labeled) $\prob$-normal form of $\trm{N*}$. Then Lemma~\ref{lem:exhaustive p - parallel beta} gives $M=\trm{<N*>}=_\prob\trm{<P*>}$, illustrated below.
 \[
 \begin{tikzpicture}
 	\matrix (m) [matrix of math nodes] {
