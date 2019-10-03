@@ -47,6 +47,9 @@
         \raisebox{-0.3ex}{$\m@th\cdot$}%
  {=}}}
 
+% vcenter
+\newcommand\vc[1]{\vcenter{\hbox{$#1$}}}
+
 % Small operators:
 
 \newcommand\smallbin[1]{\mathchoice
@@ -117,6 +120,8 @@
 \newcommand\y{\lambda y}
 \newcommand\z{\lambda z}
 
+\newcommand\lab{\bullet}
+
 \newcommand\term[1]{{\let\term@typecolor\typecolor\termcolor\trm{#1}}}
 \newcommand\trm[1]{%
   \vphantom(%
@@ -165,6 +170,7 @@
 
 % new rewriting
 
+\tikzstyle{implied}=[dashed]
 \tikzstyle{rwhead}=[>/.tip={Triangle[open,length=2.5pt,width=4.5pt]},|/.tip={Rectangle[length=.5pt,width=4.5pt]}]
 \tikzstyle{rwblack}=[>/.tip={Triangle[length=2.5pt,width=4.5pt]},|/.tip={Rectangle[length=.5pt,width=4.5pt]}]
 \tikzstyle{rw} =[line width=.5pt,rwhead,->]
@@ -184,6 +190,7 @@
 \newcommand\rwpleft{\mathrel{\tikz\draw[rwp](10pt,0pt)--(0,0);}}
 \newcommand\rwxleft{\mathrel{\tikz\draw[rwx](10pt,0pt)--(0,0);}}
 
+
 % rule names
 
 \newcommand\idem{\ensuremath{\mathsf i}}
@@ -192,10 +199,13 @@
 \newcommand\plusAbs{\ensuremath{{\smallbin\oplus}\lambda}}
 \newcommand\plusArg{\ensuremath{{\smallbin\oplus}\mathsf a}}
 \newcommand\plusFun{\ensuremath{{\smallbin\oplus}\mathsf f}}
-\newcommand\plusL{\ensuremath{\mathsf d_1}}
-\newcommand\plusR{\ensuremath{\mathsf d_2}}
 \newcommand\plusBox{\ensuremath{{\smallbin{\oplus}\smallsquare}}}
-\newcommand\boxVoid{\ensuremath{\not{\!\smallsquare}}}
+%\newcommand\plusL{\ensuremath{\mathsf d_1}}
+%\newcommand\plusR{\ensuremath{\mathsf d_2}}
+\newcommand\plusL{\ensuremath{{\smallbin\oplus}{\smallbin\oplus}_1}}
+\newcommand\plusR{\ensuremath{{\smallbin\oplus}{\smallbin\oplus}_2}}
+\newcommand\plusX{\ensuremath{{\smallbin\oplus}{\star}}}
+\newcommand\boxVoid{\ensuremath{\not{\kern-2pt\smallsquare}}}
 \newcommand\boxAbs{\ensuremath{\smallsquare\lambda}}
 \newcommand\boxFun{\ensuremath{\smallsquare\mathsf f}}
 
@@ -212,19 +222,6 @@
 %============================================================ DOCUMENT
 
 \begin{document}
-
-\[
-\begin{array}{l}
-	N\rw_\prob M
-\\
-	N\rws_\prob M
-\\
-	N\rwn_\prob M
-\\
-	N\rwb_\prob M
-\end{array}
-\]
-
 
 \maketitle
 
@@ -299,7 +296,7 @@ for every occurrence of $\probox a$ in $\trm{M}$ there is no $\probox a$ occurri
 \\	\trm{(N +a M) +b P}		&\rw_\prob \trm{(N +b P) +a (M +b P)} 	\rstrut	&& (a\smallbin<b)	\tag{\plusL}
 \\	\trm{N +b (M +a P)}		&\rw_\prob \trm{(N +b M) +a (N +b P)} 	\rstrut	&& (a\smallbin<b)	\tag{\plusR}
 %\\	\trm{!b.(N +a M)}		&\rw_\prob \trm{(!b.N) +a (!c M[c/b])}	\rstrut	&& (a\neq b)		\tag{\plusBox}
-\\	\trm{!b.(N +a M)}		&\rw_\prob \trm{(!b.N) +a (!b.M)}	\rstrut	&& (a\neq b)		\tag{\plusBox}
+\\	\trm{!b.(N +a M)}		&\rw_\prob \trm{(!b.N) +a (!b.M)}		\rstrut	&& (a\neq b)		\tag{\plusBox}
 \\																								\notag
 \\	\trm{!a.N}				&\rw_\prob N 									&& (a\notin N)		\tag{\boxVoid}
 \\	\trm{\x.!a.N} 			&\rw_\prob \trm{!a.\x. N}				\rstrut						\tag{\boxAbs}
@@ -382,10 +379,11 @@ as follows.
 The term $C[N]$ represents $C[\,]$ with the hole $[\,]$ replaced by $N$.
 \end{definition}
 
-Observe that the six reduction rules $\plusAbs$ through $\plusBox$ in Figure~\ref{fig:reduction rules} are all of the following form.
-\[
+Observe that the six reduction rules $\plusAbs$ through $\plusBox$ in Figure~\ref{fig:reduction rules} are all of the following form. We refer to these collectively as $\plusX$.
+\begin{align}
 	\trm{C[N+aM]} \rw_\prob \trm{C[N]+aC[M]}
-\]
+	\tag\plusX
+\end{align}
 
 
 %
@@ -405,8 +403,6 @@ Observe that the six reduction rules $\plusAbs$ through $\plusBox$ in Figure~\re
 %\]
 %\end{definition}
 
-
-
 %
 %\begin{proof}[Sketch]
 %The following measure reduces for every step. Order constructors by
@@ -419,6 +415,154 @@ Observe that the six reduction rules $\plusAbs$ through $\plusBox$ in Figure~\re
 %\]
 %(where $@$ stands for application). We consider sequences of these, ordered lexicographically.
 %\end{proof}
+%
+%\begin{lemma}
+%Reduction $\rw_\prob$ is confluent.
+%\end{lemma}
+%
+%\begin{proof}
+%	By Newman's lemma and strong normalization of $\rw_\prob$ (\Cref{lemma:strong-normalization}), we only have to prove that $\rw_\prob$ is locally confluent.
+%We consider each reduction rule against those lower down in the table in Figure~\ref{fig:reduction rules}.
+%\begin{itemize}
+%	\item $(\idem)$ $\trm{N +a N}\rw N$.
+%
+%\[
+%\begin{tikzpicture}
+%	\matrix [matrix of math nodes] (m) {
+%	  \trm{N +a (M +a M)} &[20pt] \trm{N +a M}
+%	\\ };
+%	\draw[rw,yshift=30pt]  (m-1-1) [] --node[above]{$\idem$}    (m-1-2);
+%	\draw[rw,yshift=-3pt] (m-1-1) --node[below]{$\cancelR$} (m-1-2);
+%\end{tikzpicture}
+%\]
+%
+%\[
+%	\trm{N +a (M +a M)} \begin{array}{c}\rw\\[-6pt]\rw\end{array} \trm{N +a M}
+%\qquad
+%\begin{array}{c@{~}c@{~}c}
+%	\trm{(N +a M) +a (N +a M)} &\rw& \trm{N+a M}
+%\\	\dw & \rotatebox[origin=c]{30}{$\rw$}
+%\\	\trm{(N +a M) +a M}\rstrut
+%\end{array}
+%\qquad
+%\begin{array}{c@{~}c@{~}c}
+%	\trm{C[N +a N]}	&\rw& C[N]
+%\\	\dw & \rotatebox[origin=c]{30}{$\rw$}
+%\\	\trm{C[N] +a C[N]}\rstrut
+%\end{array}
+%\]
+%
+%	\item $\trm{N +a (M +a P)}\rw\trm{N +a P}$.
+%
+%\[
+%\begin{array}{c@{~}c@{~}c}
+%	\trm{(N+aM)+a(P+aQ)} & \rw & \trm{(N+aM)+a Q}
+%\\	\dw && \dw
+%\\	\trm{N +a (P+aQ)} & \rw & \trm{N+aQ} \rstrut
+%\end{array}
+%\qquad
+%\begin{array}{c@{~}c@{~}c}
+%	\trm{C[N +a (M +a P)]} &\rw& \trm{C[N+a M]}
+%\\	\dw
+%\\	\trm{C[N] +a C[M+a P]} && \dw
+%\\	\dw
+%\\	\trm{C[N] +a (C[M] +a C[P])} &\rw& \trm{C[N] +a C[M]}
+%\end{array}
+%\]
+%
+%\[
+%a<b
+%\begin{array}{c@{~}c@{~}c}
+%	\trm{(N+aM)+b(P+bQ)} & \rw & \trm{(N+aM)+b Q}
+%\\	\dw && \dw
+%\\	\trm{(N+b(P+bQ))+a(M+b(P+bQ))} & \rws & \trm{(N+bQ)+a(M+bQ)} \rstrut
+%\end{array}
+%\]
+%
+%	\item $\trm{C[N+aM]}\rw\trm{C[N]+a C[M]}$.
+%
+%\[
+%a < b \quad
+%\begin{array}{c@{~}c@{~}c}
+%	\trm{C[N +b (M +a P)]} &\rw& \trm{C[N]+b C[M+a P]}
+%\\	\dw && \dw
+%\\	\trm{C[(N +b M) +a (N+b P)]} && \trm{C[N]+b (C[M] +a C[P]} \rstrut
+%\\	\dw && \dw
+%\\	\trm{C[N +b M] +a [N +b P]}	&\rw& \trm{(C[N]+b C[M])+a(C[N]+bC[P]]} \rstrut
+%\end{array}
+%\]
+%
+%
+%	\item $\trm{N +b (M +a P)}\rw\trm{(N +b M) +a (N +b P)}$.
+%
+%\[
+%a<b
+%\begin{array}{c@{~}c@{~}c}
+%	\trm{(N+a Q)+b(M+a P)} &\rw& \trm{((N+a Q) +b M) +a ((N+a Q) +b P)}
+%\\	\dw && \dw_*
+%\\	\trm{(N+b(M+a P))+a(Q+b(M+a P))} && \trm{((N +b M)+a (Q +b M)) +a ((N +b P)+a(Q +b P))} \rstrut
+%\\	\dw_* && \dw_*
+%\\	\trm{((N+b M) +a (N+b P)) +a ((Q +b M) +a (Q +b P))} &\rw^*& \trm{(N+b M)+a(Q+b P)} \rstrut
+%\end{array}
+%\]
+%
+%{\footnotesize
+%\[
+%a<c<b
+%\begin{array}{c@{~}c@{~}c}
+%\trm{(N+a Q)+b(M+c P)} &\rw& \trm{((N+a Q) +b M) +c ((N+a Q) +b P)}
+%\\	\dw && \dw_*
+%\\	\trm{(N +b(M+c P))+a(Q+b(M+c P))} && \trm{((N +b M)+a (Q +b M)) +c ((N +b P)+a(Q +b P))} \rstrut
+%\\	\dw_* && \dw_*
+%\\\trm{((N +b M) +c (N +b P)) +a ((Q +b M) +c (Q +b P))} && \trm{((N +b M) +c ((N +b P)+a(Q +b P))) +a ((Q +b M) +c ((N +b P)+a(Q +b P)))} \rstrut
+%\\	 & \rotatebox[origin=c]{155}{$\rw_*$}& \dw_*
+%\\	 && \trm{(((N +b M) +c (N +b P)) +a ((N +b M) +c (Q +b P))) +a (((Q +b M) +c (N +b P)) +a ((Q +b M) +c (Q +b P)))} \rstrut
+%\end{array}
+%\]
+%}
+%
+%
+%	\item $\trm{N (M +a P)}\rw\trm{(NM) +a (NP)}$.
+%
+%\[
+%\begin{array}{c@{~}c@{~}c}
+%\trm{(N+a Q)(M+a P)} &\rw& \trm{((N+a Q) M) +a ((N+a Q) P)}
+%\\	\dw && \dw_*
+%\\	\trm{(N(M+a P))+a(Q(M+a P))} && \trm{((N M)+a (Q M)) +a ((N P)+a(Q P))} \rstrut
+%\\	\dw_* && \dw_*
+%\\	\trm{((NM) +a (N P)) +a ((Q M) +a (Q P))} &\rw^*& \trm{(NM)+a(QP)} \rstrut
+%\end{array}
+%\]
+%
+%{\footnotesize
+%\[
+%a<b
+%\begin{array}{c@{~}c@{~}c}
+%\trm{(N+a Q)(M+b P)} &\rw& \trm{((N+a Q) M) +b ((N+a Q) P)}
+%\\	\dw && \dw_*
+%\\	\trm{(N(M+b P))+a(Q(M+b P))} && \trm{((N M)+a (Q M)) +b ((N P)+a(Q P))} \rstrut
+%\\	\dw_* && \dw_*
+%\\	\trm{((NM) +b (N P)) +a ((Q M) +b (Q P))} && \trm{((N M) +b ((N P)+a(Q P))) +a ((Q M) +b ((N P)+a(Q P)))} \rstrut
+%\\	 &\rotatebox[origin=c]{155}{$\rw_*$} & \dw_*
+%\\	 && \trm{(((N M) +b (N P)) +a((N M) +b(Q P))) +a (((Q M) +b (N P)) +a ((Q M) +b(Q P)))} \rstrut
+%\end{array}
+%\]
+%}
+%
+%	\item $\trm{!b.(N +a M)} \rw \trm{(!b.N) +a (!b.M)}$ %(!c M[c/b])}$
+%
+%\[
+%a \neq b, \ b \notin\trm{N+a M} \
+%\begin{array}{c@{~}c@{~}c}
+%	\trm{!b.(N +a M)} &\rw& \trm{(!b.N) +a (!b.M)}
+%\\	\dw & \rotatebox[origin=c]{210}{$\rw_*$}
+%\\	\trm{N +a M} &&
+%\end{array}
+%\]
+%
+%\end{itemize}
+%\end{proof}
+
 
 \begin{lemma}
 Reduction $\rw_\prob$ is confluent.
@@ -426,136 +570,195 @@ Reduction $\rw_\prob$ is confluent.
 
 \begin{proof}
 	By Newman's lemma and strong normalization of $\rw_\prob$ (\Cref{lemma:strong-normalization}), we only have to prove that $\rw_\prob$ is locally confluent.
-We consider each reduction rule against those lower down in the table in Figure~\ref{fig:reduction rules}.
+We consider each reduction rule against those lower down in the table in Figure~\ref{fig:reduction rules}. For the symmetric rule pairs $\cancelL$/$\cancelR$, $\plusL$/$\plusR$, and $\plusFun/\plusArg$ we present only the first case.
 \begin{itemize}
-	\item $\trm{N +a N}\rw N$.
+	\item $(\idem)$ $\trm{N +a N}\rw N$.
 
 \[
-	\trm{N +a (M +a M)} \begin{array}{c}\rw\\[-6pt]\rw\end{array} \trm{N +a M}
+\vc{\begin{tikzpicture}[x=20pt,y=1.5ex]
+	\node[anchor=base east] (a) at (0,0) {$\trm{(N+aN)+aM}$};
+	\node[anchor=base west] (b) at (1,0) {$\trm{N+aM}$};
+	\draw[rw] (0,1) --node[above]{$\idem$}    (1,1);
+	\draw[rw] (0,0) --node[below]{$\cancelL$} (1,0);
+\end{tikzpicture}}
+\quad
+\vcenter{\hbox{\begin{tikzpicture}
+	\matrix [matrix of math nodes] (m) {
+	  		\trm{(N+aM)+a(N+aM)} &[20pt] \trm{N+aM}
+	\\[20pt]\trm{N+a(N+aM)}
+	\\ };
+	\draw[rw] (m-1-1) --node[above]{$\idem$}    (m-1-2);
+	\draw[rw] (m-1-1) --node[left] {$\cancelL$} (m-2-1);
+	\draw[rw,implied] (m-2-1) --node[below right=-2pt] {$\cancelR$} (m-1-2);
+\end{tikzpicture}}}
+\quad
+\vcenter{\hbox{\begin{tikzpicture}
+	\matrix [matrix of math nodes] (m) {
+	  		\trm{C[N+aN]}    &[20pt] C[N]
+	\\[20pt]\trm{C[N]+aC[N]}
+	\\ };
+	\draw[rw] (m-1-1) --node[above]{$\idem$}  (m-1-2);
+	\draw[rw] (m-1-1) --node[left] {$\plusX$} (m-2-1);
+	\draw[rw,implied] (m-2-1) --node[below right=-2pt] {$\idem$} (m-1-2);
+\end{tikzpicture}}}
+\]
+\[
+\vcenter{\hbox{\begin{tikzpicture}
+	\matrix [matrix of math nodes] (m) {
+	  		\trm{(N+aM)+b(N+aM)} &[30pt] \trm{N+aM}
+	\\[20pt]\trm{(N+b(N+aM))+a(M+b(N+aM))} &&[10pt] (a<b)
+	\\[20pt]\trm{((N+bN)+a(N+bM))+a((M+bN)+a(M+bM))} & \trm{(N+bN)+a(M+bM)}
+	\\ };
+	\draw[rw] (m-1-1) --node[above]{$\idem$}    (m-1-2);
+	\draw[rw] (m-1-1) --node[left] {$\plusL$} (m-2-1);
+	\draw[rws,implied] (m-2-1) --node[left] {$\plusR$}   (m-3-1);
+	\draw[rws,implied] (m-3-2) --node[right]{$\idem$}    (m-1-2);
+	\draw[rws,implied] (m-3-1) --node[below]{$\cancelL,\cancelR$} (m-3-2);
+\end{tikzpicture}}}
+\]
+
+	\item $(\cancelL)$ $\trm{(N +a M) +a P}\rw\trm{N +a P}$.
+
+\[
+\vcenter{\hbox{\begin{tikzpicture}
+	\matrix [matrix of math nodes] (m) {
+	  		\trm{(N+aM)+a(P+aQ)} &[20pt] \trm{N+a(P+aQ)}
+	\\[20pt]\trm{(N+aM)+a Q} & \trm{N+aQ}
+	\\ };
+	\draw[rw] (m-1-1) --node[above]{$\cancelL$} (m-1-2);
+	\draw[rw] (m-1-1) --node[left] {$\cancelR$} (m-2-1);
+	\draw[rw,implied] (m-1-2) --node[right]{$\cancelR$} (m-2-2);
+	\draw[rw,implied] (m-2-1) --node[below]{$\cancelL$} (m-2-2);
+\end{tikzpicture}}}
 \qquad
-\begin{array}{c@{~}c@{~}c}
-	\trm{(N +a M) +a (N +a M)} &\rw& \trm{N+a M}
-\\	\dw & \rotatebox[origin=c]{30}{$\rw$}
-\\	\trm{(N +a M) +a M}\rstrut
-\end{array}
-\qquad
-\begin{array}{c@{~}c@{~}c}
-	\trm{C[N +a N]}	&\rw& C[N]
-\\	\dw & \rotatebox[origin=c]{30}{$\rw$}
-\\	\trm{C[N] +a C[N]}\rstrut
-\end{array}
+\vcenter{\hbox{\begin{tikzpicture}
+	\matrix [matrix of math nodes] (m) {
+	  		\trm{C[(N+aM)+aP]} &[20pt] \trm{C[N+aM]}
+	\\[20pt]\trm{C[N+aM]+aC[P]}
+	\\[20pt]\trm{(C[N]+aC[M])+aC[P]} & \trm{C[N]+aC[M]}
+	\\ };
+	\draw[rw] (m-1-1) --node[above]{$\cancelL$} (m-1-2);
+	\draw[rw] (m-1-1) --node[left] {$\plusX$}   (m-2-1);
+	\draw[rw,implied] (m-2-1) --node[left] {$\plusX$}   (m-3-1);
+	\draw[rw,implied] (m-1-2) --node[right]{$\plusX$}   (m-3-2);
+	\draw[rw,implied] (m-3-1) --node[below]{$\cancelL$} (m-3-2);
+\end{tikzpicture}}}
+\]
+\[
+\vcenter{\hbox{\begin{tikzpicture}
+	\matrix [matrix of math nodes] (m) {
+			\trm{(N+bM)+b(P+aQ)} &[20pt]  \trm{N+b(P+aQ)}
+	\\[20pt]\trm{((N+bM)+bP)+a((N+bM)+bQ)} & \trm{(N+bP)+a(N+bQ)}
+	\\ };
+	\draw[rw] (m-1-1) --node[above]{$\cancelL$} (m-1-2);
+	\draw[rw] (m-1-1) --node[left] {$\plusR$}   (m-2-1);
+	\draw[rw, implied] (m-1-2) --node[right]{$\plusR$} (m-2-2);
+	\draw[rws,implied] (m-2-1) --node[below]{$\cancelL$} (m-2-2);
+\end{tikzpicture}}}
+\qquad(a<b)
 \]
 
-	\item $\trm{N +a (M +a P)}\rw\trm{N +a P}$.
+	\item $(\plusX)$ $\trm{C[N+aM]}\rw\trm{C[N]+a C[M]}$.
 
 \[
-\begin{array}{c@{~}c@{~}c}
-	\trm{(N+aM)+a(P+aQ)} & \rw & \trm{(N+aM)+a Q}
-\\	\dw && \dw
-\\	\trm{N +a (P+aQ)} & \rw & \trm{N+aQ} \rstrut
-\end{array}
-\qquad
-\begin{array}{c@{~}c@{~}c}
-	\trm{C[N +a (M +a P)]} &\rw& \trm{C[N+a M]}
-\\	\dw
-\\	\trm{C[N] +a C[M+a P]} && \dw
-\\	\dw
-\\	\trm{C[N] +a (C[M] +a C[P])} &\rw& \trm{C[N] +a C[M]}
-\end{array}
+\vcenter{\hbox{\begin{tikzpicture}
+	\matrix [matrix of math nodes] (m) {
+	  		\trm{C[(N+aM)+bP]}      &[20pt] \trm{C[N+aM]+bC[P]}
+	\\[20pt]\trm{C[(N+bP)+a(M+bP)]} &       \trm{(C[N]+aC[M])+bC[P]}		 &[10pt] (a<b)
+	\\[20pt]\trm{C[N+bP]+aC[M+bP]}  &       \trm{(C[N]+bC[P])+a(C[M]+bC[P])}
+	\\ };
+	\draw[rw] (m-1-1) --node[above]{$\plusX$} (m-1-2);
+	\draw[rw] (m-1-1) --node[left] {$\plusL$} (m-2-1);
+	\draw[rw, implied] (m-1-2) --node[right]{$\plusX$} (m-2-2);
+	\draw[rw, implied] (m-2-1) --node[left] {$\plusX$} (m-3-1);
+	\draw[rw, implied] (m-2-2) --node[right]{$\plusL$} (m-3-2);
+	\draw[rws,implied] (m-3-1) --node[below]{$\plusX$} (m-3-2);
+\end{tikzpicture}}}
 \]
 
+	\item $(\plusL)$ $\trm{(N+aM)+bP}\rw\trm{(N+bP)+a(M+bP)}$.
+
 \[
-a<b
-\begin{array}{c@{~}c@{~}c}
-	\trm{(N+aM)+b(P+bQ)} & \rw & \trm{(N+aM)+b Q}
-\\	\dw && \dw
-\\	\trm{(N+b(P+bQ))+a(M+b(P+bQ))} & \rws & \trm{(N+bQ)+a(M+bQ)} \rstrut
-\end{array}
+\vcenter{\hbox{\begin{tikzpicture}
+	\matrix [matrix of math nodes] (m) {
+	  		\trm{(N+aM)+b(P+aQ)}                      &[10pt] \trm{(N+b(P+aQ))+a(M+b(P+aQ))}
+	\\[20pt]\trm{((N+aM)+bP)+a((N+aM)+bQ)}            &       \trm{((N+bP)+a(N+bQ))+a((M+bP)+a(M+bQ))} &[10pt] (a<b)
+	\\[20pt]\trm{((N+bP)+a(M+bP))+a((N+bQ)+a(M+bQ))}  &       \trm{(N+bP)+a(M+bQ)}
+	\\ };
+	\draw[rw] (m-1-1) --node[above]{$\plusL$} (m-1-2);
+	\draw[rw] (m-1-1) --node[left] {$\plusR$} (m-2-1);
+	\draw[rws,implied] (m-1-2) --node[right]{$\plusR$} (m-2-2);
+	\draw[rws,implied] (m-2-1) --node[left] {$\plusL$} (m-3-1);
+	\draw[rws,implied] (m-2-2) --node[right]{$\cancelL,\cancelR$} (m-3-2);
+	\draw[rws,implied] (m-3-1) --node[below]{$\cancelL,\cancelR$} (m-3-2);
+\end{tikzpicture}}}
+\]
+\[
+\vcenter{\hbox{\begin{tikzpicture}
+	\matrix [matrix of math nodes] (m) {
+	  		\trm{(N+bM)+c(P+aQ)}            &[20pt] \trm{(N+c(P+aQ))+b(M+c(P+aQ))}
+	\\[20pt]                                &       \trm{((N+cP)+a(N+cQ))+b((M+cP)+a(M+cQ))} &[10pt] (a<b<c)
+	\\[20pt]\trm{((N+bM)+cP)+a((N+bM)+cQ)}  &       \trm{((N+cP)+b(M+cP))+a((N+cQ)+b(M+cQ))}
+	\\ };
+	\draw[rw] (m-1-1) --node[above]{$\plusL$} (m-1-2);
+	\draw[rw] (m-1-1) --node[left] {$\plusR$} (m-3-1);
+	\draw[rws,implied] (m-1-2) --node[right]{$\plusR$} (m-2-2);
+	\draw[rws,implied] (m-2-2) --node[right]{$\plusL,\plusR,\cancelL,\cancelR$} (m-3-2);
+	\draw[rws,implied] (m-3-1) --node[below]{$\plusL$} (m-3-2);
+\end{tikzpicture}}}
 \]
 
-	\item $\trm{C[N+aM]}\rw\trm{C[N]+a C[M]}$.
+	\item $(\plusFun)$ $\trm{(N+aM)P}\rw\trm{(NP)+a(MP)}$.
 
 \[
-a < b \quad
-\begin{array}{c@{~}c@{~}c}
-	\trm{C[N +b (M +a P)]} &\rw& \trm{C[N]+b C[M+a P]}
-\\	\dw && \dw
-\\	\trm{C[(N +b M) +a (N+b P)]} && \trm{C[N]+b (C[M] +a C[P]} \rstrut
-\\	\dw && \dw
-\\	\trm{C[N +b M] +a [N +b P]}	&\rw& \trm{(C[N]+b C[M])+a(C[N]+bC[P]]} \rstrut
-\end{array}
+\vcenter{\hbox{\begin{tikzpicture}
+	\matrix [matrix of math nodes] (m) {
+	  		\trm{(N+aM)(P+aQ)}                &[10pt] \trm{(N(P+aQ))+a(M(P+aQ))}
+	\\[20pt]\trm{((N+aM)P)+a((N+aM)Q)}        &       \trm{((NP)+a(NQ))+a((MP)+a(MQ))}
+	\\[20pt]\trm{((NP)+a(MP))+a((NQ)+a(MQ))}  &       \trm{(NP)+a(MQ)}
+	\\ };
+	\draw[rw] (m-1-1) --node[above]{$\plusFun$} (m-1-2);
+	\draw[rw] (m-1-1) --node[left] {$\plusArg$} (m-2-1);
+	\draw[rws,implied] (m-1-2) --node[right]{$\plusArg$} (m-2-2);
+	\draw[rws,implied] (m-2-1) --node[left] {$\plusFun$} (m-3-1);
+	\draw[rws,implied] (m-2-2) --node[right]{$\cancelL,\cancelR$} (m-3-2);
+	\draw[rws,implied] (m-3-1) --node[below]{$\cancelL,\cancelR$} (m-3-2);
+\end{tikzpicture}}}
+\]
+\[
+\vcenter{\hbox{\begin{tikzpicture}
+	\matrix [matrix of math nodes] (m) {
+	  		\trm{(N+bM)(P+aQ)}         &[20pt] \trm{(N(P+aQ))+b(M(P+aQ))}
+	\\[20pt]                           &       \trm{((NP)+a(NQ))+b((MP)+a(MQ))} &[10pt] (a<b)
+	\\[20pt]\trm{((N+bM)P)+a((N+bM)Q)} &       \trm{((NP)+b(MP))+a((NQ)+b(MQ))}
+	\\ };
+	\draw[rw] (m-1-1) --node[above]{$\plusFun$} (m-1-2);
+	\draw[rw] (m-1-1) --node[left] {$\plusArg$} (m-3-1);
+	\draw[rws,implied] (m-1-2) --node[right]{$\plusArg$} (m-2-2);
+	\draw[rws,implied] (m-2-2) --node[right]{$\plusL,\plusR,\cancelL,\cancelR$} (m-3-2);
+	\draw[rws,implied] (m-3-1) --node[below]{$\plusFun$} (m-3-2);
+\end{tikzpicture}}}
 \]
 
-
-	\item $\trm{N +b (M +a P)}\rw\trm{(N +b M) +a (N +b P)}$.
-
-\[
-a<b
-\begin{array}{c@{~}c@{~}c}
-	\trm{(N+a Q)+b(M+a P)} &\rw& \trm{((N+a Q) +b M) +a ((N+a Q) +b P)}
-\\	\dw && \dw_*
-\\	\trm{(N+b(M+a P))+a(Q+b(M+a P))} && \trm{((N +b M)+a (Q +b M)) +a ((N +b P)+a(Q +b P))} \rstrut
-\\	\dw_* && \dw_*
-\\	\trm{((N+b M) +a (N+b P)) +a ((Q +b M) +a (Q +b P))} &\rw^*& \trm{(N+b M)+a(Q+b P)} \rstrut
-\end{array}
-\]
-
-{\footnotesize
-\[
-a<c<b
-\begin{array}{c@{~}c@{~}c}
-\trm{(N+a Q)+b(M+c P)} &\rw& \trm{((N+a Q) +b M) +c ((N+a Q) +b P)}
-\\	\dw && \dw_*
-\\	\trm{(N +b(M+c P))+a(Q+b(M+c P))} && \trm{((N +b M)+a (Q +b M)) +c ((N +b P)+a(Q +b P))} \rstrut
-\\	\dw_* && \dw_*
-\\\trm{((N +b M) +c (N +b P)) +a ((Q +b M) +c (Q +b P))} && \trm{((N +b M) +c ((N +b P)+a(Q +b P))) +a ((Q +b M) +c ((N +b P)+a(Q +b P)))} \rstrut
-\\	 & \rotatebox[origin=c]{155}{$\rw_*$}& \dw_*
-\\	 && \trm{(((N +b M) +c (N +b P)) +a ((N +b M) +c (Q +b P))) +a (((Q +b M) +c (N +b P)) +a ((Q +b M) +c (Q +b P)))} \rstrut
-\end{array}
-\]
-}
-
-
-	\item $\trm{N (M +a P)}\rw\trm{(NM) +a (NP)}$.
+	\item $(\plusBox)$ $\trm{!b.(N +a M)} \rw \trm{(!b.N) +a (!b.M)}$
 
 \[
-\begin{array}{c@{~}c@{~}c}
-\trm{(N+a Q)(M+a P)} &\rw& \trm{((N+a Q) M) +a ((N+a Q) P)}
-\\	\dw && \dw_*
-\\	\trm{(N(M+a P))+a(Q(M+a P))} && \trm{((N M)+a (Q M)) +a ((N P)+a(Q P))} \rstrut
-\\	\dw_* && \dw_*
-\\	\trm{((NM) +a (N P)) +a ((Q M) +a (Q P))} &\rw^*& \trm{(NM)+a(QP)} \rstrut
-\end{array}
-\]
-
-{\footnotesize
-\[
-a<b
-\begin{array}{c@{~}c@{~}c}
-\trm{(N+a Q)(M+b P)} &\rw& \trm{((N+a Q) M) +b ((N+a Q) P)}
-\\	\dw && \dw_*
-\\	\trm{(N(M+b P))+a(Q(M+b P))} && \trm{((N M)+a (Q M)) +b ((N P)+a(Q P))} \rstrut
-\\	\dw_* && \dw_*
-\\	\trm{((NM) +b (N P)) +a ((Q M) +b (Q P))} && \trm{((N M) +b ((N P)+a(Q P))) +a ((Q M) +b ((N P)+a(Q P)))} \rstrut
-\\	 &\rotatebox[origin=c]{155}{$\rw_*$} & \dw_*
-\\	 && \trm{(((N M) +b (N P)) +a((N M) +b(Q P))) +a (((Q M) +b (N P)) +a ((Q M) +b(Q P)))} \rstrut
-\end{array}
-\]
-}
-
-	\item $\trm{!b.(N +a M)} \rw \trm{(!b.N) +a (!b.M)}$ %(!c M[c/b])}$
-
-\[
-a \neq b, \ b \notin\trm{N+a M} \
-\begin{array}{c@{~}c@{~}c}
-	\trm{!b.(N +a M)} &\rw& \trm{(!b.N) +a (!b.M)}
-\\	\dw & \rotatebox[origin=c]{210}{$\rw_*$}
-\\	\trm{N +a M} &&
-\end{array}
+\vcenter{\hbox{\begin{tikzpicture}
+	\matrix [matrix of math nodes] (m) {
+	  		\trm{!b.(N+aM)}    &[20pt] \trm{(!b.N)+a(!b.M)}
+	\\[20pt]\trm{N+aM}
+	\\ };
+	\draw[rw] (m-1-1) --node[above]{$\plusBox$} (m-1-2);
+	\draw[rw] (m-1-1) --node[left] {$\boxVoid$} (m-2-1);
+	\draw[rws,implied] (m-1-2) --node[below right=-2pt] {$\boxVoid$} (m-2-1);
+\end{tikzpicture}}}
+\quad (a \neq b, \ b \notin\trm{N+a M})
 \]
 
 \end{itemize}
 \end{proof}
+
+
 
 \begin{definition}
 We denote the unique $\prob$-normal form of a term $N$ by $N^\prob$.
@@ -612,6 +815,20 @@ We aim to prove that $\rw \,=\, \rw_\beta \cup \rw_\prob$ is confluent.
 			\allowbreak\rw_\prob^*
 			\trm{(M_1[N/x] +b M_2[N/x]) +a (M_1[P/x] +b M_2[P/x])} = \trm{M[N/x] +a M[P/x]}$.
 
+%			\item \emph{Superposition}, \ie\ $\trm{M = M_1 +b M_2}$.
+%			Since $\trm{x \in {\fv{M}}}$ there are three cases:
+%			\begin{itemize}
+%				\item $\trm{x \in {\fv{M_1}} \cup \fv{M_2}}$ and then, by \ih, $\trm{M_i[N +a P/x]} \rw_\prob^* \trm{M_i[N/x] +a M_i[P/x]}$ for all $i \in \{1,2\}$.
+%				So,
+%				$\trm{M[N +a P/x]} = \trm{M_1[N +a P/x] M_2[N +a P/x]} \rw_\prob^* \trm{(M_1[N/x] +a M_1[P/x])(M_2[N/x] +a M_2[P/x])} \allowbreak\rw_\prob^* \trm{M_1[N/x]M_2[N/x] +a M_1[P/x]M_2[P/x]} = \trm{M[N/x] +a M[P/x]}$.
+%
+%				\item $\trm{x \in {\fv{M_{1}}}}$ and $\trm{x \notin {\fv{M_2}}}$ and then, by \ih, $\trm{M_1[N +a P/x]} \rw_\prob^* \trm{M_1[N/x] +a M_1[P/x]}$.
+%				So,
+%				$\trm{M[N +a P/x]} = \trm{M_1[N +a P/x] M_2} \rw_\prob^* \trm{(M_1[N/x] +a M_1[P/x])M_2} \allowbreak\rw_\prob^* \trm{M_1[N/x]M_2 +a M_1[P/x]M_2} = \trm{M[N/x] +a M[P/x]}$.
+%
+%				\item $\trm{x \notin {\fv{M_{1}}}}$ and $\trm{x \in {\fv{M_2}}}$: analogous to the previous case.
+%			\end{itemize}
+
 			\item \emph{Box}, \ie\
 			\qedhere
 		\end{itemize}
@@ -623,6 +840,7 @@ We aim to prove that $\rw \,=\, \rw_\beta \cup \rw_\prob$ is confluent.
 	For instance, take $\trm{M} = \trm{y} \neq \trm{x}$: then, $\trm{M[N +a P/x]} \allowbreak= y \neq \trm{y +a y} = \trm{M[N/x] +a M[P/x]}$ where $\trm{y}$ is $\prob$-normal.
 	In fact, if $\trm{x \notin {\fv{M}}}$ then $\trm{M[N/x] +a M[P/x] \allowbreak= M +a M \rw_\prob M = M[N +a P/x]}$.
 \end{remark}
+
 Two problematic cases to join critical pairs: the first two ones mean that we cannot use commutation and Hindley--Rosen lemma to prove that $\rw$ is confluent;
 the second two ones suggest that the proof of confluence of $\rw$ is delicate (see the remark above).
 
@@ -646,25 +864,46 @@ $
 \end{array}
 $
 
-\begin{align*}
-\trm{x \in {\fv{M}}} \qquad & & & \qquad \trm{x \notin {\fv{M}}} \\
-\begin{array}{c@{~}c@{~}c}
-\trm{(\x.M)(N +a P)} &\rw_\prob & \trm{((\x.M)N) +a ((\x. M)P)}
-\\	\dw_\beta && \dw_{\beta^+}
-\\ \trm{M[(N +a P)/x]} & \rw_\prob^* & \trm{M[N/x] +a M[P/x]}
-\end{array}
-&&&
-\begin{array}{c@{~}c@{~}c}
-\trm{(\x.M)(N +a P)} &\rw_\prob & \trm{((\x.M)N) +a ((\x. M)P)}
-\\	\dw_\beta && \dw_{\beta^+}
-\\ \trm{M} & {}_\prob \lw & \trm{M +a M}
-\end{array}
-\end{align*}
+
+%Two problematic cases to join critical pairs: the first two ones mean that we cannot use commutation and Hindley--Rosen lemma to prove that $\rw$ is confluent;
+%the second two ones suggest that the proof of confluence of $\rw$ is delicate (see the remark above);
+%
+%$
+%\begin{array}{c@{~}c@{~}c}
+%\trm{(\x.!a.M)P} &\rw_\prob & \trm{(!a.(\x. M))P}
+%\\	\dw_\beta && \dw_\prob
+%\\ \trm{(!a.M)[P/x]} & & \trm{!a.(\x. M)P}
+%\\	= & \rotatebox[origin=c]{210}{$\rw_\beta$}
+%\\	\trm{!a.M[P/x]} &&
+%\end{array}
+%$
+%\qquad
+%$
+%\begin{array}{c@{~}c@{~}c}
+%\trm{(\x.(N +a M))P} &\rw_\prob & \trm{((\x.N) +a (\x. M))P}
+%\\	\dw_\beta && \dw_\prob
+%\\ \trm{(N +a M)[P/x]} & & \trm{(\x.N)P +a (\x. M)P}
+%\\	= & \rotatebox[origin=c]{210}{$\rw_\beta^+$}
+%\\	\trm{N[P/x] +a M[P/x]} &&
+%\end{array}
+%$
+%
+%\begin{align*}
+%\trm{x \in {\fv{M}}} \qquad & & & \qquad \trm{x \notin {\fv{M}}} \\
+%\begin{array}{c@{~}c@{~}c}
+%\trm{(\x.M)(N +a P)} &\rw_\prob & \trm{((\x.M)N) +a ((\x. M)P)}
+%\\	\dw_\beta && \dw_{\beta^+}
+%\\ \trm{M[(N +a P)/x]} & \rw_\prob^* & \trm{M[N/x] +a M[P/x]}
+%\end{array}
+%&&&
+%\begin{array}{c@{~}c@{~}c}
+%\trm{(\x.M)(N +a P)} &\rw_\prob & \trm{((\x.M)N) +a ((\x. M)P)}
+%\\	\dw_\beta && \dw_{\beta^+}
+%\\ \trm{M} & {}_\prob \lw & \trm{M +a M}
+%\end{array}
+%\end{align*}
 
 \hrule
-
-\newcommand\lab{\bullet}
-
 
 \begin{definition}
 A \emph{labelled} term $\trm{N*}$ is a term $N$ with chosen redexes annotated as $\trm{(\x.M)*P}$. The \emph{labelled reduct} $\trm{<N*>}$ of a labelled term is defined inductively as follows.
@@ -731,7 +970,18 @@ Any reduction step $N\rw M$ maps onto a complete step $N^\prob\rwp M^\prob$ on $
 \end{lemma}
 
 \begin{proof}
-The case of a $\prob$-step $N\rw_\prob M$ is immediate, since $N^\prob=M^\prob$. For a $\beta$-step $N\rw_\beta M$ we label the reduced redex in $N$ to get $\trm{N*}\rwp_\beta\trm{<N*>}=M$. Let $\trm{P*}=(\trm{N*})^\prob$ be the (labelled) $\prob$-normal form of $\trm{N*}$. Then Lemma~\ref{lem:exhaustive p - parallel beta} gives $M=\trm{<N*>}=_\prob\trm{<P*>}$. By confluence and strong normalization of $\rw_\prob$ then $\trm{<P*>}^\prob=M^\prob$. The complete reduction $N^\prob\rwp M^\prob$ is then given by $N^\prob\rwp_\beta\trm{<P*>}\rwn_\prob M^\prob$.
+The case of a $\prob$-step $N\rw_\prob M$ is immediate, since $N^\prob=M^\prob$. For a $\beta$-step $N\rw_\beta M$ we label the reduced redex in $N$ to get $\trm{N*}\rwp_\beta\trm{<N*>}=M$. Let $\trm{P*}=(\trm{N*})^\prob$ be the (labelled) $\prob$-normal form of $\trm{N*}$. Then Lemma~\ref{lem:exhaustive p - parallel beta} gives $M=\trm{<N*>}=_\prob\trm{<P*>}$, illustrated below.
+\[
+\begin{tikzpicture}
+	\matrix (m) [matrix of math nodes] {
+	  \trm{N*} && \trm{P*} \\[20pt] \\ \trm{M=<N*>} & =_\prob & \trm{<P*>} \\
+	};
+	\draw[rwn] (m-1-1) --node[above]{$\scriptstyle\prob$} (m-1-3);
+	\draw[rwp] (m-1-1) --node[left] {$\scriptstyle\beta$} (m-3-1);
+	\draw[rwp] (m-1-3) --node[right]{$\scriptstyle\beta$} (m-3-3);
+\end{tikzpicture}
+\]
+By confluence and strong normalization of $\rw_\prob$ then $\trm{<P*>}^\prob=M^\prob$. The complete reduction $N^\prob\rwp M^\prob$ is then given by $N^\prob\rwp_\beta\trm{<P*>}\rwn_\prob M^\prob$.
 \end{proof}
 
 \begin{lemma}
@@ -739,30 +989,6 @@ The case of a $\prob$-step $N\rw_\prob M$ is immediate, since $N^\prob=M^\prob$.
 Complete reduction has the diamond property: if $P\rwpleft N\rwp M$ then $P\rwp Q\rwpleft M$ for some $Q$.
 \end{lemma}
 
-\begin{theorem}
-\label{thm:confluence}
-Reduction $\rw$ is confluent.
-\end{theorem}
-
-\begin{proof}
-By the following diagram. For the top and left areas, by Lemma~\ref{lem:p to complete reduction} any reduction path $N\rws M$ maps onto one $N^\prob \rwx M^\prob$. The main square follows by the diamond property of complete reduction, Lemma~\ref{lem:complete diamond}.
-\[
-\begin{tikzpicture}
-	\matrix (m) [matrix of math nodes] {
-	  N &[12pt] &[18pt] M &[12pt] \\[12pt] & N^\prob && M^\prob \\[18pt] P \\[12pt] & P^\prob && Q \\
-	};
-	\draw[rws] (m-1-1) -- (m-1-3);
-	\draw[rws] (m-1-1) -- (m-3-1);
-	\draw[rwn] (m-1-1) --node[below left =-2pt] {$\scriptstyle\prob$} (m-2-2);
-	\draw[rwn] (m-1-3) --node[above right=-2pt]{$\scriptstyle\prob$} (m-2-4);
-	\draw[rwn] (m-3-1) --node[below left =-2pt] {$\scriptstyle\prob$} (m-4-2);
-	\draw[rwx] (m-2-2) -- (m-2-4);
-	\draw[rwx] (m-2-2) -- (m-4-2);
-	\draw[rwx] (m-2-4) -- (m-4-4);
-	\draw[rwx] (m-4-2) -- (m-4-4);
-\end{tikzpicture}
-\]
-\end{proof}
 
 \begin{figure}
 \[
@@ -816,22 +1042,86 @@ By the following diagram. For the top and left areas, by Lemma~\ref{lem:p to com
 \end{figure}
 
 
+\begin{theorem}
+\label{thm:confluence}
+Reduction $\rw$ is confluent.
+\end{theorem}
 
+\begin{proof}
+By the following diagram. For the top and left areas, by Lemma~\ref{lem:p to complete reduction} any reduction path $N\rws M$ maps onto one $N^\prob \rwx M^\prob$. The main square follows by the diamond property of complete reduction, Lemma~\ref{lem:complete diamond}.
 \[
-\begin{array}{l}
-	N\rw M
-\\
-	N\rwb M
-\\
-	N\rws M
-\\
-	N\rwn M
-\\
-	N\rwp M
-\\
-	N\rwx M
-\end{array}
+\begin{tikzpicture}
+	\matrix (m) [matrix of math nodes] {
+	  N &[10pt] &[18pt] M &[10pt] \\[10pt] & N^\prob && M^\prob \\[18pt] P \\[10pt] & P^\prob && Q \\
+	};
+	\draw[rws] (m-1-1) -- (m-1-3);
+	\draw[rws] (m-1-1) -- (m-3-1);
+	\draw[rwn] (m-1-1) --node[below left =-2pt] {$\scriptstyle\prob$} (m-2-2);
+	\draw[rwn] (m-1-3) --node[above right=-2pt]{$\scriptstyle\prob$} (m-2-4);
+	\draw[rwn] (m-3-1) --node[below left =-2pt] {$\scriptstyle\prob$} (m-4-2);
+	\draw[rwx] (m-2-2) -- (m-2-4);
+	\draw[rwx] (m-2-2) -- (m-4-2);
+	\draw[rwx] (m-2-4) -- (m-4-4);
+	\draw[rwx] (m-4-2) -- (m-4-4);
+\end{tikzpicture}
 \]
+\end{proof}
+
+
+\hrule
+
+\newcommand\proj[3]{\pi^{#1}_{#2}(\trm{#3})}
+
+\section{Projective reduction}
+
+The reduction $\rw_\prob$ evaluates probabilistic sums purely by rewriting. Here we look at an alternative \emph{projective} notion of reduction, which conforms more closely to the intuition that $\trm{!a}$ generates a probabilistic event that is consumed by $\trm{+a}$.
+
+For projective reduction we distinguish a global, meta-level probabilistic sum $+$ from the internal, object-level probabilistic sum $\trm{N+{}M=!a.N+aM}$. Let $N^+$ denote the term $N$ with every top-level internal sum $\trm{+{}}$ evaluated as an external sum; formally:
+\[
+	\trm{(N+{}M)}^+=N^+\!+M^+ \qquad\qquad N^+=N \quad(N\neq \trm{M+{}P})~.
+\]
+{\color{red}(NOTE: The evaluation $N^+$ should be discussed earlier, to complete our reduction $\rw_\prob$ by linking our syntactic $\trm{+{}}$ to semantic probilistic sums.)}
+
+\begin{definition}
+The \emph{$a$-projections} $\proj a0N$ and $\proj a1N$ are defined as follows, where $a\neq b$.
+\begin{align*}
+	\proj a0{N+aM} &= \proj a0N
+\\	\proj a1{N+aM} &= \proj a1M
+\\	\proj ai{!a.N} &= \trm{!a.N}
+\\	\proj aix      &= x
+\\	\proj ai{\x.N} &= \x.\proj aiN
+\\	\proj ai{NM}   &= (\proj aiN)(\proj aiM)
+\\	\proj ai{N+bM} &= (\proj aiN)\trm{+b}(\proj aiM)
+\\	\proj ai{!b.N} &= \trm{!b.}\proj aiN
+\end{align*}
+\end{definition}
+
+\begin{definition}
+A \emph{head context} $H[\,]$ is given by the following grammar.
+\[
+	H[\,] \coloneqq [\,] ~\mid~ \lambda x.H[\,] ~\mid~ H[\,]N
+\]
+\end{definition}
+
+
+\begin{definition}
+\emph{Projective} reduction $\rw_\pi$ is the reduction step
+\[
+	\trm{!a.N} ~\rw_\pi~ \proj a0N + \proj a1N
+\]
+closed under head context:
+\[
+	N\rw_\pi M \quad\implies\quad H[N]\rw_\pi H[M]~.
+\]
+\end{definition}
+
+
+Observe that projective reduction is not a rewrite relation, as it applies only in head contexts---that is, we do not evaluate inside arguments or under other probabilistic events $\trm{!a}$ or sums $\trm{+a}$.
+
+\begin{proposition}
+If $N\rw_\pi M$ then there is a $P$ such that $N\rws_\prob P$ with $P^+=M$.
+\end{proposition}
+
 
 \bibliographystyle{plain}
 \bibliography{biblio}
