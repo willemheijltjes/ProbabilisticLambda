@@ -996,7 +996,8 @@ Reduction to normal form in $\rwb_\prob$ is equal to $\rwn_\prob$.
 \end{lemma}
 
 \begin{proof}
-	On labeled terms, $\rwb_\prob \,\subseteq\, \rws_\prob$ and {\color{red}(incomplete; how about:) if $N\rw_\prob M$ but $N\not\rwb_\prob M$ then for some $P$ we have $N\rwb_\prob$ and $M\rws_\prob P$;} hence $\rwbn_\prob \,=\, \rwn_\prob$.
+Observe that $\rw_\prob$ and $\rwb_\prob$ have the same normal forms. Then since $\rwb_\prob\,\subseteq\,\rws_\prob$ we have $\rwbn_\prob\,\subseteq\,\rwn_\prob$. Conversely, let $N\rwn_\prob M$. On this reduction, let $P\rw_\prob Q$ be the first step such that $P\not\rwb_\prob Q$. Then there is an $R$ such that $P\rwb_\prob R$ and $Q\rw_\prob R$. Note that we have $N\rwbs_\prob R$. By confluence, $R\rwn_\prob M$, and by induction on the sum length of paths in $\rw_\prob$ from $R$ (smaller than from $N$) we have $R\rwbn_\prob M$, and hence $N\rwbn_\prob M$.
+	%On labeled terms, $\rwb_\prob \,\subseteq\, \rws_\prob$ and thus $\rwbn_\prob \,\subseteq\, \rwn_\prob$ {\color{red}(incomplete; how about:) if $N\rw_\prob M$ but $N\not\rwb_\prob M$ then for some $P$ we have $N\rwb_\prob$ and $M\rws_\prob P$;} hence $\rwbn_\prob \,=\, \rwn_\prob$.
 %	In particular, $\trm{N*} \rwbn_\prob \trm{M*}$ if and only if $\trm{N*} \rwn_\prob \trm{M*}$.
 \end{proof}
 
