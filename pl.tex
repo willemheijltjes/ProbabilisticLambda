@@ -12,6 +12,7 @@
   \usetikzlibrary{matrix}
 \usepackage[hidelinks]{hyperref}
 \usepackage{cleveref}
+\usepackage{proof}
 
 \makeatletter
 
@@ -266,7 +267,7 @@ A representative $\trm{M}$ of a term is \emph{well-labeled} if
 %for every sub-term $\trm{!a.N}$ of $\trm{M}$, the label $a$ may occur only in $\trm{N}$ (if at all).
 for every occurrence of $\probox a$ in $\trm{M}$ there is no $\probox a$ occurring in its scope.
 
-\begin{definition}[Order for labels]
+\begin{definition}[Order for labels]\label{def:orderlabels}
 	Let $\trm{M}$ be a well-labeled representative of a term.
 	We define an \emph{order} $<_{{\trm{M}}}$ for the labels occurring in $\trm{M}$ as follows: $a <_{\trm{M}} b$ if and only if $\probox b$ occurs in the scope of $\probox a$.
 \end{definition}
@@ -336,7 +337,6 @@ P_0 &\coloneqq& P_1 &\mid& \trm{P_0 +{} P_0}
 	\]
 \end{proposition}
 
-
 \subsection{Strong normalization of $\prob$-reduction}
 
 \begin{remark}
@@ -368,6 +368,181 @@ P_0 &\coloneqq& P_1 &\mid& \trm{P_0 +{} P_0}
 	For the first-order term rewriting system $(\PEL, \rw_\prob)$  it can be defined a well-founded recursive path ordering $>$ in the sense of \cite[p. 289]{Dershowitz82} such that $\trm{M \rw_\prob N}$ implies $\trm{M}>\trm{N}$.
 \end{proof}
 
+\subsection{Strong normalization for typed terms}
+In this section, we prove that the relation $\rw$ enjoys strong
+normalization in simply typed terms.
+
+Since the proof of strong normalization is quite delicate, it make
+sense to turn the definition of the order $<_{{\trm{M}}}$ from
+Definition~\ref{def:orderlabels} more formal, at the same time
+allowing to treat label-\emph{open} terms. This is based on
+Figure~\ref{fig:order}.
+\newcommand{\labjudg}[2]{#1\vdash_{L} #2}
+\begin{figure}
+  \fbox{
+    \begin{minipage}{.97\textwidth}
+      \begin{tabular}{ll}        
+        \textsf{Label Sequences}: & $\theta\quad\coloneqq\quad \varepsilon ~\mid~ a\cdot\theta $\\
+        \textsf{Label Judgments}: & $\xi\quad\coloneqq\quad \labjudg{\theta}{M}$\\
+        \begin{minipage}{.25\textwidth}\textsf{Label Rules}:\end{minipage} &
+        \begin{minipage}{.7\textwidth}
+        $$
+        \infer{\labjudg{\theta}{x}}{}\qquad
+        \infer{\labjudg{\theta}{\x.M}}{\labjudg{\theta}{M}}\qquad
+        \infer{\labjudg{\theta}{MN}}{\labjudg{\theta}{M} & \labjudg{\theta}{N}}
+        $$
+        $$
+        \infer{\labjudg{\theta}{\trm{M +a N}}}{\labjudg{\theta}{M} & \labjudg{\theta}{N} & a\in\theta}\qquad\qquad
+        \infer{\labjudg{\theta}{\trm{!a.M}}}{\labjudg{a,\theta}{M}}
+        $$
+        \end{minipage}
+        \\
+      \end{tabular}
+    \end{minipage}
+  }
+\label{fig:order}
+\end{figure}
+It is easy to realize that, of course modulo label $\alpha$-equivalence, for
+every term $M$ there is at least one $\theta$ such that $\labjudg{\theta}{M}$.
+
+Now, let us define types, environments, judgments, and typing rules in
+Figure~\ref{fig:typing}.
+\newcommand{\arrow}{\Rightarrow}
+\newcommand{\judg}[3]{#1\vdash #2:#3}
+\begin{figure}
+  \fbox{
+    \begin{minipage}{.97\textwidth}
+      \begin{tabular}{ll}        
+        \textsf{Types}: & $\tau\quad\coloneqq\quad \alpha ~\mid~ \tau\arrow\rho$\\
+        \textsf{Environments}: & $\Gamma\quad\coloneqq\quad x_1:\tau_1,\ldots,x_n:\tau_n$\\
+        \textsf{Judgments}: & $\pi\quad\coloneqq\quad \judg{\Gamma}{M}{\tau}$\\
+        \begin{minipage}{.25\textwidth}\textsf{Typing Rules}:\end{minipage} &
+        \begin{minipage}{.7\textwidth}
+        $$
+        \infer{\judg{\Gamma,x:\tau}{x}{\tau}}{}\qquad
+        \infer{\judg{\Gamma}{\x.M}{\tau\arrow\rho}}{\judg{\Gamma,x:\tau}{M:\rho}}\qquad
+        \infer{\judg{\Gamma}{MN}{\rho}}{\judg{\Gamma}{M}{\tau\arrow\rho} & \judg{\Gamma}{N}{\tau}}
+        $$
+        $$
+        \infer{\judg{\Gamma}{\trm{M +a N}}{\tau}}{\judg{\Gamma}{M}{\tau} & \judg{\Gamma}{N}{\tau}}\qquad\qquad
+        \infer{\judg{\Gamma}{\trm{!a.M}}{\tau}}{\judg{\Gamma}{M}{\tau}}
+        $$
+        \end{minipage}
+        \\
+      \end{tabular}
+    \end{minipage}
+  }
+\label{fig:typing}
+\end{figure}
+
+The type structure being precisely the usual one (although terms are of course
+different), we can reuse most of the usual proof of strong normalization, for
+example in the version given by Ralph Loader's notes, page 17. In the following, we only
+report the elements which make our proof different.
+
+\begin{lemma}\label{lemma:cloredsum}
+  The set SN is closed under the following rule:
+  $$
+  \infer{\trm{M +a N}L_1\ldots L_m}{ML_1\ldots L_m & NL_1\ldots L_m}
+  $$
+\end{lemma}
+\begin{proof}
+  Let $\theta$ be such that
+  $$
+  \labjudg{\theta}{\trm{M +a N}L_1\ldots L_m}
+  $$
+  and let $h(a,\theta)$ be the height of $a$ in the sequence $\theta$.
+  The proof goes by lexicographic induction on the following quadruple:
+  \begin{equation}\label{equ:redord}
+  (m,h(a,\theta),\sum_{i=1}^m\mathit{sn}(L_i)+\mathit{sn}(M)+\mathit{sn}(N),|M|+|N|)
+  \end{equation}
+  As usual, we proceed by showing that all terms to which
+  $\trm{M +a N}L_1\ldots L_m$ reduces are strongly normalizing:
+  \begin{itemize}
+  \item
+    If reduction happens in one between $M,N,L_1,\ldots,L_m$, then we
+    are done, because we get an instance of the rule where the first two
+    components of \ref{equ:redord} stay constant, and the third
+    strictly decreases.
+  \item
+    If reduction happens at the leftmost component $\trm{M +a N}$
+    due to the rule $\trm{P +a P}\rw_\prob P$, then one of the two
+    hypotheses apply trivially.
+  \item
+    If reduction happens at the leftmost component $\trm{M +a N}$
+    due to the rule $\trm{(P +a Q) +a R}\rw_\prob \trm{P +a R}$,
+    then the IH holds due to the fourth component being strictly
+    smaller. Similarly when the rule is
+    $\trm{P +a (Q +a R)}\rw_\prob \trm{P +a R}$.    
+  \item
+    If reduction happens in the leftmost application due to
+    the rule $\trm{(P +a Q) R}\rw_\prob \trm{(PR) +a (QR)}$,
+    then the IH can be applied, because the number of arguments $m$
+    strictly decreases. Similarly when the rule is
+    $\trm{N (M +a P)}\rw_\prob\trm{(NM) +a (NP)}$.
+  \item
+    If reduction happens at the leftmost component $\trm{M +a N}$
+    due to the rule $\trm{(P +b Q) +a R}\rw_\prob \trm{(P +a R) +b (Q +b R)}$,
+    then $M$ can be written as $\trm{P +b Q}$, and the
+    following two terms are strongly normalizing (because
+    $\trm{(P +b Q)L_1\ldots L_m}$ is by hypothesis strongly normalizing
+      itself):
+    $$
+    PL_1\ldots L_m\qquad QL_1\ldots L_m
+    $$
+    Moreover, $\mathit{sn}(PL_1\ldots L_m),\mathit{sn}(QL_1\ldots
+    L_m)\leq\mathit{sn}(\trm{(P +b Q)L_1\ldots L_m}$.  We can then
+    conclude that $\trm{(P +a N)}L_1\ldots L_m$ and $\trm{(Q +a
+        N)}L_1\ldots L_m$ are both strongly normalizing by IH, because
+    the fourth component is strictly smaller. Finally, we can conclude
+    again by induction hypothesis, since the number of arguments stays
+    the same, while the level of $b$ must be smaller than that of
+    $a$. Similarly if the rule applied is $\trm{P +a (Q +b
+      R)}\rw_\prob \trm{(P +a Q) +b (P +b R)}$.
+  \end{itemize}
+\end{proof}
+
+\begin{lemma}
+  The set SN is closed under the following rule:
+  $$
+  \infer{\trm{(!a.M)}L_1\ldots L_m}{\trm{M}L_1\ldots L_m}
+  $$
+\end{lemma}
+\begin{proof}
+  The proof is structurally very similar to the one of
+  Lemma~\ref{lemma:cloredsum}. The lexicographic order
+  is however the following one:
+  $$
+  (m,\sum_{i=1}^m\mathit{sn}(L_i)+\mathit{sn}(M),|M|)
+  $$
+  There is one case in which we need to use
+  Lemma \ref{lemma:cloredsum}, namely the one in which the
+  considered reduction rule is the following:
+  $$
+  \trm{!b.(N +a M)}\rw_\prob\trm{(!b.N) +a (!b.M)}.
+  $$
+\end{proof}
+
+Lemma 3.2 continues to hold, but requires a new proof. 
+
+The definition of a reducible term stays the same.
+
+Lemma 3.5 must be complemented with two new clauses, as follows:
+\newcommand{\RedSet}[1]{\mathit{Red}_{#1}}
+\begin{lemma}
+  \begin{itemize}
+  \item
+    If $(\Gamma,ML_1\ldots L_m)\in\RedSet{\tau}$
+    and $(\Gamma,NL_1\ldots L_m)\in\RedSet{\tau}$,
+    then $(\Gamma,\trm{(M +a N)}L_1\ldots L_m)\in\RedSet{\tau}$.
+  \item
+    If $(\Gamma,ML_1\ldots L_m)\in\RedSet{\tau}$,
+    then $(\Gamma,\trm{(!a.M)}L_1\ldots L_m)\in\RedSet{\tau}$.
+  \end{itemize}
+\end{lemma}
+\begin{proof}
+  The proofs are just very simple inductions on $\tau$.
+\end{proof}
 
 \subsection{Confluence of $\prob$-reduction}
 
