@@ -122,6 +122,7 @@
 \newcommand\z{\lambda z}
 
 \newcommand\lab{\bullet}
+\newcommand{\labtwo}{\circ}
 
 \newcommand\term[1]{{\let\term@typecolor\typecolor\termcolor\trm{#1}}}
 \newcommand\trm[1]{%
@@ -1096,7 +1097,7 @@ $
 \hrule
 
 \begin{definition}
-A \emph{labelled} term $\trm{N*}$ is a term $N$ with chosen $\beta$-redexes annotated as $\trm{(\x.M)*P}$. The \emph{labeled reduct} $\trm{<N*>}$ of a labeled term is defined by induction on $N$ as follows:
+A \emph{labeled} term $\trm{N*}$ is a term $N$ with chosen $\beta$-redexes annotated as $\trm{(\x.M)*P}$. The \emph{labeled reduct} $\trm{<N*>}$ of a labeled term is defined by induction on $N$ as follows:
 \begin{align*}
 	\trm{<(\x.N)*M>} &= \trm{<N>[<M>/x]}
 \\	\trm{<x>}		&= x
@@ -1170,8 +1171,9 @@ Reduction to normal form in $\rwb_\prob$ is equal to $\rwn_\prob$.
 \end{lemma}
 
 \begin{proof}
-	On labeled terms, $\rw_\prob \,\subseteq\, \rwb_\prob \,\subseteq\, \rws_\prob$ and hence $\rwbs_\prob \,=\, \rws_\prob$.
-	In particular, $\trm{N*} \rwbn_\prob \trm{M*}$ if and only if $\trm{N*} \rwn_\prob \trm{M*}$.
+Observe that $\rw_\prob$ and $\rwb_\prob$ have the same normal forms. Then since $\rwb_\prob\,\subseteq\,\rws_\prob$ we have $\rwbn_\prob\,\subseteq\,\rwn_\prob$. Conversely, let $N\rwn_\prob M$. On this reduction, let $P\rw_\prob Q$ be the first step such that $P\not\rwb_\prob Q$. Then there is an $R$ such that $P\rwb_\prob R$ and $Q\rw_\prob R$. Note that we have $N\rwbs_\prob R$. By confluence, $R\rwn_\prob M$, and by induction on the sum length of paths in $\rw_\prob$ from $R$ (smaller than from $N$) we have $R\rwbn_\prob M$, and hence $N\rwbn_\prob M$.
+	%On labeled terms, $\rwb_\prob \,\subseteq\, \rws_\prob$ and thus $\rwbn_\prob \,\subseteq\, \rwn_\prob$ {\color{red}(incomplete; how about:) if $N\rw_\prob M$ but $N\not\rwb_\prob M$ then for some $P$ we have $N\rwb_\prob$ and $M\rws_\prob P$;} hence $\rwbn_\prob \,=\, \rwn_\prob$.
+%	In particular, $\trm{N*} \rwbn_\prob \trm{M*}$ if and only if $\trm{N*} \rwn_\prob \trm{M*}$.
 \end{proof}
 
 \begin{lemma}
@@ -1185,11 +1187,11 @@ If $\trm{N*}\rwn_\prob\trm{M*}$ then $\trm{<N*>}=_\prob\trm{<M*>}$
 \end{lemma}
 
 \begin{proof}
-Using Lemma~\ref{lem:parallel p-reduction} we decompose $\trm{N*}\rwn_\prob\trm{M*}$ as
+Using \Cref{lem:parallel p-reduction} we decompose $\trm{N*}\rwn_\prob\trm{M*}$ as
 \[
 	\trm{N*}=\trm{N_1*}\rwb_\prob\trm{N_2*}\rwb_\prob \dots \rwb_\prob \trm{N_n*}=\trm{M*}
 \]
-for which Lemma~\ref{lem:parallel p - parallel beta} gives $\trm{<N_i*>}=_\prob\trm{<N_{i+1}*>}$.
+for which \Cref{lem:parallel p - parallel beta} gives $\trm{<N_i*>}=_\prob\trm{<N_{i+1}*>}$.
 \end{proof}
 
 \begin{definition}
@@ -1199,14 +1201,16 @@ A \emph{complete} reduction step $\rwp$ is a parallel $\beta$-step followed by $
 \]
 \end{definition}
 
-\begin{lemma}
+\begin{lemma}[Mapping on $\prob$-normal forms]
 \label{lem:p to complete reduction}
 Any reduction step $N\rw M$ maps onto a complete step $N^\prob\rwp M^\prob$ on $\prob$-normal forms.
 \end{lemma}
 
 \begin{proof}
 The case of a $\prob$-step $N\rw_\prob M$ is immediate, since $N^\prob=M^\prob$ and $\rwp_\beta$ is reflexive (\Cref{rmk:reflexivity}). 
-For a $\beta$-step $N\rw_\beta M$ we label the reduced redex in $N$ to get $\trm{N*}\rwp_\beta\trm{<N*>}=M$. Let $\trm{P*}=(\trm{N*})^\prob$ be the (labeled) $\prob$-normal form of $\trm{N*}$. Then Lemma~\ref{lem:exhaustive p - parallel beta} gives $M=\trm{<N*>}=_\prob\trm{<P*>}$, illustrated below.
+For a $\beta$-step $N\rw_\beta M$ we label the reduced redex in $N$ to get $\trm{N*}\rwp_\beta\trm{<N*>}=M$. 
+Let $\trm{P*}=(\trm{N*})^\prob$ be the (labeled) $\prob$-normal form of $\trm{N*}$. 
+Then \Cref{lem:exhaustive p - parallel beta} gives $M=\trm{<N*>}=_\prob\trm{<P*>}$, illustrated below.
 \[
 \begin{tikzpicture}
 	\matrix (m) [matrix of math nodes] {
@@ -1220,11 +1224,71 @@ For a $\beta$-step $N\rw_\beta M$ we label the reduced redex in $N$ to get $\trm
 By confluence and strong normalization of $\rw_\prob$ then $\trm{<P*>}^\prob=M^\prob$. The complete reduction $N^\prob\rwp M^\prob$ is then given by $N^\prob\rwp_\beta\trm{<P*>}\rwn_\prob M^\prob$.
 \end{proof}
 
-\begin{lemma}
-\label{lem:complete diamond}
-Complete reduction has the diamond property: if $P\rwpleft N\rwp M$ then $P\rwp Q\rwpleft M$ for some $Q$.
+\begin{lemma}\label{lemma:application-parallel-beta}
+	If $\trm{M} \rwp_\beta \trm{M'}$ and $\trm{N} \rwp_\beta \trm{N'}$, then $\trm{MN} \rwp_\beta \trm{M'N'}$.
 \end{lemma}
 
+\begin{proof}
+	Since $\trm{M} \rwp_\beta \trm{<M*>} = M'$ and $\trm{N} \rwp_\beta \trm{<N*>} = N'$ for some labelings $\trm{M*}$ and $\trm{N*}$ of $M$ and $N$ respectively, let $\trm{(MN)*}$ be the labeling of $\trm{MN}$ obtained by putting together the labelings $\trm{M*}$ and $\trm{N*}$.
+	Clearly, $\trm{MN} \rwp_\beta \trm{<(MN)*>} = \trm{<M*><N*>} = M'N'$.
+\end{proof}
+
+\begin{lemma}[Full labeling]
+	\label{lemma:full-development}
+	Let $\trm{M}$ be a term, and $\trm{M*}$ be its \emph{full labeling}, which labels every $\beta$-redex in $\trm{M}$.
+	\begin{enumerate}
+		\item\label{lemma:full-development-beta} If $\trm{M} \rwp_\beta \trm{N}$ then $\trm{N} \rwp_\beta \trm{<M*>}$.
+		\item\label{lemma:full-development-complete} If $\trm{M} \rwp \trm{N}$ then $\trm{N} \rwp \trm{<M*>}^\prob$.
+	\end{enumerate}
+\end{lemma}
+\begin{proof}\hfill
+	\begin{enumerate}
+		\item	By induction on $\trm{M}$.
+		Cases:
+		\begin{itemize}
+			\item \emph{Variable}, \ie\ $\trm{M} = x$.
+			Then $\trm{N} = x$ since $x$ is normal. 
+			Moreover, $\trm{M*} = x$ and hence $\trm{<M*>} = x$.
+			Therefore, $\trm{N} \rwp \trm{<M*>}$ because $\rwp_\beta$ is reflexive (\Cref{rmk:reflexivity}).
+			
+			\item \emph{Abstraction}, \ie\ $\trm{M} = \trm{\x.P}$.
+			Then $\trm{N} = \trm{\x.<P^\circ>}$ for some labeling $\trm{P^\circ}$ of $\trm{P}$.
+			Since $\trm{P} \rwp_\beta \trm{<P^\circ>}$, one has $\trm{<P^\circ>} \rwp_\beta \trm{<P*>}$ and hence $\trm{N} = \trm{\x.<P^\circ>} \rwp_\beta \trm{\x.<P*>} = \trm{<M*>}$.
+			
+			\item \emph{Application}, \ie\ $\trm{M} = \trm{PQ}$.
+			Let $\trm{M^\circ}$ be a labeling of $\trm{M}$ such that $N = \trm{<M^\circ>}$.
+			There are three subcases:
+			\begin{itemize}
+				\item $\trm{M} \neq \trm{(\x.R)Q}$. 
+				Then $\trm{N} = \trm{<P^\circ><Q^\circ>}$.
+				By \ih\ (since $\trm{P} \rwp_\beta \trm{<P^\circ>}$ and $\trm{Q} \rwp_\beta \trm{<Q^\circ>}$), one has $\trm{<P^\circ>} \rwp_\beta \trm{<P*>}$ and $\trm{<Q^\circ>} \rwp_\beta \trm{<Q*>}$.
+				Therefore, by \Cref{lemma:application-parallel-beta}, $\trm{N} \rwp_\beta \trm{<P*><Q*>} = \trm{<M*>}$, where the equality holds because $\trm{M} \neq \trm{(\x.R)Q}$.
+				
+				\item $\trm{M^\circ} = \trm{(\x.R)*Q}$.
+				Then $\trm{N} = \trm{<R^\circ>[<Q^\circ>/x]}$
+				
+				\item $\trm{M^\circ} \neq \trm{(\x.R)*Q}$ but $\trm{M} = \trm{(\x.R)Q}$. 
+				Then $\trm{N} = \trm{<P^\circ><Q^\circ>}$.
+				By \ih\ (since $\trm{P} \rwp_\beta \trm{<P^\circ>}$ and $\trm{Q} \rwp_\beta \trm{<Q^\circ>}$), one has $\trm{<P^\circ>} \rwp_\beta \trm{<P*>}$ and $\trm{<Q^\circ>} \rwp_\beta \trm{<Q*>}$.
+			\end{itemize}
+		\end{itemize}
+	
+		\item Since $\trm{M} \rwp \trm{N}$, then $\trm{M} \rwp_\beta \trm{P} \rwn_\prob \trm{N}$ for some term $\trm{P}$ such that $\trm{N} = \trm{P}^\prob$.
+		By \Cref{lemma:full-development}.\ref{lemma:full-development-beta}, $\trm{P} \rwp_\beta \trm{<M*>}$ and hence $\trm{P} \rwp \trm{<M*>^\prob}$.
+		According to \Cref{lem:p to complete reduction}, $\trm{N} = \trm{P}^\prob \rwp \trm{(<M*>^\prob)^\prob} = \trm{<M*>^\prob}$.
+		\qedhere
+	\end{enumerate}
+\end{proof}
+
+\begin{corollary}[Complete reduction is diamond]
+\label{cor:complete diamond}
+%Complete reduction has the diamond property: if
+	If $P\rwpleft N\rwp M$ then $P\rwp Q\rwpleft M$ for some $Q$.
+\end{corollary}
+
+\begin{proof}
+	By \Cref{lemma:full-development}.\ref{lemma:full-development-complete}, $P\rwp \trm{<M*>} \rwpleft M$ where $\trm{M*}$ is the full labeling of $\trm{M}$.
+\end{proof}
 
 \begin{figure}
 \[
@@ -1267,10 +1331,10 @@ Complete reduction has the diamond property: if $P\rwpleft N\rwp M$ then $P\rwp 
 	\draw[rwp] (m-3-1) -- (m-3-3);
 \end{tikzpicture}}}
 \\ \\
-  \text{Lemma~\ref{lem:parallel p - parallel beta}}
-& \text{Lemma~\ref{lem:exhaustive p - parallel beta}}
-& \text{Lemma~\ref{lem:p to complete reduction}}
-& \text{Lemma~\ref{lem:complete diamond}}
+  \text{\Cref{lem:parallel p - parallel beta}}
+& \text{\Cref{lem:exhaustive p - parallel beta}}
+& \text{\Cref{lem:p to complete reduction}}
+& \text{\Cref{cor:complete diamond}}
 \end{array}
 \]
 \caption{Diagrams for the lemmata leading up to confluence}
@@ -1284,7 +1348,7 @@ Reduction $\rw$ is confluent.
 \end{theorem}
 
 \begin{proof}
-By the following diagram. For the top and left areas, by Lemma~\ref{lem:p to complete reduction} any reduction path $N\rws M$ maps onto one $N^\prob \rwx M^\prob$. The main square follows by the diamond property of complete reduction, Lemma~\ref{lem:complete diamond}.
+By the following diagram. For the top and left areas, by Lemma~\ref{lem:p to complete reduction} any reduction path $N\rws M$ maps onto one $N^\prob \rwx M^\prob$. The main square follows by the diamond property of complete reduction, \Cref{cor:complete diamond}.
 \[
 \begin{tikzpicture}
 	\matrix (m) [matrix of math nodes] {
@@ -1316,7 +1380,7 @@ For projective reduction we distinguish a global, meta-level probabilistic sum $
 \[
 	\trm{(N+{}M)}^+=N^+\!+M^+ \qquad\qquad N^+=N \quad(N\neq \trm{M+{}P})~.
 \]
-{\color{red}(NOTE: The evaluation $N^+$ should be discussed earlier, to complete our reduction $\rw_\prob$ by linking our syntactic $\trm{+{}}$ to semantic probilistic sums.)}
+{\color{red}(NOTE: The evaluation $N^+$ should be discussed earlier, to complete our reduction $\rw_\prob$ by linking our syntactic $\trm{+{}}$ to semantic probabilistic sums.)}
 
 \begin{definition}
 The \emph{$a$-projections} $\proj a0N$ and $\proj a1N$ are defined as follows, where $a\neq b$.
