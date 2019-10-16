@@ -394,7 +394,7 @@ Figure~\ref{fig:order}.
         $$
         $$
         \infer{\labjudg{\theta}{\trm{M +a N}}}{\labjudg{\theta}{M} & \labjudg{\theta}{N} & a\in\theta}\qquad\qquad
-        \infer{\labjudg{\theta}{\trm{!a.M}}}{\labjudg{a,\theta}{M}}
+        \infer{\labjudg{\theta}{\trm{!a.M}}}{\labjudg{a\cdot\theta}{M}}
         $$
         \end{minipage}
         \\
@@ -421,7 +421,7 @@ Figure~\ref{fig:typing}.
         \begin{minipage}{.7\textwidth}
         $$
         \infer{\judg{\Gamma,x:\tau}{x}{\tau}}{}\qquad
-        \infer{\judg{\Gamma}{\x.M}{\tau\arrow\rho}}{\judg{\Gamma,x:\tau}{M:\rho}}\qquad
+        \infer{\judg{\Gamma}{\x.M}{\tau\arrow\rho}}{\judg{\Gamma,x:\tau}M\rho}\qquad
         \infer{\judg{\Gamma}{MN}{\rho}}{\judg{\Gamma}{M}{\tau\arrow\rho} & \judg{\Gamma}{N}{\tau}}
         $$
         $$
@@ -483,7 +483,7 @@ report the elements which make our proof different.
     $\trm{N (M +a P)}\rw_\prob\trm{(NM) +a (NP)}$.
   \item
     If reduction happens at the leftmost component $\trm{M +a N}$
-    due to the rule $\trm{(P +b Q) +a R}\rw_\prob \trm{(P +a R) +b (Q +b R)}$,
+    due to the rule $\trm{(P +b Q) +a R}\rw_\prob \trm{(P +a R) +b (Q +a R)}$,
     then $M$ can be written as $\trm{P +b Q}$, and the
     following two terms are strongly normalizing (because
     $\trm{(P +b Q)L_1\ldots L_m}$ is by hypothesis strongly normalizing
@@ -499,7 +499,7 @@ report the elements which make our proof different.
     again by induction hypothesis, since the number of arguments stays
     the same, while the level of $b$ must be smaller than that of
     $a$. Similarly if the rule applied is $\trm{P +a (Q +b
-      R)}\rw_\prob \trm{(P +a Q) +b (P +b R)}$.
+      R)}\rw_\prob \trm{(P +a Q) +b (P +a R)}$.
   \end{itemize}
 \end{proof}
 
