@@ -408,7 +408,8 @@ Figure~\ref{fig:order}.
       \end{tabular}
     \end{minipage}
   }
-\label{fig:order}
+  \label{fig:order}
+  \caption{Labelizing Terms}
 \end{figure}
 It is easy to realize that, of course modulo label $\alpha$-equivalence, for
 every term $M$ there is at least one $\theta$ such that $\labjudg{\theta}{M}$.
@@ -440,9 +441,9 @@ Figure~\ref{fig:typing}.
       \end{tabular}
     \end{minipage}
   }
-\label{fig:typing}
+  \caption{Types, Environments, Judgments, and Rules}
+  \label{fig:typing}
 \end{figure}
-
 The type structure being precisely the usual one (although terms are of course
 different), we can reuse most of the usual proof of strong normalization, for
 example in the version given by Ralph Loader's notes, page 17. In the following, we only
@@ -465,7 +466,7 @@ report the elements which make our proof different.
   \begin{equation}\label{equ:redord}
   (m,h(a,\theta),\sum_{i=1}^m\mathit{sn}(L_i)+\mathit{sn}(M)+\mathit{sn}(N),|M|+|N|)
   \end{equation}
-  As usual, we proceed by showing that all terms to which
+  We proceed by showing that all terms to which
   $\trm{M +a N}L_1\ldots L_m$ reduces are strongly normalizing:
   \begin{itemize}
   \item
@@ -528,13 +529,50 @@ report the elements which make our proof different.
   Lemma \ref{lemma:cloredsum}, namely the one in which the
   considered reduction rule is the following:
   $$
-  \trm{!b.(N +a M)}\rw_\prob\trm{(!b.N) +a (!b.M)}.
+  \trm{!b.(P +a Q)}\rw_\prob\trm{(!b.P) +a (!b.Q)}.
   $$
+  Since $M=\trm{P +a Q}$ and $ML_1\ldots L_m$ by hypothesis,
+  we conclusde that $PL_1\ldots L_m$ and $QL_1\ldots L_m$
+  are both strongly normalizing. By induction hypothesis,
+  since $\mathit{sn}(P),\mathit{sn}(Q)\leq\mathit{sn}(M)$,
+  it holds that $\trm{(!b.P)}L_1\ldots L_m$ and $\trm{(!b.Q)}L_1\ldots L_m$
+  are both strongly normalizing themselves. Lemma~\ref{lemma:cloredsum},
+  yields the thesis.
 \end{proof}
 
-Lemma 3.2 continues to hold, but requires a new proof. 
+\begin{lemma}
+  The set SN is closed under the following rule:
+  $$
+  \infer{\trm{(\x.M)}L_0\ldots L_m}{\trm{M[L_0/x]}L_1\ldots L_m & L_0}
+  $$
+\end{lemma}
+\begin{proof}
+  Again, the proof is structurally very similar to the one
+  of Lemma~\ref{lemma:cloredsum}. The underlying order,
+  needs to be slightly adapted, and is the lexicographic
+  order on
+  $$
+  (\mathit{sn}(\trm{M[L_0/x]}L_1\ldots L_m)+\mathit{sn}(L_0),|M|)
+  $$
+  As usual, we proceed by showing that all terms to which
+  $\trm{(\x.M)}L_0\ldots L_m$ reduces are strongly normalizing:
+  \begin{itemize}
+  \item
+    If reduction happens in $L_0$, then we can mimick
+    the same reduction in by zero or more reduction
+    steps in $\trm{M[L_0/x]}L_1\ldots L_m$, and conclude
+    by induction hypothesis.
+  \item
+    If reduction happens in $M$ or in $L_1,\ldots,L_m$,
+    then we can mimick the same reduction in one or more
+    reduction in $\trm{M[L_0/x]}L_1\ldots L_m$, and conclude
+    by induction hypothesis.
+  \item
+    If the reduction step we perform is 
+  \end{itemize}
+\end{proof}
 
-The definition of a reducible term stays the same.
+The definition of a reducible term stays the same:
 
 Lemma 3.5 must be complemented with two new clauses, as follows:
 \newcommand{\RedSet}[1]{\mathit{Red}_{#1}}
