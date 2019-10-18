@@ -1,11 +1,11 @@
-\documentclass{article}
+\documentclass{llncs}
 
 \usepackage[hidelinks]{hyperref}
 \usepackage{amsmath,amssymb,amsthm,mathtools,stmaryrd}
 
 \usepackage{nicefrac}
 
-\usepackage{fullpage}
+%\usepackage{fullpage}
 
 \usepackage{xcolor}
 \usepackage{tikz}
@@ -17,18 +17,18 @@
 \makeatletter
 
 % theorem environments
-
-\theoremstyle{definition}
-\newtheorem{definition}{Definition}
-\newtheorem{remark}[definition]{Remark}
-%%
-\theoremstyle{plain}
-\newtheorem{conjecture} [definition]{Conjecture}
-\newtheorem{corollary}  [definition]{Corollary}
-\newtheorem{lemma}      [definition]{Lemma}
-\newtheorem{proposition}[definition]{Proposition}
-\newtheorem{theorem}    [definition]{Theorem}
-%%
+%
+%\theoremstyle{definition}
+%\newtheorem{definition}{Definition}
+%\newtheorem{remark}[definition]{Remark}
+%%%
+%\theoremstyle{plain}
+%\newtheorem{conjecture} [definition]{Conjecture}
+%\newtheorem{corollary}  [definition]{Corollary}
+%\newtheorem{lemma}      [definition]{Lemma}
+%\newtheorem{proposition}[definition]{Proposition}
+%\newtheorem{theorem}    [definition]{Theorem}
+%%%
 
 %text
 \newcommand{\ie}{\textit{i.e.}}
@@ -173,6 +173,10 @@
 
 \newcommand\rstrut{\rule{0pt}{13pt}}
 
+% strategies
+\newcommand\cbn{\mathsf{cbn}}
+\newcommand\cbv{\mathsf{cbv}}
+
 % new rewriting
 
 \tikzstyle{implied}=[dashed]
@@ -226,13 +230,46 @@
 
 \title{Decomposing probabilistic lambda-calculus}
 
-\author{Ugo Dal Lago, Giulio Guerrieri, and Willem Heijltjes}
+%\author{Ugo Dal Lago, Giulio Guerrieri, and Willem Heijltjes}
+
+\author{
+	 Ugo Dal Lago\inst1
+\and Giulio Guerrieri\inst2
+\and Willem Heijltjes\inst2
+}
+
+\authorrunning{U.\ Dal Lago et al.}
+
+\institute{%
+Dipartimento di Informatica - Scienza e Ingegneria\\ Universit\`a di Bologna, Bologna, Italy\\
+\email{ugo.dallago@unibo.it}\\[10pt]
+\and%
+Department of Computer Science\\ University of Bath, Bath, UK\\
+\email{\{w.b.heijltjes,g.guerrieri\}@bath.ac.uk}
+}
+
 
 %============================================================ DOCUMENT
 
 \begin{document}
 
 \maketitle
+
+\begin{abstract}
+A notion of probabilistic lambda-calculus usually comes with a prescribed reduction strategy, typically call-by-name or call-by-value, as the calculus is non-confluent and these strategies yield different results. This is a break with one of the main advantages of lambda-calculus: confluence, which means results are independent from the choice of strategy.
+
+We present a probabilistic lambda-calculus where the probabilistic operator is decomposed into two syntactic constructs: a generator, which represents a probabilistic event; and a consumer, which acts on the term depending on a given event. The resulting calculus, the Probabilistic Event Lambda-Calculus, is confluent, and interprets the call-by-name and call-by-value strategies through different interpretations of the probabilistic operator into our generator and consumer constructs.
+
+We present two notions of reduction, one via fine-grained local rewrite steps, and one by generation and consumption of probabilistic events. Simple types for the calculus are essentially standard, and they convey strong normalization. We demonstrate how we can encode call-by-name and call-by-value probabilistic evaluation.
+\end{abstract}
+
+\section{Introduction}
+
+\[
+	\trm{(\x.x = x)(\top+{}\bot)} \qquad\begin{array}{ll}\rw_\cbn &\quad \trm{\top+{}\bot} \\[5pt] \rw_\cbv &\quad \top\end{array}
+\]
+
+\end{document}
 
 \section{\texorpdfstring{The probabilistic $\lambda$-calculus $\PEL$}{The probabilistic lambda-claculus PEL}}
 
