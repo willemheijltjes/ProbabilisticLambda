@@ -415,13 +415,11 @@ P_0 &\coloneqq& P_1 &\mid& \trm{P_0 +{} P_0}
 
 \subsection{Strong normalization for typed terms}
 In this section, we prove that the relation $\rw$ enjoys strong
-normalization in simply typed terms.
-
-Since the proof of strong normalization is quite delicate, it make
-sense to turn the definition of the order $<_{{\trm{M}}}$ from
-Definition~\ref{def:orderlabels} more formal, at the same time
-allowing to treat label-\emph{open} terms. This is based on
-Figure~\ref{fig:order}.
+normalization in simply typed terms. Since the proof of strong
+normalization is quite delicate, it make sense to turn the definition
+of the order $<_{{\trm{M}}}$ from Definition~\ref{def:orderlabels}
+more formal, at the same time allowing to treat label-\emph{open}
+terms. This is based on Figure~\ref{fig:order}. 
 \newcommand{\labjudg}[2]{#1\vdash_{L} #2}
 \begin{figure}
   \fbox{
@@ -450,6 +448,14 @@ Figure~\ref{fig:order}.
 \end{figure}
 It is easy to realize that, of course modulo label $\alpha$-equivalence, for
 every term $M$ there is at least one $\theta$ such that $\labjudg{\theta}{M}$.
+Similarly, reduction as defined by $\rw$ can be made parametric on a sequence
+of labels $\theta$, i.e., one can define a family of reduction
+relations $\rw^\theta$. An easy fact to check is that if
+$\labjudg{\theta}{M}$ and $M\rw^\theta N$, then $\labjudg{\theta}{N}$.
+It thus makes sense to define $\mathit{SN}^\theta$ and $\mathit{sn}^\theta(M)$
+simply as the set of strongly normalizing $\theta$-terms modulo $\rw^\theta$,
+and the maximum number of $\theta$-steps to normal form of a given
+$\theta$-term $M$.
 
 Now, let us define types, environments, judgments, and typing rules in
 Figure~\ref{fig:typing}.
