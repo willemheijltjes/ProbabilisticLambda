@@ -127,8 +127,12 @@
 \newcommand\y{\lambda y}
 \newcommand\z{\lambda z}
 
+\newcommand\+[1][{}]{\kern1pt{\smallbin\oplus}_{#1}\kern1pt}
+
 \newcommand\lab{\bullet}
 \newcommand{\labtwo}{\circ}
+
+\newcommand\ttrm[1]{\smash{\trm{#1}}}
 
 \newcommand\term[1]{{\let\term@typecolor\typecolor\termcolor\trm{#1}}}
 \newcommand\trm[1]{%
@@ -159,11 +163,18 @@
 \newcommand\term@sub[1]{_{#1}\let\term@loop\term@next\term@loop}
 \newcommand\term@sup[1]{^{#1}\let\term@loop\term@next\term@loop}
 \newcommand\term@vec[1]{\vec{\kern.5pt#1\kern.5pt}\let\term@loop\term@next\term@loop}
-\newcommand\term@prob[1]{\kern1pt\overset{#1}{{\smallbin\oplus}}\kern1pt\let\term@loop\term@next\term@loop}
+\newcommand\term@prob[1]{\kern1pt\raisebox{-.5pt}{$\overset{\raisebox{-1pt}{$\scriptstyle#1$}}{{\smallbin\oplus}}$}\kern1pt\let\term@loop\term@next\term@loop}
 \newcommand\term@type{\let\type@loop=\type@next\type@loop}
 \newcommand\term@box[1]{\probox{#1}\let\term@loop\term@next\term@loop}
 
-\newcommand\probox[1]{\tikz[baseline=(a.base)]\node[draw,line width=.6pt,inner sep=2pt,minimum height=10pt,minimum width=10pt](a){\makebox[0pt][c]{$\scriptstyle #1\vphantom)$}};}
+%\newcommand\probox[1]{\tikz[baseline=(a.base)]\node[draw,line width=.6pt,inner sep=2pt,minimum height=10pt,minimum width=10pt](a){\makebox[0pt][c]{$\scriptstyle #1\vphantom)$}};}
+
+\newcommand\probox[1]{\begin{tikzpicture}[baseline=0]\node[anchor=base](a){$\scriptstyle #1\vphantom)$};\draw[line width=.6pt] (-5pt,-2.5pt) rectangle (5pt,7.5pt);\end{tikzpicture}}
+
+
+% label judgments
+\newcommand{\labjudg}[2]{#1\vdash_{L} #2}
+
 
 % rewriting
 \newcommand\rw[1][{}]{\stackrel{#1}\rightsquigarrow}
@@ -179,6 +190,11 @@
 % strategies
 \newcommand\cbn{\mathsf{cbn}}
 \newcommand\cbv{\mathsf{cbv}}
+
+% translations
+\newcommand\uncbv[1]{\llbracket#1\rrbracket_\cbv}
+\newcommand\unopen[1]{\llbracket#1\rrbracket_{\mathsf{open}}}
+\newcommand\labclose[2]{\lfloor\labjudg{#1}{#2}\rfloor}
 
 % new rewriting
 
@@ -256,6 +272,7 @@ Department of Computer Science\\ University of Bath, Bath, UK\\
 
 \begin{document}
 
+
 \maketitle
 
 \begin{abstract}
@@ -268,11 +285,35 @@ We present two notions of reduction, one via fine-grained local rewrite steps, a
 
 \section{Introduction}
 
+Probabilistic lambda-calculi \cite{...} extend the lambda-calculus with a probabilistic choice operator $N\+[p]M$, which chooses $N$ with probability $p$ and $M$ with probability $1-p$ (throughout this paper, we let $p=0.5$ and will omit it). Duplication of $N\+M$, as is wont to happen in lambda-calculus, raises a fundamental question about its semantics: do the duplicate occurrences represent \emph{the same} probabilistic event, or \emph{different} ones with the same probability? For example, take the formula $\top\+\bot$ that represents a coin flip between boolean values \emph{true} $\top$ and \emph{false} $\bot$. If we duplicate this formula, do the copies represent two distinct coin flips with possibly distinct outcomes, or do these represent a single coin flip that determines the outcome for both copies? Put differently again, when we duplicate $\top\+\bot$, do we duplicate the \emph{event}, or only its \emph{outcome}?
+
+In probabilistic lambda-calculus, these two interpretations are captured by the evaluation strategies of call-by-name ($\rw_\cbn$), which duplicates events, and call-by-value ($\rw_\cbv$), which evaluates any probabilistic choice before it is duplicated, and thus only duplicates outcomes. Consider the following example, where $=$ tests equality of boolean values.
 \[
-	\trm{(\x.x = x)(\top+{}\bot)} \qquad\begin{array}{ll}\rw_\cbn &\quad \trm{\top+{}\bot} \\[5pt] \rw_\cbv &\quad \top\end{array}
+	(\x.x = x)(\top\+\bot) \qquad\begin{array}{ll}\rws_\cbn &\quad \trm{\top\+\bot} \\[5pt] \rws_\cbv &\quad \top\end{array}
+\]
+This situation is not ideal, for several, related reasons. First, it demonstrates how probabilistic lambda-calculus is non-confluent, negating one of the central properties of the lambda-calculus, and one of the main reasons why it is the prominent model of computation that it is. Second, a probabilistic lambda-calculus must derive its semantics from a prescribed reduction strategy, and its terms only have meaning in the context of that strategy. Third, it becomes difficult to have a mix of different kinds of probabilities, as it would require specialized reduction strategies.
+
+We address these issues by a decomposition of the probabilistic operator into a \emph{generator} $\ttrm{!a}$ and a \emph{consumer} $\ttrm{+a}$, as follows.
+\[
+	\trm{N \+ M} \quad\stackrel\Delta=\quad \trm{!a.\, N +a M}
+\]
+Semantically, $\ttrm{!a}$ represents a probabilistic event, that generates a boolean value recorded as $a$. The consumer $\ttrm{N+aM}$ is simply a conditional on $a$, choosing $N$ if $a$ is false and $M$ if $a$ is true. Syntactically, $a$ is a boolean variable with an occurrence in $\ttrm{+a}$, and $\ttrm{!a}$ acts as a quantifier, binding all occurrences in its scope. (To capture a non-equal chance, one would attach a probability $p$ to a generator, as $\ttrm{!a}{\kern1pt}_p$, though we will not do so in this paper.) 
+
+The resulting \emph{probabilistic event lambda-calculus} $\PEL$, which we present in this paper, is confluent. Our decomposition allows us to separate duplicating an \emph{event}, represented by the generator $\ttrm{!a}$, from duplicating only its \emph{outcome} $a$, through having multiple consumers $\trm{+a}$. In this way our calculus may interpret both original strategies, call-by-name and call-by-value, by different translations of standard probabilistic terms into $\PEL$. For the above example, we get the following translations and reductions.
+\[
+\begin{array}{l@{\quad}l@{\quad}l@{\quad}l@{\quad}l@{\quad}l}
+	\cbn: & \trm{(\x.x = x)(!a.\top+a\bot)} & \rw_\beta & \trm{(!a.\top+a\bot)=(!b.\top+b\bot)} & \rws & \top\+\bot
+\\[10pt]
+	\cbv: & \trm{!a.(\x.x = x)(\top+a\bot)} & \rw_\beta & \trm{!a.(\top+a\bot)=(\top+a\bot)}    & \rws & \top
+\end{array}
 \]
 
-\end{document}
+In this paper, we introduce $\PEL$ and its reduction mechanisms (Section~\ref{...}); we prove confluence (Section~\ref{...}); we give a system of simple types and prove strong normalization for typed terms (Section~\ref{...}); and we demonstrate the two translations to interpret call-by-name and call-by-value evaluation (Section~\ref{...}).
+
+\subsection*{Related work}
+
+
+
 
 \section{\texorpdfstring{The probabilistic $\lambda$-calculus $\PEL$}{The probabilistic lambda-claculus PEL}}
 
@@ -286,11 +327,11 @@ The \emph{probabilistic event $\lambda$-calculus} ($\PEL$) is given by the follo
 
 In a term of the form $\trm{\x.M}$ (resp.~$\trm{!a.M}$), the abstraction $\trm{\x}$ (resp.~the box $\probox a$) is a binder for the free occurrences of the variable $x$ (resp.~the label $a$) in their scope $\trm{M}$.
 
-The calculus features a decomposition of the usual probabilistic sum $\trm{+{}}$, as follows,
+The calculus features a decomposition of the usual probabilistic sum $\trm{\+}$, as follows,
 \[
-	\trm{N +{} M} \quad\stackrel\Delta=\quad \trm{!a.\, N +a M}
+	\trm{N \+ M} \quad\stackrel\Delta=\quad \trm{!a.\, N +a M}
 \]
-where the name $a$ represents an \emph{event}, a binary value $\{0,1\}$, probabilistically generated by the constructor $\probox a$ and used to create a choice by the constructor $\trm{+a}$. That is, $\probox a$ flips a coin setting $a$ to $0$ or $1$, and depending on this $\trm{N+aM}$ reduces to $N$ respectively $M$.
+where the name $a$ represents an \emph{event}, a binary value $\{0,1\}$, probabilistically generated by the constructor $\probox a$ and used to create a choice by the constructor $\trm{+a}$. That is, $\ttrm{!a}$ flips a coin setting $a$ to $0$ or $1$, and depending on this $\ttrm{N+aM}$ reduces to $N$ respectively $M$.
 
 \begin{definition}
 	The set $\fl{M}$ of \emph{free labels} of a term $\trm{M}$ is defined inductively as follows:
@@ -364,7 +405,7 @@ for every occurrence of $\probox a$ in $\trm{M}$ there is no $\probox a$ occurri
 The normal forms $P_0$ of $\rw_\prob$ are given by the following grammars
 \[
 \begin{array}{ccc@{~}c@{~}c@{}l}
-P_0 &\coloneqq& P_1 &\mid& \trm{P_0 +{} P_0}
+P_0 &\coloneqq& P_1 &\mid& \trm{P_0 \+ P_0}
 \\	P_1	&\coloneqq& x   &\mid& \x.P_1 			 &~\mid~ P_1\,P_0
 \end{array}
 \]
@@ -378,7 +419,7 @@ P_0 &\coloneqq& P_1 &\mid& \trm{P_0 +{} P_0}
 	The normal forms $N_0$ of $\rw$ are given by the following grammars.
 	\[
 	\begin{array}{ccc@{~}c@{~}c}
-	N_0 &\coloneqq& N_1 &\mid& \trm{N_0 +{} N_0}
+	N_0 &\coloneqq& N_1 &\mid& \trm{N_0 \+ N_0}
 	\\	N_1	&\coloneqq& N_2 &\mid& \x.N_1
 	\\	N_2 &\coloneqq& x	&\mid& N_2\,N_0
 	\end{array}
@@ -423,7 +464,7 @@ normalization is quite delicate, it make sense to turn the definition
 of the order $<_{{\trm{M}}}$ from Definition~\ref{def:orderlabels}
 more formal, at the same time allowing to treat label-\emph{open}
 terms. This is based on Figure~\ref{fig:order}. 
-\newcommand{\labjudg}[2]{#1\vdash_{L} #2}
+%
 \begin{figure}
   \fbox{
     \begin{minipage}{.97\textwidth}
@@ -449,6 +490,7 @@ terms. This is based on Figure~\ref{fig:order}.
   \label{fig:order}
   \caption{Labelizing Terms}
 \end{figure}
+%
 It is easy to realize that, of course modulo label $\alpha$-equivalence, for
 every term $M$ there is at least one $\theta$ such that $\labjudg{\theta}{M}$.
 Similarly, reduction as defined by $\rw$ can be made parametric on a sequence
@@ -1469,11 +1511,11 @@ By the following diagram. For the top and left areas, by Lemma~\ref{lem:p to com
 
 The reduction $\rw_\prob$ evaluates probabilistic sums purely by rewriting. Here we look at an alternative \emph{projective} notion of reduction, which conforms more closely to the intuition that $\trm{!a}$ generates a probabilistic event that is consumed by $\trm{+a}$.
 
-For projective reduction we distinguish a global, meta-level probabilistic sum $+$ from the internal, object-level probabilistic sum $\trm{N+{}M=!a.N+aM}$. Let $N^+$ denote the term $N$ with every top-level internal sum $\trm{+{}}$ evaluated as an external sum; formally:
+For projective reduction we distinguish a global, meta-level probabilistic sum $+$ from the internal, object-level probabilistic sum $\trm{N\+M=!a.N+aM}$. Let $N^+$ denote the term $N$ with every top-level internal sum $\trm{\+}$ evaluated as an external sum; formally:
 \[
-	\trm{(N+{}M)}^+=N^+\!+M^+ \qquad\qquad N^+=N \quad(N\neq \trm{M+{}P})~.
+	\trm{(N\+M)}^+=N^+\!+M^+ \qquad\qquad N^+=N \quad(N\neq \trm{M\+P})~.
 \]
-{\color{red}(NOTE: The evaluation $N^+$ should be discussed earlier, to complete our reduction $\rw_\prob$ by linking our syntactic $\trm{+{}}$ to semantic probabilistic sums.)}
+{\color{red}(NOTE: The evaluation $N^+$ should be discussed earlier, to complete our reduction $\rw_\prob$ by linking our syntactic $\trm{\+}$ to semantic probabilistic sums.)}
 
 \begin{definition}
 The \emph{$a$-projections} $\proj a0N$ and $\proj a1N$ are defined as follows, where $a\neq b$.
@@ -1514,6 +1556,34 @@ Observe that projective reduction is not a rewrite relation, as it applies only 
 \begin{proposition}
 If $N\rw_\pi M$ then there is a $P$ such that $N\rws_\prob P$ with $P^+=M$.
 \end{proposition}
+
+\hrule
+
+
+\subsection*{Call-by-value translation}
+
+
+The call-by-value interpretation $\uncbv{N}$ of a probabilistic lambda-term $N$ is a given as follows. First, we translate $N$ to an open $\PEL$-term $\unopen N=\labjudg\theta P$, and then $\uncbv{N}$ is the label closure $\uncbv{N}=\labclose\theta P$, which prefixes $P$ with a generator $\trm{!a}$ for every $a$ in $\theta$.
+
+\begin{definition}
+The \emph{label closure} $\labclose\theta P$ is given inductively as follows.
+\[
+	\labclose{}P = P \qquad \labclose{a\cdot\theta}P = \labclose\theta{\trm{!a.P}}
+\]
+The \emph{open interpretation} $\unopen N$ is given as follows, where $\unopen{N_i}=\labjudg{\theta_i}{P_i}$ for $i\in\{1,2\}$, and all labels are fresh.
+\[
+\begin{array}{r@{\quad}c@{\quad}l@{\qquad}r@{\quad}c@{\quad}l}
+		\unopen x 		 &=& \labjudg{}x				& \unopen {N_1N_2}   &=& \labjudg{\theta_2\cdot\theta_1}{P_1P_2}
+\\[5pt]	\unopen {\x.N_1} &=& \labjudg{\theta_1}{\x.P_1} & \unopen {N_1\+N_2} &=& \labjudg{\theta_2\cdot\theta_1\cdot a}{\trm{P_1 +a P_2}}
+\end{array}
+\]
+The \emph{call-by-value interpretation} of a probabilistic lambda-term $N$ is
+\[
+	\uncbv N=\lfloor\unopen N\rfloor~.
+\]
+\end{definition}
+
+{\color{red}NOTE: Please check thoroughly that I haven't messed up the order of labels in the notion of ``label closure''.}
 
 
 \bibliographystyle{plain}
