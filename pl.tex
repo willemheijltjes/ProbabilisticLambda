@@ -13,6 +13,7 @@
 \usepackage{xcolor}
 \usepackage{tikz}
   \usetikzlibrary{arrows.meta}
+  \usetikzlibrary{calc}
   \usetikzlibrary{matrix}
 \usepackage{cleveref}
 \usepackage{proof}
@@ -150,12 +151,13 @@
   \ifx#1*^\lab\else%
   \ifx#1<\lfloor\else%
   \ifx#1>\rfloor\else%
+  \ifx#1..\,\else%
 %  \ifx#1\x\lambda x\else%
 %  \ifx#1\y\lambda y\else%
 %  \ifx#1\z\lambda z\else%
   \ifx#1=\kern1pt{\smallbin=}\kern1pt\else
   #1%
-  \fi\fi\fi\fi\fi\fi\fi\fi\fi\fi%\fi\fi\fi%
+  \fi\fi\fi\fi\fi\fi\fi\fi\fi\fi\fi%\fi\fi\fi%
   \term@loop%
 }
 \newcommand\term@typecolor{}
@@ -186,6 +188,8 @@
 \newcommand\confluence[4]{\begin{array}{ccc} \trm{#1} & \rw & \trm{#2} \\ \dw && \dw \\ \trm{#3} & \rw & \trm{#4} \end{array}}
 
 \newcommand\rstrut{\rule{0pt}{13pt}}
+
+\newcommand\SN{\textsf{SN}}
 
 % strategies
 \newcommand\cbn{\mathsf{cbn}}
@@ -289,13 +293,13 @@ Probabilistic lambda-calculi \cite{...} extend the lambda-calculus with a probab
 
 In probabilistic lambda-calculus, these two interpretations are captured by the evaluation strategies of call-by-name ($\rw_\cbn$), which duplicates events, and call-by-value ($\rw_\cbv$), which evaluates any probabilistic choice before it is duplicated, and thus only duplicates outcomes. Consider the following example, where $=$ tests equality of boolean values.
 \[
-	(\x.x = x)(\top\+\bot) \qquad\begin{array}{ll}\rws_\cbn &\quad \trm{\top\+\bot} \\[5pt] \rws_\cbv &\quad \top\end{array}
+	(\x.\,x = x)(\top\+\bot) \qquad\begin{array}{ll}\rws_\cbn &\quad \trm{\top\+\bot} \\[5pt] \rws_\cbv &\quad \top\end{array}
 \]
 This situation is not ideal, for several, related reasons. First, it demonstrates how probabilistic lambda-calculus is non-confluent, negating one of the central properties of the lambda-calculus, and one of the main reasons why it is the prominent model of computation that it is. Second, a probabilistic lambda-calculus must derive its semantics from a prescribed reduction strategy, and its terms only have meaning in the context of that strategy. Third, it becomes difficult to have a mix of different kinds of probabilities, as it would require specialized reduction strategies.
 
 We address these issues by a decomposition of the probabilistic operator into a \emph{generator} $\ttrm{!a}$ and a \emph{choice} $\ttrm{+a}$, as follows.
 \[
-	\trm{N \+ M} \quad\stackrel\Delta=\quad \trm{!a.\, N +a M}
+	\trm{N \+ M} \quad\stackrel\Delta=\quad \trm{!a. N +a M}
 \]
 Semantically, $\ttrm{!a}$ represents a probabilistic event, that generates a boolean value recorded as $a$. The choice $\ttrm{N+aM}$ is simply a conditional on $a$, choosing $N$ if $a$ is false and $M$ if $a$ is true. Syntactically, $a$ is a boolean variable with an occurrence in $\ttrm{+a}$, and $\ttrm{!a}$ acts as a quantifier, binding all occurrences in its scope. (To capture a non-equal chance, one would attach a probability $p$ to a generator, as $\ttrm{!a}{\kern1pt}_p$, though we will not do so in this paper.) 
 
@@ -309,6 +313,7 @@ The resulting \emph{probabilistic event lambda-calculus} $\PEL$, which we presen
 \]
 
 In this paper, we introduce $\PEL$ and its reduction mechanisms (Section~\ref{...}); we prove confluence (Section~\ref{...}); we give a system of simple types and prove strong normalization for typed terms (Section~\ref{...}); and we demonstrate the two translations to interpret call-by-name and call-by-value evaluation (Section~\ref{...}).
+
 
 \subsection{Related work}
 
@@ -333,7 +338,7 @@ The \emph{probabilistic event $\lambda$-calculus} ($\PEL$) is given by the follo
 %
 In a term $\trm{\x.M}$ the abstraction $\x$ binds the free occurrences of the variable $x$ in its scope $\trm{M}$, and in $\ttrm{!a.N}$ the generator $\ttrm{!a}$ binds the \emph{label} $a$ in $\trm{M}$. The calculus features a decomposition of the usual probabilistic sum $\trm{\+}$, as follows.
 \[
-	N\+M \quad\stackrel\Delta=\quad \trm{!a.\, N +a M}
+	N\+M \quad\stackrel\Delta=\quad \trm{!a. N +a M}
 \]
 The generator $\ttrm{!a}$ represents a probabilistic \emph{event}, whose outcome, a binary value $\{0,1\}$ represented by the label $a$, is used by the choice operator $\ttrm{+a}$. That is, $\ttrm{!a}$ flips a coin setting $a$ to $0$ or $1$, and depending on this $\ttrm{N+aM}$ reduces to $N$ respectively $M$. We will use the unlabelled choice $\+$ as the above abbreviation.
 
@@ -367,7 +372,7 @@ The generator $\ttrm{!a}$ represents a probabilistic \emph{event}, whose outcome
 
 \subsection{Reduction}
 
-Reduction in $\PEL$ will consist of standard $\beta$-reduction $\rw_\beta$ plus an evaluation mechanism for generators and choice operators, implementing probabilistic choice. We will present two such mechanisms: \emph{projective} reduction~$\rw_\pi$ and \emph{permutative} reduction~$\rw_\perm$. While projective reduction implements the given intuition for the generator and choice operator, we relegate it to Section~\ref{sec:projective reduction} and make permutative reduction our main evaluation mechanism, for the reason that it is more fine-grained, and thus more general. 
+Reduction in $\PEL$ will consist of standard $\beta$-reduction $\rw_\beta$ plus an evaluation mechanism for generators and choice operators, which implements probabilistic choice. We will present two such mechanisms: \emph{projective} reduction~$\rw_\pi$ and \emph{permutative} reduction~$\rw_\perm$. While projective reduction implements the given intuition for the generator and choice operator, we relegate it to Section~\ref{sec:projective reduction} and make permutative reduction our main evaluation mechanism, for the reason that it is more fine-grained, and thus more general. 
 
 Permutative reduction is based on the idea that any operator distributes over the labelled choice operator (see the reduction steps in Figure~\ref{fig:reduction rules}), even other choice operators, as below.
 \[
@@ -412,7 +417,16 @@ For a well-labeled and label-closed representative $\trm{M}$, $<_{\trm{M}}$ is a
 %\]
 \end{defn}
 
-By inspection of the rewrite rules in Figure~\ref{fig:reduction rules}, we can characterize the normal forms of $\rw_\perm$ and $\rw$ as follows.
+\noindent
+The introduction briefly sketches two example reductions; a third, complete reduction is given in Figure~\ref{fig:example reduction}.
+The crucial feature of $\perm$-reduction is that a choice $\ttrm{+a}$ \emph{does} permute out of the argument position of an application, but a generator $\ttrm{!a}$ does \emph{not}, as below. Since the argument of a redex may be duplicated, this is how we characterize the difference between the \emph{outcome} of a probabilistic event, whose duplicates may be identified, and the event itself, whose duplicates may yield different outcomes.
+\[
+	\trm{N\,(M +a P)}~\rw_\perm~ \trm{(NM) +a (NP)} 
+	\qquad
+	\qquad
+	\trm{N\,(!a.M)}~\not\rw_\perm~\trm{!a.N\,M}
+\]
+By inspection of the rewrite rules in Figure~\ref{fig:reduction rules}, we can then characterize the normal forms of $\rw_\perm$ and $\rw$ as follows.
 
 \begin{prop}[Syntactic characterization of normal forms]
 The normal forms $P_0$ of $\rw_\perm$, respectively $N_0$ of $\rw$, are given by the following grammars.
@@ -430,32 +444,47 @@ The normal forms $P_0$ of $\rw_\perm$, respectively $N_0$ of $\rw$, are given by
 \]
 \end{prop}
 
+
+\begin{figure}[!t]
+\newcommand\fit[1]{\makebox[36pt][c]{$#1$}}%
+\begin{align*}
+	\trm{!a.(\x.x = x)(\top+a\bot)} 
+			& \fit{\rw_\perm}	\trm{!a.(\x.x=x)\top~+a~(\x.x=x)\bot}	\tag\plusArg
+\\[5pt]		& \fit{\rws_\beta}	\trm{!a.(\top=\top)\,+a\,(\bot=\bot)}
+\\[5pt]		& \fit{=}			\trm{!a. \top +a \top}
+			  \fit{\rw_\perm} 	\trm{!a. \top} 
+			  \fit{\rw_\perm}	\top           						 	\tag{\idem,\boxVoid}
+\end{align*}
+\caption{Example reduction of the $\cbv$-translation of the term in the introduction.}
+\label{fig:example reduction}
+\end{figure}
+
 %=====================================================================================
 
 \section{Properties of permutative reduction}
 
-We will prove strong normalization and confluence of $\rw_\perm$.
+We will prove strong normalization (\SN) and confluence of $\rw_\perm$. For strong normalization, the obstacle is the interaction between different choice operators, which may duplicate each other, and even themselves, creating super-exponential growth.\footnote{This was inferred from only a simple simulation; we would be interested to know a rigorous complexity result.} Fortunately, Dershowitz's \emph{recursive path orders}~\cite{Dershowitz82} seem tailor-made for our situation.
 
-\subsection{Strong normalization of permutative reduction}
+%\subsection{Strong normalization of permutative reduction}
 
-\begin{remark}
-	The set $\PEL$ endowed with $\rw_\perm$ is a (first-order) term rewriting system over a countably infinite set of variables (denoted by $x, y, z, \dots$) and the signature $\Sigma$ given by:
-	\begin{itemize}
-		\item the binary function symbol $\trm{+a}$, for any label $a$;
-		\item the unary function symbol $\trm{!a}$, for any label $a$;
-		\item the unary function symbol $\trm{\x}$, for any variable $x$;
-		\item the binary function symbol $\trm{@}$ ($@(\trm{M},\trm{N})$ stands for $MN$).
-	\end{itemize}
-\end{remark}
+We observe that the set $\PEL$ endowed with $\rw_\perm$ is a (first-order) term rewriting system over a countably infinite set of variables (denoted by $x, y, z, \dots$) and the signature $\Sigma$ given by:
+\begin{itemize}
+	\item the binary function symbol $\trm{+a}$, for any label $a$;
+	\item the unary function symbol $\trm{!a}$, for any label $a$;
+	\item the unary function symbol $\trm{\x}$, for any variable $x$;
+	\item the binary function symbol $\trm{@}$, letting $@(\trm{M},\trm{N})$ stand for $MN$.
+\end{itemize}
 
 \begin{defn}
-	Let $\trm{M}$ be a well-labeled and label-closed representative a term, and let $\Sigma(M)$ be the set of signature symbols occurring in $\trm{M}$.
-	We define $\prec_{\trm{M}}$ as the (strict) partial order on $\Sigma(M)$ generated by the following rules:
-	\begin{itemize}
-		\item $\trm{+a \prec_{\trm{M}} +b}$ if $a <_{\trm{M}} b$;
-		\item $\trm{+a \prec_{\trm{M}} !b}$ for any labels $a, b$;
-		\item $\trm{!b.\prec_{\trm{M}} @}$ and $\trm{!b.\prec_{\trm{M}} \x}$ for any label $b$.
-	\end{itemize}
+	Let $\trm{M}$ be a well-labeled representative of a label-closed term, and let $\Sigma_M$ be the set of signature symbols occurring in $\trm{M}$.
+	We define $\prec_M$ as the (strict) partial order on $\Sigma_M$ generated by the following rules.
+\[
+\begin{array}{rcl@{\qquad\quad}l}
+		\trm{+a} &\prec_M& \trm{+b} & \text{ if } a <_M b
+\\[5pt]	\trm{+a} &\prec_M& \trm{!b} & \text{ for any labels } a,b
+\\[5pt]	\trm{!b} &\prec_M& @,\x		& \text{ for any label } b
+\end{array}
+\]
 \end{defn}
 
 \begin{lem}
@@ -464,18 +493,31 @@ We will prove strong normalization and confluence of $\rw_\perm$.
 \end{lem}
 
 \begin{proof}
-	For the first-order term rewriting system $(\PEL, \rw_\perm)$  it can be defined a well-founded recursive path ordering $>$ in the sense of \cite[p. 289]{Dershowitz82} such that $\trm{M \rw_\perm N}$ implies $\trm{M}>\trm{N}$.
+For the first-order term rewriting system $(\PEL, \rw_\perm)$ we derive a well-founded recursive path ordering $<$ from $\prec_M$ following \cite[p. 289]{Dershowitz82}. Let $f$ and $g$ range over function symbols, let $[N_1,\dots,N_n]$ denote a multiset and extend $<$ to multisets by the standard multiset ordering, and let $N = f(N_1,\dots,N_n)$ and $M = g(M_1,\dots,M_m)$; then
+\[
+N < M \iff
+\left\{
+\begin{array}{ll}
+	[N_1,\dots,N_n] < [M_1,\dots,M_m] & \text{ if } f = g
+\\[5pt]
+	[N_1,\dots,N_n] < [M]			  & \text{ if } f \prec_M g 
+\\[5pt]
+	[N] \leq [M_1,\dots,M_m]		  & \text{ if } f \npreceq_M g~.
+\end{array}
+\right.
+\]
+While $\prec_M$ is defined only relative to $\Sigma_M$, reduction may only reduce the signature. Inspection of Figure~\ref{fig:reduction rules} then shows that $M \rw_\perm N$ implies $N<M$.
 \end{proof}
 
-\subsection{Confluence of $\perm$-reduction}
+\subsection{Confluence of permutative reduction}
+
+With strong normalization, confluence of $\rw_\perm$ requires only local confluence. We begin by reducing the number of cases to consider, by casting the permutations of $\ttrm{+a}$ as instances of a common shape.
 
 \begin{defn}
-We define a \emph{context} $C[\,]$ %and \emph{head context} $H[\,]$
-as follows.
+We define a \emph{context} $C[\,]$ as follows.
 \[
 \begin{array}{lll@{~}l@{~}l@{~}l@{~}l}
 	C[\,] &\coloneqq& [\,] &\mid& \lambda x.C[\,] &\mid& C[\,]M ~\mid~ NC[\,] ~\mid~ \trm{C[\,]+aM} ~\mid~ \trm{N+aC[\,]} ~\mid~ \trm{!a.C[\,]}
-%\\	H[\,] &\coloneqq& [\,] &\mid& \lambda x.H[\,] &\mid& H[\,]M
 \end{array}
 \]
 The term $C[N]$ represents $C[\,]$ with the hole $[\,]$ replaced by $N$.
@@ -671,11 +713,12 @@ Reduction $\rw_\perm$ is confluent.
 \end{lem}
 
 \begin{proof}
-	By Newman's lemma and strong normalization of $\rw_\perm$ (\Cref{lemma:strong-normalization}), we only have to prove that $\rw_\perm$ is locally confluent.
-We consider each reduction rule against those lower down in the table in Figure~\ref{fig:reduction rules}. For the symmetric rule pairs $\cancelL$/$\cancelR$, $\plusL$/$\plusR$, and $\plusFun/\plusArg$ we present only the first case.
-\begin{itemize}
-	\item $(\idem)$ $\trm{N +a N}\rw N$.
+We prove local confluence; by Newman's lemma and strong normalization of $\rw_\perm$ (\Cref{lemma:strong-normalization}), confluence follows. We consider each reduction rule against those lower down in Figure~\ref{fig:reduction rules}. For the symmetric rule pairs $\cancelL$/$\cancelR$, $\plusL$/$\plusR$, and $\plusFun/\plusArg$ we present only the first case. Unless otherwise specified, we let $a<b<c$.
 
+\newcommand\itm[2]{\medskip\noindent(#1)}% \qquad$#2$}
+
+%=====
+\itm\idem{\trm{N +a N}\rw N}
 \[
 \vc{\begin{tikzpicture}[x=20pt,y=1.5ex]
 	\node[anchor=base east] (a) at (0,0) {$\trm{(N+aN)+aM}$};
@@ -683,7 +726,8 @@ We consider each reduction rule against those lower down in the table in Figure~
 	\draw[rw] (0,1) --node[above]{$\idem$}    (1,1);
 	\draw[rw] (0,0) --node[below]{$\cancelL$} (1,0);
 \end{tikzpicture}}
-\quad
+\]
+\[
 \vcenter{\hbox{\begin{tikzpicture}
 	\matrix [matrix of math nodes] (m) {
 	  		\trm{(N+aM)+a(N+aM)} &[20pt] \trm{N+aM}
@@ -693,7 +737,7 @@ We consider each reduction rule against those lower down in the table in Figure~
 	\draw[rw] (m-1-1) --node[left] {$\cancelL$} (m-2-1);
 	\draw[rw,implied] (m-2-1) --node[below right=-2pt] {$\cancelR$} (m-1-2);
 \end{tikzpicture}}}
-\quad
+\qquad
 \vcenter{\hbox{\begin{tikzpicture}
 	\matrix [matrix of math nodes] (m) {
 	  		\trm{C[N+aN]}    &[20pt] C[N]
@@ -708,7 +752,7 @@ We consider each reduction rule against those lower down in the table in Figure~
 \vcenter{\hbox{\begin{tikzpicture}
 	\matrix [matrix of math nodes] (m) {
 	  		\trm{(N+aM)+b(N+aM)} &[30pt] \trm{N+aM}
-	\\[20pt]\trm{(N+b(N+aM))+a(M+b(N+aM))} &&[10pt] (a<b)
+	\\[20pt]\trm{(N+b(N+aM))+a(M+b(N+aM))} %&&[10pt] (a<b)
 	\\[20pt]\trm{((N+bN)+a(N+bM))+a((M+bN)+a(M+bM))} & \trm{(N+bN)+a(M+bM)}
 	\\ };
 	\draw[rw] (m-1-1) --node[above]{$\idem$}    (m-1-2);
@@ -719,12 +763,12 @@ We consider each reduction rule against those lower down in the table in Figure~
 \end{tikzpicture}}}
 \]
 
-	\item $(\cancelL)$ $\trm{(N +a M) +a P}\rw\trm{N +a P}$.
-
+%=====
+\itm\cancelL{\trm{(N +a M) +a P}\rw\trm{N +a P}}
 \[
 \vcenter{\hbox{\begin{tikzpicture}
 	\matrix [matrix of math nodes] (m) {
-	  		\trm{(N+aM)+a(P+aQ)} &[20pt] \trm{N+a(P+aQ)}
+	  		\trm{(N+aM)+a(P+aQ)} &[15pt] \trm{N+a(P+aQ)}
 	\\[20pt]\trm{(N+aM)+a Q} & \trm{N+aQ}
 	\\ };
 	\draw[rw] (m-1-1) --node[above]{$\cancelL$} (m-1-2);
@@ -732,10 +776,9 @@ We consider each reduction rule against those lower down in the table in Figure~
 	\draw[rw,implied] (m-1-2) --node[right]{$\cancelR$} (m-2-2);
 	\draw[rw,implied] (m-2-1) --node[below]{$\cancelL$} (m-2-2);
 \end{tikzpicture}}}
-\qquad
 \vcenter{\hbox{\begin{tikzpicture}
 	\matrix [matrix of math nodes] (m) {
-	  		\trm{C[(N+aM)+aP]} &[20pt] \trm{C[N+aM]}
+	  		\trm{C[(N+aM)+aP]} &[15pt] \trm{C[N+aM]}
 	\\[20pt]\trm{C[N+aM]+aC[P]}
 	\\[20pt]\trm{(C[N]+aC[M])+aC[P]} & \trm{C[N]+aC[M]}
 	\\ };
@@ -757,16 +800,16 @@ We consider each reduction rule against those lower down in the table in Figure~
 	\draw[rw, implied] (m-1-2) --node[right]{$\plusR$} (m-2-2);
 	\draw[rws,implied] (m-2-1) --node[below]{$\cancelL$} (m-2-2);
 \end{tikzpicture}}}
-\qquad(a<b)
+%\qquad(a<b)
 \]
 
-	\item $(\plusX)$ $\trm{C[N+aM]}\rw\trm{C[N]+a C[M]}$.
-
+%=====
+\itm\plusX{\trm{C[N+aM]}\rw\trm{C[N]+a C[M]}}
 \[
 \vcenter{\hbox{\begin{tikzpicture}
 	\matrix [matrix of math nodes] (m) {
 	  		\trm{C[(N+aM)+bP]}      &[20pt] \trm{C[N+aM]+bC[P]}
-	\\[20pt]\trm{C[(N+bP)+a(M+bP)]} &       \trm{(C[N]+aC[M])+bC[P]}		 &[10pt] (a<b)
+	\\[20pt]\trm{C[(N+bP)+a(M+bP)]} &       \trm{(C[N]+aC[M])+bC[P]}		 %&[10pt] (a<b)
 	\\[20pt]\trm{C[N+bP]+aC[M+bP]}  &       \trm{(C[N]+bC[P])+a(C[M]+bC[P])}
 	\\ };
 	\draw[rw] (m-1-1) --node[above]{$\plusX$} (m-1-2);
@@ -778,28 +821,44 @@ We consider each reduction rule against those lower down in the table in Figure~
 \end{tikzpicture}}}
 \]
 
-	\item $(\plusL)$ $\trm{(N+aM)+bP}\rw\trm{(N+bP)+a(M+bP)}$.
-
+%=====
+\itm\plusL{\trm{(N+aM)+bP}\rw\trm{(N+bP)+a(M+bP)}}
 \[
-\vcenter{\hbox{\begin{tikzpicture}
-	\matrix [matrix of math nodes] (m) {
-	  		\trm{(N+aM)+b(P+aQ)}                      &[10pt] \trm{(N+b(P+aQ))+a(M+b(P+aQ))}
-	\\[20pt]\trm{((N+aM)+bP)+a((N+aM)+bQ)}            &       \trm{((N+bP)+a(N+bQ))+a((M+bP)+a(M+bQ))} &[10pt] (a<b)
-	\\[20pt]\trm{((N+bP)+a(M+bP))+a((N+bQ)+a(M+bQ))}  &       \trm{(N+bP)+a(M+bQ)}
-	\\ };
-	\draw[rw] (m-1-1) --node[above]{$\plusL$} (m-1-2);
-	\draw[rw] (m-1-1) --node[left] {$\plusR$} (m-2-1);
-	\draw[rws,implied] (m-1-2) --node[right]{$\plusR$} (m-2-2);
-	\draw[rws,implied] (m-2-1) --node[left] {$\plusL$} (m-3-1);
-	\draw[rws,implied] (m-2-2) --node[right]{$\cancelL,\cancelR$} (m-3-2);
-	\draw[rws,implied] (m-3-1) --node[below]{$\cancelL,\cancelR$} (m-3-2);
+\vcenter{\hbox{\begin{tikzpicture}[x=340pt,y=40pt]
+	\node[anchor=west] (a) at (0,2) {$\trm{(N+aM)+b(P+aQ)}$};
+	\node[anchor=west] (b) at (0,1) {$\trm{((N+aM)+bP)+a((N+aM)+bQ)}$};
+	\node[anchor=west] (c) at (0,0) {$\trm{((N+bP)+a(M+bP))+a((N+bQ)+a(M+bQ))}$};
+	%
+	\node[anchor=east] (d) at (1,2) {$\trm{(N+b(P+aQ))+a(M+b(P+aQ))}$};
+	\node[anchor=east] (e) at (1,1) {$\trm{((N+bP)+a(N+bQ))+a((M+bP)+a(M+bQ))}$};
+	\node[anchor=east] (f) at (1,0) {$\trm{(N+bP)+a(M+bQ)}$};
+%
+	\draw[rw] (a) --node[above]{$\plusL$} (d);
+	\draw[rw] 			($(a.south west)+( 43.5pt,0pt)$) --node[left] {$\plusR$} ($(b.north west)+( 43.5pt,0pt)$);
+	\draw[rws,implied]	($(d.south east)+(-43.5pt,0pt)$) --node[right]{$\plusR$} ($(e.north east)+(-43.5pt,0pt)$);
+	\draw[rws,implied]	($(b.south west)+( 43.5pt,0pt)$) --node[left] {$\plusL$} ($(c.north west)+( 43.5pt,0pt)$);
+	\draw[rws,implied]	($(e.south east)+(-43.5pt,0pt)$) --node[right]{$\cancelL,\cancelR$} ($(f.north east)+(-43.5pt,0pt)$);
+	\draw[rws,implied] (c) --node[below]{$\cancelL,\cancelR$} (f);
 \end{tikzpicture}}}
+%\vcenter{\hbox{\begin{tikzpicture}
+%	\matrix [matrix of math nodes] (m) {
+%	  		\trm{(N+aM)+b(P+aQ)}                      &[10pt] \trm{(N+b(P+aQ))+a(M+b(P+aQ))}
+%	\\[20pt]\trm{((N+aM)+bP)+a((N+aM)+bQ)}            &       \trm{((N+bP)+a(N+bQ))+a((M+bP)+a(M+bQ))} %&[10pt] (a<b)
+%	\\[20pt]\trm{((N+bP)+a(M+bP))+a((N+bQ)+a(M+bQ))}  &       \trm{(N+bP)+a(M+bQ)}
+%	\\ };
+%	\draw[rw] (m-1-1) --node[above]{$\plusL$} (m-1-2);
+%	\draw[rw] (m-1-1) --node[left] {$\plusR$} (m-2-1);
+%	\draw[rws,implied] (m-1-2) --node[right]{$\plusR$} (m-2-2);
+%	\draw[rws,implied] (m-2-1) --node[left] {$\plusL$} (m-3-1);
+%	\draw[rws,implied] (m-2-2) --node[right]{$\cancelL,\cancelR$} (m-3-2);
+%	\draw[rws,implied] (m-3-1) --node[below]{$\cancelL,\cancelR$} (m-3-2);
+%\end{tikzpicture}}}
 \]
 \[
 \vcenter{\hbox{\begin{tikzpicture}
 	\matrix [matrix of math nodes] (m) {
 	  		\trm{(N+bM)+c(P+aQ)}            &[20pt] \trm{(N+c(P+aQ))+b(M+c(P+aQ))}
-	\\[20pt]                                &       \trm{((N+cP)+a(N+cQ))+b((M+cP)+a(M+cQ))} &[10pt] (a<b<c)
+	\\[20pt]                                &       \trm{((N+cP)+a(N+cQ))+b((M+cP)+a(M+cQ))} %&[10pt] (a<b<c)
 	\\[20pt]\trm{((N+bM)+cP)+a((N+bM)+cQ)}  &       \trm{((N+cP)+b(M+cP))+a((N+cQ)+b(M+cQ))}
 	\\ };
 	\draw[rw] (m-1-1) --node[above]{$\plusL$} (m-1-2);
@@ -810,8 +869,8 @@ We consider each reduction rule against those lower down in the table in Figure~
 \end{tikzpicture}}}
 \]
 
-	\item $(\plusFun)$ $\trm{(N+aM)P}\rw\trm{(NP)+a(MP)}$.
-
+%=====
+\itm\plusFun{\trm{(N+aM)P}\rw\trm{(NP)+a(MP)}}
 \[
 \vcenter{\hbox{\begin{tikzpicture}
 	\matrix [matrix of math nodes] (m) {
@@ -831,7 +890,7 @@ We consider each reduction rule against those lower down in the table in Figure~
 \vcenter{\hbox{\begin{tikzpicture}
 	\matrix [matrix of math nodes] (m) {
 	  		\trm{(N+bM)(P+aQ)}         &[20pt] \trm{(N(P+aQ))+b(M(P+aQ))}
-	\\[20pt]                           &       \trm{((NP)+a(NQ))+b((MP)+a(MQ))} &[10pt] (a<b)
+	\\[20pt]                           &       \trm{((NP)+a(NQ))+b((MP)+a(MQ))} %&[10pt] (a<b)
 	\\[20pt]\trm{((N+bM)P)+a((N+bM)Q)} &       \trm{((NP)+b(MP))+a((NQ)+b(MQ))}
 	\\ };
 	\draw[rw] (m-1-1) --node[above]{$\plusFun$} (m-1-2);
@@ -842,8 +901,8 @@ We consider each reduction rule against those lower down in the table in Figure~
 \end{tikzpicture}}}
 \]
 
-	\item $(\plusBox)$ $\trm{!b.(N +a M)} \rw \trm{(!b.N) +a (!b.M)}$
-
+%=====
+\itm\plusBox{\trm{!b.(N +a M)} \rw \trm{(!b.N) +a (!b.M)}}
 \[
 \vcenter{\hbox{\begin{tikzpicture}
 	\matrix [matrix of math nodes] (m) {
@@ -856,7 +915,6 @@ We consider each reduction rule against those lower down in the table in Figure~
 \end{tikzpicture}}}
 \quad (a \neq b, \ b \notin\trm{N+a M})
 \]
-\end{itemize}
 \end{proof}
 
 \begin{defn}
