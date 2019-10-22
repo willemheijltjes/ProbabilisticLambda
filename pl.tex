@@ -408,7 +408,7 @@ For a well-labeled and label-closed representative $\trm{M}$, $<_{\trm{M}}$ is a
 
 
 \begin{defn}
-\emph{Reduction} $\rw \,=\, \rw_\beta \cup \rw_\perm$ in $\PEL$ consists of \emph{$\beta$-reduction}~$\rw_\beta$ and \emph{permutative} or \emph{$\perm$-reduction}~$\rw_\perm$, both given in Figure~\ref{fig:reduction rules}.
+\emph{Reduction} $\rw \,=\, \rw_\beta \cup \rw_\perm$ in $\PEL$ consists of \emph{$\beta$-reduction}~$\rw_\beta$ and \emph{permutative} or \emph{$\perm$-reduction}~$\rw_\perm$, both given in Figure~\ref{fig:reduction rules}. We write $\rws$ for the reflexive-transitive closure of reduction and $\rwn$ for reduction to normal form, and similarly for $\rw_\beta$ and $\rw_\perm$.
 %\[
 %\begin{array}{rcl}
 %	C[(\lambda x.N)M] &\rw_\beta& C[M[N/x]]
@@ -925,91 +925,95 @@ We denote the unique $\perm$-normal form of a term $N$ by $N^\perm$.
 
 \section{Confluence}
 
-We aim to prove that $\rw \,=\, \rw_\beta \cup \rw_\perm$ is confluent.
+We aim to prove that $\rw \,=\, \rw_\beta \cup \rw_\perm$ is confluent. We will use the standard technique of \emph{parallel} $\beta$-reduction, a simultaneous reduction step on an arbitrary number of $\beta$-redexes in the source term, which we define via a labelling of the redexes to be reduced. The central point is to find a notion of reduction that is \emph{diamond}, \ie\ every critical pair can be closed in one (or zero) steps. This will be our \emph{complete} reduction, which consists of parallel $\beta$-reduction followed by $\perm$-reduction to normal form.
+%
+%\begin{lem}[Substitution for $\rw_\perm$]
+%	\label{lemma:substitution}
+%	\hfill
+%	\begin{enumerate}
+%		\item If $\trm{N \rw_\perm N'}$ then $\trm{M[N/x] \rw_\perm^* M[N'/x]}$.
+%		\item If $\trm{M \rw_\perm M'}$ then $\trm{M[N/x] \rw_\perm M'[N/x]}$.
+%		%\item If $\trm{x \in {\fv{M}}}$ and $a <_M b$ for any $\trm{b \in {\fl{M}}}$ then $\trm{M[N +a P/x]} \rw_\perm^* \trm{M[N/x] +a M[P/x]}$.
+%	\end{enumerate}
+%\end{lem}
 
-\begin{lem}[Substitution for $\rw_\perm$]
-	\label{lemma:substitution}
-	\hfill
-	\begin{enumerate}
-		\item If $\trm{N \rw_\perm N'}$ then $\trm{M[N/x] \rw_\perm^* M[N'/x]}$.
-		\item If $\trm{M \rw_\perm M'}$ then $\trm{M[N/x] \rw_\perm M'[N/x]}$.
-		\item If $\trm{x \in {\fv{M}}}$ and $a <_M b$ for any $\trm{b \in {\fl{M}}}$ then $\trm{M[N +a P/x]} \rw_\perm^* \trm{M[N/x] +a M[P/x]}$.
-	\end{enumerate}
-\end{lem}
+%\begin{proof}\hfill
+%	\begin{enumerate}
+%		\item By induction on $\trm{M}$.
+%		\item By induction on the definition of $\trm{M \rw_\perm M'}$. \qedhere
+%	\end{enumerate}
+%\end{proof}
 
-\begin{proof}\hfill
-	\begin{enumerate}
-		\item By induction on $\trm{M}$.
-		\item By induction on the definition of $\trm{M \rw_\perm M'}$.
-		\item By induction on $\trm{M}$.
-		Cases:
-		\begin{itemize}
-			\item \emph{Variable}, \ie\ $\trm{M = x}$ (as $\trm{x} \in \fv{M}$), and then $\trm{M[N +a P/x]} = \trm{N +a P} = \trm{M[N/x] +a M[P/x]}$.
 
-			\item \emph{Application}, \ie\ $\trm{M = M_1M_2}$.
-			Since $\trm{x \in {\fv{M}}}$ there are three cases:
-			\begin{itemize}
-				\item $\trm{x \in {\fv{M_1}} \cup \fv{M_2}}$ and then, by \ih, $\trm{M_i[N +a P/x]} \rw_\perm^* \trm{M_i[N/x] +a M_i[P/x]}$ for all $i \in \{1,2\}$.
-				So,
-				$\trm{M[N +a P/x]} = \trm{M_1[N +a P/x] M_2[N +a P/x]} \rw_\perm^* \trm{(M_1[N/x] +a M_1[P/x])(M_2[N/x] +a M_2[P/x])} \allowbreak\rw_\perm^* \trm{M_1[N/x]M_2[N/x] +a M_1[P/x]M_2[P/x]} = \trm{M[N/x] +a M[P/x]}$.
 
-				\item $\trm{x \in {\fv{M_{1}}}}$ and $\trm{x \notin {\fv{M_2}}}$ and then, by \ih, $\trm{M_1[N +a P/x]} \rw_\perm^* \trm{M_1[N/x] +a M_1[P/x]}$.
-				So,
-				$\trm{M[N +a P/x]} = \trm{M_1[N +a P/x] M_2} \rw_\perm^* \trm{(M_1[N/x] +a M_1[P/x])M_2} \allowbreak\rw_\perm^* \trm{M_1[N/x]M_2 +a M_1[P/x]M_2} = \trm{M[N/x] +a M[P/x]}$.
 
-				\item $\trm{x \notin {\fv{M_{1}}}}$ and $\trm{x \in {\fv{M_2}}}$: analogous to the previous case.
-			\end{itemize}
-
-			\item \emph{Abstraction}, \ie\ $\trm{M = \y.M'}$.
-			By \ih, as $\trm{x \in {\fv{M}} \subseteq \fv{M'}}$ $\trm{M'[N +a P/x]} \rw_\perm^* \trm{M'[N/x] +a M'[P/x]}$
-			So, $\trm{M [N +a P/x] = \y.(M'[N +a P/x]) \rw_\perm^* \y.(M'[N/x] +a M'[P/x]) \rw_\perm \y.(M'[N/x]) +a \y.(M'[P/x])}$ $= \trm{M[N/x] +a M[P/x]}$.
-			
-			\item \emph{Superposition}, \ie\ $\trm{M = M_1 +b M_2}$. 
-			By \ih, $\trm{M_i[N +a P/x]} \rw_\perm^* \trm{M_i[N/x] +a M_i[P/x]}$ for all $i \in \{1,2\}$.
-			Since $a <_M b$ by hypothesis, $\trm{M[N +a P/x]} = \trm{M_1[N +a P/x] +b M_2[N +a P/x]} \rw_\perm^* \trm{(M_1[N/x] +a M_1[P/x]) 
-				\allowbreak+b (M_2[N/x] +a M_2[P/x])} \rw_\perm
-			\trm{((M_1[N/x] +a M_1[P/x]) \allowbreak+b M_2[N/x]) +a ((M_1[N/x] +a M_1[P/x]) \allowbreak+b M_2[P/x])}
-			\allowbreak\rw_\perm^* 
-			\trm{((M_1[N/x]\allowbreak+b M_2[N/x]) +a (M_1[P/x] \allowbreak+b M_2[N/x]))  +a ((M_1[N/x] \allowbreak+b M_2[P/x]) +a (M_1[P/x] \allowbreak+b M_2[P/x])) }
-			\allowbreak\rw_\perm^*
-			\trm{(M_1[N/x] +b M_2[N/x]) +a (M_1[P/x] +b M_2[P/x])} = \trm{M[N/x] +a M[P/x]}$.
-
-			\item \emph{Superposition}, \ie\ $\trm{M = M_1 +b M_2}$.
-			Since $\trm{x \in {\fv{M}}}$ there are three cases:
-			\begin{itemize}
-				\item $\trm{x \in {\fv{M_1}} \cup \fv{M_2}}$ and then, by \ih, $\trm{M_i[N +a P/x]} \rw_\perm^* \trm{M_i[N/x] +a M_i[P/x]}$ for all $i \in \{1,2\}$.
-				Since $a <_M b$ by hypothesis, $\trm{M[N +a P/x]} = \trm{M_1[N +a P/x] +b M_2[N +a P/x]} \rw_\perm^* \trm{(M_1[N/x] +a M_1[P/x]) 
-					\allowbreak+b (M_2[N/x] +a M_2[P/x])} \rw_\perm
-				\trm{((M_1[N/x] +a M_1[P/x]) \allowbreak+b M_2[N/x]) +a ((M_1[N/x] +a M_1[P/x]) \allowbreak+b M_2[P/x])}
-				\allowbreak\rw_\perm^* 
-				\trm{((M_1[N/x]\allowbreak+b M_2[N/x]) +a (M_1[P/x] \allowbreak+b M_2[N/x]))  +a ((M_1[N/x] \allowbreak+b M_2[P/x]) +a (M_1[P/x] \allowbreak+b M_2[P/x])) }
-				\allowbreak\rw_\perm^*
-				\trm{(M_1[N/x] +b M_2[N/x]) +a (M_1[P/x] +b M_2[P/x])} = \trm{M[N/x] +a M[P/x]}$.
-				
-				\item $\trm{x \in {\fv{M_{1}}}}$ and $\trm{x \notin {\fv{M_2}}}$ and then, by \ih, $\trm{M_1[N +a P/x]} \rw_\perm^* \trm{M_1[N/x] +a M_1[P/x]}$.
-				
-				Since $a <_M b$ by hypothesis, $\trm{M[N +a P/x]} = \trm{M_1[N +a P/x] +b M_2} \rw_\perm^* \trm{(M_1[N/x] +a M_1[P/x]) 
-					\allowbreak+b M_2} \rw_\perm
-				\trm{((M_1[N/x]\allowbreak+b M_2) +a (M_1[P/x] \allowbreak+b M_2) }
-				= \trm{M[N/x] +a M[P/x]}$.
-
-				\item $\trm{x \notin {\fv{M_{1}}}}$ and $\trm{x \in {\fv{M_2}}}$: analogous to the previous case.
-			\end{itemize}
-
-			\item \emph{Box}, \ie\ $\trm{M} = \trm{!b.M'}$. 
-			We can suppose without loss of generality that $b \neq a$.
-			By \ih, as $\trm{x \in {\fv{M}} = \fv{M'}}$ $\trm{M'[N +a P/x]} \rw_\perm^* \trm{M'[N/x] +a M'[P/x]}$
-			So, $\trm{M [N +a P/x] = !b.(M'[N +a P/x]) \rw_\perm^* !b.(M'[N/x] +a M'[P/x]) \rw_\perm !b.(M'[N/x]) +a !b.(M'[P/x])}$ $= \trm{M[N/x] +a M[P/x]}$.
-			\qedhere
-		\end{itemize}
-	\end{enumerate}
-\end{proof}
-
-\begin{remark}
-	If $\trm{x \notin {\fv{M}}}$ then $\trm{M[N +a P/x] \not\rw_\perm^* M[N/x] +a M[P/x]}$.
-	For instance, take $\trm{M} = \trm{y} \neq \trm{x}$: then, $\trm{M[N +a P/x]} \allowbreak= y \neq \trm{y +a y} = \trm{M[N/x] +a M[P/x]}$ where $\trm{y}$ is $\perm$-normal.
-	In fact, if $\trm{x \notin {\fv{M}}}$ then $\trm{M[N/x] +a M[P/x] \allowbreak= M +a M \rw_\perm M = M[N +a P/x]}$.
-\end{remark}
+%		\item By induction on $\trm{M}$.
+%		Cases:
+%		\begin{itemize}
+%			\item \emph{Variable}, \ie\ $\trm{M = x}$ (as $\trm{x} \in \fv{M}$), and then $\trm{M[N +a P/x]} = \trm{N +a P} = \trm{M[N/x] +a M[P/x]}$.
+%
+%			\item \emph{Application}, \ie\ $\trm{M = M_1M_2}$.
+%			Since $\trm{x \in {\fv{M}}}$ there are three cases:
+%			\begin{itemize}
+%				\item $\trm{x \in {\fv{M_1}} \cup \fv{M_2}}$ and then, by \ih, $\trm{M_i[N +a P/x]} \rw_\perm^* \trm{M_i[N/x] +a M_i[P/x]}$ for all $i \in \{1,2\}$.
+%				So,
+%				$\trm{M[N +a P/x]} = \trm{M_1[N +a P/x] M_2[N +a P/x]} \rw_\perm^* \trm{(M_1[N/x] +a M_1[P/x])(M_2[N/x] +a M_2[P/x])} \allowbreak\rw_\perm^* \trm{M_1[N/x]M_2[N/x] +a M_1[P/x]M_2[P/x]} = \trm{M[N/x] +a M[P/x]}$.
+%
+%				\item $\trm{x \in {\fv{M_{1}}}}$ and $\trm{x \notin {\fv{M_2}}}$ and then, by \ih, $\trm{M_1[N +a P/x]} \rw_\perm^* \trm{M_1[N/x] +a M_1[P/x]}$.
+%				So,
+%				$\trm{M[N +a P/x]} = \trm{M_1[N +a P/x] M_2} \rw_\perm^* \trm{(M_1[N/x] +a M_1[P/x])M_2} \allowbreak\rw_\perm^* \trm{M_1[N/x]M_2 +a M_1[P/x]M_2} = \trm{M[N/x] +a M[P/x]}$.
+%
+%				\item $\trm{x \notin {\fv{M_{1}}}}$ and $\trm{x \in {\fv{M_2}}}$: analogous to the previous case.
+%			\end{itemize}
+%
+%			\item \emph{Abstraction}, \ie\ $\trm{M = \y.M'}$.
+%			By \ih, as $\trm{x \in {\fv{M}} \subseteq \fv{M'}}$ $\trm{M'[N +a P/x]} \rw_\perm^* \trm{M'[N/x] +a M'[P/x]}$
+%			So, $\trm{M [N +a P/x] = \y.(M'[N +a P/x]) \rw_\perm^* \y.(M'[N/x] +a M'[P/x]) \rw_\perm \y.(M'[N/x]) +a \y.(M'[P/x])}$ $= \trm{M[N/x] +a M[P/x]}$.
+%			
+%			\item \emph{Superposition}, \ie\ $\trm{M = M_1 +b M_2}$. 
+%			By \ih, $\trm{M_i[N +a P/x]} \rw_\perm^* \trm{M_i[N/x] +a M_i[P/x]}$ for all $i \in \{1,2\}$.
+%			Since $a <_M b$ by hypothesis, $\trm{M[N +a P/x]} = \trm{M_1[N +a P/x] +b M_2[N +a P/x]} \rw_\perm^* \trm{(M_1[N/x] +a M_1[P/x]) 
+%				\allowbreak+b (M_2[N/x] +a M_2[P/x])} \rw_\perm
+%			\trm{((M_1[N/x] +a M_1[P/x]) \allowbreak+b M_2[N/x]) +a ((M_1[N/x] +a M_1[P/x]) \allowbreak+b M_2[P/x])}
+%			\allowbreak\rw_\perm^* 
+%			\trm{((M_1[N/x]\allowbreak+b M_2[N/x]) +a (M_1[P/x] \allowbreak+b M_2[N/x]))  +a ((M_1[N/x] \allowbreak+b M_2[P/x]) +a (M_1[P/x] \allowbreak+b M_2[P/x])) }
+%			\allowbreak\rw_\perm^*
+%			\trm{(M_1[N/x] +b M_2[N/x]) +a (M_1[P/x] +b M_2[P/x])} = \trm{M[N/x] +a M[P/x]}$.
+%
+%			\item \emph{Superposition}, \ie\ $\trm{M = M_1 +b M_2}$.
+%			Since $\trm{x \in {\fv{M}}}$ there are three cases:
+%			\begin{itemize}
+%				\item $\trm{x \in {\fv{M_1}} \cup \fv{M_2}}$ and then, by \ih, $\trm{M_i[N +a P/x]} \rw_\perm^* \trm{M_i[N/x] +a M_i[P/x]}$ for all $i \in \{1,2\}$.
+%				Since $a <_M b$ by hypothesis, $\trm{M[N +a P/x]} = \trm{M_1[N +a P/x] +b M_2[N +a P/x]} \rw_\perm^* \trm{(M_1[N/x] +a M_1[P/x]) 
+%					\allowbreak+b (M_2[N/x] +a M_2[P/x])} \rw_\perm
+%				\trm{((M_1[N/x] +a M_1[P/x]) \allowbreak+b M_2[N/x]) +a ((M_1[N/x] +a M_1[P/x]) \allowbreak+b M_2[P/x])}
+%				\allowbreak\rw_\perm^* 
+%				\trm{((M_1[N/x]\allowbreak+b M_2[N/x]) +a (M_1[P/x] \allowbreak+b M_2[N/x]))  +a ((M_1[N/x] \allowbreak+b M_2[P/x]) +a (M_1[P/x] \allowbreak+b M_2[P/x])) }
+%				\allowbreak\rw_\perm^*
+%				\trm{(M_1[N/x] +b M_2[N/x]) +a (M_1[P/x] +b M_2[P/x])} = \trm{M[N/x] +a M[P/x]}$.
+%				
+%				\item $\trm{x \in {\fv{M_{1}}}}$ and $\trm{x \notin {\fv{M_2}}}$ and then, by \ih, $\trm{M_1[N +a P/x]} \rw_\perm^* \trm{M_1[N/x] +a M_1[P/x]}$.
+%				
+%				Since $a <_M b$ by hypothesis, $\trm{M[N +a P/x]} = \trm{M_1[N +a P/x] +b M_2} \rw_\perm^* \trm{(M_1[N/x] +a M_1[P/x]) 
+%					\allowbreak+b M_2} \rw_\perm
+%				\trm{((M_1[N/x]\allowbreak+b M_2) +a (M_1[P/x] \allowbreak+b M_2) }
+%				= \trm{M[N/x] +a M[P/x]}$.
+%
+%				\item $\trm{x \notin {\fv{M_{1}}}}$ and $\trm{x \in {\fv{M_2}}}$: analogous to the previous case.
+%			\end{itemize}
+%
+%			\item \emph{Box}, \ie\ $\trm{M} = \trm{!b.M'}$. 
+%			We can suppose without loss of generality that $b \neq a$.
+%			By \ih, as $\trm{x \in {\fv{M}} = \fv{M'}}$ $\trm{M'[N +a P/x]} \rw_\perm^* \trm{M'[N/x] +a M'[P/x]}$
+%			So, $\trm{M [N +a P/x] = !b.(M'[N +a P/x]) \rw_\perm^* !b.(M'[N/x] +a M'[P/x]) \rw_\perm !b.(M'[N/x]) +a !b.(M'[P/x])}$ $= \trm{M[N/x] +a M[P/x]}$.
+%			\qedhere
+%		\end{itemize}
+%
+%\begin{remark}
+%	If $\trm{x \notin {\fv{M}}}$ then $\trm{M[N +a P/x] \not\rw_\perm^* M[N/x] +a M[P/x]}$.
+%	For instance, take $\trm{M} = \trm{y} \neq \trm{x}$: then, $\trm{M[N +a P/x]} \allowbreak= y \neq \trm{y +a y} = \trm{M[N/x] +a M[P/x]}$ where $\trm{y}$ is $\perm$-normal.
+%	In fact, if $\trm{x \notin {\fv{M}}}$ then $\trm{M[N/x] +a M[P/x] \allowbreak= M +a M \rw_\perm M = M[N +a P/x]}$.
+%\end{remark}
 %
 %Two problematic cases to join critical pairs: the first two ones mean that we cannot use commutation and Hindley--Rosen lemma to prove that $\rw$ is confluent;
 %the second two ones suggest that the proof of confluence of $\rw$ is delicate (see the remark above).
@@ -1072,73 +1076,80 @@ We aim to prove that $\rw \,=\, \rw_\beta \cup \rw_\perm$ is confluent.
 %\end{array}
 %\end{align*}
 
-\hrule
+%\hrule
 
 \begin{defn}
 A \emph{labeled} term $\trm{N*}$ is a term $N$ with chosen $\beta$-redexes annotated as $\trm{(\x.M)*P}$. The \emph{labeled reduct} $\trm{<N*>}$ of a labeled term is defined by induction on $N$ as follows:
 \begin{align*}
-	\trm{<(\x.N)*M>} &= \trm{<N>[<M>/x]}
-\\	\trm{<x>}		&= x
-\\	\trm{<\x.N>}	&= \trm{\x.<N>}
-\\	\trm{<NM>} 		&= \trm{<N><M>}
-\\	\trm{<N+aM>}	&= \trm{<N>+a<M>}
-\\	\trm{<!a.N>}	&= \trm{!a.<N>}
+	\trm{<(\x.N*)*M*>} &= \trm{<N*>[<M*>/x]}	&	\trm{<N*M*>} 	&= \trm{<N*><M*>}
+\\	\trm{<x>}		&= x						&	\trm{<N*+aM*>}	&= \trm{<N*>+a<M*>}
+\\	\trm{<\x.N*>}	&= \trm{\x.<N*>}			&	\trm{<\,!a.N*>}	&= \trm{!a.<N*>}
 \end{align*}
 A \emph{parallel $\beta$-step} is a reduction $N\rwp_\beta\trm{<N*>}$ for some labelling $\trm{N*}$ of $N$.
 \end{defn}
 
-We write $\trm{N*}\rwp_\beta\trm{<N*>}$ for the specific parallel step indicated by the labeling $\trm{N*}$. Observe that $\trm{<N*>}$ is a regular unlabeled term, since all labels are removed in the reduction.
-
-\begin{remark}[Reflexivity of $\rwp_\beta$]
-\label{rmk:reflexivity}
-	For every term $\trm{N}$, one has $\trm{N} \rwp_\beta \trm{N}$. 
-	Indeed, if $\trm{N*}$ is the empty labeling (which does not annotate any $\beta$-redex), then $\trm{N} = \trm{<N*>}$.
-\end{remark}
+\noindent
+We write $\trm{N*}\rwp_\beta\trm{<N*>}$ for the specific parallel step indicated by the labeling $\trm{N*}$. Observe that $\trm{<N*>}$ is a regular unlabeled term, since all labels are removed in the reduction. For the empty labelling, $\trm{N} = \trm{<N*>}$, so that parallel reduction is reflexive: $\trm{N} \rwp_\beta \trm{N}$.
 
 \begin{lem}
 A parallel $\beta$-step $N\rwp_\beta M$ is a $\beta$-reduction $N\rws_\beta M$.
 \end{lem}
 
 \begin{proof}
-	Since $N\rwp_\beta M$ means that $\trm{M} = \trm{<N*>}$ for some labeling $\trm{N*}$ of $\trm{N}$, we prove that $\trm{N} \rws_\beta \trm{<N*>}$ for any labeling $\trm{N*}$ of $\trm{N}$, by induction on $\trm{N}$.
-	Cases:
-	\begin{itemize}
-		\item \emph{Variable}, \ie\ $\trm{N} = x$. 
-		Then $\trm{x*} = x$ and $\trm{<x*>} = x$.
-		Therefore, $N = x = \trm{<N*>}$ and so $N \rws_\beta \trm{<N*>}$.
-		
-		\item \emph{Abstraction}, \ie\ $\trm{N} = \trm{\x.M}$.
-		Then $\trm{N*} = \trm{\x.M*}$ and $\trm{<N*>} = \trm{\x.<M*>}$.
-		By \ih, $\trm{M} \rws_\beta \trm{<M*>}$ and so $\trm{N} = \trm{\x.M} \rws_\beta \trm{\x.<M*>} = \trm{<N*>}$.
-		
-		\item \emph{Application}, \ie\ $\trm{N} = \trm{MP}$.
-		There are two sub-cases:
-		\begin{itemize}
-			\item $\trm{M} \neq \trm{(\x.Q)*}$. 
-			Then $\trm{N*} = \trm{M*P*}$ and $\trm{<N*>} = \trm{<M*><P*>}$.
-			By \ih, $\trm{M} \rws_\beta \trm{<M*>}$ and $\trm{P} \rws_\beta \trm{<P*>}$, so $\trm{N} = \trm{MP} \rws_\beta \trm{<M*><P*>} = \trm{<N*>}$.
-			
-			\item $\trm{M} = \trm{(\x.Q)*}$.
-			Then $\trm{N*} = \trm{(\x.Q*)*P*}$ and $\trm{<N*>} = \trm{<Q*>[<P*>/x]}$.
-			By \ih, $\trm{Q} \rws_\beta \trm{<Q*>}$ and $\trm{P} \rws_\beta \trm{<P*>}$, so $\trm{N} = \trm{(\x.Q)P} \rw_\beta \trm{Q[P/x]} \rws_\beta \trm{<Q*>[<P*>/x]} = \trm{<N*>}$.
-		\end{itemize}
-	
-		\item \emph{Superposition}, \ie\ $\trm{N} = \trm{M +a P}$.
-		Then $\trm{N*} = \trm{M* +a P*}$ and $\trm{<N*>} = \trm{<M*>+a<P*>}$.
-		By \ih, $\trm{M} \rws_\beta \trm{<M*>}$ and $\trm{P} \rws_\beta \trm{<P*>}$, so $\trm{N} = \trm{M +a P} \rws_\beta \trm{<M*> +a <P*>} = \trm{<N*>}$.
-		
-		\item \emph{Box}, \ie\ $\trm{N} = \trm{!a. M}$. 
-		Analogous to the abstraction case.
-		\qedhere
-	\end{itemize}
+By induction on the labelled term $\trm{N*}$ generating $N\rwp_\beta\trm{<N*>}=M$.
 \end{proof}
+
+%\begin{proof}
+%	Since $N\rwp_\beta M$ means that $\trm{M} = \trm{<N*>}$ for some labeling $\trm{N*}$ of $\trm{N}$, we prove that $\trm{N} \rws_\beta \trm{<N*>}$ for any labeling $\trm{N*}$ of $\trm{N}$, by induction on $\trm{N}$.
+%	Cases:
+%	\begin{itemize}
+%		\item \emph{Variable}: $\trm{N} = x$. 
+%		Then $\trm{x*} = x$ and $\trm{<x*>} = x$.
+%		Therefore, $N = x = \trm{<N*>}$ and so $N \rws_\beta \trm{<N*>}$.
+%		
+%		\item \emph{Abstraction}: $\trm{N} = \trm{\x.M}$.
+%		Then $\trm{N*} = \trm{\x.M*}$ and $\trm{<N*>} = \trm{\x.<M*>}$.
+%		By \ih, $\trm{M} \rws_\beta \trm{<M*>}$ and so $\trm{N} = \trm{\x.M} \rws_\beta \trm{\x.<M*>} = \trm{<N*>}$.
+%		
+%		\item \emph{Application}: $\trm{N} = \trm{MP}$.
+%		There are two sub-cases:
+%		\begin{enumerate}
+%			\item $\trm{M} \neq \trm{(\x.Q)*}$. 
+%			Then $\trm{N*} = \trm{M*P*}$ and $\trm{<N*>} = \trm{<M*><P*>}$.
+%			By \ih, $\trm{M} \rws_\beta \trm{<M*>}$ and $\trm{P} \rws_\beta \trm{<P*>}$, so $\trm{N} = \trm{MP} \rws_\beta \trm{<M*><P*>} = \trm{<N*>}$.
+%			
+%			\item $\trm{M} = \trm{(\x.Q)*}$.
+%			Then $\trm{N*} = \trm{(\x.Q*)*P*}$ and $\trm{<N*>} = \trm{<Q*>[<P*>/x]}$.
+%			By \ih, $\trm{Q} \rws_\beta \trm{<Q*>}$ and $\trm{P} \rws_\beta \trm{<P*>}$, so $\trm{N} = \trm{(\x.Q)P} \rw_\beta \trm{Q[P/x]} \rws_\beta \trm{<Q*>[<P*>/x]} = \trm{<N*>}$.
+%		\end{enumerate}
+%	
+%		\item \emph{Choice}: $\trm{N} = \trm{M +a P}$.
+%		Then $\trm{N*} = \trm{M* +a P*}$ and $\trm{<N*>} = \trm{<M*>+a<P*>}$.
+%		By \ih, $\trm{M} \rws_\beta \trm{<M*>}$ and $\trm{P} \rws_\beta \trm{<P*>}$, so $\trm{N} = \trm{M +a P} \rws_\beta \trm{<M*> +a <P*>} = \trm{<N*>}$.
+%		
+%		\item \emph{Generator}: $\trm{N} = \trm{!a. M}$. 
+%		Analogous to the abstraction case.
+%		\qedhere
+%	\end{itemize}
+%\end{proof}
+
+For the commutation of (parallel) $\beta$-reduction with $\perm$-reduction, we run into the minor issue that a permuting generator or choice operator may block a redex: in both cases below, on the left the term has a redex, but on the right it is blocked. We address by an adaptation of $\perm$-reduction $\rwb_\perm$ on labelled terms, which is a strategy in $\rws_\perm$ that permutes past a labelled redex in one step.
+\[
+\begin{array}{rcl}
+	\trm{(\x.N+aM)\,P} & \rw_\perm & \trm{((\x.N)+a(\x.M))\,P}
+\\[5pt]
+	\trm{(\x.!a.N)\,M} & \rw_\perm & \trm{(!a.\x.N)\,M}
+\end{array}
+\]
 
 \begin{defn}
 A \emph{labelled} $\perm$-reduction $\trm{N*}\rwb_\perm\trm{M*}$ is a $\perm$-reduction of one of the forms
 \[
-	\trm{(\x.N+aM)*P} \rws_\perm \trm{(\x.N)*P+a(\x.M)*P}
-\qquad
-	\trm{(\x.!a.N)*M} \rws_\perm \trm{!a.(\x.N)*M}
+\begin{array}{rcl}
+	\trm{(\x.N*+aM*)*P*} &\rws_\perm& \trm{(\x.N*)*P*+a(\x.M*)*P*}
+\\[5pt]
+	\trm{(\x.!a.N*)*M*} &\rws_\perm& \trm{!a.(\x.N*)*M*}
+\end{array}
 \]
 or a single $\perm$-step $\rw_\perm$ on unlabeled constructors in $\trm{N*}$.
 \end{defn}
@@ -1150,14 +1161,47 @@ Reduction to normal form in $\rwb_\perm$ is equal to $\rwn_\perm$.
 
 \begin{proof}
 Observe that $\rw_\perm$ and $\rwb_\perm$ have the same normal forms. Then since $\rwb_\perm\,\subseteq\,\rws_\perm$ we have $\rwbn_\perm\,\subseteq\,\rwn_\perm$. Conversely, let $N\rwn_\perm M$. On this reduction, let $P\rw_\perm Q$ be the first step such that $P\not\rwb_\perm Q$. Then there is an $R$ such that $P\rwb_\perm R$ and $Q\rw_\perm R$. Note that we have $N\rwbs_\perm R$. By confluence, $R\rwn_\perm M$, and by induction on the sum length of paths in $\rw_\perm$ from $R$ (smaller than from $N$) we have $R\rwbn_\perm M$, and hence $N\rwbn_\perm M$.
-	%On labeled terms, $\rwb_\perm \,\subseteq\, \rws_\perm$ and thus $\rwbn_\perm \,\subseteq\, \rwn_\perm$ {\color{red}(incomplete; how about:) if $N\rw_\perm M$ but $N\not\rwb_\perm M$ then for some $P$ we have $N\rwb_\perm$ and $M\rws_\perm P$;} hence $\rwbn_\perm \,=\, \rwn_\perm$.
-%	In particular, $\trm{N*} \rwbn_\perm \trm{M*}$ if and only if $\trm{N*} \rwn_\perm \trm{M*}$.
 \end{proof}
+
+The following lemmata then give the required commutation properties of $\rwb_\perm$, $\rwn_\perm$, and $\rwp_\beta$. Figure~\ref{fig:confluence diagrams} gives illustrating diagrams.
 
 \begin{lem}
 \label{lem:parallel p - parallel beta}
 If $\trm{N*}\rwb_\perm\trm{M*}$ then $\trm{<N*>}=_\perm\trm{<M*>}$.
 \end{lem}
+
+\begin{proof}
+By induction on the rewrite step $\rwb_\perm$. The two interesting cases are the following.
+\[
+\begin{array}{cl}
+\vcenter{\hbox{\begin{tikzpicture}
+	\matrix[matrix of math nodes] (m) {
+	  		\trm{(\x.M*)*(N* +a P*)} &[20pt] \trm{((\x.M*)*N*) +a ((\x. M*)*P*)}
+	\\[20pt]\trm{<M*>[(<N*> +a <P*>)/x]} & \trm{<M*>[<N*>/x] +a <M*>[<P*>/x]}
+	\\ };
+	\draw[rwb] (m-1-1) --node[above]{$\perm$} (m-1-2);
+	\draw[rwp] (m-1-1) --node[left] {$\beta$} (m-2-1);
+	\draw[rwp,implied] (m-1-2) --node[right]{$\beta$} (m-2-2);
+	\draw[rws,implied] (m-2-1) --node[below]{$\perm$} (m-2-2);
+\end{tikzpicture}}}
+&	(x\in\fv M)
+\\ \\
+\vcenter{\hbox{\begin{tikzpicture}
+	\matrix[matrix of math nodes] (m) {
+	  		\trm{(\x.M*)*(N* +a P*)} &[20pt] \trm{((\x.M*)*N*) +a ((\x. M*)*P*)}
+	\\[20pt]\trm{<M*>}\vphantom{\trm{+a}} & \trm{<M*> +a <M*>}
+	\\ };
+	\draw[rwb] (m-1-1) --node[above]{$\perm$} (m-1-2);
+	\draw[rwp] (m-1-1) --node[left] {$\beta$} (m-2-1);
+	\draw[rwp,implied] (m-1-2) --node[right]{$\beta$} (m-2-2);
+	\draw[rws,implied] (m-2-2) --node[below]{$\perm$} (m-2-1);
+\end{tikzpicture}}}
+&	(x\notin\fv M)
+\end{array}
+\qedhere
+\]
+\end{proof}
+
 
 \begin{lem}
 \label{lem:exhaustive p - parallel beta}
@@ -1172,6 +1216,8 @@ Using \Cref{lem:parallel p-reduction} we decompose $\trm{N*}\rwn_\perm\trm{M*}$ 
 for which \Cref{lem:parallel p - parallel beta} gives $\trm{<N_i*>}=_\perm\trm{<N_{i+1}*>}$.
 \end{proof}
 
+
+
 \begin{defn}
 A \emph{complete} reduction step $\rwp$ is a parallel $\beta$-step followed by $\perm$-reduction to normal form:
 \[
@@ -1185,7 +1231,7 @@ Any reduction step $N\rw M$ maps onto a complete step $N^\perm\rwp M^\perm$ on $
 \end{lem}
 
 \begin{proof}
-The case of a $\perm$-step $N\rw_\perm M$ is immediate, since $N^\perm=M^\perm$ and $\rwp_\beta$ is reflexive (\Cref{rmk:reflexivity}). 
+The case of a $\perm$-step $N\rw_\perm M$ is immediate, since $N^\perm=M^\perm$ and $\rwp_\beta$ is reflexive. 
 For a $\beta$-step $N\rw_\beta M$ we label the reduced redex in $N$ to get $\trm{N*}\rwp_\beta\trm{<N*>}=M$. 
 Let $\trm{P*}=(\trm{N*})^\perm$ be the (labeled) $\perm$-normal form of $\trm{N*}$. 
 Then \Cref{lem:exhaustive p - parallel beta} gives $M=\trm{<N*>}=_\perm\trm{<P*>}$, illustrated below.
@@ -1225,19 +1271,19 @@ By confluence and strong normalization of $\rw_\perm$ then $\trm{<P*>}^\perm=M^\
 		\item	By induction on $\trm{M}$.
 		Cases:
 		\begin{itemize}
-			\item \emph{Variable}, \ie\ $\trm{M} = x$.
+			\item \emph{Variable}: $\trm{M} = x$.
 			Then $\trm{N} = x$ since $x$ is normal. 
 			Moreover, $\trm{M*} = x$ and hence $\trm{<M*>} = x$.
-			Therefore, $\trm{N} \rwp \trm{<M*>}$ because $\rwp_\beta$ is reflexive (\Cref{rmk:reflexivity}).
+			Therefore, $\trm{N} \rwp \trm{<M*>}$ because $\rwp_\beta$ is reflexive.
 			
-			\item \emph{Abstraction}, \ie\ $\trm{M} = \trm{\x.P}$.
+			\item \emph{Abstraction}: $\trm{M} = \trm{\x.P}$.
 			Then $\trm{N} = \trm{\x.<P^\circ>}$ for some labeling $\trm{P^\circ}$ of $\trm{P}$.
 			Since $\trm{P} \rwp_\beta \trm{<P^\circ>}$, one has $\trm{<P^\circ>} \rwp_\beta \trm{<P*>}$ and hence $\trm{N} = \trm{\x.<P^\circ>} \rwp_\beta \trm{\x.<P*>} = \trm{<M*>}$.
 			
-			\item \emph{Application}, \ie\ $\trm{M} = \trm{PQ}$.
+			\item \emph{Application}: $\trm{M} = \trm{PQ}$.
 			Let $\trm{M^\circ}$ be a labeling of $\trm{M}$ such that $N = \trm{<M^\circ>}$.
 			There are three subcases:
-			\begin{itemize}
+			\begin{enumerate}
 				\item $\trm{M} \neq \trm{(\x.R)Q}$. 
 				Then $\trm{N} = \trm{<P^\circ><Q^\circ>}$.
 				By \ih\ (since $\trm{P} \rwp_\beta \trm{<P^\circ>}$ and $\trm{Q} \rwp_\beta \trm{<Q^\circ>}$), one has $\trm{<P^\circ>} \rwp_\beta \trm{<P*>}$ and $\trm{<Q^\circ>} \rwp_\beta \trm{<Q*>}$.
@@ -1249,7 +1295,7 @@ By confluence and strong normalization of $\rw_\perm$ then $\trm{<P*>}^\perm=M^\
 				\item $\trm{M^\circ} \neq \trm{(\x.R)*Q}$ but $\trm{M} = \trm{(\x.R)Q}$. 
 				Then $\trm{N} = \trm{<P^\circ><Q^\circ>}$.
 				By \ih\ (since $\trm{P} \rwp_\beta \trm{<P^\circ>}$ and $\trm{Q} \rwp_\beta \trm{<Q^\circ>}$), one has $\trm{<P^\circ>} \rwp_\beta \trm{<P*>}$ and $\trm{<Q^\circ>} \rwp_\beta \trm{<Q*>}$.
-			\end{itemize}
+			\end{enumerate}
 		\end{itemize}
 	
 		\item Since $\trm{M} \rwp \trm{N}$, then $\trm{M} \rwp_\beta \trm{P} \rwn_\perm \trm{N}$ for some term $\trm{P}$ such that $\trm{N} = \trm{P}^\perm$.
@@ -1259,11 +1305,11 @@ By confluence and strong normalization of $\rw_\perm$ then $\trm{<P*>}^\perm=M^\
 	\end{enumerate}
 \end{proof}
 
-\begin{corollary}[Complete reduction is diamond]
+\begin{cor}[Complete reduction is diamond]
 \label{cor:complete diamond}
 %Complete reduction has the diamond property: if
 	If $P\rwpleft N\rwp M$ then $P\rwp Q\rwpleft M$ for some $Q$.
-\end{corollary}
+\end{cor}
 
 \begin{proof}
 	By \Cref{lemma:full-development}.\ref{lemma:full-development-complete}, $P\rwp \trm{<M*>} \rwpleft M$ where $\trm{M*}$ is the full labeling of $\trm{M}$.
@@ -1343,16 +1389,15 @@ By the following diagram. For the top and left areas, by Lemma~\ref{lem:p to com
 	\draw[rwx] (m-2-4) -- (m-4-4);
 	\draw[rwx] (m-4-2) -- (m-4-4);
 \end{tikzpicture}
+\qedhere
 \]
 \end{proof}
 
 
 %=====================================================================================
 
+\section{Strong normalization for typed terms}
 
-
-
-\subsection{Strong normalization for typed terms}
 In this section, we prove that the relation $\rw$ enjoys strong
 normalization in simply typed terms. Since the proof of strong
 normalization is quite delicate, it make sense to turn the definition
