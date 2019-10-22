@@ -19,19 +19,19 @@
 
 \makeatletter
 
-% theorem environments
-%
-%\theoremstyle{definition}
-%\newtheorem{definition}{Definition}
-%\newtheorem{remark}[definition]{Remark}
-%%%
-%\theoremstyle{plain}
-%\newtheorem{conjecture} [definition]{Conjecture}
-%\newtheorem{corollary}  [definition]{Corollary}
-%\newtheorem{lemma}      [definition]{Lemma}
-%\newtheorem{proposition}[definition]{Proposition}
-%\newtheorem{theorem}    [definition]{Theorem}
-%%%
+%% theorem environments
+
+\theoremstyle{definition}
+\newtheorem{defn}{Definition}
+\newtheorem{rmrk}[defn]{Remark}
+%%
+\theoremstyle{plain}
+\newtheorem{conj} [defn]{Conjecture}
+\newtheorem{cor}  [defn]{Corollary}
+\newtheorem{lem}  [defn]{Lemma}
+\newtheorem{prop} [defn]{Proposition}
+\newtheorem{thm}  [defn]{Theorem}
+%%
 
 %text
 \newcommand{\ie}{\textit{i.e.}}
@@ -181,7 +181,7 @@
 \newcommand\dw{\rotatebox[origin=c]{270}{$\rw$}}
 \newcommand\lw{\rotatebox[origin=c]{180}{$\rw$}}
 \newcommand\lrw{\rotatebox[origin=c]{180}{$\lw\!\rw$}}
-\newcommand\prob{\mathsf p}
+\newcommand\perm{\mathsf p}
 
 \newcommand\confluence[4]{\begin{array}{ccc} \trm{#1} & \rw & \trm{#2} \\ \dw && \dw \\ \trm{#3} & \rw & \trm{#4} \end{array}}
 
@@ -293,13 +293,13 @@ In probabilistic lambda-calculus, these two interpretations are captured by the 
 \]
 This situation is not ideal, for several, related reasons. First, it demonstrates how probabilistic lambda-calculus is non-confluent, negating one of the central properties of the lambda-calculus, and one of the main reasons why it is the prominent model of computation that it is. Second, a probabilistic lambda-calculus must derive its semantics from a prescribed reduction strategy, and its terms only have meaning in the context of that strategy. Third, it becomes difficult to have a mix of different kinds of probabilities, as it would require specialized reduction strategies.
 
-We address these issues by a decomposition of the probabilistic operator into a \emph{generator} $\ttrm{!a}$ and a \emph{consumer} $\ttrm{+a}$, as follows.
+We address these issues by a decomposition of the probabilistic operator into a \emph{generator} $\ttrm{!a}$ and a \emph{choice} $\ttrm{+a}$, as follows.
 \[
 	\trm{N \+ M} \quad\stackrel\Delta=\quad \trm{!a.\, N +a M}
 \]
-Semantically, $\ttrm{!a}$ represents a probabilistic event, that generates a boolean value recorded as $a$. The consumer $\ttrm{N+aM}$ is simply a conditional on $a$, choosing $N$ if $a$ is false and $M$ if $a$ is true. Syntactically, $a$ is a boolean variable with an occurrence in $\ttrm{+a}$, and $\ttrm{!a}$ acts as a quantifier, binding all occurrences in its scope. (To capture a non-equal chance, one would attach a probability $p$ to a generator, as $\ttrm{!a}{\kern1pt}_p$, though we will not do so in this paper.) 
+Semantically, $\ttrm{!a}$ represents a probabilistic event, that generates a boolean value recorded as $a$. The choice $\ttrm{N+aM}$ is simply a conditional on $a$, choosing $N$ if $a$ is false and $M$ if $a$ is true. Syntactically, $a$ is a boolean variable with an occurrence in $\ttrm{+a}$, and $\ttrm{!a}$ acts as a quantifier, binding all occurrences in its scope. (To capture a non-equal chance, one would attach a probability $p$ to a generator, as $\ttrm{!a}{\kern1pt}_p$, though we will not do so in this paper.) 
 
-The resulting \emph{probabilistic event lambda-calculus} $\PEL$, which we present in this paper, is confluent. Our decomposition allows us to separate duplicating an \emph{event}, represented by the generator $\ttrm{!a}$, from duplicating only its \emph{outcome} $a$, through having multiple consumers $\trm{+a}$. In this way our calculus may interpret both original strategies, call-by-name and call-by-value, by different translations of standard probabilistic terms into $\PEL$. For the above example, we get the following translations and reductions.
+The resulting \emph{probabilistic event lambda-calculus} $\PEL$, which we present in this paper, is confluent. Our decomposition allows us to separate duplicating an \emph{event}, represented by the generator $\ttrm{!a}$, from duplicating only its \emph{outcome} $a$, through having multiple choice operators $\trm{+a}$. In this way our calculus may interpret both original strategies, call-by-name and call-by-value, by different translations of standard probabilistic terms into $\PEL$. For the above example, we get the following translations and reductions.
 \[
 \begin{array}{l@{\quad}l@{\quad}l@{\quad}l@{\quad}l@{\quad}l}
 	\cbn: & \trm{(\x.x = x)(!a.\top+a\bot)} & \rw_\beta & \trm{(!a.\top+a\bot)=(!b.\top+b\bot)} & \rws & \top\+\bot
@@ -310,7 +310,7 @@ The resulting \emph{probabilistic event lambda-calculus} $\PEL$, which we presen
 
 In this paper, we introduce $\PEL$ and its reduction mechanisms (Section~\ref{...}); we prove confluence (Section~\ref{...}); we give a system of simple types and prove strong normalization for typed terms (Section~\ref{...}); and we demonstrate the two translations to interpret call-by-name and call-by-value evaluation (Section~\ref{...}).
 
-\subsection*{Related work}
+\subsection{Related work}
 
 Probabilistic $\lambda$-calculi are a topic of study since the pioneering works by Saheb-Djaromi~\cite{SahebDjahromi78}, who was the first one to give the syntax and operational semantics of a $\lambda$-calculus with binary probabilistic choice. Giving denotational models enjoying nice properties to probabilistic $\lambda$-calculi has proved to be challenging, as witnessed by the many contributions spanning thirty years: from Jones and Plotkin early study of the probabilistic powerdomain~\cite{JonesPlotkin89}, to Jung and Tix's remarkable observations~\cite{JungTix98}, to the very recent encouraging results by Goubault-Larrecq~\cite{GoubaultLarrecq19}. A particularly well-behaved model for probabilistic $\lambda$-calculus can be obtained by taking a probabilistic variation of Girard's coherent spaces~\cite{DanosEhrhard11}, this way getting fully abstraction~\cite{EPT18}.
 
@@ -318,35 +318,71 @@ On the operational side, one could mention a study about the various ways the op
 
 In all the aforementioned works, probabilistic $\lambda$-calculi have been taken as implicitly endowed with a either call-by-name or call-by-value strategies, for the reasons outlined above. There are only a few exceptions, namely some works on Geometry of Interaction~\cite{DLFVY17}, Probabilistic Coherent Spaces~\cite{EhrhardTasson19}, and Standardization~\cite{FaggianRonchi19}, which achieve, in different contexts, a certain degree of independence from the underlying strategy, thus accomodating both the call-by-name and call-by-value strategy. The way this is achieved, however, invariably relies on Linear Logic. This is deeply different from what we do here.
 
+%Our use of the conditional $\ttrm{+a}$ was inspired by recent developments in deep-inference proof theory.
 
-\section{\texorpdfstring{The probabilistic $\lambda$-calculus $\PEL$}{The probabilistic lambda-claculus PEL}}
+
+\section{\texorpdfstring{The probabilistic event $\lambda$-calculus $\PEL$}{The probabilistic event lambda-claculus PEL}}
 
 
-\begin{definition}
-The \emph{probabilistic event $\lambda$-calculus} ($\PEL$) is given by the following grammar.
+\begin{defn}
+The \emph{probabilistic event $\lambda$-calculus} ($\PEL$) is given by the following grammar, with from left to right: a \emph{variable}, an \emph{abstraction}, an \emph{application}, a \emph{(labelled) choice}, and a \emph{(probabilistic) generator}.
 \[
 	M,N \quad\coloneqq\quad x ~\mid~ \x.N ~\mid~ NM ~\mid~ \trm{N +a M} ~\mid~ \trm{!a.N}
 \]
-\end{definition}
-
-In a term of the form $\trm{\x.M}$ (resp.~$\trm{!a.M}$), the abstraction $\trm{\x}$ (resp.~the box $\probox a$) is a binder for the free occurrences of the variable $x$ (resp.~the label $a$) in their scope $\trm{M}$.
-
-The calculus features a decomposition of the usual probabilistic sum $\trm{\+}$, as follows,
+\end{defn}
+%
+In a term $\trm{\x.M}$ the abstraction $\x$ binds the free occurrences of the variable $x$ in its scope $\trm{M}$, and in $\ttrm{!a.N}$ the generator $\ttrm{!a}$ binds the \emph{label} $a$ in $\trm{M}$. The calculus features a decomposition of the usual probabilistic sum $\trm{\+}$, as follows.
 \[
-	\trm{N \+ M} \quad\stackrel\Delta=\quad \trm{!a.\, N +a M}
+	N\+M \quad\stackrel\Delta=\quad \trm{!a.\, N +a M}
 \]
-where the name $a$ represents an \emph{event}, a binary value $\{0,1\}$, probabilistically generated by the constructor $\probox a$ and used to create a choice by the constructor $\trm{+a}$. That is, $\ttrm{!a}$ flips a coin setting $a$ to $0$ or $1$, and depending on this $\ttrm{N+aM}$ reduces to $N$ respectively $M$.
+The generator $\ttrm{!a}$ represents a probabilistic \emph{event}, whose outcome, a binary value $\{0,1\}$ represented by the label $a$, is used by the choice operator $\ttrm{+a}$. That is, $\ttrm{!a}$ flips a coin setting $a$ to $0$ or $1$, and depending on this $\ttrm{N+aM}$ reduces to $N$ respectively $M$. We will use the unlabelled choice $\+$ as the above abbreviation.
 
-\begin{definition}
+
+
+\begin{figure}[!ht]
+\begin{align}
+	(\x.N)M 				&\rw_\beta N[M/x]													\tag{$\beta$}
+\\																								\notag
+\\	\trm{N +a N}			&\rw_\perm N														\tag{\idem}
+\\	\trm{(N +a M) +a P}		&\rw_\perm \trm{N +a P}					\rstrut						\tag{\cancelL}
+\\	\trm{N +a (M +a P)}		&\rw_\perm \trm{N +a P}					\rstrut						\tag{\cancelR}
+\\																								\notag
+\\	\trm{\x.(N +a M)}		&\rw_\perm \trm{(\x.N) +a (\x.M)}									\tag{\plusAbs}
+\\	\trm{(N +a M) P}		&\rw_\perm \trm{(NP) +a (MP)}			\rstrut						\tag{\plusFun}
+\\	\trm{N (M +a P)}		&\rw_\perm \trm{(NM) +a (NP)}			\rstrut						\tag{\plusArg}
+\\	\trm{(N +a M) +b P}		&\rw_\perm \trm{(N +b P) +a (M +b P)} 	\rstrut	&& (a\smallbin<b)	\tag{\plusL}
+\\	\trm{N +b (M +a P)}		&\rw_\perm \trm{(N +b M) +a (N +b P)} 	\rstrut	&& (a\smallbin<b)	\tag{\plusR}
+%\\	\trm{!b.(N +a M)}		&\rw_\perm \trm{(!b.N) +a (!c M[c/b])}	\rstrut	&& (a\neq b)		\tag{\plusBox}
+\\	\trm{!b.(N +a M)}		&\rw_\perm \trm{(!b.N) +a (!b.M)}		\rstrut	&& (a\neq b)		\tag{\plusBox}
+\\																								\notag
+\\	\trm{!a.N}				&\rw_\perm N 									&& (a\notin N)		\tag{\boxVoid}
+\\	\trm{\x.!a.N} 			&\rw_\perm \trm{!a.\x. N}				\rstrut						\tag{\boxAbs}
+\\	\trm{(!a.N)M}			&\rw_\perm \trm{!a.(NM)}				\rstrut						\tag{\boxFun}
+\end{align}
+
+\caption{Reduction rules}
+\label{fig:reduction rules}
+\end{figure}
+
+
+\subsection{Reduction}
+
+Reduction in $\PEL$ will consist of standard $\beta$-reduction $\rw_\beta$ plus an evaluation mechanism for generators and choice operators, implementing probabilistic choice. We will present two such mechanisms: \emph{projective} reduction~$\rw_\pi$ and \emph{permutative} reduction~$\rw_\perm$. While projective reduction implements the given intuition for the generator and choice operator, we relegate it to Section~\ref{sec:projective reduction} and make permutative reduction our main evaluation mechanism, for the reason that it is more fine-grained, and thus more general. 
+
+Permutative reduction is based on the idea that any operator distributes over the labelled choice operator (see the reduction steps in Figure~\ref{fig:reduction rules}), even other choice operators, as below.
+\[
+	\trm{(N +a M) +b P}	~\sim~ \trm{(N +b P) +a (M +b P)}
+\]
+To orient this as a rewrite rule, we need to give priority to one label over another. Fortunately, the relative position of the associated generators $\ttrm{!a}$ and $\ttrm{!b}$ provides just that. Then to define $\rw_\perm$, we will want every choice to belong to some generator, and make the order of generators explicit.
+
+\begin{defn}
 	The set $\fl{M}$ of \emph{free labels} of a term $\trm{M}$ is defined inductively as follows:
 	\begin{align*}
 		\fl{x} &= \emptyset & \fl{MN} &= \fl{M} \cup \fl{N}  & \fl{\x.M} &= \fl{M} \\
 		\fl{!a.M} &= \fl{M} \smallsetminus \{a\} & \fl{M +a N} &= \fl{M}\cup \fl{N} \cup \{a\}
 	\end{align*}
-
 	A term $\trm{M}$ is \emph{label-closed} if $\fl{M} = \emptyset$.
-\end{definition}
-
+\end{defn}
 
 From now on, we consider only label-closed terms (and we implicitly assume this, unless otherwise stated).
 All terms are identified up to renaming of their bound variables and labels.
@@ -356,84 +392,54 @@ A representative $\trm{M}$ of a term is \emph{well-labeled} if
 %for every sub-term $\trm{!a.N}$ of $\trm{M}$, the label $a$ may occur only in $\trm{N}$ (if at all).
 for every occurrence of $\probox a$ in $\trm{M}$ there is no $\probox a$ occurring in its scope.
 
-\begin{definition}[Order for labels]
+\begin{defn}[Order for labels]
 \label{def:orderlabels}
 	Let $\trm{M}$ be a well-labeled representative of a term.
 	We define an \emph{order} $<_{{\trm{M}}}$ for the labels occurring in $\trm{M}$ as follows: $a <_{\trm{M}} b$ if and only if $\probox b$ occurs in the scope of $\probox a$.
-\end{definition}
+\end{defn}
+
+\noindent
+For a well-labeled and label-closed representative $\trm{M}$, $<_{\trm{M}}$ is a finite tree order.
 
 
-\begin{remark}
-	If $\trm{M}$ is a well-labeled and label-closed representative of a term, then $<_{\trm{M}}$ is a finite tree order.
-\end{remark}
-
-
-\begin{definition}
-\emph{Reduction} $\rw$ in $\PEL$ consists of \emph{$\beta$-reduction} $\rw_\beta$ and \emph{probabilistic} or \emph{$\prob$-reduction} $\rw_\prob$ (\ie $\rw \,=\, \rw_\beta \,\cup\, \rw_\prob$), both given in Figure~\ref{fig:reduction rules}.
+\begin{defn}
+\emph{Reduction} $\rw \,=\, \rw_\beta \cup \rw_\perm$ in $\PEL$ consists of \emph{$\beta$-reduction}~$\rw_\beta$ and \emph{permutative} or \emph{$\perm$-reduction}~$\rw_\perm$, both given in Figure~\ref{fig:reduction rules}.
 %\[
 %\begin{array}{rcl}
 %	C[(\lambda x.N)M] &\rw_\beta& C[M[N/x]]
 %\\	\trm{H[\,!a.N]} &\rw_p& H[N[0/a]] + H[N[1/a]]
 %\end{array}
 %\]
-\end{definition}
+\end{defn}
 
+By inspection of the rewrite rules in Figure~\ref{fig:reduction rules}, we can characterize the normal forms of $\rw_\perm$ and $\rw$ as follows.
 
-
-\begin{figure}[!ht]
-\begin{align}
-	(\x.N)M 				&\rw_\beta N[M/x]													\notag
-\\																								\notag
-\\	\trm{N +a N}			&\rw_\prob N														\tag{\idem}
-\\	\trm{(N +a M) +a P}		&\rw_\prob \trm{N +a P}					\rstrut						\tag{\cancelL}
-\\	\trm{N +a (M +a P)}		&\rw_\prob \trm{N +a P}					\rstrut						\tag{\cancelR}
-\\																								\notag
-\\	\trm{\x.(N +a M)}		&\rw_\prob \trm{(\x.N) +a (\x.M)}									\tag{\plusAbs}
-\\	\trm{(N +a M) P}		&\rw_\prob \trm{(NP) +a (MP)}			\rstrut						\tag{\plusFun}
-\\	\trm{N (M +a P)}		&\rw_\prob \trm{(NM) +a (NP)}			\rstrut						\tag{\plusArg}
-\\	\trm{(N +a M) +b P}		&\rw_\prob \trm{(N +b P) +a (M +b P)} 	\rstrut	&& (a\smallbin<b)	\tag{\plusL}
-\\	\trm{N +b (M +a P)}		&\rw_\prob \trm{(N +b M) +a (N +b P)} 	\rstrut	&& (a\smallbin<b)	\tag{\plusR}
-%\\	\trm{!b.(N +a M)}		&\rw_\prob \trm{(!b.N) +a (!c M[c/b])}	\rstrut	&& (a\neq b)		\tag{\plusBox}
-\\	\trm{!b.(N +a M)}		&\rw_\prob \trm{(!b.N) +a (!b.M)}		\rstrut	&& (a\neq b)		\tag{\plusBox}
-\\																								\notag
-\\	\trm{!a.N}				&\rw_\prob N 									&& (a\notin N)		\tag{\boxVoid}
-\\	\trm{\x.!a.N} 			&\rw_\prob \trm{!a.\x. N}				\rstrut						\tag{\boxAbs}
-\\	\trm{(!a.N)M}			&\rw_\prob \trm{!a.(NM)}				\rstrut						\tag{\boxFun}
-\end{align}
-
-\caption{Reduction rules}
-\label{fig:reduction rules}
-\end{figure}
-
-\begin{proposition}[Syntactic characterization of $\prob$-normal forms]
-The normal forms $P_0$ of $\rw_\prob$ are given by the following grammars
+\begin{prop}[Syntactic characterization of normal forms]
+The normal forms $P_0$ of $\rw_\perm$, respectively $N_0$ of $\rw$, are given by the following grammars.
 \[
-\begin{array}{ccc@{~}c@{~}c@{}l}
-P_0 &\coloneqq& P_1 &\mid& \trm{P_0 \+ P_0}
-\\	P_1	&\coloneqq& x   &\mid& \x.P_1 			 &~\mid~ P_1\,P_0
-\end{array}
-\]
-\end{proposition}
-\begin{proof}
-	By inspection of the rules in Figure~\ref{fig:reduction rules}.
-\end{proof}
-
-
-\begin{proposition}[Syntactic characterization of normal forms]
-	The normal forms $N_0$ of $\rw$ are given by the following grammars.
-	\[
+	\begin{array}{ccc@{~}c@{~}c@{}l}
+		P_0 &\coloneqq& P_1 &\mid& \trm{P_0 \+ P_0}
+	\\	P_1	&\coloneqq& x   &\mid& \x.P_1 			 &~\mid~ P_1\,P_0
+	\end{array}
+	\qquad\qquad
 	\begin{array}{ccc@{~}c@{~}c}
-	N_0 &\coloneqq& N_1 &\mid& \trm{N_0 \+ N_0}
+		N_0 &\coloneqq& N_1 &\mid& \trm{N_0 \+ N_0}
 	\\	N_1	&\coloneqq& N_2 &\mid& \x.N_1
 	\\	N_2 &\coloneqq& x	&\mid& N_2\,N_0
 	\end{array}
-	\]
-\end{proposition}
+\]
+\end{prop}
 
-\subsection{Strong normalization of $\prob$-reduction}
+%=====================================================================================
+
+\section{Properties of permutative reduction}
+
+We will prove strong normalization and confluence of $\rw_\perm$.
+
+\subsection{Strong normalization of permutative reduction}
 
 \begin{remark}
-	The set $\PEL$ endowed with $\rw_\prob$ is a (first-order) term rewriting system over a countably infinite set of variables (denoted by $x, y, z, \dots$) and the signature $\Sigma$ given by:
+	The set $\PEL$ endowed with $\rw_\perm$ is a (first-order) term rewriting system over a countably infinite set of variables (denoted by $x, y, z, \dots$) and the signature $\Sigma$ given by:
 	\begin{itemize}
 		\item the binary function symbol $\trm{+a}$, for any label $a$;
 		\item the unary function symbol $\trm{!a}$, for any label $a$;
@@ -442,7 +448,7 @@ P_0 &\coloneqq& P_1 &\mid& \trm{P_0 \+ P_0}
 	\end{itemize}
 \end{remark}
 
-\begin{definition}
+\begin{defn}
 	Let $\trm{M}$ be a well-labeled and label-closed representative a term, and let $\Sigma(M)$ be the set of signature symbols occurring in $\trm{M}$.
 	We define $\prec_{\trm{M}}$ as the (strict) partial order on $\Sigma(M)$ generated by the following rules:
 	\begin{itemize}
@@ -450,242 +456,20 @@ P_0 &\coloneqq& P_1 &\mid& \trm{P_0 \+ P_0}
 		\item $\trm{+a \prec_{\trm{M}} !b}$ for any labels $a, b$;
 		\item $\trm{!b.\prec_{\trm{M}} @}$ and $\trm{!b.\prec_{\trm{M}} \x}$ for any label $b$.
 	\end{itemize}
-\end{definition}
+\end{defn}
 
-\begin{lemma}
+\begin{lem}
 \label{lemma:strong-normalization}
-	The reduction $\rw_\prob$ is strongly normalizing.
-\end{lemma}
+	The reduction $\rw_\perm$ is strongly normalizing.
+\end{lem}
 
 \begin{proof}
-	For the first-order term rewriting system $(\PEL, \rw_\prob)$  it can be defined a well-founded recursive path ordering $>$ in the sense of \cite[p. 289]{Dershowitz82} such that $\trm{M \rw_\prob N}$ implies $\trm{M}>\trm{N}$.
+	For the first-order term rewriting system $(\PEL, \rw_\perm)$  it can be defined a well-founded recursive path ordering $>$ in the sense of \cite[p. 289]{Dershowitz82} such that $\trm{M \rw_\perm N}$ implies $\trm{M}>\trm{N}$.
 \end{proof}
 
-\subsection{Strong normalization for typed terms}
-In this section, we prove that the relation $\rw$ enjoys strong
-normalization in simply typed terms. Since the proof of strong
-normalization is quite delicate, it make sense to turn the definition
-of the order $<_{{\trm{M}}}$ from Definition~\ref{def:orderlabels}
-more formal, at the same time allowing to treat label-\emph{open}
-terms. This is based on Figure~\ref{fig:order}. 
-%
-\begin{figure}
-  \fbox{
-    \begin{minipage}{.97\textwidth}
-      \begin{tabular}{ll}        
-        \textsf{Label Sequences}: & $\theta\quad\coloneqq\quad \varepsilon ~\mid~ a\cdot\theta $\\
-        \textsf{Label Judgments}: & $\xi\quad\coloneqq\quad \labjudg{\theta}{M}$\\
-        \begin{minipage}{.25\textwidth}\textsf{Label Rules}:\end{minipage} &
-        \begin{minipage}{.7\textwidth}
-        $$
-        \infer{\labjudg{\theta}{x}}{}\qquad
-        \infer{\labjudg{\theta}{\x.M}}{\labjudg{\theta}{M}}\qquad
-        \infer{\labjudg{\theta}{MN}}{\labjudg{\theta}{M} & \labjudg{\theta}{N}}
-        $$
-        $$
-        \infer{\labjudg{\theta}{\trm{M +a N}}}{\labjudg{\theta}{M} & \labjudg{\theta}{N} & a\in\theta}\qquad\qquad
-        \infer{\labjudg{\theta}{\trm{!a.M}}}{\labjudg{a\cdot\theta}{M}}
-        $$
-        \end{minipage}
-        \\
-      \end{tabular}
-    \end{minipage}
-  }
-  \label{fig:order}
-  \caption{Labelizing Terms}
-\end{figure}
-%
-It is easy to realize that, of course modulo label $\alpha$-equivalence, for
-every term $M$ there is at least one $\theta$ such that $\labjudg{\theta}{M}$.
-Similarly, reduction as defined by $\rw$ can be made parametric on a sequence
-of labels $\theta$, i.e., one can define a family of reduction
-relations $\rw^\theta$. An easy fact to check is that if
-$\labjudg{\theta}{M}$ and $M\rw^\theta N$, then $\labjudg{\theta}{N}$.
-It thus makes sense to define $\mathit{SN}^\theta$ and $\mathit{sn}^\theta(M)$
-simply as the set of strongly normalizing $\theta$-terms modulo $\rw^\theta$,
-and the maximum number of $\theta$-steps to normal form of a given
-$\theta$-term $M$.
+\subsection{Confluence of $\perm$-reduction}
 
-Now, let us define types, environments, judgments, and typing rules in
-Figure~\ref{fig:typing}.
-\newcommand{\arrow}{\Rightarrow}
-\newcommand{\judg}[3]{#1\vdash #2:#3}
-\begin{figure}
-  \fbox{
-    \begin{minipage}{.97\textwidth}
-      \begin{tabular}{ll}        
-        \textsf{Types}: & $\tau\quad\coloneqq\quad \alpha ~\mid~ \tau\arrow\rho$\\
-        \textsf{Environments}: & $\Gamma\quad\coloneqq\quad x_1:\tau_1,\ldots,x_n:\tau_n$\\
-        \textsf{Judgments}: & $\pi\quad\coloneqq\quad \judg{\Gamma}{M}{\tau}$\\
-        \begin{minipage}{.25\textwidth}\textsf{Typing Rules}:\end{minipage} &
-        \begin{minipage}{.7\textwidth}
-        $$
-        \infer{\judg{\Gamma,x:\tau}{x}{\tau}}{}\qquad
-        \infer{\judg{\Gamma}{\x.M}{\tau\arrow\rho}}{\judg{\Gamma,x:\tau}M\rho}\qquad
-        \infer{\judg{\Gamma}{MN}{\rho}}{\judg{\Gamma}{M}{\tau\arrow\rho} & \judg{\Gamma}{N}{\tau}}
-        $$
-        $$
-        \infer{\judg{\Gamma}{\trm{M +a N}}{\tau}}{\judg{\Gamma}{M}{\tau} & \judg{\Gamma}{N}{\tau}}\qquad\qquad
-        \infer{\judg{\Gamma}{\trm{!a.M}}{\tau}}{\judg{\Gamma}{M}{\tau}}
-        $$
-        \end{minipage}
-        \\
-      \end{tabular}
-    \end{minipage}
-  }
-  \caption{Types, Environments, Judgments, and Rules}
-  \label{fig:typing}
-\end{figure}
-The type structure being precisely the usual one (although terms are of course
-different), we can reuse most of the usual proof of strong normalization, for
-example in the version given by Ralph Loader's notes, page 17. In the following, we only
-report the elements which make our proof different.
-
-\begin{lemma}
-\label{lemma:cloredsum}
-  The set SN is closed under the following rule:
-  $$
-  \infer{\trm{M +a N}L_1\ldots L_m}{ML_1\ldots L_m & NL_1\ldots L_m}
-  $$
-\end{lemma}
-\begin{proof}
-  Let $\theta$ be such that
-  $$
-  \labjudg{\theta}{\trm{M +a N}L_1\ldots L_m}
-  $$
-  and let $h(a,\theta)$ be the height of $a$ in the sequence $\theta$.
-  The proof goes by lexicographic induction on the following quadruple:
-  \begin{equation}\label{equ:redord}
-  (m,h(a,\theta),\sum_{i=1}^m\mathit{sn}(L_i)+\mathit{sn}(M)+\mathit{sn}(N),|M|+|N|)
-  \end{equation}
-  We proceed by showing that all terms to which
-  $\trm{M +a N}L_1\ldots L_m$ reduces are strongly normalizing:
-  \begin{itemize}
-  \item
-    If reduction happens in one between $M,N,L_1,\ldots,L_m$, then we
-    are done, because we get an instance of the rule where the first two
-    components of \ref{equ:redord} stay constant, and the third
-    strictly decreases.
-  \item
-    If reduction happens at the leftmost component $\trm{M +a N}$
-    due to the rule $\trm{P +a P}\rw_\prob P$, then one of the two
-    hypotheses apply trivially.
-  \item
-    If reduction happens at the leftmost component $\trm{M +a N}$
-    due to the rule $\trm{(P +a Q) +a R}\rw_\prob \trm{P +a R}$,
-    then the IH holds due to the fourth component being strictly
-    smaller. Similarly when the rule is
-    $\trm{P +a (Q +a R)}\rw_\prob \trm{P +a R}$.    
-  \item
-    If reduction happens in the leftmost application due to
-    the rule $\trm{(P +a Q) R}\rw_\prob \trm{(PR) +a (QR)}$,
-    then the IH can be applied, because the number of arguments $m$
-    strictly decreases. Similarly when the rule is
-    $\trm{N (M +a P)}\rw_\prob\trm{(NM) +a (NP)}$.
-  \item
-    If reduction happens at the leftmost component $\trm{M +a N}$
-    due to the rule $\trm{(P +b Q) +a R}\rw_\prob \trm{(P +a R) +b (Q +a R)}$,
-    then $M$ can be written as $\trm{P +b Q}$, and the
-    following two terms are strongly normalizing (because
-    $\trm{(P +b Q)L_1\ldots L_m}$ is by hypothesis strongly normalizing
-      itself):
-    $$
-    PL_1\ldots L_m\qquad QL_1\ldots L_m
-    $$
-    Moreover, $\mathit{sn}(PL_1\ldots L_m),\mathit{sn}(QL_1\ldots
-    L_m)\leq\mathit{sn}(\trm{(P +b Q)L_1\ldots L_m}$.  We can then
-    conclude that $\trm{(P +a N)}L_1\ldots L_m$ and $\trm{(Q +a
-        N)}L_1\ldots L_m$ are both strongly normalizing by IH, because
-    the fourth component is strictly smaller. Finally, we can conclude
-    again by induction hypothesis, since the number of arguments stays
-    the same, while the level of $b$ must be smaller than that of
-    $a$. Similarly if the rule applied is $\trm{P +a (Q +b
-      R)}\rw_\prob \trm{(P +a Q) +b (P +a R)}$.
-  \end{itemize}
-\end{proof}
-
-\begin{lemma}
-  The set SN is closed under the following rule:
-  $$
-  \infer{\trm{(!a.M)}L_1\ldots L_m}{\trm{M}L_1\ldots L_m}
-  $$
-\end{lemma}
-\begin{proof}
-  The proof is structurally very similar to the one of
-  Lemma~\ref{lemma:cloredsum}. The lexicographic order
-  is however the following one:
-  $$
-  (m,\sum_{i=1}^m\mathit{sn}(L_i)+\mathit{sn}(M),|M|)
-  $$
-  There is one case in which we need to use
-  Lemma \ref{lemma:cloredsum}, namely the one in which the
-  considered reduction rule is the following:
-  $$
-  \trm{!b.(P +a Q)}\rw_\prob\trm{(!b.P) +a (!b.Q)}.
-  $$
-  Since $M=\trm{P +a Q}$ and $ML_1\ldots L_m$ by hypothesis,
-  we conclusde that $PL_1\ldots L_m$ and $QL_1\ldots L_m$
-  are both strongly normalizing. By induction hypothesis,
-  since $\mathit{sn}(P),\mathit{sn}(Q)\leq\mathit{sn}(M)$,
-  it holds that $\trm{(!b.P)}L_1\ldots L_m$ and $\trm{(!b.Q)}L_1\ldots L_m$
-  are both strongly normalizing themselves. Lemma~\ref{lemma:cloredsum},
-  yields the thesis.
-\end{proof}
-
-\begin{lemma}
-  The set SN is closed under the following rule:
-  $$
-  \infer{\trm{(\x.M)}L_0\ldots L_m}{\trm{M[L_0/x]}L_1\ldots L_m & L_0}
-  $$
-\end{lemma}
-\begin{proof}
-  Again, the proof is structurally very similar to the one
-  of Lemma~\ref{lemma:cloredsum}. The underlying order,
-  needs to be slightly adapted, and is the lexicographic
-  order on
-  $$
-  (\mathit{sn}(\trm{M[L_0/x]}L_1\ldots L_m)+\mathit{sn}(L_0),|M|)
-  $$
-  As usual, we proceed by showing that all terms to which
-  $\trm{(\x.M)}L_0\ldots L_m$ reduces are strongly normalizing:
-  \begin{itemize}
-  \item
-    If reduction happens in $L_0$, then we can mimick
-    the same reduction in by zero or more reduction
-    steps in $\trm{M[L_0/x]}L_1\ldots L_m$, and conclude
-    by induction hypothesis.
-  \item
-    If reduction happens in $M$ or in $L_1,\ldots,L_m$,
-    then we can mimick the same reduction in one or more
-    reduction in $\trm{M[L_0/x]}L_1\ldots L_m$, and conclude
-    by induction hypothesis.
-  \item
-    If the reduction step we perform is 
-  \end{itemize}
-\end{proof}
-
-The definition of a reducible term stays the same:
-
-Lemma 3.5 must be complemented with two new clauses, as follows:
-\newcommand{\RedSet}[1]{\mathit{Red}_{#1}}
-\begin{lemma}
-  \begin{itemize}
-  \item
-    If $(\Gamma,ML_1\ldots L_m)\in\RedSet{\tau}$
-    and $(\Gamma,NL_1\ldots L_m)\in\RedSet{\tau}$,
-    then $(\Gamma,\trm{(M +a N)}L_1\ldots L_m)\in\RedSet{\tau}$.
-  \item
-    If $(\Gamma,ML_1\ldots L_m)\in\RedSet{\tau}$,
-    then $(\Gamma,\trm{(!a.M)}L_1\ldots L_m)\in\RedSet{\tau}$.
-  \end{itemize}
-\end{lemma}
-\begin{proof}
-  The proofs are just very simple inductions on $\tau$.
-\end{proof}
-
-\subsection{Confluence of $\prob$-reduction}
-
-\begin{definition}
+\begin{defn}
 We define a \emph{context} $C[\,]$ %and \emph{head context} $H[\,]$
 as follows.
 \[
@@ -695,17 +479,17 @@ as follows.
 \end{array}
 \]
 The term $C[N]$ represents $C[\,]$ with the hole $[\,]$ replaced by $N$.
-\end{definition}
+\end{defn}
 
 Observe that the six reduction rules $\plusAbs$ through $\plusBox$ in Figure~\ref{fig:reduction rules} are all of the following form. We refer to these collectively as $\plusX$.
 \begin{align}
-	\trm{C[N+aM]} \rw_\prob \trm{C[N]+aC[M]}
+	\trm{C[N+aM]} \rw_\perm \trm{C[N]+aC[M]}
 	\tag\plusX
 \end{align}
 
 
 %
-%\begin{definition}
+%\begin{defn}
 %The $a$-\emph{projections} $N[i/a]$ for $i\in\{0,1\}$ of a term $N$ are as follows.
 %\[
 %\begin{array}{rcl}
@@ -719,7 +503,7 @@ Observe that the six reduction rules $\plusAbs$ through $\plusBox$ in Figure~\re
 %\\\rstrut	\trm{(!b.N)[i/a]}  		&=& \trm{!b.(N[i/a])}
 %\end{array}
 %\]
-%\end{definition}
+%\end{defn}
 
 %
 %\begin{proof}[Sketch]
@@ -734,12 +518,12 @@ Observe that the six reduction rules $\plusAbs$ through $\plusBox$ in Figure~\re
 %(where $@$ stands for application). We consider sequences of these, ordered lexicographically.
 %\end{proof}
 %
-%\begin{lemma}
-%Reduction $\rw_\prob$ is confluent.
-%\end{lemma}
+%\begin{lem}
+%Reduction $\rw_\perm$ is confluent.
+%\end{lem}
 %
 %\begin{proof}
-%	By Newman's lemma and strong normalization of $\rw_\prob$ (\Cref{lemma:strong-normalization}), we only have to prove that $\rw_\prob$ is locally confluent.
+%	By Newman's lemma and strong normalization of $\rw_\perm$ (\Cref{lemma:strong-normalization}), we only have to prove that $\rw_\perm$ is locally confluent.
 %We consider each reduction rule against those lower down in the table in Figure~\ref{fig:reduction rules}.
 %\begin{itemize}
 %	\item $(\idem)$ $\trm{N +a N}\rw N$.
@@ -882,12 +666,12 @@ Observe that the six reduction rules $\plusAbs$ through $\plusBox$ in Figure~\re
 %\end{proof}
 
 
-\begin{lemma}
-Reduction $\rw_\prob$ is confluent.
-\end{lemma}
+\begin{lem}
+Reduction $\rw_\perm$ is confluent.
+\end{lem}
 
 \begin{proof}
-	By Newman's lemma and strong normalization of $\rw_\prob$ (\Cref{lemma:strong-normalization}), we only have to prove that $\rw_\prob$ is locally confluent.
+	By Newman's lemma and strong normalization of $\rw_\perm$ (\Cref{lemma:strong-normalization}), we only have to prove that $\rw_\perm$ is locally confluent.
 We consider each reduction rule against those lower down in the table in Figure~\ref{fig:reduction rules}. For the symmetric rule pairs $\cancelL$/$\cancelR$, $\plusL$/$\plusR$, and $\plusFun/\plusArg$ we present only the first case.
 \begin{itemize}
 	\item $(\idem)$ $\trm{N +a N}\rw N$.
@@ -1078,28 +862,28 @@ We consider each reduction rule against those lower down in the table in Figure~
 
 
 
-\begin{definition}
-We denote the unique $\prob$-normal form of a term $N$ by $N^\prob$.
-\end{definition}
+\begin{defn}
+We denote the unique $\perm$-normal form of a term $N$ by $N^\perm$.
+\end{defn}
 
 \subsection{Confluence}
 
-We aim to prove that $\rw \,=\, \rw_\beta \cup \rw_\prob$ is confluent.
+We aim to prove that $\rw \,=\, \rw_\beta \cup \rw_\perm$ is confluent.
 
-\begin{lemma}[Substitution for $\rw_\prob$]
+\begin{lem}[Substitution for $\rw_\perm$]
 	\label{lemma:substitution}
 	\hfill
 	\begin{enumerate}
-		\item If $\trm{N \rw_\prob N'}$ then $\trm{M[N/x] \rw_\prob^* M[N'/x]}$.
-		\item If $\trm{M \rw_\prob M'}$ then $\trm{M[N/x] \rw_\prob M'[N/x]}$.
-		\item If $\trm{x \in {\fv{M}}}$ and $a <_M b$ for any $\trm{b \in {\fl{M}}}$ then $\trm{M[N +a P/x]} \rw_\prob^* \trm{M[N/x] +a M[P/x]}$.
+		\item If $\trm{N \rw_\perm N'}$ then $\trm{M[N/x] \rw_\perm^* M[N'/x]}$.
+		\item If $\trm{M \rw_\perm M'}$ then $\trm{M[N/x] \rw_\perm M'[N/x]}$.
+		\item If $\trm{x \in {\fv{M}}}$ and $a <_M b$ for any $\trm{b \in {\fl{M}}}$ then $\trm{M[N +a P/x]} \rw_\perm^* \trm{M[N/x] +a M[P/x]}$.
 	\end{enumerate}
-\end{lemma}
+\end{lem}
 
 \begin{proof}\hfill
 	\begin{enumerate}
 		\item By induction on $\trm{M}$.
-		\item By induction on the definition of $\trm{M \rw_\prob M'}$.
+		\item By induction on the definition of $\trm{M \rw_\perm M'}$.
 		\item By induction on $\trm{M}$.
 		Cases:
 		\begin{itemize}
@@ -1108,47 +892,47 @@ We aim to prove that $\rw \,=\, \rw_\beta \cup \rw_\prob$ is confluent.
 			\item \emph{Application}, \ie\ $\trm{M = M_1M_2}$.
 			Since $\trm{x \in {\fv{M}}}$ there are three cases:
 			\begin{itemize}
-				\item $\trm{x \in {\fv{M_1}} \cup \fv{M_2}}$ and then, by \ih, $\trm{M_i[N +a P/x]} \rw_\prob^* \trm{M_i[N/x] +a M_i[P/x]}$ for all $i \in \{1,2\}$.
+				\item $\trm{x \in {\fv{M_1}} \cup \fv{M_2}}$ and then, by \ih, $\trm{M_i[N +a P/x]} \rw_\perm^* \trm{M_i[N/x] +a M_i[P/x]}$ for all $i \in \{1,2\}$.
 				So,
-				$\trm{M[N +a P/x]} = \trm{M_1[N +a P/x] M_2[N +a P/x]} \rw_\prob^* \trm{(M_1[N/x] +a M_1[P/x])(M_2[N/x] +a M_2[P/x])} \allowbreak\rw_\prob^* \trm{M_1[N/x]M_2[N/x] +a M_1[P/x]M_2[P/x]} = \trm{M[N/x] +a M[P/x]}$.
+				$\trm{M[N +a P/x]} = \trm{M_1[N +a P/x] M_2[N +a P/x]} \rw_\perm^* \trm{(M_1[N/x] +a M_1[P/x])(M_2[N/x] +a M_2[P/x])} \allowbreak\rw_\perm^* \trm{M_1[N/x]M_2[N/x] +a M_1[P/x]M_2[P/x]} = \trm{M[N/x] +a M[P/x]}$.
 
-				\item $\trm{x \in {\fv{M_{1}}}}$ and $\trm{x \notin {\fv{M_2}}}$ and then, by \ih, $\trm{M_1[N +a P/x]} \rw_\prob^* \trm{M_1[N/x] +a M_1[P/x]}$.
+				\item $\trm{x \in {\fv{M_{1}}}}$ and $\trm{x \notin {\fv{M_2}}}$ and then, by \ih, $\trm{M_1[N +a P/x]} \rw_\perm^* \trm{M_1[N/x] +a M_1[P/x]}$.
 				So,
-				$\trm{M[N +a P/x]} = \trm{M_1[N +a P/x] M_2} \rw_\prob^* \trm{(M_1[N/x] +a M_1[P/x])M_2} \allowbreak\rw_\prob^* \trm{M_1[N/x]M_2 +a M_1[P/x]M_2} = \trm{M[N/x] +a M[P/x]}$.
+				$\trm{M[N +a P/x]} = \trm{M_1[N +a P/x] M_2} \rw_\perm^* \trm{(M_1[N/x] +a M_1[P/x])M_2} \allowbreak\rw_\perm^* \trm{M_1[N/x]M_2 +a M_1[P/x]M_2} = \trm{M[N/x] +a M[P/x]}$.
 
 				\item $\trm{x \notin {\fv{M_{1}}}}$ and $\trm{x \in {\fv{M_2}}}$: analogous to the previous case.
 			\end{itemize}
 
 			\item \emph{Abstraction}, \ie\ $\trm{M = \y.M'}$.
-			By \ih, as $\trm{x \in {\fv{M}} \subseteq \fv{M'}}$ $\trm{M'[N +a P/x]} \rw_\prob^* \trm{M'[N/x] +a M'[P/x]}$
-			So, $\trm{M [N +a P/x] = \y.(M'[N +a P/x]) \rw_\prob^* \y.(M'[N/x] +a M'[P/x]) \rw_\prob \y.(M'[N/x]) +a \y.(M'[P/x])}$ $= \trm{M[N/x] +a M[P/x]}$.
+			By \ih, as $\trm{x \in {\fv{M}} \subseteq \fv{M'}}$ $\trm{M'[N +a P/x]} \rw_\perm^* \trm{M'[N/x] +a M'[P/x]}$
+			So, $\trm{M [N +a P/x] = \y.(M'[N +a P/x]) \rw_\perm^* \y.(M'[N/x] +a M'[P/x]) \rw_\perm \y.(M'[N/x]) +a \y.(M'[P/x])}$ $= \trm{M[N/x] +a M[P/x]}$.
 			
 			\item \emph{Superposition}, \ie\ $\trm{M = M_1 +b M_2}$. 
-			By \ih, $\trm{M_i[N +a P/x]} \rw_\prob^* \trm{M_i[N/x] +a M_i[P/x]}$ for all $i \in \{1,2\}$.
-			Since $a <_M b$ by hypothesis, $\trm{M[N +a P/x]} = \trm{M_1[N +a P/x] +b M_2[N +a P/x]} \rw_\prob^* \trm{(M_1[N/x] +a M_1[P/x]) 
-				\allowbreak+b (M_2[N/x] +a M_2[P/x])} \rw_\prob
+			By \ih, $\trm{M_i[N +a P/x]} \rw_\perm^* \trm{M_i[N/x] +a M_i[P/x]}$ for all $i \in \{1,2\}$.
+			Since $a <_M b$ by hypothesis, $\trm{M[N +a P/x]} = \trm{M_1[N +a P/x] +b M_2[N +a P/x]} \rw_\perm^* \trm{(M_1[N/x] +a M_1[P/x]) 
+				\allowbreak+b (M_2[N/x] +a M_2[P/x])} \rw_\perm
 			\trm{((M_1[N/x] +a M_1[P/x]) \allowbreak+b M_2[N/x]) +a ((M_1[N/x] +a M_1[P/x]) \allowbreak+b M_2[P/x])}
-			\allowbreak\rw_\prob^* 
+			\allowbreak\rw_\perm^* 
 			\trm{((M_1[N/x]\allowbreak+b M_2[N/x]) +a (M_1[P/x] \allowbreak+b M_2[N/x]))  +a ((M_1[N/x] \allowbreak+b M_2[P/x]) +a (M_1[P/x] \allowbreak+b M_2[P/x])) }
-			\allowbreak\rw_\prob^*
+			\allowbreak\rw_\perm^*
 			\trm{(M_1[N/x] +b M_2[N/x]) +a (M_1[P/x] +b M_2[P/x])} = \trm{M[N/x] +a M[P/x]}$.
 
 			\item \emph{Superposition}, \ie\ $\trm{M = M_1 +b M_2}$.
 			Since $\trm{x \in {\fv{M}}}$ there are three cases:
 			\begin{itemize}
-				\item $\trm{x \in {\fv{M_1}} \cup \fv{M_2}}$ and then, by \ih, $\trm{M_i[N +a P/x]} \rw_\prob^* \trm{M_i[N/x] +a M_i[P/x]}$ for all $i \in \{1,2\}$.
-				Since $a <_M b$ by hypothesis, $\trm{M[N +a P/x]} = \trm{M_1[N +a P/x] +b M_2[N +a P/x]} \rw_\prob^* \trm{(M_1[N/x] +a M_1[P/x]) 
-					\allowbreak+b (M_2[N/x] +a M_2[P/x])} \rw_\prob
+				\item $\trm{x \in {\fv{M_1}} \cup \fv{M_2}}$ and then, by \ih, $\trm{M_i[N +a P/x]} \rw_\perm^* \trm{M_i[N/x] +a M_i[P/x]}$ for all $i \in \{1,2\}$.
+				Since $a <_M b$ by hypothesis, $\trm{M[N +a P/x]} = \trm{M_1[N +a P/x] +b M_2[N +a P/x]} \rw_\perm^* \trm{(M_1[N/x] +a M_1[P/x]) 
+					\allowbreak+b (M_2[N/x] +a M_2[P/x])} \rw_\perm
 				\trm{((M_1[N/x] +a M_1[P/x]) \allowbreak+b M_2[N/x]) +a ((M_1[N/x] +a M_1[P/x]) \allowbreak+b M_2[P/x])}
-				\allowbreak\rw_\prob^* 
+				\allowbreak\rw_\perm^* 
 				\trm{((M_1[N/x]\allowbreak+b M_2[N/x]) +a (M_1[P/x] \allowbreak+b M_2[N/x]))  +a ((M_1[N/x] \allowbreak+b M_2[P/x]) +a (M_1[P/x] \allowbreak+b M_2[P/x])) }
-				\allowbreak\rw_\prob^*
+				\allowbreak\rw_\perm^*
 				\trm{(M_1[N/x] +b M_2[N/x]) +a (M_1[P/x] +b M_2[P/x])} = \trm{M[N/x] +a M[P/x]}$.
 				
-				\item $\trm{x \in {\fv{M_{1}}}}$ and $\trm{x \notin {\fv{M_2}}}$ and then, by \ih, $\trm{M_1[N +a P/x]} \rw_\prob^* \trm{M_1[N/x] +a M_1[P/x]}$.
+				\item $\trm{x \in {\fv{M_{1}}}}$ and $\trm{x \notin {\fv{M_2}}}$ and then, by \ih, $\trm{M_1[N +a P/x]} \rw_\perm^* \trm{M_1[N/x] +a M_1[P/x]}$.
 				
-				Since $a <_M b$ by hypothesis, $\trm{M[N +a P/x]} = \trm{M_1[N +a P/x] +b M_2} \rw_\prob^* \trm{(M_1[N/x] +a M_1[P/x]) 
-					\allowbreak+b M_2} \rw_\prob
+				Since $a <_M b$ by hypothesis, $\trm{M[N +a P/x]} = \trm{M_1[N +a P/x] +b M_2} \rw_\perm^* \trm{(M_1[N/x] +a M_1[P/x]) 
+					\allowbreak+b M_2} \rw_\perm
 				\trm{((M_1[N/x]\allowbreak+b M_2) +a (M_1[P/x] \allowbreak+b M_2) }
 				= \trm{M[N/x] +a M[P/x]}$.
 
@@ -1157,17 +941,17 @@ We aim to prove that $\rw \,=\, \rw_\beta \cup \rw_\prob$ is confluent.
 
 			\item \emph{Box}, \ie\ $\trm{M} = \trm{!b.M'}$. 
 			We can suppose without loss of generality that $b \neq a$.
-			By \ih, as $\trm{x \in {\fv{M}} = \fv{M'}}$ $\trm{M'[N +a P/x]} \rw_\prob^* \trm{M'[N/x] +a M'[P/x]}$
-			So, $\trm{M [N +a P/x] = !b.(M'[N +a P/x]) \rw_\prob^* !b.(M'[N/x] +a M'[P/x]) \rw_\prob !b.(M'[N/x]) +a !b.(M'[P/x])}$ $= \trm{M[N/x] +a M[P/x]}$.
+			By \ih, as $\trm{x \in {\fv{M}} = \fv{M'}}$ $\trm{M'[N +a P/x]} \rw_\perm^* \trm{M'[N/x] +a M'[P/x]}$
+			So, $\trm{M [N +a P/x] = !b.(M'[N +a P/x]) \rw_\perm^* !b.(M'[N/x] +a M'[P/x]) \rw_\perm !b.(M'[N/x]) +a !b.(M'[P/x])}$ $= \trm{M[N/x] +a M[P/x]}$.
 			\qedhere
 		\end{itemize}
 	\end{enumerate}
 \end{proof}
 
 \begin{remark}
-	If $\trm{x \notin {\fv{M}}}$ then $\trm{M[N +a P/x] \not\rw_\prob^* M[N/x] +a M[P/x]}$.
-	For instance, take $\trm{M} = \trm{y} \neq \trm{x}$: then, $\trm{M[N +a P/x]} \allowbreak= y \neq \trm{y +a y} = \trm{M[N/x] +a M[P/x]}$ where $\trm{y}$ is $\prob$-normal.
-	In fact, if $\trm{x \notin {\fv{M}}}$ then $\trm{M[N/x] +a M[P/x] \allowbreak= M +a M \rw_\prob M = M[N +a P/x]}$.
+	If $\trm{x \notin {\fv{M}}}$ then $\trm{M[N +a P/x] \not\rw_\perm^* M[N/x] +a M[P/x]}$.
+	For instance, take $\trm{M} = \trm{y} \neq \trm{x}$: then, $\trm{M[N +a P/x]} \allowbreak= y \neq \trm{y +a y} = \trm{M[N/x] +a M[P/x]}$ where $\trm{y}$ is $\perm$-normal.
+	In fact, if $\trm{x \notin {\fv{M}}}$ then $\trm{M[N/x] +a M[P/x] \allowbreak= M +a M \rw_\perm M = M[N +a P/x]}$.
 \end{remark}
 
 Two problematic cases to join critical pairs: the first two ones mean that we cannot use commutation and Hindley--Rosen lemma to prove that $\rw$ is confluent;
@@ -1175,8 +959,8 @@ the second two ones suggest that the proof of confluence of $\rw$ is delicate (s
 
 $
 \begin{array}{c@{~}c@{~}c}
-\trm{(\x.!a.M)P} &\rw_\prob & \trm{(!a.(\x. M))P}
-\\	\dw_\beta && \dw_\prob
+\trm{(\x.!a.M)P} &\rw_\perm & \trm{(!a.(\x. M))P}
+\\	\dw_\beta && \dw_\perm
 \\ \trm{(!a.M)[P/x]} & & \trm{!a.(\x. M)P}
 \\	= & \rotatebox[origin=c]{210}{$\rw_\beta$}
 \\	\trm{!a.M[P/x]} &&
@@ -1185,8 +969,8 @@ $
 \qquad
 $
 \begin{array}{c@{~}c@{~}c}
-\trm{(\x.(N +a M))P} &\rw_\prob & \trm{((\x.N) +a (\x. M))P}
-\\	\dw_\beta && \dw_\prob
+\trm{(\x.(N +a M))P} &\rw_\perm & \trm{((\x.N) +a (\x. M))P}
+\\	\dw_\beta && \dw_\perm
 \\ \trm{(N +a M)[P/x]} & & \trm{(\x.N)P +a (\x. M)P}
 \\	= & \rotatebox[origin=c]{210}{$\rw_\beta^+$}
 \\	\trm{N[P/x] +a M[P/x]} &&
@@ -1199,8 +983,8 @@ $
 %
 %$
 %\begin{array}{c@{~}c@{~}c}
-%\trm{(\x.!a.M)P} &\rw_\prob & \trm{(!a.(\x. M))P}
-%\\	\dw_\beta && \dw_\prob
+%\trm{(\x.!a.M)P} &\rw_\perm & \trm{(!a.(\x. M))P}
+%\\	\dw_\beta && \dw_\perm
 %\\ \trm{(!a.M)[P/x]} & & \trm{!a.(\x. M)P}
 %\\	= & \rotatebox[origin=c]{210}{$\rw_\beta$}
 %\\	\trm{!a.M[P/x]} &&
@@ -1209,8 +993,8 @@ $
 %\qquad
 %$
 %\begin{array}{c@{~}c@{~}c}
-%\trm{(\x.(N +a M))P} &\rw_\prob & \trm{((\x.N) +a (\x. M))P}
-%\\	\dw_\beta && \dw_\prob
+%\trm{(\x.(N +a M))P} &\rw_\perm & \trm{((\x.N) +a (\x. M))P}
+%\\	\dw_\beta && \dw_\perm
 %\\ \trm{(N +a M)[P/x]} & & \trm{(\x.N)P +a (\x. M)P}
 %\\	= & \rotatebox[origin=c]{210}{$\rw_\beta^+$}
 %\\	\trm{N[P/x] +a M[P/x]} &&
@@ -1220,21 +1004,21 @@ $
 %\begin{align*}
 %\trm{x \in {\fv{M}}} \qquad & & & \qquad \trm{x \notin {\fv{M}}} \\
 %\begin{array}{c@{~}c@{~}c}
-%\trm{(\x.M)(N +a P)} &\rw_\prob & \trm{((\x.M)N) +a ((\x. M)P)}
+%\trm{(\x.M)(N +a P)} &\rw_\perm & \trm{((\x.M)N) +a ((\x. M)P)}
 %\\	\dw_\beta && \dw_{\beta^+}
-%\\ \trm{M[(N +a P)/x]} & \rw_\prob^* & \trm{M[N/x] +a M[P/x]}
+%\\ \trm{M[(N +a P)/x]} & \rw_\perm^* & \trm{M[N/x] +a M[P/x]}
 %\end{array}
 %&&&
 %\begin{array}{c@{~}c@{~}c}
-%\trm{(\x.M)(N +a P)} &\rw_\prob & \trm{((\x.M)N) +a ((\x. M)P)}
+%\trm{(\x.M)(N +a P)} &\rw_\perm & \trm{((\x.M)N) +a ((\x. M)P)}
 %\\	\dw_\beta && \dw_{\beta^+}
-%\\ \trm{M} & {}_\prob \lw & \trm{M +a M}
+%\\ \trm{M} & {}_\perm \lw & \trm{M +a M}
 %\end{array}
 %\end{align*}
 
 \hrule
 
-\begin{definition}
+\begin{defn}
 A \emph{labeled} term $\trm{N*}$ is a term $N$ with chosen $\beta$-redexes annotated as $\trm{(\x.M)*P}$. The \emph{labeled reduct} $\trm{<N*>}$ of a labeled term is defined by induction on $N$ as follows:
 \begin{align*}
 	\trm{<(\x.N)*M>} &= \trm{<N>[<M>/x]}
@@ -1245,7 +1029,7 @@ A \emph{labeled} term $\trm{N*}$ is a term $N$ with chosen $\beta$-redexes annot
 \\	\trm{<!a.N>}	&= \trm{!a.<N>}
 \end{align*}
 A \emph{parallel $\beta$-step} is a reduction $N\rwp_\beta\trm{<N*>}$ for some labelling $\trm{N*}$ of $N$.
-\end{definition}
+\end{defn}
 
 We write $\trm{N*}\rwp_\beta\trm{<N*>}$ for the specific parallel step indicated by the labeling $\trm{N*}$. Observe that $\trm{<N*>}$ is a regular unlabeled term, since all labels are removed in the reduction.
 
@@ -1255,9 +1039,9 @@ We write $\trm{N*}\rwp_\beta\trm{<N*>}$ for the specific parallel step indicated
 	Indeed, if $\trm{N*}$ is the empty labeling (which does not annotate any $\beta$-redex), then $\trm{N} = \trm{<N*>}$.
 \end{remark}
 
-\begin{lemma}
+\begin{lem}
 A parallel $\beta$-step $N\rwp_\beta M$ is a $\beta$-reduction $N\rws_\beta M$.
-\end{lemma}
+\end{lem}
 
 \begin{proof}
 	Since $N\rwp_\beta M$ means that $\trm{M} = \trm{<N*>}$ for some labeling $\trm{N*}$ of $\trm{N}$, we prove that $\trm{N} \rws_\beta \trm{<N*>}$ for any labeling $\trm{N*}$ of $\trm{N}$, by induction on $\trm{N}$.
@@ -1293,93 +1077,93 @@ A parallel $\beta$-step $N\rwp_\beta M$ is a $\beta$-reduction $N\rws_\beta M$.
 	\end{itemize}
 \end{proof}
 
-\begin{definition}
-A \emph{labelled} $\prob$-reduction $\trm{N*}\rwb_\prob\trm{M*}$ is a $\prob$-reduction of one of the forms
+\begin{defn}
+A \emph{labelled} $\perm$-reduction $\trm{N*}\rwb_\perm\trm{M*}$ is a $\perm$-reduction of one of the forms
 \[
-	\trm{(\x.N+aM)*P} \rws_\prob \trm{(\x.N)*P+a(\x.M)*P}
+	\trm{(\x.N+aM)*P} \rws_\perm \trm{(\x.N)*P+a(\x.M)*P}
 \qquad
-	\trm{(\x.!a.N)*M} \rws_\prob \trm{!a.(\x.N)*M}
+	\trm{(\x.!a.N)*M} \rws_\perm \trm{!a.(\x.N)*M}
 \]
-or a single $\prob$-step $\rw_\prob$ on unlabeled constructors in $\trm{N*}$.
-\end{definition}
+or a single $\perm$-step $\rw_\perm$ on unlabeled constructors in $\trm{N*}$.
+\end{defn}
 
-\begin{lemma}
+\begin{lem}
 \label{lem:parallel p-reduction}
-Reduction to normal form in $\rwb_\prob$ is equal to $\rwn_\prob$.
-\end{lemma}
+Reduction to normal form in $\rwb_\perm$ is equal to $\rwn_\perm$.
+\end{lem}
 
 \begin{proof}
-Observe that $\rw_\prob$ and $\rwb_\prob$ have the same normal forms. Then since $\rwb_\prob\,\subseteq\,\rws_\prob$ we have $\rwbn_\prob\,\subseteq\,\rwn_\prob$. Conversely, let $N\rwn_\prob M$. On this reduction, let $P\rw_\prob Q$ be the first step such that $P\not\rwb_\prob Q$. Then there is an $R$ such that $P\rwb_\prob R$ and $Q\rw_\prob R$. Note that we have $N\rwbs_\prob R$. By confluence, $R\rwn_\prob M$, and by induction on the sum length of paths in $\rw_\prob$ from $R$ (smaller than from $N$) we have $R\rwbn_\prob M$, and hence $N\rwbn_\prob M$.
-	%On labeled terms, $\rwb_\prob \,\subseteq\, \rws_\prob$ and thus $\rwbn_\prob \,\subseteq\, \rwn_\prob$ {\color{red}(incomplete; how about:) if $N\rw_\prob M$ but $N\not\rwb_\prob M$ then for some $P$ we have $N\rwb_\prob$ and $M\rws_\prob P$;} hence $\rwbn_\prob \,=\, \rwn_\prob$.
-%	In particular, $\trm{N*} \rwbn_\prob \trm{M*}$ if and only if $\trm{N*} \rwn_\prob \trm{M*}$.
+Observe that $\rw_\perm$ and $\rwb_\perm$ have the same normal forms. Then since $\rwb_\perm\,\subseteq\,\rws_\perm$ we have $\rwbn_\perm\,\subseteq\,\rwn_\perm$. Conversely, let $N\rwn_\perm M$. On this reduction, let $P\rw_\perm Q$ be the first step such that $P\not\rwb_\perm Q$. Then there is an $R$ such that $P\rwb_\perm R$ and $Q\rw_\perm R$. Note that we have $N\rwbs_\perm R$. By confluence, $R\rwn_\perm M$, and by induction on the sum length of paths in $\rw_\perm$ from $R$ (smaller than from $N$) we have $R\rwbn_\perm M$, and hence $N\rwbn_\perm M$.
+	%On labeled terms, $\rwb_\perm \,\subseteq\, \rws_\perm$ and thus $\rwbn_\perm \,\subseteq\, \rwn_\perm$ {\color{red}(incomplete; how about:) if $N\rw_\perm M$ but $N\not\rwb_\perm M$ then for some $P$ we have $N\rwb_\perm$ and $M\rws_\perm P$;} hence $\rwbn_\perm \,=\, \rwn_\perm$.
+%	In particular, $\trm{N*} \rwbn_\perm \trm{M*}$ if and only if $\trm{N*} \rwn_\perm \trm{M*}$.
 \end{proof}
 
-\begin{lemma}
+\begin{lem}
 \label{lem:parallel p - parallel beta}
-If $\trm{N*}\rwb_\prob\trm{M*}$ then $\trm{<N*>}=_\prob\trm{<M*>}$.
-\end{lemma}
+If $\trm{N*}\rwb_\perm\trm{M*}$ then $\trm{<N*>}=_\perm\trm{<M*>}$.
+\end{lem}
 
-\begin{lemma}
+\begin{lem}
 \label{lem:exhaustive p - parallel beta}
-If $\trm{N*}\rwn_\prob\trm{M*}$ then $\trm{<N*>}=_\prob\trm{<M*>}$
-\end{lemma}
+If $\trm{N*}\rwn_\perm\trm{M*}$ then $\trm{<N*>}=_\perm\trm{<M*>}$
+\end{lem}
 
 \begin{proof}
-Using \Cref{lem:parallel p-reduction} we decompose $\trm{N*}\rwn_\prob\trm{M*}$ as
+Using \Cref{lem:parallel p-reduction} we decompose $\trm{N*}\rwn_\perm\trm{M*}$ as
 \[
-	\trm{N*}=\trm{N_1*}\rwb_\prob\trm{N_2*}\rwb_\prob \dots \rwb_\prob \trm{N_n*}=\trm{M*}
+	\trm{N*}=\trm{N_1*}\rwb_\perm\trm{N_2*}\rwb_\perm \dots \rwb_\perm \trm{N_n*}=\trm{M*}
 \]
-for which \Cref{lem:parallel p - parallel beta} gives $\trm{<N_i*>}=_\prob\trm{<N_{i+1}*>}$.
+for which \Cref{lem:parallel p - parallel beta} gives $\trm{<N_i*>}=_\perm\trm{<N_{i+1}*>}$.
 \end{proof}
 
-\begin{definition}
-A \emph{complete} reduction step $\rwp$ is a parallel $\beta$-step followed by $\prob$-reduction to normal form:
+\begin{defn}
+A \emph{complete} reduction step $\rwp$ is a parallel $\beta$-step followed by $\perm$-reduction to normal form:
 \[
-	N\rwp M^\prob \quad\coloneq\quad N\rwp_\beta M\rwn_\prob M^\prob~.
+	N\rwp M^\perm \quad\coloneq\quad N\rwp_\beta M\rwn_\perm M^\perm~.
 \]
-\end{definition}
+\end{defn}
 
-\begin{lemma}[Mapping on $\prob$-normal forms]
+\begin{lem}[Mapping on $\perm$-normal forms]
 \label{lem:p to complete reduction}
-Any reduction step $N\rw M$ maps onto a complete step $N^\prob\rwp M^\prob$ on $\prob$-normal forms.
-\end{lemma}
+Any reduction step $N\rw M$ maps onto a complete step $N^\perm\rwp M^\perm$ on $\perm$-normal forms.
+\end{lem}
 
 \begin{proof}
-The case of a $\prob$-step $N\rw_\prob M$ is immediate, since $N^\prob=M^\prob$ and $\rwp_\beta$ is reflexive (\Cref{rmk:reflexivity}). 
+The case of a $\perm$-step $N\rw_\perm M$ is immediate, since $N^\perm=M^\perm$ and $\rwp_\beta$ is reflexive (\Cref{rmk:reflexivity}). 
 For a $\beta$-step $N\rw_\beta M$ we label the reduced redex in $N$ to get $\trm{N*}\rwp_\beta\trm{<N*>}=M$. 
-Let $\trm{P*}=(\trm{N*})^\prob$ be the (labeled) $\prob$-normal form of $\trm{N*}$. 
-Then \Cref{lem:exhaustive p - parallel beta} gives $M=\trm{<N*>}=_\prob\trm{<P*>}$, illustrated below.
+Let $\trm{P*}=(\trm{N*})^\perm$ be the (labeled) $\perm$-normal form of $\trm{N*}$. 
+Then \Cref{lem:exhaustive p - parallel beta} gives $M=\trm{<N*>}=_\perm\trm{<P*>}$, illustrated below.
 \[
 \begin{tikzpicture}
 	\matrix (m) [matrix of math nodes] {
-	  \trm{N*} && \trm{P*} \\[20pt] \\ \trm{M=<N*>} & =_\prob & \trm{<P*>} \\
+	  \trm{N*} && \trm{P*} \\[20pt] \\ \trm{M=<N*>} & =_\perm & \trm{<P*>} \\
 	};
-	\draw[rwn] (m-1-1) --node[above]{$\scriptstyle\prob$} (m-1-3);
+	\draw[rwn] (m-1-1) --node[above]{$\scriptstyle\perm$} (m-1-3);
 	\draw[rwp] (m-1-1) --node[left] {$\scriptstyle\beta$} (m-3-1);
 	\draw[rwp] (m-1-3) --node[right]{$\scriptstyle\beta$} (m-3-3);
 \end{tikzpicture}
 \]
-By confluence and strong normalization of $\rw_\prob$ then $\trm{<P*>}^\prob=M^\prob$. The complete reduction $N^\prob\rwp M^\prob$ is then given by $N^\prob\rwp_\beta\trm{<P*>}\rwn_\prob M^\prob$.
+By confluence and strong normalization of $\rw_\perm$ then $\trm{<P*>}^\perm=M^\perm$. The complete reduction $N^\perm\rwp M^\perm$ is then given by $N^\perm\rwp_\beta\trm{<P*>}\rwn_\perm M^\perm$.
 \end{proof}
 
-\begin{lemma}
+\begin{lem}
 \label{lemma:application-parallel-beta}
 	If $\trm{M} \rwp_\beta \trm{M'}$ and $\trm{N} \rwp_\beta \trm{N'}$, then $\trm{MN} \rwp_\beta \trm{M'N'}$.
-\end{lemma}
+\end{lem}
 
 \begin{proof}
 	Since $\trm{M} \rwp_\beta \trm{<M*>} = M'$ and $\trm{N} \rwp_\beta \trm{<N*>} = N'$ for some labelings $\trm{M*}$ and $\trm{N*}$ of $M$ and $N$ respectively, let $\trm{(MN)*}$ be the labeling of $\trm{MN}$ obtained by putting together the labelings $\trm{M*}$ and $\trm{N*}$.
 	Clearly, $\trm{MN} \rwp_\beta \trm{<(MN)*>} = \trm{<M*><N*>} = M'N'$.
 \end{proof}
 
-\begin{lemma}[Full labeling]
+\begin{lem}[Full labeling]
 \label{lemma:full-development}
 	Let $\trm{M}$ be a term, and $\trm{M*}$ be its \emph{full labeling}, which labels every $\beta$-redex in $\trm{M}$.
 	\begin{enumerate}
 		\item\label{lemma:full-development-beta} If $\trm{M} \rwp_\beta \trm{N}$ then $\trm{N} \rwp_\beta \trm{<M*>}$.
-		\item\label{lemma:full-development-complete} If $\trm{M} \rwp \trm{N}$ then $\trm{N} \rwp \trm{<M*>}^\prob$.
+		\item\label{lemma:full-development-complete} If $\trm{M} \rwp \trm{N}$ then $\trm{N} \rwp \trm{<M*>}^\perm$.
 	\end{enumerate}
-\end{lemma}
+\end{lem}
 \begin{proof}\hfill
 	\begin{enumerate}
 		\item	By induction on $\trm{M}$.
@@ -1412,9 +1196,9 @@ By confluence and strong normalization of $\rw_\prob$ then $\trm{<P*>}^\prob=M^\
 			\end{itemize}
 		\end{itemize}
 	
-		\item Since $\trm{M} \rwp \trm{N}$, then $\trm{M} \rwp_\beta \trm{P} \rwn_\prob \trm{N}$ for some term $\trm{P}$ such that $\trm{N} = \trm{P}^\prob$.
-		By \Cref{lemma:full-development}.\ref{lemma:full-development-beta}, $\trm{P} \rwp_\beta \trm{<M*>}$ and hence $\trm{P} \rwp \trm{<M*>^\prob}$.
-		According to \Cref{lem:p to complete reduction}, $\trm{N} = \trm{P}^\prob \rwp \trm{(<M*>^\prob)^\prob} = \trm{<M*>^\prob}$.
+		\item Since $\trm{M} \rwp \trm{N}$, then $\trm{M} \rwp_\beta \trm{P} \rwn_\perm \trm{N}$ for some term $\trm{P}$ such that $\trm{N} = \trm{P}^\perm$.
+		By \Cref{lemma:full-development}.\ref{lemma:full-development-beta}, $\trm{P} \rwp_\beta \trm{<M*>}$ and hence $\trm{P} \rwp \trm{<M*>^\perm}$.
+		According to \Cref{lem:p to complete reduction}, $\trm{N} = \trm{P}^\perm \rwp \trm{(<M*>^\perm)^\perm} = \trm{<M*>^\perm}$.
 		\qedhere
 	\end{enumerate}
 \end{proof}
@@ -1434,29 +1218,29 @@ By confluence and strong normalization of $\rw_\prob$ then $\trm{<P*>}^\prob=M^\
 \begin{array}{cccc}
 \vcenter{\hbox{\begin{tikzpicture}
 	\matrix (m) [matrix of math nodes] {
-	  \trm{N*} && \trm{M*} \\[20pt] \\ \trm{<N*>} & =_\prob & \trm{<M*>} \\
+	  \trm{N*} && \trm{M*} \\[20pt] \\ \trm{<N*>} & =_\perm & \trm{<M*>} \\
 	};
-	\draw[rwb] (m-1-1) --node[above]{$\scriptstyle\prob$} (m-1-3);
+	\draw[rwb] (m-1-1) --node[above]{$\scriptstyle\perm$} (m-1-3);
 	\draw[rwp] (m-1-1) --node[left] {$\scriptstyle\beta$} (m-3-1);
 	\draw[rwp] (m-1-3) --node[right]{$\scriptstyle\beta$} (m-3-3);
 \end{tikzpicture}}}
 &
 \vcenter{\hbox{\begin{tikzpicture}
 	\matrix (m) [matrix of math nodes] {
-	  \trm{N*} && \trm{M*} \\[20pt] \\ \trm{<N*>} & =_\prob & \trm{<M*>} \\
+	  \trm{N*} && \trm{M*} \\[20pt] \\ \trm{<N*>} & =_\perm & \trm{<M*>} \\
 	};
-	\draw[rwn] (m-1-1) --node[above]{$\scriptstyle\prob$} (m-1-3);
+	\draw[rwn] (m-1-1) --node[above]{$\scriptstyle\perm$} (m-1-3);
 	\draw[rwp] (m-1-1) --node[left] {$\scriptstyle\beta$} (m-3-1);
 	\draw[rwp] (m-1-3) --node[right]{$\scriptstyle\beta$} (m-3-3);
 \end{tikzpicture}}}
 &
 \vcenter{\hbox{\begin{tikzpicture}
 	\matrix (m) [matrix of math nodes] {
-	  \trm{N} &[20pt] & \trm{M} \\[20pt] \\ N^\prob && M^\prob \\
+	  \trm{N} &[20pt] & \trm{M} \\[20pt] \\ N^\perm && M^\perm \\
 	};
 	\draw[rw]  (m-1-1) -- (m-1-3);
-	\draw[rwn] (m-1-1) --node[left] {$\scriptstyle\prob$} (m-3-1);
-	\draw[rwn] (m-1-3) --node[right]{$\scriptstyle\prob$} (m-3-3);
+	\draw[rwn] (m-1-1) --node[left] {$\scriptstyle\perm$} (m-3-1);
+	\draw[rwn] (m-1-3) --node[right]{$\scriptstyle\perm$} (m-3-3);
 	\draw[rwx] (m-3-1) -- (m-3-3);
 \end{tikzpicture}}}
 &
@@ -1481,23 +1265,23 @@ By confluence and strong normalization of $\rw_\prob$ then $\trm{<P*>}^\prob=M^\
 \end{figure}
 
 
-\begin{theorem}
+\begin{thm}
 \label{thm:confluence}
 Reduction $\rw$ is confluent.
-\end{theorem}
+\end{thm}
 
 \begin{proof}
-By the following diagram. For the top and left areas, by Lemma~\ref{lem:p to complete reduction} any reduction path $N\rws M$ maps onto one $N^\prob \rwx M^\prob$. The main square follows by the diamond property of complete reduction, \Cref{cor:complete diamond}.
+By the following diagram. For the top and left areas, by Lemma~\ref{lem:p to complete reduction} any reduction path $N\rws M$ maps onto one $N^\perm \rwx M^\perm$. The main square follows by the diamond property of complete reduction, \Cref{cor:complete diamond}.
 \[
 \begin{tikzpicture}
 	\matrix (m) [matrix of math nodes] {
-	  N &[10pt] &[18pt] M &[10pt] \\[10pt] & N^\prob && M^\prob \\[18pt] P \\[10pt] & P^\prob && Q \\
+	  N &[10pt] &[18pt] M &[10pt] \\[10pt] & N^\perm && M^\perm \\[18pt] P \\[10pt] & P^\perm && Q \\
 	};
 	\draw[rws] (m-1-1) -- (m-1-3);
 	\draw[rws] (m-1-1) -- (m-3-1);
-	\draw[rwn] (m-1-1) --node[below left =-2pt] {$\scriptstyle\prob$} (m-2-2);
-	\draw[rwn] (m-1-3) --node[above right=-2pt]{$\scriptstyle\prob$} (m-2-4);
-	\draw[rwn] (m-3-1) --node[below left =-2pt] {$\scriptstyle\prob$} (m-4-2);
+	\draw[rwn] (m-1-1) --node[below left =-2pt] {$\scriptstyle\perm$} (m-2-2);
+	\draw[rwn] (m-1-3) --node[above right=-2pt]{$\scriptstyle\perm$} (m-2-4);
+	\draw[rwn] (m-3-1) --node[below left =-2pt] {$\scriptstyle\perm$} (m-4-2);
 	\draw[rwx] (m-2-2) -- (m-2-4);
 	\draw[rwx] (m-2-2) -- (m-4-2);
 	\draw[rwx] (m-2-4) -- (m-4-4);
@@ -1507,69 +1291,317 @@ By the following diagram. For the top and left areas, by Lemma~\ref{lem:p to com
 \end{proof}
 
 
+%=====================================================================================
+
+
+
+
+\subsection{Strong normalization for typed terms}
+In this section, we prove that the relation $\rw$ enjoys strong
+normalization in simply typed terms. Since the proof of strong
+normalization is quite delicate, it make sense to turn the definition
+of the order $<_{{\trm{M}}}$ from Definition~\ref{def:orderlabels}
+more formal, at the same time allowing to treat label-\emph{open}
+terms. This is based on Figure~\ref{fig:order}. 
+%
+\begin{figure}
+  \fbox{
+    \begin{minipage}{.97\textwidth}
+      \begin{tabular}{ll}        
+        \textsf{Label Sequences}: & $\theta\quad\coloneqq\quad \varepsilon ~\mid~ a\cdot\theta$\\[5pt]
+        \textsf{Label Judgments}: & $\xi\quad\coloneqq\quad \labjudg{\theta}{M}$\\
+        \begin{minipage}{.25\textwidth}\textsf{Label Rules}:\end{minipage} &
+        \begin{minipage}{.7\textwidth}
+        \[
+        \begin{array}{c}        
+        \infer{\labjudg{\theta}{x}}{}\qquad\quad
+        \infer{\labjudg{\theta}{\x.M}}{\labjudg{\theta}{M}}\qquad\quad
+        \infer{\labjudg{\theta}{\ttrm{!a.M}}}{\labjudg{a\cdot\theta}{M}}
+        \\\\
+        \infer{\labjudg{\theta}{MN}}{\labjudg{\theta}{M} & \labjudg{\theta}{N}}\qquad\quad
+        \infer{\labjudg{\theta}{\ttrm{M +a N}}}{\labjudg{\theta}{M} & \labjudg{\theta}{N} & a\in\theta}
+        \end{array}
+        \]
+        \end{minipage}
+        \\
+      \end{tabular}
+    \end{minipage}
+  }
+  \label{fig:order}
+  \caption{Labelling Terms}
+\end{figure}
+%\begin{figure}
+%  \fbox{
+%    \begin{minipage}{.97\textwidth}
+%      \begin{tabular}{ll}        
+%        \textsf{Label Sequences}: & $\theta\quad\coloneqq\quad \varepsilon ~\mid~ a\cdot\theta $\\
+%        \textsf{Label Judgments}: & $\xi\quad\coloneqq\quad \labjudg{\theta}{M}$\\
+%        \begin{minipage}{.25\textwidth}\textsf{Label Rules}:\end{minipage} &
+%        \begin{minipage}{.7\textwidth}
+%        $$
+%        \infer{\labjudg{\theta}{x}}{}\qquad
+%        \infer{\labjudg{\theta}{\x.M}}{\labjudg{\theta}{M}}\qquad
+%        \infer{\labjudg{\theta}{\ttrm{!a.M}}}{\labjudg{a\cdot\theta}{M}}
+%        $$
+%        $$
+%        \infer{\labjudg{\theta}{MN}}{\labjudg{\theta}{M} & \labjudg{\theta}{N}}\qquad
+%        \infer{\labjudg{\theta}{\ttrm{M +a N}}}{\labjudg{\theta}{M} & \labjudg{\theta}{N} & a\in\theta}
+%        $$
+%        \end{minipage}
+%        \\
+%      \end{tabular}
+%    \end{minipage}
+%  }
+%  \label{fig:order}
+%  \caption{Labelling Terms}
+%\end{figure}
+%
+It is easy to realize that, of course modulo label $\alpha$-equivalence, for
+every term $M$ there is at least one $\theta$ such that $\labjudg{\theta}{M}$.
+Similarly, reduction as defined by $\rw$ can be made parametric on a sequence
+of labels $\theta$, i.e., one can define a family of reduction
+relations $\rw^\theta$. An easy fact to check is that if
+$\labjudg{\theta}{M}$ and $M\rw^\theta N$, then $\labjudg{\theta}{N}$.
+It thus makes sense to define $\mathit{SN}^\theta$ and $\mathit{sn}^\theta(M)$
+simply as the set of strongly normalizing $\theta$-terms modulo $\rw^\theta$,
+and the maximum number of $\theta$-steps to normal form of a given
+$\theta$-term $M$.
+
+Now, let us define types, environments, judgments, and typing rules in
+Figure~\ref{fig:typing}.
+\newcommand{\arrow}{\Rightarrow}
+\newcommand{\judg}[3]{#1\vdash #2:#3}
+\begin{figure}
+  \fbox{
+    \begin{minipage}{.97\textwidth}
+      \begin{tabular}{ll}        
+        \textsf{Types}: & $\tau\quad\coloneqq\quad \alpha ~\mid~ \tau\arrow\rho$\\[5pt]
+        \textsf{Environments}: & $\Gamma\quad\coloneqq\quad x_1:\tau_1,\ldots,x_n:\tau_n$\\[5pt]
+        \textsf{Judgments}: & $\pi\quad\coloneqq\quad \judg{\Gamma}{M}{\tau}$\\
+        \begin{minipage}{.25\textwidth}\textsf{Typing Rules}:\end{minipage} &
+        \begin{minipage}{.7\textwidth}
+        \[
+        \begin{array}{c}
+        \infer{\judg{\Gamma,x:\tau}{x}{\tau}}{}\qquad\quad
+        \infer{\judg{\Gamma}{\x.M}{\tau\arrow\rho}}{\judg{\Gamma,x:\tau}M\rho}\qquad\quad
+        \infer{\judg{\Gamma}{\ttrm{!a.M}}{\tau}}{\judg{\Gamma}{M}{\tau}}
+        \\\\
+        \infer{\judg{\Gamma}{MN}{\rho}}{\judg{\Gamma}{M}{\tau\arrow\rho} & \judg{\Gamma}{N}{\tau}}\qquad\quad
+        \infer{\judg{\Gamma}{\ttrm{M +a N}}{\tau}}{\judg{\Gamma}{M}{\tau} & \judg{\Gamma}{N}{\tau}}
+        \end{array}
+        \]
+        \end{minipage}
+        \\
+      \end{tabular}
+    \end{minipage}
+  }
+  \caption{Types, Environments, Judgments, and Rules}
+  \label{fig:typing}
+\end{figure}
+The type structure being precisely the usual one (although terms are of course
+different), we can reuse most of the usual proof of strong normalization, for
+example in the version given by Ralph Loader's notes, page 17. In the following, we only
+report the elements which make our proof different.
+
+\begin{lem}
+\label{lemma:cloredsum}
+  The set SN is closed under the following rule:
+  $$
+  \infer{\trm{M +a N}L_1\ldots L_m}{ML_1\ldots L_m & NL_1\ldots L_m}
+  $$
+\end{lem}
+\begin{proof}
+  Let $\theta$ be such that
+  $$
+  \labjudg{\theta}{\trm{M +a N}L_1\ldots L_m}
+  $$
+  and let $h(a,\theta)$ be the height of $a$ in the sequence $\theta$.
+  The proof goes by lexicographic induction on the following quadruple:
+  \begin{equation}\label{equ:redord}
+  (m,h(a,\theta),\sum_{i=1}^m\mathit{sn}(L_i)+\mathit{sn}(M)+\mathit{sn}(N),|M|+|N|)
+  \end{equation}
+  We proceed by showing that all terms to which
+  $\trm{M +a N}L_1\ldots L_m$ reduces are strongly normalizing:
+  \begin{itemize}
+  \item
+    If reduction happens in one between $M,N,L_1,\ldots,L_m$, then we
+    are done, because we get an instance of the rule where the first two
+    components of \ref{equ:redord} stay constant, and the third
+    strictly decreases.
+  \item
+    If reduction happens at the leftmost component $\trm{M +a N}$
+    due to the rule $\trm{P +a P}\rw_\perm P$, then one of the two
+    hypotheses apply trivially.
+  \item
+    If reduction happens at the leftmost component $\trm{M +a N}$
+    due to the rule $\trm{(P +a Q) +a R}\rw_\perm \trm{P +a R}$,
+    then the IH holds due to the fourth component being strictly
+    smaller. Similarly when the rule is
+    $\trm{P +a (Q +a R)}\rw_\perm \trm{P +a R}$.    
+  \item
+    If reduction happens in the leftmost application due to
+    the rule $\trm{(P +a Q) R}\rw_\perm \trm{(PR) +a (QR)}$,
+    then the IH can be applied, because the number of arguments $m$
+    strictly decreases. Similarly when the rule is
+    $\trm{N (M +a P)}\rw_\perm\trm{(NM) +a (NP)}$.
+  \item
+    If reduction happens at the leftmost component $\trm{M +a N}$
+    due to the rule $\trm{(P +b Q) +a R}\rw_\perm \trm{(P +a R) +b (Q +a R)}$,
+    then $M$ can be written as $\trm{P +b Q}$, and the
+    following two terms are strongly normalizing (because
+    $\trm{(P +b Q)L_1\ldots L_m}$ is by hypothesis strongly normalizing
+      itself):
+    $$
+    PL_1\ldots L_m\qquad QL_1\ldots L_m
+    $$
+    Moreover, $\mathit{sn}(PL_1\ldots L_m),\mathit{sn}(QL_1\ldots
+    L_m)\leq\mathit{sn}(\trm{(P +b Q)L_1\ldots L_m}$.  We can then
+    conclude that $\trm{(P +a N)}L_1\ldots L_m$ and $\trm{(Q +a
+        N)}L_1\ldots L_m$ are both strongly normalizing by IH, because
+    the fourth component is strictly smaller. Finally, we can conclude
+    again by induction hypothesis, since the number of arguments stays
+    the same, while the level of $b$ must be smaller than that of
+    $a$. Similarly if the rule applied is $\trm{P +a (Q +b
+      R)}\rw_\perm \trm{(P +a Q) +b (P +a R)}$.
+  \end{itemize}
+\end{proof}
+
+\begin{lem}
+  The set SN is closed under the following rule:
+  $$
+  \infer{\trm{(!a.M)}L_1\ldots L_m}{\trm{M}L_1\ldots L_m}
+  $$
+\end{lem}
+\begin{proof}
+  The proof is structurally very similar to the one of
+  Lemma~\ref{lemma:cloredsum}. The lexicographic order
+  is however the following one:
+  $$
+  (m,\sum_{i=1}^m\mathit{sn}(L_i)+\mathit{sn}(M),|M|)
+  $$
+  There is one case in which we need to use
+  Lemma \ref{lemma:cloredsum}, namely the one in which the
+  considered reduction rule is the following:
+  $$
+  \trm{!b.(P +a Q)}\rw_\perm\trm{(!b.P) +a (!b.Q)}.
+  $$
+  Since $M=\trm{P +a Q}$ and $ML_1\ldots L_m$ by hypothesis,
+  we conclusde that $PL_1\ldots L_m$ and $QL_1\ldots L_m$
+  are both strongly normalizing. By induction hypothesis,
+  since $\mathit{sn}(P),\mathit{sn}(Q)\leq\mathit{sn}(M)$,
+  it holds that $\trm{(!b.P)}L_1\ldots L_m$ and $\trm{(!b.Q)}L_1\ldots L_m$
+  are both strongly normalizing themselves. Lemma~\ref{lemma:cloredsum},
+  yields the thesis.
+\end{proof}
+
+\begin{lem}
+  The set SN is closed under the following rule:
+  $$
+  \infer{\trm{(\x.M)}L_0\ldots L_m}{\trm{M[L_0/x]}L_1\ldots L_m & L_0}
+  $$
+\end{lem}
+\begin{proof}
+  Again, the proof is structurally very similar to the one
+  of Lemma~\ref{lemma:cloredsum}. The underlying order,
+  needs to be slightly adapted, and is the lexicographic
+  order on
+  $$
+  (\mathit{sn}(\trm{M[L_0/x]}L_1\ldots L_m)+\mathit{sn}(L_0),|M|)
+  $$
+  As usual, we proceed by showing that all terms to which
+  $\trm{(\x.M)}L_0\ldots L_m$ reduces are strongly normalizing:
+  \begin{itemize}
+  \item
+    If reduction happens in $L_0$, then we can mimick
+    the same reduction in by zero or more reduction
+    steps in $\trm{M[L_0/x]}L_1\ldots L_m$, and conclude
+    by induction hypothesis.
+  \item
+    If reduction happens in $M$ or in $L_1,\ldots,L_m$,
+    then we can mimick the same reduction in one or more
+    reduction in $\trm{M[L_0/x]}L_1\ldots L_m$, and conclude
+    by induction hypothesis.
+  \item
+    If the reduction step we perform is 
+  \end{itemize}
+\end{proof}
+
+The definition of a reducible term stays the same:
+
+Lemma 3.5 must be complemented with two new clauses, as follows:
+\newcommand{\RedSet}[1]{\mathit{Red}_{#1}}
+\begin{lem}
+  \begin{itemize}
+  \item
+    If $(\Gamma,ML_1\ldots L_m)\in\RedSet{\tau}$
+    and $(\Gamma,NL_1\ldots L_m)\in\RedSet{\tau}$,
+    then $(\Gamma,\trm{(M +a N)}L_1\ldots L_m)\in\RedSet{\tau}$.
+  \item
+    If $(\Gamma,ML_1\ldots L_m)\in\RedSet{\tau}$,
+    then $(\Gamma,\trm{(!a.M)}L_1\ldots L_m)\in\RedSet{\tau}$.
+  \end{itemize}
+\end{lem}
+\begin{proof}
+  The proofs are just very simple inductions on $\tau$.
+\end{proof}
+
+
 \hrule
 
 \newcommand\proj[3]{\pi^{#1}_{#2}(\trm{#3})}
 
 \section{Projective reduction}
+\label{sec:projective reduction}
 
-The reduction $\rw_\prob$ evaluates probabilistic sums purely by rewriting. Here we look at an alternative \emph{projective} notion of reduction, which conforms more closely to the intuition that $\trm{!a}$ generates a probabilistic event that is consumed by $\trm{+a}$.
+The reduction $\rw_\perm$ evaluates probabilistic sums purely by rewriting. Here we look at an alternative \emph{projective} notion of reduction, which conforms more closely to the intuition that $\trm{!a}$ generates a probabilistic event to determine the choice $\trm{+a}$.
 
 For projective reduction we distinguish a global, meta-level probabilistic sum $+$ from the internal, object-level probabilistic sum $\trm{N\+M=!a.N+aM}$. Let $N^+$ denote the term $N$ with every top-level internal sum $\trm{\+}$ evaluated as an external sum; formally:
 \[
 	\trm{(N\+M)}^+=N^+\!+M^+ \qquad\qquad N^+=N \quad(N\neq \trm{M\+P})~.
 \]
-{\color{red}(NOTE: The evaluation $N^+$ should be discussed earlier, to complete our reduction $\rw_\prob$ by linking our syntactic $\trm{\+}$ to semantic probabilistic sums.)}
+{\color{red}(NOTE: The evaluation $N^+$ should be discussed earlier, to complete our reduction $\rw_\perm$ by linking our syntactic $\trm{\+}$ to semantic probabilistic sums.)}
 
-\begin{definition}
+\begin{defn}
 The \emph{$a$-projections} $\proj a0N$ and $\proj a1N$ are defined as follows, where $a\neq b$.
 \begin{align*}
-	\proj a0{N+aM} &= \proj a0N
-\\	\proj a1{N+aM} &= \proj a1M
-\\	\proj ai{!a.N} &= \trm{!a.N}
-\\	\proj aix      &= x
-\\	\proj ai{\x.N} &= \x.\proj aiN
-\\	\proj ai{NM}   &= (\proj aiN)(\proj aiM)
-\\	\proj ai{N+bM} &= (\proj aiN)\trm{+b}(\proj aiM)
-\\	\proj ai{!b.N} &= \trm{!b.}\proj aiN
+	\proj a0{N+aM} &= \proj a0N		&	\proj ai{\x.N} &= \x.\proj aiN
+\\	\proj a1{N+aM} &= \proj a1M		&	\proj ai{NM}   &= (\proj aiN)(\proj aiM)
+\\	\proj ai{!a.N} &= \trm{!a.N}	& 	\proj ai{N+bM} &= (\proj aiN)\trm{+b}(\proj aiM)
+\\	\proj aix      &= x				&	\proj ai{!b.N} &= \trm{!b.}\proj aiN
 \end{align*}
-\end{definition}
+\end{defn}
 
-\begin{definition}
+\begin{defn}
 A \emph{head context} $H[\,]$ is given by the following grammar.
 \[
 	H[\,] \coloneqq [\,] ~\mid~ \lambda x.H[\,] ~\mid~ H[\,]N
 \]
-\end{definition}
+\end{defn}
 
 
-\begin{definition}
-\emph{Projective} reduction $\rw_\pi$ is the reduction step
+\begin{defn}
+\emph{Projective} reduction $\rw_\pi$ is the following reduction step.
 \[
-	\trm{!a.N} ~\rw_\pi~ \proj a0N + \proj a1N
+	H[\trm{!a.N}] ~\rw_\pi~ H[\proj a0N] + H[\proj a1N]
 \]
-closed under head context:
-\[
-	N\rw_\pi M \quad\implies\quad H[N]\rw_\pi H[M]~.
-\]
-\end{definition}
+\end{defn}
 
 
-Observe that projective reduction is not a rewrite relation, as it applies only in head contexts---that is, we do not evaluate inside arguments or under other probabilistic events $\trm{!a}$ or sums $\trm{+a}$.
+Observe that projective reduction is not a rewrite relation, as it applies only in head contexts---that is, we do not evaluate inside arguments or under other generators $\ttrm{!a}$ or choices $\ttrm{+a}$.
 
-\begin{proposition}
-If $N\rw_\pi M$ then there is a $P$ such that $N\rws_\prob P$ with $P^+=M$.
-\end{proposition}
+\begin{prop}
+If $N\rw_\pi M$ then there is a $P$ such that $N\rws_\perm P$ with $P^+=M$.
+\end{prop}
 
 \hrule
 
 
-\subsection*{Call-by-value translation}
+\subsection{Call-by-value translation}
 
 
 The call-by-value interpretation $\uncbv{N}$ of a probabilistic lambda-term $N$ is a given as follows. First, we translate $N$ to an open $\PEL$-term $\unopen N=\labjudg\theta P$, and then $\uncbv{N}$ is the label closure $\uncbv{N}=\labclose\theta P$, which prefixes $P$ with a generator $\trm{!a}$ for every $a$ in $\theta$.
 
-\begin{definition}
+\begin{defn}
 The \emph{label closure} $\labclose\theta P$ is given inductively as follows.
 \[
 	\labclose{}P = P \qquad \labclose{a\cdot\theta}P = \labclose\theta{\trm{!a.P}}
@@ -1585,7 +1617,7 @@ The \emph{call-by-value interpretation} of a probabilistic lambda-term $N$ is
 \[
 	\uncbv N=\lfloor\unopen N\rfloor~.
 \]
-\end{definition}
+\end{defn}
 
 {\color{red}NOTE: Please check thoroughly that I haven't messed up the order of labels in the notion of ``label closure''.}
 
