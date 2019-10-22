@@ -856,17 +856,16 @@ We consider each reduction rule against those lower down in the table in Figure~
 \end{tikzpicture}}}
 \quad (a \neq b, \ b \notin\trm{N+a M})
 \]
-
 \end{itemize}
 \end{proof}
-
-
 
 \begin{defn}
 We denote the unique $\perm$-normal form of a term $N$ by $N^\perm$.
 \end{defn}
 
-\subsection{Confluence}
+%=====================================================================================
+
+\section{Confluence}
 
 We aim to prove that $\rw \,=\, \rw_\beta \cup \rw_\perm$ is confluent.
 
@@ -953,30 +952,29 @@ We aim to prove that $\rw \,=\, \rw_\beta \cup \rw_\perm$ is confluent.
 	For instance, take $\trm{M} = \trm{y} \neq \trm{x}$: then, $\trm{M[N +a P/x]} \allowbreak= y \neq \trm{y +a y} = \trm{M[N/x] +a M[P/x]}$ where $\trm{y}$ is $\perm$-normal.
 	In fact, if $\trm{x \notin {\fv{M}}}$ then $\trm{M[N/x] +a M[P/x] \allowbreak= M +a M \rw_\perm M = M[N +a P/x]}$.
 \end{remark}
-
-Two problematic cases to join critical pairs: the first two ones mean that we cannot use commutation and Hindley--Rosen lemma to prove that $\rw$ is confluent;
-the second two ones suggest that the proof of confluence of $\rw$ is delicate (see the remark above).
-
-$
-\begin{array}{c@{~}c@{~}c}
-\trm{(\x.!a.M)P} &\rw_\perm & \trm{(!a.(\x. M))P}
-\\	\dw_\beta && \dw_\perm
-\\ \trm{(!a.M)[P/x]} & & \trm{!a.(\x. M)P}
-\\	= & \rotatebox[origin=c]{210}{$\rw_\beta$}
-\\	\trm{!a.M[P/x]} &&
-\end{array}
-$
-\qquad
-$
-\begin{array}{c@{~}c@{~}c}
-\trm{(\x.(N +a M))P} &\rw_\perm & \trm{((\x.N) +a (\x. M))P}
-\\	\dw_\beta && \dw_\perm
-\\ \trm{(N +a M)[P/x]} & & \trm{(\x.N)P +a (\x. M)P}
-\\	= & \rotatebox[origin=c]{210}{$\rw_\beta^+$}
-\\	\trm{N[P/x] +a M[P/x]} &&
-\end{array}
-$
-
+%
+%Two problematic cases to join critical pairs: the first two ones mean that we cannot use commutation and Hindley--Rosen lemma to prove that $\rw$ is confluent;
+%the second two ones suggest that the proof of confluence of $\rw$ is delicate (see the remark above).
+%
+%$
+%\begin{array}{c@{~}c@{~}c}
+%\trm{(\x.!a.M)P} &\rw_\perm & \trm{(!a.(\x. M))P}
+%\\	\dw_\beta && \dw_\perm
+%\\ \trm{(!a.M)[P/x]} & & \trm{!a.(\x. M)P}
+%\\	= & \rotatebox[origin=c]{210}{$\rw_\beta$}
+%\\	\trm{!a.M[P/x]} &&
+%\end{array}
+%$
+%\qquad
+%$
+%\begin{array}{c@{~}c@{~}c}
+%\trm{(\x.(N +a M))P} &\rw_\perm & \trm{((\x.N) +a (\x. M))P}
+%\\	\dw_\beta && \dw_\perm
+%\\ \trm{(N +a M)[P/x]} & & \trm{(\x.N)P +a (\x. M)P}
+%\\	= & \rotatebox[origin=c]{210}{$\rw_\beta^+$}
+%\\	\trm{N[P/x] +a M[P/x]} &&
+%\end{array}
+%$
 
 %Two problematic cases to join critical pairs: the first two ones mean that we cannot use commutation and Hindley--Rosen lemma to prove that $\rw$ is confluent;
 %the second two ones suggest that the proof of confluence of $\rw$ is delicate (see the remark above);
