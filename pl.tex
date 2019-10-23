@@ -1745,14 +1745,26 @@ Let $N$ a label-closed term. If $N\rw_\pi M$ then there is a $P$ such that $N\rw
 		
 		\item \emph{Variable}, \ie\ $N = H[\trm{!a}. x] \rw_\pi H[\proj{a}{0}{x}] + H[\proj{a}{1}{x}] =\allowbreak H[x] + H[x] = H[x] = M$.
 %		$\proj{a}{0}{N''} + \proj{a}{1}{N''} = M$ with $N' \rw_\pi M'$.
-		Let $P = \trm{!a}. H[x]$: thus, $N  \rws_\perm P$ with $P^+ =  \trm{!a}.H[x] \neq H[x] = M$.
+		Let $P = M$: thus, $N  \rws_\perm P$ with $P^+ =  H[x]^+ = H[x] = M$.
 		
 		\item \emph{Abstraction}, \ie\ $N = H[\trm{!a}.\lambda x. Q] \rw_\pi H[\proj{a}{0}{\lambda x.Q}] + H[\proj{a}{1}{\lambda x.Q}] =\allowbreak H[\lambda x.\proj{a}{0}{Q}] + H[\lambda x.\proj{a}{1}{Q}] = M$.
 		%		$\proj{a}{0}{N''} + \proj{a}{1}{N''} = M$ with $N' \rw_\pi M'$.
-		Let $P = \trm{!a}. H[\lambda x.\proj{a}{0}{Q}] \trm{+a} H[\lambda x.\proj{a}{1}{Q}]$: thus, $N  \rws_\perm P$ with $P^+ =  H[\lambda x.\proj{a}{0}{Q}]^+ + H[\lambda x.\proj{a}{1}{Q}]^+ = H[\lambda x.\proj{a}{0}{Q}] + H[\lambda x.\proj{a}{1}{Q}] = M$.
+		There are two sub-cases:
+		\begin{itemize}
+			\item $a \in \fl{Q}$, and then let $P = \trm{!a}. H[\lambda x.\proj{a}{0}{Q}] \trm{+a} H[\lambda x.\proj{a}{1}{Q}]$: 
+			as $H[\trm{!a}.Q] \allowbreak\rw_\pi H[\proj{a}{0}{Q}] + H[\proj{a}{1}{Q}]$, we have $H[\trm{!a}.Q] \rws_\perm \trm{!a}.H[\proj{a}{0}{Q}] \trm{+a} H[\proj{a}{1}{Q}]$ by \ih,
+			thus $N = H[\trm{!a}.\lambda x.Q] \rws_\perm \trm{!a}.H[\proj{a}{0}{\lambda x.Q}] \trm{+a} H[\proj{a}{1}{\lambda x.Q}] = \trm{!a}. H[\lambda x.\proj{a}{0}{Q}] \trm{+a} H[\lambda x.\proj{a}{1}{Q}] = P$ with $P^+ =  H[\lambda x.\proj{a}{0}{Q}]^+ +\allowbreak H[\lambda x.\proj{a}{1}{Q}]^+ \allowbreak= H[\lambda x.\proj{a}{0}{Q}] + H[\lambda x.\proj{a}{1}{Q}] \allowbreak= M$.
+			
+			\item $a \notin \fl{Q}$, and then let $P = H[\lambda x.Q]$: 
+			we have $N = H[\trm{!a}.\lambda x. Q] \rw_\perm P$ and $P^+ = H[\lambda x.Q] = H[\lambda x.Q] + H[\lambda x.Q] = H[\lambda x.\proj{a}{0}{Q}] + H[\lambda x.\proj{a}{1}{Q}] \allowbreak= M$ since $\proj{a}{i}{Q} = Q$ because $a \notin \fl{Q}$.
+		\end{itemize}
 		
-		\item \emph{Application}, \ie\ $N = N'Q \rw_\pi M'Q = M$ with $N' \rw_\pi M'$.
-		By \ih, there is $P'$ such that $N' \rws_\perm P'$ and $P'^+ = M'$. 
+		\item \emph{Application}, \ie\ $N = H[\trm{!a}.QQ'] \rw_\pi H[\proj{a}{0}{QQ'}] + H[\proj{a}{1}{QQ'}] = H[\proj{a}{0}{Q}\proj{a}{0}{Q'}] + H[\proj{a}{1}{Q}\proj{a}{1}{Q'}] = M$.
+		Analogous to the abstraction case.
+%		Let $P = \trm{!a}. H[\proj{a}{0}{Q}\proj{a}{1}{Q'}] \trm{+a} H[\proj{a}{1}{Q}\proj{a}{1}{Q'}]$: thus, $N  \rws_\perm P$ with $P^+ =  H[\lambda x.\proj{a}{0}{Q}]^+ + H[\lambda x.\proj{a}{1}{Q}]^+ = H[\lambda x.\proj{a}{0}{Q}] + H[\lambda x.\proj{a}{1}{Q}] = M$.
+
+		\item \emph{Box}, \ie\ $N = H[\trm{!a}.\trm{!b}.Q] \rw_\pi H[\proj{a}{0}{!b.Q}] + H[\proj{a}{1}{!b.Q}] = H[\trm{!b.}\proj{a}{0}{Q}] + H[\trm{!b.}\proj{a}{1}{Q}] = M$ where $a \neq b$ (without loss of generality).
+		Analogous to the abstraction case.
 		\qedhere
 	\end{itemize}
 \end{proof}
