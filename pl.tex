@@ -1690,11 +1690,75 @@ A \emph{head context} $H[\,]$ is given by the following grammar.
 
 Observe that projective reduction is not a rewrite relation, as it applies only in head contexts---that is, we do not evaluate inside arguments or under other generators $\ttrm{!a}$ or choices $\ttrm{+a}$.
 
+\begin{rmrk}
+	\label{rmrk:proj}
+	Let $N, M$ be terms with $\fl{N} \cup \fl{M} \subseteq \{a\}$. 
+	Then $\trm{!a. N +a M} \rws_\perm \trm{!a}. \proj{a}{0}{N} \trm{+a} \proj{a}{1}{M} $, where the number of $\rw_\perm$-steps is the number of free occurrences of the label $a$ in $N$ and $M$ not in the scope of some box.
+	More in general, under the same hypothesis, if $H$ is a head context then $H[\trm{!a. N +a M}] \rws_\perm \trm{!a}. H[\proj{a}{0}{N}] \trm{+a} H[\proj{a}{1}{M}]$.
+	The proof is a straightforward induction on $H$.
+\end{rmrk}
+
+\begin{lem}\label{lem:plus-projection}
+	Let $N$ be a term such that $\fl{N} \subseteq \{a\}$.
+	\begin{enumerate}
+		\item\label{lem:plus-projection-base} 	Then, $\proj{a}{i}{N}^+ = \proj{a}{i}{N}$ for all $i \in \{0,1\}$.
+		\item\label{lem:plus-projection-head} If $H$ is a head context, then $H[\proj{a}{i}{N}]^+ = H[\proj{a}{i}{N}]$.
+	\end{enumerate}
+\end{lem}
+
+\begin{proof}
+	\begin{enumerate}
+		\item By straightforward induction on $N$.
+		\item By straightforward induction on $H$, the base case is \Cref{lem:plus-projection-base}.
+		\qedhere 
+	\end{enumerate}
+\end{proof}
+
 \begin{prop}
-If $N\rw_\pi M$ then there is a $P$ such that $N\rws_\perm P$ with $P^+=M$.
+Let $N$ a label-closed term. If $N\rw_\pi M$ then there is a $P$ such that $N\rws_\perm P$ with $P^+=M$.
 \end{prop}
 
+%\begin{proof}
+%	By induction on the definition of $N \rw_\pi M$. Cases:
+%	\begin{itemize}
+%		\item \emph{Step at the root}, \ie\ $N = \trm{!a.N'} \rw_\pi \proj{a}{0}{N'} + \proj{a}{1}{N'}$.
+%		
+%		\item \emph{Abstraction}, \ie\ $N = \lambda x. N' \rw_\pi \lambda x. M' = M$ with $N' \rw_\pi M'$.
+%		Let $P = M$: thus, $N  \rws_\perm = P$ (since $\rws_\perm$ is reflexive) with $P^+ =  (\lambda x.P')^+ = \lambda x. P' $.
+%		
+%		\item \emph{Application}, \ie\ $N = N'Q \rw_\pi M'Q = M$ with $N' \rw_\pi M'$.
+%		By \ih, there is $P'$ such that $N' \rws_\perm P'$ and $P'^+ = M'$. 
+%		\qed
+%	\end{itemize}
+%\end{proof}
+\begin{proof}
+	Since $N\rw_\pi M$, then $N = H[\trm{!a.N'}]$ and $M = H[\proj a0{N'}] + H[\proj a1{N'}]$.
+	We prove the proposition by induction on $N'$. Cases:
+	\begin{itemize}
+		\item \emph{Superposition}, \ie\ $N = H[\trm{!a.N_0 +b N_1}] \rw_\pi H[\proj{a}{0}{N_0 +b N_1}] + H[\proj{a}{1}{N_0 +b N_1}] \allowbreak= M$.
+		Since $N$ is label-closed and the head context cannot close $\trm{+b}$, then $b = a$.
+		Therefore, $M = H[\proj{a}{0}{N_0}] + H[\proj{a}{1}{N_1}]$.
+		Let $P = \trm{!a}. H[\proj{a}{0}{N_0}] \trm{+a} \allowbreak H[\proj{a}{1}{N_1}]$.
+		According to \Cref{rmrk:proj}, $N = H[\trm{!a.N_0 +a N_1}] \rws_\perm P 
+			%\trm{!a}. H[\proj{a}{0}{N_0}] \trm{+a} H[\proj{a}{1}{N_1}]
+		$ where $P^+ = \allowbreak (\trm{!a}. H[\proj{a}{0}{N_0}] \trm{+a} H[\proj{a}{1}{N_1}])^+ = (H[\proj{a}{0}{N_0}])^+ + (H[\proj{a}{1}{N_1}])^+ = \allowbreak H[\proj{a}{0}{N_0}] \allowbreak+ H[\proj{a}{1}{N_1}] = M$ (the last identity holds by \Cref{lem:plus-projection}.\ref{lem:plus-projection-head}).
+		
+		\item \emph{Variable}, \ie\ $N = H[\trm{!a}. x] \rw_\pi H[\proj{a}{0}{x}] + H[\proj{a}{1}{x}] =\allowbreak H[x] + H[x] = H[x] = M$.
+%		$\proj{a}{0}{N''} + \proj{a}{1}{N''} = M$ with $N' \rw_\pi M'$.
+		Let $P = \trm{!a}. H[x]$: thus, $N  \rws_\perm P$ with $P^+ =  \trm{!a}.H[x] \neq H[x] = M$.
+		
+		\item \emph{Abstraction}, \ie\ $N = H[\trm{!a}.\lambda x. Q] \rw_\pi H[\proj{a}{0}{\lambda x.Q}] + H[\proj{a}{1}{\lambda x.Q}] =\allowbreak H[\lambda x.\proj{a}{0}{Q}] + H[\lambda x.\proj{a}{1}{Q}] = M$.
+		%		$\proj{a}{0}{N''} + \proj{a}{1}{N''} = M$ with $N' \rw_\pi M'$.
+		Let $P = \trm{!a}. H[\lambda x.\proj{a}{0}{Q}] \trm{+a} H[\lambda x.\proj{a}{1}{Q}]$: thus, $N  \rws_\perm P$ with $P^+ =  H[\lambda x.\proj{a}{0}{Q}]^+ + H[\lambda x.\proj{a}{1}{Q}]^+ = H[\lambda x.\proj{a}{0}{Q}] + H[\lambda x.\proj{a}{1}{Q}] = M$.
+		
+		\item \emph{Application}, \ie\ $N = N'Q \rw_\pi M'Q = M$ with $N' \rw_\pi M'$.
+		By \ih, there is $P'$ such that $N' \rws_\perm P'$ and $P'^+ = M'$. 
+		\qedhere
+	\end{itemize}
+\end{proof}
+
 \hrule
+
 
 
 \subsection{Call-by-value translation}
