@@ -1459,14 +1459,21 @@ terms. This is based on Figure~\ref{fig:order}.
 %
 It is easy to realize that, of course modulo label $\alpha$-equivalence, for
 every term $M$ there is at least one $\theta$ such that $\labjudg{\theta}{M}$.
-Similarly, reduction as defined by $\rw$ can be made parametric on a sequence
+An easy fact to check is that if $\labjudg{\theta}{M}$ and $M\rw^\theta N$, then $\labjudg{\theta}{N}$.
+It thus makes sense to make $\rw$ parametric on a sequence
 of labels $\theta$, i.e., one can define a family of reduction
-relations $\rw^\theta$. An easy fact to check is that if
-$\labjudg{\theta}{M}$ and $M\rw^\theta N$, then $\labjudg{\theta}{N}$.
-It thus makes sense to define $\mathit{SN}^\theta$ and $\mathit{sn}^\theta(M)$
-simply as the set of strongly normalizing $\theta$-terms modulo $\rw^\theta$,
-and the maximum number of $\theta$-steps to normal form of a given
-$\theta$-term $M$.
+relations $\rw^\theta$ on pairs in the form $(M,\theta)$.
+Similarly, one can define:
+\begin{itemize}
+\item
+  The set $\mathit{SN}^\theta$ of those terms $M$ such
+  that $\labjudg{\theta}{M}$ and $(M,\theta)$ is strongly
+  normalizing modullo $\rw^\theta$;
+\item
+  The function $\mathit{sn}^\theta$ assigning to any
+  term in $\mathit{SN}^\theta$ the maximal number of steps
+  to normal form.
+\end{itemize}
 
 Now, let us define types, environments, judgments, and typing rules in
 Figure~\ref{fig:typing}.
@@ -1499,24 +1506,23 @@ Figure~\ref{fig:typing}.
   \caption{Types, Environments, Judgments, and Rules}
   \label{fig:typing}
 \end{figure}
-The type structure being precisely the usual one (although terms are of course
-different), we can reuse most of the usual proof of strong normalization, for
-example in the version given by Ralph Loader's notes, page 17. In the following, we only
-report the elements which make our proof different.
+Please notice that the type structure is precisely the one of the
+usual, vanilla, simply-typed $\lambda$-calculus (although terms are of
+course different),
+%we can reuse most of the usual proof of strong normalization, for
+%example in the version given by Ralph Loader's notes, page 17. In the following, we only
+%report the elements which make our proof different.
 
 \begin{lem}
 \label{lemma:cloredsum}
-  The set SN is closed under the following rule:
+  Each set $SN^\theta$ is closed under the following rule:
   $$
   \infer{\trm{M +a N}L_1\ldots L_m}{ML_1\ldots L_m & NL_1\ldots L_m}
   $$
+  provided $a\in\theta$.
 \end{lem}
 \begin{proof}
-  Let $\theta$ be such that
-  $$
-  \labjudg{\theta}{\trm{M +a N}L_1\ldots L_m}
-  $$
-  and let $h(a,\theta)$ be the height of $a$ in the sequence $\theta$.
+  Let $h(a,\theta)$ be the height of $a$ in the sequence $\theta$.
   The proof goes by lexicographic induction on the following quadruple:
   \begin{equation}\label{equ:redord}
   (m,h(a,\theta),\sum_{i=1}^m\mathit{sn}(L_i)+\mathit{sn}(M)+\mathit{sn}(N),|M|+|N|)
@@ -1567,11 +1573,12 @@ report the elements which make our proof different.
   \end{itemize}
 \end{proof}
 
-\begin{lem}
-  The set SN is closed under the following rule:
+\begin{lem}\label{lemma:cloredbox}
+  The set $\mathit{SN}^\theta$ is closed under the following rule:
   $$
   \infer{\trm{(!a.M)}L_1\ldots L_m}{\trm{M}L_1\ldots L_m}
   $$
+  whenever $a\not\in L_i$ for every $1\leq i\leq m$.
 \end{lem}
 \begin{proof}
   The proof is structurally very similar to the one of
@@ -1596,7 +1603,7 @@ report the elements which make our proof different.
 \end{proof}
 
 \begin{lem}
-  The set SN is closed under the following rule:
+  The set $SN^\theta$ is closed under the following rule:
   $$
   \infer{\trm{(\x.M)}L_0\ldots L_m}{\trm{M[L_0/x]}L_1\ldots L_m & L_0}
   $$
@@ -1606,9 +1613,9 @@ report the elements which make our proof different.
   of Lemma~\ref{lemma:cloredsum}. The underlying order,
   needs to be slightly adapted, and is the lexicographic
   order on
-  $$
+  \begin{equation}\label{equ:redordbet}
   (\mathit{sn}(\trm{M[L_0/x]}L_1\ldots L_m)+\mathit{sn}(L_0),|M|)
-  $$
+  \end{equation}
   As usual, we proceed by showing that all terms to which
   $\trm{(\x.M)}L_0\ldots L_m$ reduces are strongly normalizing:
   \begin{itemize}
@@ -1616,36 +1623,136 @@ report the elements which make our proof different.
     If reduction happens in $L_0$, then we can mimick
     the same reduction in by zero or more reduction
     steps in $\trm{M[L_0/x]}L_1\ldots L_m$, and conclude
-    by induction hypothesis.
+    by induction hypothesis, because the first component
+    of \ref{equ:redordbet} strictly decreases.
   \item
     If reduction happens in $M$ or in $L_1,\ldots,L_m$,
     then we can mimick the same reduction in one or more
     reduction in $\trm{M[L_0/x]}L_1\ldots L_m$, and conclude
-    by induction hypothesis.
+    by induction hypothesis since, again, the first component
+    of \ref{equ:redortbet} strictly decreases.
   \item
-    If the reduction step we perform is 
+    If the reduction step we perform reduces
+    $\trm{(\x.M)}L_0$, then the thesis follows from the
+    hypothesis about $\trm{M[L_0/x]}L_1\ldots L_m$.
+  \item
+    If $M$ is in the form $\trm{P +a Q}$ and
+    the reduction step we perform reduces
+    $\trm{(\x.M)}L_0\ldots L_m$
+    to $\trm{((\x.P)+a(\x.Q))}L_0\ldots L_m$,
+    we proceed by observing that
+    $\trm{(\x.P)}L_0\ldots L_m$
+    and $\trm{(\x.Q)}L_0\ldots L_m$ are
+    both in $\mathit{SN}^\theta$ and we
+    can apply the induction hypothesis to them,
+    because the first component of \ref{equ:redortbet}
+    stays the same, but the second one strictly decreases.
+    We can then obtain that
+    $\trm{P[x/L_0])}L_1\ldots L_m$
+    and $\trm{Q[x/L_0]}L_1\ldots L_m$ are both
+    in $\mathit{SN}^\theta$, and from Lemma~\ref{lemma:cloredsum}
+    we get the thesis.
+  \item
+    If $M$ is in the form $\trm{!a.P}$ and
+    the reduction step we perform reduces
+    $\trm{(\x.M)}L_0\ldots L_m$ to
+    $\trm{!a.(\x.P)}L_0\ldots L_m$. We can
+    first of all that we can assume that
+    $a\not\in L_i$ for every $0\leq i\leq m$.
+    We proceed by observing that
+    $\trm{(\x.P)}L_0\ldots L_m$ is in $\mathit{SN}^\theta$
+    and we can apply the induction hypothesis to it, because
+    the first component of \ref{equ:redortbet}
+    stays the same, but the second one strictly decreases.
+    We can then obtain that
+    $\trm{P[x/L_0])}L_1\ldots L_m$
+    is in $\mathit{SN}^\theta$, and from Lemma~\ref{lemma:cloredbox}
+    we get the thesis.
   \end{itemize}
 \end{proof}
-
+\newcommand{\RedSet}[2]{\mathit{Red}^{#1}_{#2}}
 The definition of a reducible term stays the same:
-
-Lemma 3.5 must be complemented with two new clauses, as follows:
-\newcommand{\RedSet}[1]{\mathit{Red}_{#1}}
-\begin{lem}
-  \begin{itemize}
+\begin{align*}
+  \RedSet{\theta}{\alpha}&=\{(\Gamma,M)\mid M\in\mathit{SN}^\theta\wedge\judg{\Gamma}{M}{\alpha}\};\\
+  \RedSet{\theta}{\tau\arrow\rho}&=\{(\Gamma,M)\mid(\judg{\Gamma}{M}{\tau\arrow\rho})\wedge \forall(\Gamma,\Delta,N)\in\RedSet{\theta}{A}.(\Gamma,\Delta,MN)\in\RedSet{\theta}{\rho}\}.
+\end{align*}
+\begin{lem}\label{lemma:redprop}
+  \begin{enumerate}
   \item
-    If $(\Gamma,ML_1\ldots L_m)\in\RedSet{\tau}$
-    and $(\Gamma,NL_1\ldots L_m)\in\RedSet{\tau}$,
-    then $(\Gamma,\trm{(M +a N)}L_1\ldots L_m)\in\RedSet{\tau}$.
+    If $(\Gamma,M)\in\RedSet{\theta}{\tau}$, then $M\in\mathit{SN}^\theta$;
   \item
-    If $(\Gamma,ML_1\ldots L_m)\in\RedSet{\tau}$,
-    then $(\Gamma,\trm{(!a.M)}L_1\ldots L_m)\in\RedSet{\tau}$.
-  \end{itemize}
+    If $\judg{\Gamma}{x L_1\ldots L_m}{\tau}$ and $L_1,\ldots,L_m\in\mathit{SN}^\theta$,
+    then $(\Gamma,x L_1\ldots L_m)\in\RedSet{\theta}{\tau}$.
+  \item
+    If $(\Gamma,\trm{M[L_0/x]}L_1\ldots L_m)\in\RedSet{\theta}{\tau}$,
+    $\judg{\Gamma}{L_0}{\rho}$ and $L_0\in\mathit{SN}^\theta$
+    then $(\Gamma,\trm{(\x.M)}L_0\ldots L_m)\in\RedSet{\theta}{\tau}$.
+  \item
+    If $(\Gamma,ML_1\ldots L_m)\in\RedSet{\theta}{\tau}$
+    and $(\Gamma,NL_1\ldots L_m)\in\RedSet{\theta}{\tau}$,
+    then $(\Gamma,\trm{(M +a N)}L_1\ldots L_m)\in\RedSet{\theta}{\tau}$.
+  \item
+    If $(\Gamma,ML_1\ldots L_m)\in\RedSet{\theta}{\tau}$,
+    then $(\Gamma,\trm{(!a.M)}L_1\ldots L_m)\in\RedSet{\theta}{\tau}$.
+  \end{enumerate}
 \end{lem}
 \begin{proof}
-  The proofs are just very simple inductions on $\tau$.
+  The proof is an induction on $\tau$.
 \end{proof}
 
+The following is the so-called Main Lemma:
+\begin{proposition}
+  Suppose $\judg{y_1:\tau_1,\ldots,y_n:\tau_n}{M}{\rho}$,
+  $\labjudg{\theta}{M}$, and let
+  $(\Gamma,N_j)\in\RedSet{\theta}{\tau_j}$ for every $1\leq j\leq
+  n$. Then
+  $(\Gamma,M[N_1/y_1,\ldots,N_n/y_n])\in\RedSet{\theta}{\rho}$.
+\end{proposition}
+\begin{proof}
+  This is an induction on the structure of the term $M$:
+  \begin{itemize}
+  \item
+    If $M$ is a variable, necessarily one among $y_1,\ldots,y_n$,
+    then the result is trivial.
+  \item
+    If $M$ is an application $LP$, then there exist
+    a type $\xi$ such that
+    $\judg{y_1:\tau_1,\ldots,y_n:\tau_n}{L}{\xi\arrow\rho}$
+    and $\judg{y_1:\tau_1,\ldots,y_n:\tau_n}{P}{\xi}$. Moreover,
+    $\labjudg{\theta}{L}$ and $\labjudg{\theta}{P}$ we can
+    then safely apply the induction hypothesis and conclude
+    that
+    $$
+    (\Gamma,\trm{L[\overline{N}/\overline{y}]})\in\RedSet{\theta}{\xi\arrow\rho}
+    \qquad
+    (\Gamma,\trm{P[\overline{N}/\overline{y}]})\in\RedSet{\theta}{\xi}
+    $$
+    By definition, we get
+    $$
+    (\Gamma,\trm{(LP)[\overline{N}/\overline{y}]})\in\RedSet{\theta}{\rho}
+    $$
+  \item
+    If $M$ is an abstraction $\trm{\x.L}$, then $\rho$
+    is an arrow type $\xi\arrow\mu$ and
+    $\judg{y_1:\tau_1,\ldots,y_n:\tau_n,x:\xi}{L}{\mu}$.
+    Now, consider any $(\Gamma\Delta,P)\in\RedSet{\theta}{\xi}$.
+    Our objective is to prove with this hypothesis
+    that $(\Gamma\Delta,\trm{(\x.L[\overline{N}/\overline{y}])}P)\in\RedSet{\theta}{\mu}$
+    By induction hypothesis, since $(\Gamma\Delta,N_i)\in\RedSet{\theta}{\tau_i}$,
+    we get that $(\Gamma\Delta,\trm{L[\overline{N}/\overline{y},P/x]})\in\RedSet{\theta}{\mu}$.
+    The thesis follows from Lemma~\ref{lemma:redprop}
+  \item
+    If $M$ is a sum $\trm{L+a P}$, we can make use of Lemma~\ref{lemma:redprop}
+    and the induction hypothesis, and conclude.
+  \item
+    If $M$ is a sum $\trm{!a.P}$, again, we can make use of Lemma~\ref{lemma:redprop}
+    and the induction hypothesis, and conclude.
+  \end{itemize}
+\end{proof}
+
+\begin{theorem}
+  If $\judg{\Gamma}{M}{\tau}$ and $\labjudg{\theta}{M}$, then $M\in\mathit{SN}^\theta$.
+\end{theorem}
 
 \hrule
 
