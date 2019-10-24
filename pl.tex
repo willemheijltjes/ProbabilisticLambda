@@ -1873,7 +1873,7 @@ Let $N$ a label-closed term. If $N\rw_\pi M$ then there is a $P$ such that $N\rw
 	We prove the proposition by induction on $N'$. Cases:
 	\begin{itemize}
 		\item \emph{Superposition}, \ie\ $N = H[\trm{!a.N_0 +b N_1}] \rw_\pi H[\proj{a}{0}{N_0 +b N_1}] + H[\proj{a}{1}{N_0 +b N_1}] \allowbreak= M$.
-		Since $N$ is label-closed and the head context cannot close $\trm{+b}$, then $b = a$.
+		Since $N$ is label-closed and the head context $H$ cannot close $\trm{+b}$, then $b = a$.
 		Therefore, $M = H[\proj{a}{0}{N_0}] + H[\proj{a}{1}{N_1}]$.
 		Let $P = \trm{!a}. H[\proj{a}{0}{N_0}] \trm{+a} \allowbreak H[\proj{a}{1}{N_1}]$.
 		According to \Cref{rmrk:proj}, $N = H[\trm{!a.N_0 +a N_1}] \rws_\perm P 
@@ -1934,6 +1934,79 @@ The \emph{call-by-value interpretation} of a probabilistic lambda-term $N$ is
 \end{defn}
 
 {\color{red}NOTE: Please check thoroughly that I haven't messed up the order of labels in the notion of ``label closure''.}
+
+\begin{defn}
+	A \emph{weak context} $W[\,]$ is given by the following grammar.
+	\[
+	W[\,] \coloneqq [\,] ~\mid~ NW[\,] ~\mid~ W[\,]N
+	\]
+\end{defn}
+
+\begin{defn}
+	\emph{Projective call-by-value} reduction $\rw_\pi$ is the following reduction step.
+	\[
+	W[\,\trm{!a.N}] ~\rw_{\pi_\cbv}~ W[\proj a0N] + W[\proj a1N]
+	\]
+\end{defn}
+
+\begin{rmrk}
+	\label{rmrk:proj-cbv}
+	Let $N, M$ be terms with $\fl{N} \cup \fl{M} \subseteq \{a\}$.
+	If $W$ is a weak context then $W[\trm{!a. N +a M}] \rws_\perm \trm{!a}. W[\proj{a}{0}{N}] \trm{+a} W[\proj{a}{1}{M}]$.
+	The proof is a straightforward induction on $W$ (the base case is the same as in \Cref{rmrk:proj}).
+\end{rmrk}
+
+\begin{prop}
+	Let $N$ a label-closed term. If $N\rw_{\pi_\cbv} M$ then there is a $P$ such that $N\rws_\perm P$ with $\uncbv{P}^+ = M$.
+\end{prop}
+
+%\begin{proof}
+%	By induction on the definition of $N \rw_\pi M$. Cases:
+%	\begin{itemize}
+%		\item \emph{Step at the root}, \ie\ $N = \trm{!a.N'} \rw_\pi \proj{a}{0}{N'} + \proj{a}{1}{N'}$.
+%		
+%		\item \emph{Abstraction}, \ie\ $N = \lambda x. N' \rw_\pi \lambda x. M' = M$ with $N' \rw_\pi M'$.
+%		Let $P = M$: thus, $N  \rws_\perm = P$ (since $\rws_\perm$ is reflexive) with $P^+ =  (\lambda x.P')^+ = \lambda x. P' $.
+%		
+%		\item \emph{Application}, \ie\ $N = N'Q \rw_\pi M'Q = M$ with $N' \rw_\pi M'$.
+%		By \ih, there is $P'$ such that $N' \rws_\perm P'$ and $P'^+ = M'$. 
+%		\qed
+%	\end{itemize}
+%\end{proof}
+\begin{proof}
+	Since $N\rw_\pi M$, then $N = W[\trm{!a.N'}]$ and $M = W[\proj a0{N'}] + W[\proj a1{N'}]$.
+	We prove the proposition by induction on $N'$. Cases:
+	\begin{itemize}
+		\item \emph{Superposition}, \ie\ $N = W[\trm{!a.N_0 +b N_1}] \rw_{\pi_\cbv} W[\proj{a}{0}{N_0 +b N_1}] + W[\proj{a}{1}{N_0 +b N_1}] \allowbreak= M$.
+		Since $N$ is label-closed and the weak context $W$ cannot close $\trm{+b}$, then $b = a$.
+		Therefore, $M = W[\proj{a}{0}{N_0}] + W[\proj{a}{1}{N_1}]$.
+		Let $P = \trm{!a}. W[\proj{a}{0}{N_0}] \trm{+a} \allowbreak W[\proj{a}{1}{N_1}]$.
+		According to \Cref{rmrk:proj-cbv}, $N = W[\trm{!a.N_0 +a N_1}] \rws_\perm P $ where $\uncbv{P}^+ = \allowbreak \uncbv{\trm{!a}. W[\proj{a}{0}{N_0}] \trm{+a} W[\proj{a}{1}{N_1}]}^+ = \uncbv{W[\proj{a}{0}{N_0}]} + \uncbv{W[\proj{a}{1}{N_1}]} = \allowbreak W[\proj{a}{0}{N_0}] \allowbreak+ W[\proj{a}{1}{N_1}] = M$ (the last identity holds by \Cref{lem:plus-projection}.\ref{lem:plus-projection-head}).
+		
+		\item \emph{Variable}, \ie\ $N = W[\trm{!a}. x] \rw_\pi W[\proj{a}{0}{x}] + W[\proj{a}{1}{x}] =\allowbreak W[x] + W[x] = W[x] = M$.
+		Let $P = M$: thus, $N  \rws_\perm P$ with $\uncbv{P} = \uncbv{W[x]} = \lfloor\unopen{W[x]}\rfloor = \lfloor \labjudg{}{W[x]} \rfloor = W[x] = M$.
+		
+		\item \emph{Abstraction}, \ie\ $N = W[\trm{!a}.\lambda x. Q] \rw_\pi W[\proj{a}{0}{\lambda x.Q}] + W[\proj{a}{1}{\lambda x.Q}] =\allowbreak W[\lambda x.\proj{a}{0}{Q}] + W[\lambda x.\proj{a}{1}{Q}] = M$.
+		%		$\proj{a}{0}{N''} + \proj{a}{1}{N''} = M$ with $N' \rw_\pi M'$.
+		There are two sub-cases:
+		\begin{itemize}
+			\item $a \in \fl{Q}$, and then let $P = \trm{!a}. H[\lambda x.\proj{a}{0}{Q}] \trm{+a} H[\lambda x.\proj{a}{1}{Q}]$: 
+			as $H[\trm{!a}.Q] \allowbreak\rw_\pi H[\proj{a}{0}{Q}] + H[\proj{a}{1}{Q}]$, we have $H[\trm{!a}.Q] \rws_\perm \trm{!a}.H[\proj{a}{0}{Q}] \trm{+a} H[\proj{a}{1}{Q}]$ by \ih,
+			thus $N = H[\trm{!a}.\lambda x.Q] \rws_\perm \trm{!a}.H[\proj{a}{0}{\lambda x.Q}] \trm{+a} H[\proj{a}{1}{\lambda x.Q}] = \trm{!a}. H[\lambda x.\proj{a}{0}{Q}] \trm{+a} H[\lambda x.\proj{a}{1}{Q}] = P$ with $P^+ =  H[\lambda x.\proj{a}{0}{Q}]^+ +\allowbreak H[\lambda x.\proj{a}{1}{Q}]^+ \allowbreak= H[\lambda x.\proj{a}{0}{Q}] + H[\lambda x.\proj{a}{1}{Q}] \allowbreak= M$.
+			
+			\item $a \notin \fl{Q}$, and then let $P = H[\lambda x.Q]$: 
+			we have $N = H[\trm{!a}.\lambda x. Q] \rw_\perm P$ and $P^+ = H[\lambda x.Q] = H[\lambda x.Q] + H[\lambda x.Q] = H[\lambda x.\proj{a}{0}{Q}] + H[\lambda x.\proj{a}{1}{Q}] \allowbreak= M$ since $\proj{a}{i}{Q} = Q$ because $a \notin \fl{Q}$.
+		\end{itemize}
+		
+		\item \emph{Application}, \ie\ $N = H[\trm{!a}.QQ'] \rw_\pi H[\proj{a}{0}{QQ'}] + H[\proj{a}{1}{QQ'}] = H[\proj{a}{0}{Q}\proj{a}{0}{Q'}] + H[\proj{a}{1}{Q}\proj{a}{1}{Q'}] = M$.
+		Analogous to the abstraction case.
+		%		Let $P = \trm{!a}. H[\proj{a}{0}{Q}\proj{a}{1}{Q'}] \trm{+a} H[\proj{a}{1}{Q}\proj{a}{1}{Q'}]$: thus, $N  \rws_\perm P$ with $P^+ =  H[\lambda x.\proj{a}{0}{Q}]^+ + H[\lambda x.\proj{a}{1}{Q}]^+ = H[\lambda x.\proj{a}{0}{Q}] + H[\lambda x.\proj{a}{1}{Q}] = M$.
+		
+		\item \emph{Box}, \ie\ $N = H[\trm{!a}.\trm{!b}.Q] \rw_\pi H[\proj{a}{0}{!b.Q}] + H[\proj{a}{1}{!b.Q}] = H[\trm{!b.}\proj{a}{0}{Q}] + H[\trm{!b.}\proj{a}{1}{Q}] = M$ where $a \neq b$ (without loss of generality).
+		Analogous to the abstraction case.
+		\qedhere
+	\end{itemize}
+\end{proof}
 
 
 \bibliographystyle{plain}
