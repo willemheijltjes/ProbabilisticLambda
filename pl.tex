@@ -191,6 +191,8 @@
 
 \newcommand\SN{\textsf{SN}}
 
+\newcommand\proj[3]{\pi^{#1}_{#2}(\trm{#3})}
+
 % strategies
 \newcommand\cbn{\mathsf{cbn}}
 \newcommand\cbv{\mathsf{cbv}}
@@ -312,7 +314,7 @@ The resulting \emph{probabilistic event lambda-calculus} $\PEL$, which we presen
 \end{array}
 \]
 
-In this paper, we introduce $\PEL$ and its reduction mechanisms (Section~\ref{...}); we prove confluence (Section~\ref{...}); we give a system of simple types and prove strong normalization for typed terms (Section~\ref{...}); and we demonstrate the two translations to interpret call-by-name and call-by-value evaluation (Section~\ref{...}).
+In this paper, we introduce $\PEL$ and its reduction mechanisms (Sections~\ref{sec:PEL},~\ref{sec:p-reduction},~\ref{sec:projective-reduction}); we prove confluence (Section~\ref{sec:confluence}); we give a system of simple types and prove strong normalization for typed terms (Section~\ref{sec:SN}); and we demonstrate the two translations to interpret call-by-name and call-by-value evaluation (Section~\ref{sec:cbv}).
 
 
 \subsection{Related work}
@@ -327,8 +329,11 @@ In all the aforementioned works, probabilistic $\lambda$-calculi have been taken
 
 Our permutative reduction implements the equational theory of \emph{(ordered) binary decision trees} via rewriting~\cite{Zantema-Pol-2001}. Probabilistic decision trees have been proposed with a primitive binary probabilistic operator~\cite{Manber-Tompa-1982}, but not a decomposition as we explore here.
 
-\section{\texorpdfstring{The probabilistic event $\lambda$-calculus $\PEL$}{The probabilistic event lambda-claculus PEL}}
 
+%============================================================ PEL
+
+\section{\texorpdfstring{The probabilistic event $\lambda$-calculus $\PEL$}{The probabilistic event lambda-claculus PEL}}
+\label{sec:PEL}
 
 \begin{defn}
 The \emph{probabilistic event $\lambda$-calculus} ($\PEL$) is given by the following grammar, with from left to right: a \emph{variable}, an \emph{abstraction}, an \emph{application}, a \emph{(labelled) choice}, and a \emph{(probabilistic) generator}.
@@ -460,9 +465,10 @@ The normal forms $P_0$ of $\rw_\perm$, respectively $N_0$ of $\rw$, are given by
 \label{fig:example reduction}
 \end{figure}
 
-%=====================================================================================
+%============================================================ P-REDUCTION
 
 \section{Properties of permutative reduction}
+\label{sec:p-reduction}
 
 We will prove strong normalization (\SN) and confluence of $\rw_\perm$. For strong normalization, the obstacle is the interaction between different choice operators, which may duplicate each other, and even themselves, creating super-exponential growth.\footnote{This was inferred from only a simple simulation; we would be interested to know a rigorous complexity result.} Fortunately, Dershowitz's \emph{recursive path orders}~\cite{Dershowitz82} seem tailor-made for our situation.
 
@@ -922,9 +928,10 @@ We prove local confluence; by Newman's lemma and strong normalization of $\rw_\p
 We denote the unique $\perm$-normal form of a term $N$ by $N^\perm$.
 \end{defn}
 
-%=====================================================================================
+%============================================================ CONFLUENCE
 
 \section{Confluence}
+\label{sec:confluence}
 
 We aim to prove that $\rw \,=\, \rw_\beta \cup \rw_\perm$ is confluent. We will use the standard technique of \emph{parallel} $\beta$-reduction, a simultaneous reduction step on an arbitrary number of $\beta$-redexes in the source term, which we define via a labelling of the redexes to be reduced. The central point is to find a notion of reduction that is \emph{diamond}, \ie\ every critical pair can be closed in one (or zero) steps. This will be our \emph{complete} reduction, which consists of parallel $\beta$-reduction followed by $\perm$-reduction to normal form.
 %
@@ -1398,6 +1405,7 @@ By the following diagram. For the top and left areas, by Lemma~\ref{lem:p to com
 %=====================================================================================
 
 \section{Strong normalization for typed terms}
+\label{sec:SN}
 
 In this section, we prove that the relation $\rw$ enjoys strong
 normalization in simply typed terms. Our proof of strong
@@ -1789,7 +1797,7 @@ The following is the so-called Main Lemma:
 \end{proof}
 \hrule
 
-\newcommand\proj[3]{\pi^{#1}_{#2}(\trm{#3})}
+%============================================================ PROJECTIVE
 
 \section{Projective reduction}
 \label{sec:projective reduction}
@@ -1870,37 +1878,34 @@ Given that $a$ is the smallest label in $N$, \ie\ $a<b$ for any other label $b$ 
 %	\trm{(N\+M)}^+=N^+\!+M^+ \qquad\qquad N^+=N \quad(N\neq \trm{M\+P})
 %\]
 %
-
-
-
-
-\begin{rmrk}
-	\label{rmrk:proj}
-	Let $N, M$ be terms with $\fl{N} \cup \fl{M} \subseteq \{a\}$. 
-	Then $\trm{!a. N +a M} \rws_\perm \trm{!a}. \proj{a}{0}{N} \trm{+a} \proj{a}{1}{M} $, where the number of $\rw_\perm$-steps is the number of free occurrences of the label $a$ in $N$ and $M$ not in the scope of some box.
-	More in general, under the same hypothesis, if $H$ is a head context then $H[\trm{!a. N +a M}] \rws_\perm \trm{!a}. H[\proj{a}{0}{N}] \trm{+a} H[\proj{a}{1}{M}]$.
-	The proof is a straightforward induction on $H$.
-\end{rmrk}
-
-\begin{lem}\label{lem:plus-projection}
-	Let $N$ be a term such that $\fl{N} \subseteq \{a\}$.
-	\begin{enumerate}
-		\item\label{lem:plus-projection-base} 	Then, $\proj{a}{i}{N}^+ = \proj{a}{i}{N}$ for all $i \in \{0,1\}$.
-		\item\label{lem:plus-projection-head} If $H$ is a head context, then $H[\proj{a}{i}{N}]^+ = H[\proj{a}{i}{N}]$.
-	\end{enumerate}
-\end{lem}
-
-\begin{proof}
-	\begin{enumerate}
-		\item By straightforward induction on $N$.
-		\item By straightforward induction on $H$, the base case is \Cref{lem:plus-projection-base}.
-		\qedhere 
-	\end{enumerate}
-\end{proof}
-
-\begin{prop}
-Let $N$ a label-closed term. If $N\rw_\pi M$ then there is a $P$ such that $N\rws_\perm P$ with $P^+=M$.
-\end{prop}
+%
+%\begin{rmrk}
+%	\label{rmrk:proj}
+%	Let $N, M$ be terms with $\fl{N} \cup \fl{M} \subseteq \{a\}$. 
+%	Then $\trm{!a. N +a M} \rws_\perm \trm{!a}. \proj{a}{0}{N} \trm{+a} \proj{a}{1}{M} $, where the number of $\rw_\perm$-steps is the number of free occurrences of the label $a$ in $N$ and $M$ not in the scope of some box.
+%	More in general, under the same hypothesis, if $H$ is a head context then $H[\trm{!a. N +a M}] \rws_\perm \trm{!a}. H[\proj{a}{0}{N}] \trm{+a} H[\proj{a}{1}{M}]$.
+%	The proof is a straightforward induction on $H$.
+%\end{rmrk}
+%
+%\begin{lem}\label{lem:plus-projection}
+%	Let $N$ be a term such that $\fl{N} \subseteq \{a\}$.
+%	\begin{enumerate}
+%		\item\label{lem:plus-projection-base} 	Then, $\proj{a}{i}{N}^+ = \proj{a}{i}{N}$ for all $i \in \{0,1\}$.
+%		\item\label{lem:plus-projection-head} If $H$ is a head context, then $H[\proj{a}{i}{N}]^+ = H[\proj{a}{i}{N}]$.
+%	\end{enumerate}
+%\end{lem}
+%
+%\begin{proof}
+%	\begin{enumerate}
+%		\item By straightforward induction on $N$.
+%		\item By straightforward induction on $H$, the base case is \Cref{lem:plus-projection-base}.
+%		\qedhere 
+%	\end{enumerate}
+%\end{proof}
+%
+%\begin{prop}
+%Let $N$ a label-closed term. If $N\rw_\pi M$ then there is a $P$ such that $N\rws_\perm P$ with $P^+=M$.
+%\end{prop}
 
 %\begin{proof}
 %	By induction on the definition of $N \rw_\pi M$. Cases:
@@ -1915,49 +1920,50 @@ Let $N$ a label-closed term. If $N\rw_\pi M$ then there is a $P$ such that $N\rw
 %		\qed
 %	\end{itemize}
 %\end{proof}
-\begin{proof}
-	Since $N\rw_\pi M$, then $N = H[\trm{!a.N'}]$ and $M = H[\proj a0{N'}] + H[\proj a1{N'}]$.
-	We prove the proposition by induction on $N'$. Cases:
-	\begin{itemize}
-		\item \emph{Superposition}, \ie\ $N = H[\trm{!a.N_0 +b N_1}] \rw_\pi H[\proj{a}{0}{N_0 +b N_1}] + H[\proj{a}{1}{N_0 +b N_1}] \allowbreak= M$.
-		Since $N$ is label-closed and the head context $H$ cannot close $\trm{+b}$, then $b = a$.
-		Therefore, $M = H[\proj{a}{0}{N_0}] + H[\proj{a}{1}{N_1}]$.
-		Let $P = \trm{!a}. H[\proj{a}{0}{N_0}] \trm{+a} \allowbreak H[\proj{a}{1}{N_1}]$.
-		According to \Cref{rmrk:proj}, $N = H[\trm{!a.N_0 +a N_1}] \rws_\perm P 
-			%\trm{!a}. H[\proj{a}{0}{N_0}] \trm{+a} H[\proj{a}{1}{N_1}]
-		$ where $P^+ = \allowbreak (\trm{!a}. H[\proj{a}{0}{N_0}] \trm{+a} H[\proj{a}{1}{N_1}])^+ = (H[\proj{a}{0}{N_0}])^+ + (H[\proj{a}{1}{N_1}])^+ = \allowbreak H[\proj{a}{0}{N_0}] \allowbreak+ H[\proj{a}{1}{N_1}] = M$ (the last identity holds by \Cref{lem:plus-projection}.\ref{lem:plus-projection-head}).
-		
-		\item \emph{Variable}, \ie\ $N = H[\trm{!a}. x] \rw_\pi H[\proj{a}{0}{x}] + H[\proj{a}{1}{x}] =\allowbreak H[x] + H[x] = H[x] = M$.
-%		$\proj{a}{0}{N''} + \proj{a}{1}{N''} = M$ with $N' \rw_\pi M'$.
-		Let $P = M$: thus, $N  \rws_\perm P$ with $P^+ =  H[x]^+ = H[x] = M$.
-		
-		\item \emph{Abstraction}, \ie\ $N = H[\trm{!a}.\lambda x. Q] \rw_\pi H[\proj{a}{0}{\lambda x.Q}] + H[\proj{a}{1}{\lambda x.Q}] =\allowbreak H[\lambda x.\proj{a}{0}{Q}] + H[\lambda x.\proj{a}{1}{Q}] = M$.
-		%		$\proj{a}{0}{N''} + \proj{a}{1}{N''} = M$ with $N' \rw_\pi M'$.
-		There are two sub-cases:
-		\begin{itemize}
-			\item $a \in \fl{Q}$, and then let $P = \trm{!a}. H[\lambda x.\proj{a}{0}{Q}] \trm{+a} H[\lambda x.\proj{a}{1}{Q}]$: 
-			as $H[\trm{!a}.Q] \allowbreak\rw_\pi H[\proj{a}{0}{Q}] + H[\proj{a}{1}{Q}]$, we have $H[\trm{!a}.Q] \rws_\perm \trm{!a}.H[\proj{a}{0}{Q}] \trm{+a} H[\proj{a}{1}{Q}]$ by \ih,
-			thus $N = H[\trm{!a}.\lambda x.Q] \rws_\perm \trm{!a}.H[\proj{a}{0}{\lambda x.Q}] \trm{+a} H[\proj{a}{1}{\lambda x.Q}] = \trm{!a}. H[\lambda x.\proj{a}{0}{Q}] \trm{+a} H[\lambda x.\proj{a}{1}{Q}] = P$ with $P^+ =  H[\lambda x.\proj{a}{0}{Q}]^+ +\allowbreak H[\lambda x.\proj{a}{1}{Q}]^+ \allowbreak= H[\lambda x.\proj{a}{0}{Q}] + H[\lambda x.\proj{a}{1}{Q}] \allowbreak= M$.
-			
-			\item $a \notin \fl{Q}$, and then let $P = H[\lambda x.Q]$: 
-			we have $N = H[\trm{!a}.\lambda x. Q] \rw_\perm P$ and $P^+ = H[\lambda x.Q] = H[\lambda x.Q] + H[\lambda x.Q] = H[\lambda x.\proj{a}{0}{Q}] + H[\lambda x.\proj{a}{1}{Q}] \allowbreak= M$ since $\proj{a}{i}{Q} = Q$ because $a \notin \fl{Q}$.
-		\end{itemize}
-		
-		\item \emph{Application}, \ie\ $N = H[\trm{!a}.QQ'] \rw_\pi H[\proj{a}{0}{QQ'}] + H[\proj{a}{1}{QQ'}] = H[\proj{a}{0}{Q}\proj{a}{0}{Q'}] + H[\proj{a}{1}{Q}\proj{a}{1}{Q'}] = M$.
-		Analogous to the abstraction case.
-%		Let $P = \trm{!a}. H[\proj{a}{0}{Q}\proj{a}{1}{Q'}] \trm{+a} H[\proj{a}{1}{Q}\proj{a}{1}{Q'}]$: thus, $N  \rws_\perm P$ with $P^+ =  H[\lambda x.\proj{a}{0}{Q}]^+ + H[\lambda x.\proj{a}{1}{Q}]^+ = H[\lambda x.\proj{a}{0}{Q}] + H[\lambda x.\proj{a}{1}{Q}] = M$.
+%\begin{proof}
+%	Since $N\rw_\pi M$, then $N = H[\trm{!a.N'}]$ and $M = H[\proj a0{N'}] + H[\proj a1{N'}]$.
+%	We prove the proposition by induction on $N'$. Cases:
+%	\begin{itemize}
+%		\item \emph{Superposition}, \ie\ $N = H[\trm{!a.N_0 +b N_1}] \rw_\pi H[\proj{a}{0}{N_0 +b N_1}] + H[\proj{a}{1}{N_0 +b N_1}] \allowbreak= M$.
+%		Since $N$ is label-closed and the head context $H$ cannot close $\trm{+b}$, then $b = a$.
+%		Therefore, $M = H[\proj{a}{0}{N_0}] + H[\proj{a}{1}{N_1}]$.
+%		Let $P = \trm{!a}. H[\proj{a}{0}{N_0}] \trm{+a} \allowbreak H[\proj{a}{1}{N_1}]$.
+%		According to \Cref{rmrk:proj}, $N = H[\trm{!a.N_0 +a N_1}] \rws_\perm P 
+%			%\trm{!a}. H[\proj{a}{0}{N_0}] \trm{+a} H[\proj{a}{1}{N_1}]
+%		$ where $P^+ = \allowbreak (\trm{!a}. H[\proj{a}{0}{N_0}] \trm{+a} H[\proj{a}{1}{N_1}])^+ = (H[\proj{a}{0}{N_0}])^+ + (H[\proj{a}{1}{N_1}])^+ = \allowbreak H[\proj{a}{0}{N_0}] \allowbreak+ H[\proj{a}{1}{N_1}] = M$ (the last identity holds by \Cref{lem:plus-projection}.\ref{lem:plus-projection-head}).
+%		
+%		\item \emph{Variable}, \ie\ $N = H[\trm{!a}. x] \rw_\pi H[\proj{a}{0}{x}] + H[\proj{a}{1}{x}] =\allowbreak H[x] + H[x] = H[x] = M$.
+%%		$\proj{a}{0}{N''} + \proj{a}{1}{N''} = M$ with $N' \rw_\pi M'$.
+%		Let $P = M$: thus, $N  \rws_\perm P$ with $P^+ =  H[x]^+ = H[x] = M$.
+%		
+%		\item \emph{Abstraction}, \ie\ $N = H[\trm{!a}.\lambda x. Q] \rw_\pi H[\proj{a}{0}{\lambda x.Q}] + H[\proj{a}{1}{\lambda x.Q}] =\allowbreak H[\lambda x.\proj{a}{0}{Q}] + H[\lambda x.\proj{a}{1}{Q}] = M$.
+%		%		$\proj{a}{0}{N''} + \proj{a}{1}{N''} = M$ with $N' \rw_\pi M'$.
+%		There are two sub-cases:
+%		\begin{itemize}
+%			\item $a \in \fl{Q}$, and then let $P = \trm{!a}. H[\lambda x.\proj{a}{0}{Q}] \trm{+a} H[\lambda x.\proj{a}{1}{Q}]$: 
+%			as $H[\trm{!a}.Q] \allowbreak\rw_\pi H[\proj{a}{0}{Q}] + H[\proj{a}{1}{Q}]$, we have $H[\trm{!a}.Q] \rws_\perm \trm{!a}.H[\proj{a}{0}{Q}] \trm{+a} H[\proj{a}{1}{Q}]$ by \ih,
+%			thus $N = H[\trm{!a}.\lambda x.Q] \rws_\perm \trm{!a}.H[\proj{a}{0}{\lambda x.Q}] \trm{+a} H[\proj{a}{1}{\lambda x.Q}] = \trm{!a}. H[\lambda x.\proj{a}{0}{Q}] \trm{+a} H[\lambda x.\proj{a}{1}{Q}] = P$ with $P^+ =  H[\lambda x.\proj{a}{0}{Q}]^+ +\allowbreak H[\lambda x.\proj{a}{1}{Q}]^+ \allowbreak= H[\lambda x.\proj{a}{0}{Q}] + H[\lambda x.\proj{a}{1}{Q}] \allowbreak= M$.
+%			
+%			\item $a \notin \fl{Q}$, and then let $P = H[\lambda x.Q]$: 
+%			we have $N = H[\trm{!a}.\lambda x. Q] \rw_\perm P$ and $P^+ = H[\lambda x.Q] = H[\lambda x.Q] + H[\lambda x.Q] = H[\lambda x.\proj{a}{0}{Q}] + H[\lambda x.\proj{a}{1}{Q}] \allowbreak= M$ since $\proj{a}{i}{Q} = Q$ because $a \notin \fl{Q}$.
+%		\end{itemize}
+%		
+%		\item \emph{Application}, \ie\ $N = H[\trm{!a}.QQ'] \rw_\pi H[\proj{a}{0}{QQ'}] + H[\proj{a}{1}{QQ'}] = H[\proj{a}{0}{Q}\proj{a}{0}{Q'}] + H[\proj{a}{1}{Q}\proj{a}{1}{Q'}] = M$.
+%		Analogous to the abstraction case.
+%%		Let $P = \trm{!a}. H[\proj{a}{0}{Q}\proj{a}{1}{Q'}] \trm{+a} H[\proj{a}{1}{Q}\proj{a}{1}{Q'}]$: thus, $N  \rws_\perm P$ with $P^+ =  H[\lambda x.\proj{a}{0}{Q}]^+ + H[\lambda x.\proj{a}{1}{Q}]^+ = H[\lambda x.\proj{a}{0}{Q}] + H[\lambda x.\proj{a}{1}{Q}] = M$.
+%
+%		\item \emph{Box}, \ie\ $N = H[\trm{!a}.\trm{!b}.Q] \rw_\pi H[\proj{a}{0}{!b.Q}] + H[\proj{a}{1}{!b.Q}] = H[\trm{!b.}\proj{a}{0}{Q}] + H[\trm{!b.}\proj{a}{1}{Q}] = M$ where $a \neq b$ (without loss of generality).
+%		Analogous to the abstraction case.
+%		\qedhere
+%	\end{itemize}
+%\end{proof}
 
-		\item \emph{Box}, \ie\ $N = H[\trm{!a}.\trm{!b}.Q] \rw_\pi H[\proj{a}{0}{!b.Q}] + H[\proj{a}{1}{!b.Q}] = H[\trm{!b.}\proj{a}{0}{Q}] + H[\trm{!b.}\proj{a}{1}{Q}] = M$ where $a \neq b$ (without loss of generality).
-		Analogous to the abstraction case.
-		\qedhere
-	\end{itemize}
-\end{proof}
-
-\hrule
+%\hrule
 
 
 
-\subsection{Call-by-value translation}
+\section{Call-by-value translation}
+\label{sec:cbv}
 
 
 The call-by-value interpretation $\uncbv{N}$ of a probabilistic lambda-term $N$ is given as follows. First, we translate $N$ to an open $\PEL$-term $\unopen N=\labjudg\theta P$, and then $\uncbv{N}$ is the label closure $\uncbv{N}=\labclose\theta P$, which prefixes $P$ with a generator $\trm{!a}$ for every $a$ in $\theta$.
