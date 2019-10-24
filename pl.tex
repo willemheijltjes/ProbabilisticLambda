@@ -1163,7 +1163,7 @@ Reduction to normal form in $\rwb_\perm$ is equal to $\rwn_\perm$.
 Observe that $\rw_\perm$ and $\rwb_\perm$ have the same normal forms. Then since $\rwb_\perm\,\subseteq\,\rws_\perm$ we have $\rwbn_\perm\,\subseteq\,\rwn_\perm$. Conversely, let $N\rwn_\perm M$. On this reduction, let $P\rw_\perm Q$ be the first step such that $P\not\rwb_\perm Q$. Then there is an $R$ such that $P\rwb_\perm R$ and $Q\rw_\perm R$. Note that we have $N\rwbs_\perm R$. By confluence, $R\rwn_\perm M$, and by induction on the sum length of paths in $\rw_\perm$ from $R$ (smaller than from $N$) we have $R\rwbn_\perm M$, and hence $N\rwbn_\perm M$.
 \end{proof}
 
-The following lemmata then give the required commutation properties of $\rwb_\perm$, $\rwn_\perm$, and $\rwp_\beta$. Figure~\ref{fig:confluence diagrams} gives illustrating diagrams.
+The following lemmata then give the required commutation properties of the relations $\rwb_\perm$, $\rwn_\perm$, and $\rwp_\beta$. Figure~\ref{fig:confluence diagrams} illustrates these by commuting diagrams.
 
 \begin{lem}
 \label{lem:parallel p - parallel beta}
@@ -1194,7 +1194,7 @@ By induction on the rewrite step $\rwb_\perm$. The two interesting cases are the
 	\draw[rwb] (m-1-1) --node[above]{$\perm$} (m-1-2);
 	\draw[rwp] (m-1-1) --node[left] {$\beta$} (m-2-1);
 	\draw[rwp,implied] (m-1-2) --node[right]{$\beta$} (m-2-2);
-	\draw[rws,implied] (m-2-2) --node[below]{$\perm$} (m-2-1);
+	\draw[rw, implied] (m-2-2) --node[below]{$\perm$} (m-2-1);
 \end{tikzpicture}}}
 &	(x\notin\fv M)
 \end{array}
@@ -1654,13 +1654,7 @@ Lemma 3.5 must be complemented with two new clauses, as follows:
 \section{Projective reduction}
 \label{sec:projective reduction}
 
-The reduction $\rw_\perm$ evaluates probabilistic sums purely by rewriting. Here we look at an alternative \emph{projective} notion of reduction, which conforms more closely to the intuition that $\trm{!a}$ generates a probabilistic event to determine the choice $\trm{+a}$.
-
-For projective reduction we distinguish a global, meta-level probabilistic sum $+$ from the internal, object-level probabilistic sum $\trm{N\+M=!a.N+aM}$. Let $N^+$ denote the term $N$ with every top-level internal sum $\trm{\+}$ evaluated as an external sum; formally:
-\[
-	\trm{(N\+M)}^+=N^+\!+M^+ \qquad\qquad N^+=N \quad(N\neq \trm{M\+P})~.
-\]
-{\color{red}(NOTE: The evaluation $N^+$ should be discussed earlier, to complete our reduction $\rw_\perm$ by linking our syntactic $\trm{\+}$ to semantic probabilistic sums.)}
+Permutative reduction $\rw_\perm$ evaluates probabilistic sums purely by rewriting. Here we look at an alternative \emph{projective} notion of reduction, which conforms more closely to the intuition that $\ttrm{!a}$ generates a probabilistic event to determine the choice $\ttrm{+a}$. We would like to evaluate $\ttrm{!a.N}$ by the probabilistic sum $N_0+N_1$, where $N_i$ is $N$ with any subterm of the form $\ttrm{M_0+aM_1}$ projected to $M_i$. The meta-level sum $+$ must be distinct from the abbreviation $N\+M=\ttrm{!a.N+aM}$, since otherwise reduction on this term would be circular. We then need a call-by-need strategy for evaluating $\ttrm{!a.N}$, which we implement through a \emph{head context}.
 
 \begin{defn}
 The \emph{$a$-projections} $\proj a0N$ and $\proj a1N$ are defined as follows, where $a\neq b$.
@@ -1679,16 +1673,19 @@ A \emph{head context} $H[\,]$ is given by the following grammar.
 \]
 \end{defn}
 
-
 \begin{defn}
 \emph{Projective} reduction $\rw_\pi$ is the following reduction step.
 \[
-	H[\trm{!a.N}] ~\rw_\pi~ H[\proj a0N] + H[\proj a1N]
+	H[\,\trm{!a.N}] ~\rw_\pi~ H[\proj a0N] + H[\proj a1N]
 \]
 \end{defn}
 
+Observe that projective reduction is a strategy, and not a rewrite relation, as it applies only in head contexts---that is, we do not evaluate inside arguments or under other generators $\ttrm{!a}$ or choices $\ttrm{+a}$. 
 
-Observe that projective reduction is not a rewrite relation, as it applies only in head contexts---that is, we do not evaluate inside arguments or under other generators $\ttrm{!a}$ or choices $\ttrm{+a}$.
+We will demonstrate that $\rw_\pi$ is included in $\rws_\perm$. Since $\rws_\perm$ is ignorant of the external sum $+$ (it instead permutes the internal sum $\+$ to the surface), to make the connection formal we need to interpret each top-level $\+$ by $+$. Then let $N^+$ denote the term $N$ with every top-level internal sum $\+$ evaluated as an external sum $+$, as follows. 
+\[
+	\trm{(N\+M)}^+=N^+\!+M^+ \qquad\qquad N^+=N \quad(N\neq \trm{M\+P})
+\]
 
 \begin{rmrk}
 	\label{rmrk:proj}
