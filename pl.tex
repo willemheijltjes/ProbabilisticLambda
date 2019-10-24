@@ -1788,12 +1788,59 @@ A \emph{head context} $H[\,]$ is given by the following grammar.
 \]
 \end{defn}
 
-Observe that projective reduction is a strategy, and not a rewrite relation, as it applies only in head contexts---that is, we do not evaluate inside arguments or under other generators $\ttrm{!a}$ or choices $\ttrm{+a}$. 
-
-We will demonstrate that $\rw_\pi$ is included in $\rws_\perm$. Since $\rws_\perm$ is ignorant of the external sum $+$ (it instead permutes the internal sum $\+$ to the surface), to make the connection formal we need to interpret each top-level $\+$ by $+$. Then let $N^+$ denote the term $N$ with every top-level $\+$ evaluated as $+$, as follows.
+Projective reduction is a strategy, and not a rewrite relation, as it applies only in head contexts---that is, we do not evaluate inside arguments or under other generators $\ttrm{!a}$ or choices $\ttrm{+a}$. This corresponds to the generator permuting outside of a head context by $\boxAbs$ and $\boxFun$ steps, as below.
 \[
-	\trm{(N\+M)}^+=N^+\!+M^+ \qquad\qquad N^+=N \quad(N\neq \trm{M\+P})
+	\ttrm{H[\,!a.N]}\rws_\perm \ttrm{!a.H[N]}
 \]
+Evaluating inside $\ttrm{!a}$ would correspond to permuting two generators, $\ttrm{!a.!b.N}$ to $\ttrm{!b.!a.N}$, which we do not admit as a rewrite rule. Similarly, we do not evaluate inside a choice, since we distribute a generator over a choice (rule $\plusBox$) rather than permuting in the other direction. Still, since projective reduction evaluates the outermost generator on the spine of a term, and removes all its bound labels, projective reduction has the same normal forms except in argument position. Rather than trying to bring both forms closer together, which would involve juggling $\+$ and $+$ and several kinds of reduction context, we contend ourselves with showing that permutative reduction can implement a projective step. For the following proposition, observe that if $a$ is not free in $N$, then $\proj aiN=N$, so that we have $H[\,\trm{!a.N}] ~\rw_\pi~ H[N]+H[N]~=~H[N]$. 
+
+%If we restrict permutative reduction in that way, we 
+
+%\begin{definition}
+%An \emph{argument context} $A[\,]$ is a context of the form $C[N\,[\,]]$, with the hole in argument position. \emph{Deep} projective reduction is the closure of exhaustive projective reduction under argument contexts.
+%\[
+%	N \rwn N_1+\dots+N_n \qquad
+%\]
+%\end{definition}
+
+\begin{prop}[Permutative reduction simulates projective reduction]
+\[
+	H[\,\trm{!a.N}] ~\rws_\perm~
+	\left\{\begin{array}{l@{\qquad}l}
+		H[N]						 & (a\notin\fl N) \\[5pt]
+		H[\proj a0N] \+ H[\proj a1N] & (a\in\fl N)
+	\end{array}\right.
+\]
+\end{prop}
+
+\begin{proof}
+The case $a\notin\fl N$ is immediate by a $\boxVoid$ step. For the other case, observe that $\trm{H[\,!a.N]}\rws_\perm\trm{!a.H[N]}$ by $\boxAbs$ and $\boxFun$ steps, and since $a$ does not occur in $H[\,]$, we have $H[\proj aiN]=\proj ai{H[N]}$. Unfolding also the definition of $\+$, we may thus restrict ourselves to proving the following.
+\[
+	\trm{!a.N} ~\rws_\perm~ \trm{!a.} \proj a0N~\trm{+a}~\proj a1N
+\]
+Given that $a$ is the smallest label in $N$, \ie\ $a<b$ for any other label $b$ in $N$, a straightforward induction on $N$ gives $N\rws_\perm\proj a0N~\ttrm{+a}~\proj a1N$, with as special base case $N\rws_\perm N$ for $a\notin\fl N$.
+\end{proof}
+
+
+%Observe that $\trm{H[\,!a.N]}\rws_\perm\trm{!a.H[N]}$ by $\boxAbs$ and $\boxFun$ steps, and since $a$ does not occur in $H[\,]$, we have $H[\proj aiN]=\proj ai{H[N]}$. Unfolding also the definition of $\+$, we may thus restrict ourselves to proving the following.
+%\[
+%	\trm{!a.N} ~\rws_\perm~
+%	\left\{\begin{array}{l@{\qquad}l}
+%		N						 & (a\notin\fl N) \\[5pt]
+%		\trm{!a.}\proj a0N]~\trm{+a}~\proj a1N & (a\in\fl N)
+%	\end{array}\right.
+%\]
+%Given that $a$ is the smallest label in $N$, \ie\ $a<b$ for any other label $b$ in $N$, a straightforward induction on $N$ gives $N\rws_\perm\proj a0N~\ttrm{+a}~\proj a1N$, as required.
+
+
+%We will demonstrate that $\rw_\pi$ is included in $\rws_\perm$. Since $\rws_\perm$ is ignorant of the external sum $+$ (it instead permutes the internal sum $\+$ to the surface), to make the connection formal we need to interpret each top-level $\+$ by $+$. Then let $N^+$ denote the term $N$ with every top-level $\+$ evaluated as $+$, as follows.
+%\[
+%	\trm{(N\+M)}^+=N^+\!+M^+ \qquad\qquad N^+=N \quad(N\neq \trm{M\+P})
+%\]
+%
+
+
+
 
 \begin{rmrk}
 	\label{rmrk:proj}
