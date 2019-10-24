@@ -1400,11 +1400,13 @@ By the following diagram. For the top and left areas, by Lemma~\ref{lem:p to com
 \section{Strong normalization for typed terms}
 
 In this section, we prove that the relation $\rw$ enjoys strong
-normalization in simply typed terms. Since the proof of strong
-normalization is quite delicate, it make sense to turn the definition
-of the order $<_{{\trm{M}}}$ from Definition~\ref{def:orderlabels}
-more formal, at the same time allowing to treat label-\emph{open}
-terms. This is based on Figure~\ref{fig:order}. 
+normalization in simply typed terms. Our proof of strong
+normalisation, which is based on the classic reducibility technique,
+and inherently has to deal with label-open terms. It make thus great
+sense to turn the definition of the order $<_{{\trm{M}}}$ from
+Definition~\ref{def:orderlabels} more formal, at the same time
+allowing terms to be label-\emph{open}. This is based on
+Figure~\ref{fig:order}.
 %
 \begin{figure}
   \fbox{
@@ -1472,8 +1474,8 @@ Similarly, one can define:
   normalizing modullo $\rw^\theta$;
 \item
   The function $\mathit{sn}^\theta$ assigning to any
-  term in $\mathit{SN}^\theta$ the maximal number of steps
-  to normal form.
+  term in $\mathit{SN}^\theta$ the maximal number of $\rw^\theta$
+  steps to normal form.
 \end{itemize}
 
 Now, let us define types, environments, judgments, and typing rules in
@@ -1516,11 +1518,10 @@ course different),
 
 \begin{lem}
 \label{lemma:cloredsum}
-  Each set $SN^\theta$ is closed under the following rule:
+  The following rule is sound:
   $$
-  \infer{\trm{M +a N}L_1\ldots L_m}{ML_1\ldots L_m & NL_1\ldots L_m}
+  \infer{\trm{M +a N}L_1\in\mathit{SN}^\theta\ldots L_m\in\mathit{SN}^\theta}{ML_1\ldots L_m & NL_1\ldots L_m\in\mathit{SN}^\theta & a\in\theta}
   $$
-  provided $a\in\theta$.
 \end{lem}
 \begin{proof}
   Let $h(a,\theta)$ be the height of $a$ in the sequence $\theta$.
@@ -1529,7 +1530,8 @@ course different),
   (m,h(a,\theta),\sum_{i=1}^m\mathit{sn}(L_i)+\mathit{sn}(M)+\mathit{sn}(N),|M|+|N|)
   \end{equation}
   We proceed by showing that all terms to which
-  $\trm{M +a N}L_1\ldots L_m$ reduces are strongly normalizing:
+  $\trm{M +a N}L_1\ldots L_m$ reduces are in $\mathit{SN}^\theta$, and thus
+  $\trm{M +a N}L_1\ldots L_m$ is itself in $\mathit{SN}^\theta$:
   \begin{itemize}
   \item
     If reduction happens in one between $M,N,L_1,\ldots,L_m$, then we
@@ -1575,11 +1577,10 @@ course different),
 \end{proof}
 
 \begin{lem}\label{lemma:cloredbox}
-  The set $\mathit{SN}^\theta$ is closed under the following rule:
+  The following rule is sound:
   $$
-  \infer{\trm{(!a.M)}L_1\ldots L_m}{\trm{M}L_1\ldots L_m}
+  \infer{\trm{(!a.M)}L_1\ldots L_m\in\mathit{SN}^\theta}{\trm{M}L_1\ldots L_m\in\mathit{SN}^{a\cdot\theta} & \forall i.a\not\in L_i}
   $$
-  whenever $a\not\in L_i$ for every $1\leq i\leq m$.
 \end{lem}
 \begin{proof}
   The proof is structurally very similar to the one of
@@ -1603,10 +1604,17 @@ course different),
   yields the thesis.
 \end{proof}
 
-\begin{lem}
-  The set $SN^\theta$ is closed under the following rule:
+\begin{lem}\label{lemma:cloredheadvar}
+  The following rule is sound
   $$
-  \infer{\trm{(\x.M)}L_0\ldots L_m}{\trm{M[L_0/x]}L_1\ldots L_m & L_0}
+  \infer{xL_1\ldots L_m\in\mathit{SN}^\theta}{L_1\in\mathit{SN}^\theta &\cdots & L_m\in\mathit{SN}^\theta}
+  $$
+\end{lem}
+
+\begin{lem}\label{lemma:cloredbeta}
+  The following rule is sound
+  $$
+  \infer{\trm{(\x.M)}L_0\ldots L_m\in\mathit{SN}^\theta}{\trm{M[L_0/x]}L_1\ldots L_m\in\mathit{SN}^\theta & L_0\in\mathit{SN}^\theta}
   $$
 \end{lem}
 \begin{proof}
@@ -1671,43 +1679,59 @@ course different),
     we get the thesis.
   \end{itemize}
 \end{proof}
-\newcommand{\RedSet}[2]{\mathit{Red}^{#1}_{#2}}
+\newcommand{\RedSet}[1]{\mathit{Red}_{#1}}
 The definition of a reducible term stays the same:
 \begin{align*}
-  \RedSet{\theta}{\alpha}&=\{(\Gamma,M)\mid M\in\mathit{SN}^\theta\wedge\judg{\Gamma}{M}{\alpha}\};\\
-  \RedSet{\theta}{\tau\arrow\rho}&=\{(\Gamma,M)\mid(\judg{\Gamma}{M}{\tau\arrow\rho})\wedge \forall(\Gamma,\Delta,N)\in\RedSet{\theta}{A}.(\Gamma,\Delta,MN)\in\RedSet{\theta}{\rho}\}.
+  \RedSet{\alpha}&=\{(\Gamma,\theta,M)\mid M\in\mathit{SN}^\theta\wedge\judg{\Gamma}{M}{\alpha}\};\\
+  \RedSet{\tau\arrow\rho}&=\{(\Gamma,\theta,M)\mid(\judg{\Gamma}{M}{\tau\arrow\rho})\wedge(\labjudg{\theta}{M})\wedge\forall(\Gamma\Delta,\theta,N)\in\RedSet{\tau}.(\Gamma\Delta,\theta,MN)\in\RedSet{\rho}\}.
 \end{align*}
 \begin{lem}\label{lemma:redprop}
   \begin{enumerate}
-  \item
-    If $(\Gamma,M)\in\RedSet{\theta}{\tau}$, then $M\in\mathit{SN}^\theta$;
-  \item
+  \item\label{point:impl}
+    If $(\Gamma,\theta,M)\in\RedSet{\tau}$, then $M\in\mathit{SN}^\theta$;
+  \item\label{point:headvar}
     If $\judg{\Gamma}{x L_1\ldots L_m}{\tau}$ and $L_1,\ldots,L_m\in\mathit{SN}^\theta$,
-    then $(\Gamma,x L_1\ldots L_m)\in\RedSet{\theta}{\tau}$.
-  \item
-    If $(\Gamma,\trm{M[L_0/x]}L_1\ldots L_m)\in\RedSet{\theta}{\tau}$,
+    then $(\Gamma,\theta,x L_1\ldots L_m)\in\RedSet{\tau}$.
+  \item\label{point:beta}
+    If $(\Gamma,\theta,\trm{M[L_0/x]}L_1\ldots L_m)\in\RedSet{\tau}$,
     $\judg{\Gamma}{L_0}{\rho}$ and $L_0\in\mathit{SN}^\theta$
-    then $(\Gamma,\trm{(\x.M)}L_0\ldots L_m)\in\RedSet{\theta}{\tau}$.
-  \item
-    If $(\Gamma,ML_1\ldots L_m)\in\RedSet{\theta}{\tau}$
-    and $(\Gamma,NL_1\ldots L_m)\in\RedSet{\theta}{\tau}$,
-    then $(\Gamma,\trm{(M +a N)}L_1\ldots L_m)\in\RedSet{\theta}{\tau}$.
-  \item
-    If $(\Gamma,ML_1\ldots L_m)\in\RedSet{\theta}{\tau}$,
-    then $(\Gamma,\trm{(!a.M)}L_1\ldots L_m)\in\RedSet{\theta}{\tau}$.
+    then $(\Gamma,\theta,\trm{(\x.M)}L_0\ldots L_m)\in\RedSet{\tau}$.
+  \item\label{point:sum}
+    If $(\Gamma,\theta,ML_1\ldots L_m)\in\RedSet{\tau}$,
+    $(\Gamma,\theta,NL_1\ldots L_m)\in\RedSet{\tau}$, and $a\in\theta$,
+    then $(\Gamma,\theta,\trm{(M +a N)}L_1\ldots L_m)\in\RedSet{\tau}$.
+  \item\label{point:box}
+    If $(\Gamma,a\cdot\theta,ML_1\ldots L_m)\in\RedSet{\tau}$
+    and $a\not\in L_i$ for every $i$,
+    then $(\Gamma,\theta,\trm{(!a.M)}L_1\ldots L_m)\in\RedSet{\tau}$.
   \end{enumerate}
 \end{lem}
 \begin{proof}
-  The proof is an induction on $\tau$.
+  The proof is an induction on $\tau$:
+  \begin{itemize}
+  \item
+    If $\tau$ is an atom $\alpha$, then Point \ref{point:impl} comes
+    by definition, while points \ref{point:headvar} to \ref{point:box}
+    come from Lemma~\ref{lemma:cloredsum}, Lemma~\ref{lemma:cloredbox},
+    Lemma~\ref{lemma:cloredheadvar}, and Lemma~\ref{lemma:cloredbeta}.
+  \item
+    If $\tau$ is $\rho\arrow\mu$, points \ref{point:headvar} to \ref{point:box}
+    come directly from the induction hypothesis, while \ref{point:impl}
+    can be proved by observing that $M$ is in $\mathit{SN}^\theta$
+    if $Mx$ is itself $\mathit{SN}^\theta$, where $x$ is a fresh variable.
+    By induction hypothesis (on point~\ref{point:headvar}), we can
+    say that $(\Gamma(x:\rho),\theta,x)\in\RedSet{\rho}$, and
+    conclude that $(\Gamma(x:\rho),\theta,Mx)\in\RedSet{\mu}$.
+  \end{itemize}
 \end{proof}
 
 The following is the so-called Main Lemma:
-\begin{proposition}
+\begin{proposition}\label{lemma:mainlemma}
   Suppose $\judg{y_1:\tau_1,\ldots,y_n:\tau_n}{M}{\rho}$,
   $\labjudg{\theta}{M}$, and let
-  $(\Gamma,N_j)\in\RedSet{\theta}{\tau_j}$ for every $1\leq j\leq
+  $(\Gamma,\theta,N_j)\in\RedSet{\tau_j}$ for every $1\leq j\leq
   n$. Then
-  $(\Gamma,M[N_1/y_1,\ldots,N_n/y_n])\in\RedSet{\theta}{\rho}$.
+  $(\Gamma,\theta,M[N_1/y_1,\ldots,N_n/y_n])\in\RedSet{\rho}$.
 \end{proposition}
 \begin{proof}
   This is an induction on the structure of the term $M$:
@@ -1724,37 +1748,45 @@ The following is the so-called Main Lemma:
     then safely apply the induction hypothesis and conclude
     that
     $$
-    (\Gamma,\trm{L[\overline{N}/\overline{y}]})\in\RedSet{\theta}{\xi\arrow\rho}
+    (\Gamma,\theta,L[\overline{N}/\overline{y}])\in\RedSet{\xi\arrow\rho}
     \qquad
-    (\Gamma,\trm{P[\overline{N}/\overline{y}]})\in\RedSet{\theta}{\xi}
+    (\Gamma,\theta,P[\overline{N}/\overline{y}])\in\RedSet{\xi}
     $$
     By definition, we get
     $$
-    (\Gamma,\trm{(LP)[\overline{N}/\overline{y}]})\in\RedSet{\theta}{\rho}
+    (\Gamma,\theta,(LP)[\overline{N}/\overline{y}])\in\RedSet{\rho}
     $$
   \item
     If $M$ is an abstraction $\trm{\x.L}$, then $\rho$
     is an arrow type $\xi\arrow\mu$ and
     $\judg{y_1:\tau_1,\ldots,y_n:\tau_n,x:\xi}{L}{\mu}$.
-    Now, consider any $(\Gamma\Delta,P)\in\RedSet{\theta}{\xi}$.
+    Now, consider any $(\Gamma\Delta,\theta,P)\in\RedSet{\xi}$.
     Our objective is to prove with this hypothesis
-    that $(\Gamma\Delta,\trm{(\x.L[\overline{N}/\overline{y}])}P)\in\RedSet{\theta}{\mu}$
-    By induction hypothesis, since $(\Gamma\Delta,N_i)\in\RedSet{\theta}{\tau_i}$,
-    we get that $(\Gamma\Delta,\trm{L[\overline{N}/\overline{y},P/x]})\in\RedSet{\theta}{\mu}$.
-    The thesis follows from Lemma~\ref{lemma:redprop}
+    that $(\Gamma\Delta,\theta,(\x.L[\overline{N}/\overline{y}])P)\in\RedSet{\mu}$
+    By induction hypothesis, since $(\Gamma\Delta,N_i)\in\RedSet{\tau_i}$,
+    we get that $(\Gamma\Delta,\theta,L[\overline{N}/\overline{y},P/x])\in\RedSet{\mu}$.
+    The thesis follows from Lemma~\ref{lemma:redprop}.
   \item
     If $M$ is a sum $\trm{L+a P}$, we can make use of Lemma~\ref{lemma:redprop}
     and the induction hypothesis, and conclude.
   \item
     If $M$ is a sum $\trm{!a.P}$, again, we can make use of Lemma~\ref{lemma:redprop}
-    and the induction hypothesis, and conclude.
+    and the induction hypothesis. We should however observe, that
+    since $\labjudg{\theta}{M}$, then $\labjudg{a\cdot\theta}{P}$.
   \end{itemize}
 \end{proof}
 
 \begin{theorem}
   If $\judg{\Gamma}{M}{\tau}$ and $\labjudg{\theta}{M}$, then $M\in\mathit{SN}^\theta$.
 \end{theorem}
-
+\begin{proof}
+  Suppose that $\judg{x_1:\rho_1,\ldots,x_n:\rho_n}{M}{\tau}$.
+  Since $\judg{x_1:\rho_1,\ldots,x_n:\rho_n}{x_i:\rho_i}$ for every
+  $i$, and clearly $\labjudg{\theta}{x_i}$ for every $i$, we
+  can apply Lemma \ref{lemma:mainlemma} and
+  obtain that $(\Gamma,\theta,M[\overline{y}/\overline{y}])\in\RedSet{\tau}$
+  from which, by way of Lemma~\ref{lemma:redprop}, one gets the thesis.
+\end{proof}
 \hrule
 
 \newcommand\proj[3]{\pi^{#1}_{#2}(\trm{#3})}
