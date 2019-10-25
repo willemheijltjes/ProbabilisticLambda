@@ -227,7 +227,7 @@
 
 \newcommand\rwpleft{\mathrel{\tikz\draw[rwp](10pt,0pt)--(0,0);}}
 \newcommand\rwxleft{\mathrel{\tikz\draw[rwx](10pt,0pt)--(0,0);}}
-
+\newcommand\rwsleft{\mathrel{\tikz\draw[rws](10pt,0pt)--(0,0);}}
 
 % rule names
 
@@ -289,11 +289,14 @@ We present two notions of reduction, one via fine-grained local rewrite steps, a
 
 \section{Introduction}
 
-Probabilistic lambda-calculi \cite{SahebDjahromi78,...,FaggianRonchi19} extend the lambda-calculus with a probabilistic choice operator $N\+[p]M$, which chooses $N$ with probability $p$ and $M$ with probability $1-p$ (throughout this paper, we let $p=0.5$ and will omit it). Duplication of $N\+M$, as is wont to happen in lambda-calculus, raises a fundamental question about its semantics: do the duplicate occurrences represent \emph{the same} probabilistic event, or \emph{different} ones with the same probability? For example, take the formula $\top\+\bot$ that represents a coin flip between boolean values \emph{true} $\top$ and \emph{false} $\bot$. If we duplicate this formula, do the copies represent two distinct coin flips with possibly distinct outcomes, or do these represent a single coin flip that determines the outcome for both copies? Put differently again, when we duplicate $\top\+\bot$, do we duplicate the \emph{event}, or only its \emph{outcome}?
+Probabilistic lambda-calculi \cite{SahebDjahromi78,Manber-Tompa-1982,JonesPlotkin89,deLiguoroPiperno95,JungTix98,DalLagoZorzi12,FaggianRonchi19} extend the lambda-calculus with a probabilistic choice operator $N\+[p]M$, which chooses $N$ with probability $p$ and $M$ with probability $1-p$ (throughout this paper, we let $p=0.5$ and will omit it). Duplication of $N\+M$, as is wont to happen in lambda-calculus, raises a fundamental question about its semantics: do the duplicate occurrences represent \emph{the same} probabilistic event, or \emph{different} ones with the same probability? For example, take the formula $\top\+\bot$ that represents a coin flip between boolean values \emph{true} $\top$ and \emph{false} $\bot$. If we duplicate this formula, do the copies represent two distinct coin flips with possibly distinct outcomes, or do these represent a single coin flip that determines the outcome for both copies? Put differently again, when we duplicate $\top\+\bot$, do we duplicate the \emph{event}, or only its \emph{outcome}?
 
 In probabilistic lambda-calculus, these two interpretations are captured by the evaluation strategies of call-by-name ($\rw_\cbn$), which duplicates events, and call-by-value ($\rw_\cbv$), which evaluates any probabilistic choice before it is duplicated, and thus only duplicates outcomes. Consider the following example, where $=$ tests equality of boolean values.
+%\[
+%(\x.\,x = x)(\top\+\bot) \qquad\begin{array}{ll}\rws_\cbn &\quad \trm{\top\+\bot} \\[5pt] \rws_\cbv &\quad \top\end{array}
+%\]
 \[
-	(\x.\,x = x)(\top\+\bot) \qquad\begin{array}{ll}\rws_\cbn &\quad \trm{\top\+\bot} \\[5pt] \rws_\cbv &\quad \top\end{array}
+	\top \quad {}_\cbv\!\rwsleft \quad (\x.\,x = x)(\top\+\bot) \quad \rws_\cbn \quad \trm{\top\+\bot} 
 \]
 This situation is not ideal, for several, related reasons. First, it demonstrates how probabilistic lambda-calculus is non-confluent, negating one of the central properties of the lambda-calculus, and one of the main reasons why it is the prominent model of computation that it is. Second, a probabilistic lambda-calculus must derive its semantics from a prescribed reduction strategy, and its terms only have meaning in the context of that strategy. Third, combining different kinds of probabilities becomes highly involved~\cite{FaggianRonchi19}, as it would require specialized reduction strategies. These issues present themselves even in a more general setting, namely that of commutative (algebraic) effects, which in general do not commute with copying.
 
@@ -378,7 +381,7 @@ The generator $\ttrm{!a}$ represents a probabilistic \emph{event}, whose outcome
 
 \subsection{Reduction}
 
-Reduction in $\PEL$ will consist of standard $\beta$-reduction $\rw_\beta$ plus an evaluation mechanism for generators and choice operators, which implements probabilistic choice. We will present two such mechanisms: \emph{projective} reduction~$\rw_\pi$ and \emph{permutative} reduction~$\rw_\perm$. While projective reduction implements the given intuition for the generator and choice operator, we relegate it to Section~\ref{sec:projective reduction} and make permutative reduction our main evaluation mechanism, for the reason that it is more fine-grained, and thus more general. 
+Reduction in $\PEL$ will consist of standard $\beta$-reduction $\rw_\beta$ plus an evaluation mechanism for generators and choice operators, which implements probabilistic choice. We will present two such mechanisms: \emph{projective} reduction~$\rw_\pi$ and \emph{permutative} reduction~$\rw_\perm$. While projective reduction implements the given intuition for the generator and choice operator, we relegate it to Section~\ref{sec:projective-reduction} and make permutative reduction our main evaluation mechanism, for the reason that it is more fine-grained, and thus more general. 
 
 Permutative reduction is based on the idea that any operator distributes over the labelled choice operator (see the reduction steps in Figure~\ref{fig:reduction rules}), even other choice operators, as below.
 \[
@@ -728,6 +731,7 @@ We prove local confluence; by Newman's lemma and strong normalization of $\rw_\p
 
 %=====
 \itm\idem{\trm{N +a N}\rw N}
+{\small
 \[
 \vc{\begin{tikzpicture}[x=20pt,y=1.5ex]
 	\node[anchor=base east] (a) at (0,0) {$\trm{(N+aN)+aM}$};
@@ -771,9 +775,11 @@ We prove local confluence; by Newman's lemma and strong normalization of $\rw_\p
 	\draw[rws,implied] (m-3-1) --node[below]{$\cancelL,\cancelR$} (m-3-2);
 \end{tikzpicture}}}
 \]
+}
 
 %=====
 \itm\cancelL{\trm{(N +a M) +a P}\rw\trm{N +a P}}
+{\small
 \[
 \vcenter{\hbox{\begin{tikzpicture}
 	\matrix [matrix of math nodes] (m) {
@@ -811,9 +817,11 @@ We prove local confluence; by Newman's lemma and strong normalization of $\rw_\p
 \end{tikzpicture}}}
 %\qquad(a<b)
 \]
+}
 
 %=====
 \itm\plusX{\trm{C[N+aM]}\rw\trm{C[N]+a C[M]}}
+{\small
 \[
 \vcenter{\hbox{\begin{tikzpicture}
 	\matrix [matrix of math nodes] (m) {
@@ -877,9 +885,11 @@ We prove local confluence; by Newman's lemma and strong normalization of $\rw_\p
 	\draw[rws,implied] (m-3-1) --node[below]{$\plusL$} (m-3-2);
 \end{tikzpicture}}}
 \]
+}
 
 %=====
 \itm\plusFun{\trm{(N+aM)P}\rw\trm{(NP)+a(MP)}}
+{\small
 \[
 \vcenter{\hbox{\begin{tikzpicture}
 	\matrix [matrix of math nodes] (m) {
@@ -909,9 +919,11 @@ We prove local confluence; by Newman's lemma and strong normalization of $\rw_\p
 	\draw[rws,implied] (m-3-1) --node[below]{$\plusFun$} (m-3-2);
 \end{tikzpicture}}}
 \]
+}
 
 %=====
 \itm\plusBox{\trm{!b.(N +a M)} \rw \trm{(!b.N) +a (!b.M)}}
+{\small
 \[
 \vcenter{\hbox{\begin{tikzpicture}
 	\matrix [matrix of math nodes] (m) {
@@ -924,6 +936,7 @@ We prove local confluence; by Newman's lemma and strong normalization of $\rw_\p
 \end{tikzpicture}}}
 \quad (a \neq b, \ b \notin\trm{N+a M})
 \]
+}
 \end{proof}
 
 \begin{defn}
@@ -935,7 +948,7 @@ We denote the unique $\perm$-normal form of a term $N$ by $N^\perm$.
 \section{Confluence}
 \label{sec:confluence}
 
-We aim to prove that $\rw \,=\, \rw_\beta \cup \rw_\perm$ is confluent. We will use the standard technique of \emph{parallel} $\beta$-reduction, a simultaneous reduction step on an arbitrary number of $\beta$-redexes in the source term, which we define via a labelling of the redexes to be reduced. The central point is to find a notion of reduction that is \emph{diamond}, \ie\ every critical pair can be closed in one (or zero) steps. This will be our \emph{complete} reduction, which consists of parallel $\beta$-reduction followed by $\perm$-reduction to normal form.
+We aim to prove that $\rw \,=\, \rw_\beta \cup \rw_\perm$ is confluent. We will use the standard technique of \emph{parallel} $\beta$-reduction, a simultaneous reduction step on an arbitrary number of $\beta$-redexes in the source term, which we define via a labeling of the redexes to be reduced. The central point is to find a notion of reduction that is \emph{diamond}, \ie\ every critical pair can be closed in one (or zero) steps. This will be our \emph{complete} reduction, which consists of parallel $\beta$-reduction followed by $\perm$-reduction to normal form.
 %
 %\begin{lem}[Substitution for $\rw_\perm$]
 %	\label{lemma:substitution}
@@ -1181,7 +1194,7 @@ If $\trm{N*}\rwb_\perm\trm{M*}$ then $\trm{<N*>}=_\perm\trm{<M*>}$.
 \end{lem}
 
 \begin{proof}
-By induction on the rewrite step $\rwb_\perm$. The two interesting cases are the following.
+By induction on the rewrite step $\rwb_\perm$. The two interesting cases are:
 \[
 \begin{array}{cl}
 \vcenter{\hbox{\begin{tikzpicture}
@@ -1258,14 +1271,30 @@ Then \Cref{lem:exhaustive p - parallel beta} gives $M=\trm{<N*>}=_\perm\trm{<P*>
 By confluence and strong normalization of $\rw_\perm$ then $\trm{<P*>}^\perm=M^\perm$. The complete reduction $N^\perm\rwp M^\perm$ is then given by $N^\perm\rwp_\beta\trm{<P*>}\rwn_\perm M^\perm$.
 \end{proof}
 
+Following \cite{Takahashi95}, the idea to prove that complete reduction $\rwp$ is diamond is: first, to prove that if $M \rwp_\beta N$ then $N \rwp_\beta M^*$, where $M^*$ is a term obtained from $M$ (and independent of $N$) by reducing all the $\beta$-redexes existing in $M$ simultaneously (\Cref{lemma:full-development}.\ref{lemma:full-development-beta} below); second, via \Cref{lem:p to complete reduction}, to lift this property to complete reduction $\rwp$ by computing the $\perm$-normal form of $M^*$ (\Cref{lemma:full-development}.\ref{lemma:full-development-complete} below).
+To prove \Cref{lemma:full-development}.\ref{lemma:full-development-beta} we need the two following technical lemmata.
+
 \begin{lem}
 \label{lemma:application-parallel-beta}
 	If $\trm{M} \rwp_\beta \trm{M'}$ and $\trm{N} \rwp_\beta \trm{N'}$, then $\trm{MN} \rwp_\beta \trm{M'N'}$.
+	If moreover $M = \lambda x.R$ and $M'^ = \lambda x R'$ with $R \rwp_\beta R'$, then  $\trm{MN} \rwp_\beta \trm{R'[N'/x]}$.
 \end{lem}
 
 \begin{proof}
 	Since $\trm{M} \rwp_\beta \trm{<M*>} = M'$ and $\trm{N} \rwp_\beta \trm{<N*>} = N'$ for some labelings $\trm{M*}$ and $\trm{N*}$ of $M$ and $N$ respectively, let $\trm{(MN)*}$ be the labeling of $\trm{MN}$ obtained by putting together the labelings $\trm{M*}$ and $\trm{N*}$.
 	Clearly, $\trm{MN} \rwp_\beta \trm{<(MN)*>} = \trm{<M*><N*>} = M'N'$.
+	
+	Concerning the part of the statement after ``moreover'', since $\trm{R} \rwp_\beta \trm{<R*>} = R'$ and $\trm{N} \rwp_\beta \trm{<N*>} = N'$ for some labelings $\trm{R*}$ and $\trm{N*}$ of $R$ and $N$ respectively, let $\trm{(MN)*}$ be the labeling of $\trm{MN}$ obtained by putting together the labelings $\trm{R*}$ and $\trm{N*}$ plus the labeled $\beta$-redex $\trm{(\x.R)*N}$.
+	Clearly, $\trm{MN} \rwp_\beta \trm{<(MN)*>} = \trm{<R*>[<N*>/x]} = \trm{R'[N'/x]}$.
+\end{proof}
+
+\begin{lem}[Substitution]
+\label{lemma:substitution}
+	If $\trm{M} \rwp_\beta \trm{M'}$ and $\trm{N} \rwp_\beta \trm{N'}$, then $\trm{M<N/x>} \rwp_\beta \trm{M'<N'/x>}$.
+\end{lem}
+
+\begin{proof}
+	By straightforward induction on $M$.
 \end{proof}
 
 \begin{lem}[Full labeling]
@@ -1302,12 +1331,12 @@ By confluence and strong normalization of $\rw_\perm$ then $\trm{<P*>}^\perm=M^\
 				\item $\trm{M^\circ} = \trm{(\x.R)*Q}$.
 				Then $\trm{N} = \trm{<R^\circ>[<Q^\circ>/x]}$.
 				By \ih\ (since $\trm{R} \rwp_\beta \trm{<R^\circ>}$ and $\trm{Q} \rwp_\beta \trm{<Q^\circ>}$), one has $\trm{<R^\circ>} \rwp_\beta \trm{<R*>}$ and $\trm{<Q^\circ>} \rwp_\beta \trm{<Q*>}$.
-				Therefore, $\trm{N} = \trm{<R^\circ>[<Q^\circ>/x]} \rwp_\beta \trm{<R*>[<Q*>/x]}  = \trm{<M*>}$ where the last equality holds because $\trm{M} = \trm{(\x.R)Q}$ and $\trm{M*}$ is the full labeling of $M$.
+				By \Cref{lemma:substitution}, $\trm{N} = \trm{<R^\circ>[<Q^\circ>/x]} \rwp_\beta \trm{<R*>[<Q*>/x]}  = \trm{<M*>}$ where the last equality holds because $\trm{M} = \trm{(\x.R)Q}$ and $\trm{M*}$ is the full labeling of $M$.
 				
-				\item $\trm{M^\circ} \neq \trm{(\x.R)*Q}$ but $\trm{M} = \trm{(\x.R)Q}$. 
+				\item $\trm{M^\circ} \neq \trm{(\x.R)*Q}$ but $\trm{M} = \trm{(\x.R)Q}$ (\ie\ $P = \lambda x.R $). 
 				Then $\trm{N} = \trm{<P^\circ><Q^\circ>}$.
-				By \ih\ (since $\trm{P} \rwp_\beta \trm{<P^\circ>}$ and $\trm{Q} \rwp_\beta \trm{<Q^\circ>}$), one has $\trm{<P^\circ>} \rwp_\beta \trm{<P*>}$ and $\trm{<Q^\circ>} \rwp_\beta \trm{<Q*>}$.
-				Therefore, by \Cref{lemma:application-parallel-beta}, $\trm{N} \rwp_\beta \trm{<P*><Q*>} = \trm{<M*>}$, where the equality holds because $\trm{M^\circ} \neq \trm{(\x.R)*Q}$.
+				By \ih\ (since $\trm{P} \rwp_\beta \trm{<P^\circ>} = \trm{<\x.R^\circ>}$ and $\trm{Q} \rwp_\beta \trm{<Q^\circ>}$), one has $\trm{<P^\circ>} \rwp_\beta \trm{<P*>} = \trm{<\x.R*>}$ and $\trm{<Q^\circ>} \rwp_\beta \trm{<Q*>}$.
+				Therefore, by \Cref{lemma:application-parallel-beta}, $\trm{N} \rwp_\beta \trm{<R*>[<Q*>/x]} = \trm{<M*>}$, where the equality holds because $\trm{M} = \trm{(\x.R)Q}$ and $\trm{M*}$ is the full labeling of $M$.
 			\end{enumerate}
 		\end{itemize}
 	
@@ -1325,10 +1354,11 @@ By confluence and strong normalization of $\rw_\perm$ then $\trm{<P*>}^\perm=M^\
 \end{cor}
 
 \begin{proof}
-	By \Cref{lemma:full-development}.\ref{lemma:full-development-complete}, $P\rwp \trm{<M*>} \rwpleft M$ where $\trm{M*}$ is the full labeling of $\trm{M}$.
+	By \Cref{lemma:full-development}.\ref{lemma:full-development-complete}, $P \rwp
+	\! \trm{<N*>} \rwpleft M$ where $\trm{N*}$ is the full labeling of $\trm{N}$.
 \end{proof}
 
-\begin{figure}
+\begin{figure}[!t]
 \[
 \begin{array}{cccc}
 \vcenter{\hbox{\begin{tikzpicture}
@@ -1379,6 +1409,7 @@ By confluence and strong normalization of $\rw_\perm$ then $\trm{<P*>}^\perm=M^\
 \label{fig:confluence diagrams}
 \end{figure}
 
+Since complete reduction $\rwp$ is diamond, the confluence of $\rw$ easily follows.
 
 \begin{thm}
 \label{thm:confluence}
@@ -1387,10 +1418,11 @@ Reduction $\rw$ is confluent.
 
 \begin{proof}
 By the following diagram. For the top and left areas, by Lemma~\ref{lem:p to complete reduction} any reduction path $N\rws M$ maps onto one $N^\perm \rwx M^\perm$. The main square follows by the diamond property of complete reduction, \Cref{cor:complete diamond}.
+
 \[
 \begin{tikzpicture}
 	\matrix (m) [matrix of math nodes] {
-	  N &[10pt] &[18pt] M &[10pt] \\[10pt] & N^\perm && M^\perm \\[18pt] P \\[10pt] & P^\perm && Q \\
+	  N &[10pt] &[10pt] M &[10pt] \\[10pt] & N^\perm && M^\perm \\[10pt] P \\[10pt] & P^\perm && Q \\
 	};
 	\draw[rws] (m-1-1) -- (m-1-3);
 	\draw[rws] (m-1-1) -- (m-3-1);
@@ -1409,7 +1441,7 @@ By the following diagram. For the top and left areas, by Lemma~\ref{lem:p to com
 
 %=====================================================================================
 
-\section{Strong normalization for typed terms}
+\section{Strong normalization for simply typed terms}
 \label{sec:SN}
 
 In this section, we prove that the relation $\rw$ enjoys strong
@@ -1587,6 +1619,7 @@ course different),
     the same, while the level of $b$ must be smaller than that of
     $a$. Similarly if the rule applied is $\trm{P +a (Q +b
       R)}\rw_\perm \trm{(P +a Q) +b (P +a R)}$.
+    \qedhere
   \end{itemize}
 \end{proof}
 
@@ -1624,6 +1657,10 @@ course different),
   \infer{xL_1\ldots L_m\in\mathit{SN}^\theta}{L_1\in\mathit{SN}^\theta &\cdots & L_m\in\mathit{SN}^\theta}
   $$
 \end{lem}
+
+\begin{proof}
+	Trivial, since the term $xL_1\ldots L_m$ cannot create new redexes.
+\end{proof}
 
 \begin{lem}\label{lemma:cloredbeta}
   The following rule is sound
@@ -1670,7 +1707,7 @@ course different),
     can apply the induction hypothesis to them,
     because the first component of (\ref{equ:redordbet})
     stays the same, but the second one strictly decreases.
-    We can then obtain that
+    We then obtain that
     $\trm{P[x/L_0])}L_1\ldots L_m$
     and $\trm{Q[x/L_0]}L_1\ldots L_m$ are both
     in $\mathit{SN}^\theta$, and from Lemma~\ref{lemma:cloredsum}
@@ -1684,11 +1721,11 @@ course different),
     $a\not\in L_i$ for every $0\leq i\leq m$.
     We proceed by observing that
     $\trm{(\x.P)}L_0\ldots L_m$ is in $\mathit{SN}^\theta$
-    and we can apply the induction hypothesis to it, because
-    the first component of (\ref{equ:redortbet})
+    and we can apply the \ih\ to it, because
+    the first component of (\ref{equ:redordbet})
     stays the same, but the second one strictly decreases.
-    We can then obtain that
-    $\trm{P[x/L_0])}L_1\ldots L_m$
+    We then obtain that
+    $\trm{P[x/L_0]}L_1\ldots L_m$
     is in $\mathit{SN}^\theta$, and from Lemma~\ref{lemma:cloredbox}
     we get the thesis.
     \qedhere
@@ -1800,11 +1837,11 @@ ingredients for our proof of strong normalization:
 \end{theorem}
 \begin{proof}
   Suppose that $\judg{x_1:\rho_1,\ldots,x_n:\rho_n}{M}{\tau}$.
-  Since $\judg{x_1:\rho_1,\ldots,x_n:\rho_n}{x_i:\rho_i}$ for every
+  Since $\judg{x_1:\rho_1,\ldots,x_n:\rho_n}{x_i}{\rho_i}$ for all
   $i$, and clearly $\labjudg{\theta}{x_i}$ for every $i$, we
   can apply Lemma \ref{lemma:mainlemma} and
   obtain that $(\Gamma,\theta,M[\overline{y}/\overline{y}])\in\RedSet{\tau}$
-  from which, by way of Lemma~\ref{lemma:redprop}, one gets the thesis.
+  from which, via Lemma~\ref{lemma:redprop}, one gets the thesis.
 \end{proof}
 
 %============================================================ PROJECTIVE
@@ -2013,7 +2050,17 @@ If $N\rw_\val M+P$ and $\unopen N=\labjudg\theta{N'}$ then there is a permutatio
 \]
 \end{prop}
 
-
+\begin{proof}
+%	We prove the following statement, from which the thesis follows:
+	The result follows from the following, more general, statement:
+	if $N \rw_\val M +P$ and $\unopen N=\labjudg\theta{N'}$ then there is a permutation  $\theta'' \cdot \theta' \cdot a$ of $\theta$ such that  
+	$\labclose{\theta'' \cdot \theta' \cdot a}{N'} \rws_\perm \labclose{\theta'' \cdot \theta' \cdot a}{Q \trm{+a} R}$ where $\unopen{M} =  \labjudg{\theta' }{Q}$ and  $\unopen{P} = \labjudg{\theta''}{R}$.
+	The proof of this statement is by induction on the structure of the context $C$ such that $N=C[Q\oplus_\val R]$ and $M=C[Q]$ and $P=C[R]$.
+%	The proof is by induction on the structure of the context C such that N=C[R\oplus Q], M=C[R] and
+%	P=C[Q]:
+%	* If C is the empty context, the result is trivial.
+%	* If C is SD, where S is a term and D is a context, then  ….
+\end{proof}
 
 %
 %
@@ -2093,7 +2140,7 @@ If $N\rw_\val M+P$ and $\unopen N=\labjudg\theta{N'}$ then there is a permutatio
 %\end{proof}
 
 
-\bibliographystyle{plain}
+\bibliographystyle{splncs04}
 \bibliography{biblio}
 \addcontentsline{toc}{section}{References}
 
