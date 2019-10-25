@@ -1,4 +1,4 @@
-\documentclass{llncs}
+\documentclass[runningheads]{llncs}
 
 \let\proof\relax %To avoid incompatibility between llncs and amsthm
 \let\endproof\relax %To avoid incompatibility between llncs and amsthm
@@ -1300,11 +1300,14 @@ By confluence and strong normalization of $\rw_\perm$ then $\trm{<P*>}^\perm=M^\
 				Therefore, by \Cref{lemma:application-parallel-beta}, $\trm{N} \rwp_\beta \trm{<P*><Q*>} = \trm{<M*>}$, where the equality holds because $\trm{M} \neq \trm{(\x.R)Q}$.
 				
 				\item $\trm{M^\circ} = \trm{(\x.R)*Q}$.
-				Then $\trm{N} = \trm{<R^\circ>[<Q^\circ>/x]}$
+				Then $\trm{N} = \trm{<R^\circ>[<Q^\circ>/x]}$.
+				By \ih\ (since $\trm{R} \rwp_\beta \trm{<R^\circ>}$ and $\trm{Q} \rwp_\beta \trm{<Q^\circ>}$), one has $\trm{<R^\circ>} \rwp_\beta \trm{<R*>}$ and $\trm{<Q^\circ>} \rwp_\beta \trm{<Q*>}$.
+				Therefore, $\trm{N} = \trm{<R^\circ>[<Q^\circ>/x]} \rwp_\beta \trm{<R*>[<Q*>/x]}  = \trm{<M*>}$ where the last equality holds because $\trm{M} = \trm{(\x.R)Q}$ and $\trm{M*}$ is the full labeling of $M$.
 				
 				\item $\trm{M^\circ} \neq \trm{(\x.R)*Q}$ but $\trm{M} = \trm{(\x.R)Q}$. 
 				Then $\trm{N} = \trm{<P^\circ><Q^\circ>}$.
 				By \ih\ (since $\trm{P} \rwp_\beta \trm{<P^\circ>}$ and $\trm{Q} \rwp_\beta \trm{<Q^\circ>}$), one has $\trm{<P^\circ>} \rwp_\beta \trm{<P*>}$ and $\trm{<Q^\circ>} \rwp_\beta \trm{<Q*>}$.
+				Therefore, by \Cref{lemma:application-parallel-beta}, $\trm{N} \rwp_\beta \trm{<P*><Q*>} = \trm{<M*>}$, where the equality holds because $\trm{M^\circ} \neq \trm{(\x.R)*Q}$.
 			\end{enumerate}
 		\end{itemize}
 	
@@ -1688,6 +1691,7 @@ course different),
     $\trm{P[x/L_0])}L_1\ldots L_m$
     is in $\mathit{SN}^\theta$, and from Lemma~\ref{lemma:cloredbox}
     we get the thesis.
+    \qedhere
   \end{itemize}
 \end{proof}
 \newcommand{\RedSet}[1]{\mathit{Red}_{#1}}
@@ -1734,6 +1738,7 @@ The definition of a reducible term stays the same:
     By induction hypothesis (on point~\ref{point:headvar}), we can
     say that $(\Gamma(x:\rho),\theta,x)\in\RedSet{\rho}$, and
     conclude that $(\Gamma(x:\rho),\theta,Mx)\in\RedSet{\mu}$.
+    \qedhere
   \end{itemize}
 \end{proof}
 
@@ -1783,11 +1788,13 @@ The following is the so-called Main Lemma:
     and the induction hypothesis, and conclude.
   \item
     If $M$ is a sum $\trm{!a.P}$, again, we can make use of Lemma~\ref{lemma:redprop}
-    and the induction hypothesis. We should however observe, that
-    since $\labjudg{\theta}{M}$, then $\labjudg{a\cdot\theta}{P}$.
+    and the induction hypothesis. We should however observe, that $\labjudg{a\cdot\theta}{P}$,
+    since $\labjudg{\theta}{M}$.
+    \qedhere
   \end{itemize}
 \end{proof}
-We now have all the necessary ingredients for our proof of strong normalization:
+We now have all the %necessary 
+ingredients for our proof of strong normalization:
 \begin{theorem}
   If $\judg{\Gamma}{M}{\tau}$ and $\labjudg{\theta}{M}$, then $M\in\mathit{SN}^\theta$.
 \end{theorem}
@@ -1799,7 +1806,6 @@ We now have all the necessary ingredients for our proof of strong normalization:
   obtain that $(\Gamma,\theta,M[\overline{y}/\overline{y}])\in\RedSet{\tau}$
   from which, by way of Lemma~\ref{lemma:redprop}, one gets the thesis.
 \end{proof}
-\hrule
 
 %============================================================ PROJECTIVE
 
@@ -1970,7 +1976,7 @@ Given that $a$ is the smallest label in $N$, \ie\ $a<b$ for any other label $b$ 
 \section{Call-by-value translation}
 \label{sec:cbv}
 
-We consider the interpretation of a call-by-value probabilistic lambda-calculus. For simplicity we will only restrict probabilistic reduction to a call-by-value regime, and not $\beta$-reduction; our values $V$ are then just deterministic.
+We consider the interpretation of a call-by-value probabilistic lambda-calculus. For simplicity we will only restrict probabilistic reduction to a call-by-value regime, and not $\beta$-reduction; our values $V$ are then just deterministic (the idea is that probabilistic sums cannot be duplicated or erased).
 \[
 \begin{array}{l@{\qquad}rcl}
 	N \coloneqq x \mid \x.N \mid MN \mid M\plusval N  & (\x.N)V &\rw_\val& N[V/x]
