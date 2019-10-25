@@ -32,6 +32,7 @@
 \newtheorem{lem}  [defn]{Lemma}
 \newtheorem{prop} [defn]{Proposition}
 \newtheorem{thm}  [defn]{Theorem}
+\newtheorem{lemmaAppendix}{Lemma}
 %%
 
 %text
@@ -390,7 +391,7 @@ Permutative reduction is based on the idea that any operator distributes over th
 To orient this as a rewrite rule, we need to give priority to one label over another. Fortunately, the relative position of the associated generators $\ttrm{!a}$ and $\ttrm{!b}$ provides just that. Then to define $\rw_\perm$, we will want every choice to belong to some generator, and make the order of generators explicit.
 
 \begin{defn}
-	The set $\fl{M}$ of \emph{free labels} of a term $\trm{M}$ is defined inductively as follows:
+	The set $\fl{N}$ of \emph{free labels} of a term $\trm{N}$ is defined inductively by:
 	\begin{align*}
 		\fl{x} &= \emptyset & \fl{MN} &= \fl{M} \cup \fl{N}  & \fl{\x.M} &= \fl{M} \\
 		\fl{!a.M} &= \fl{M} \smallsetminus \{a\} & \fl{M +a N} &= \fl{M}\cup \fl{N} \cup \{a\}
@@ -439,6 +440,7 @@ By inspection of the rewrite rules in Figure~\ref{fig:reduction rules}, we can t
 
 \begin{prop}[Syntactic characterization of normal forms]
 The normal forms $P_0$ of $\rw_\perm$, respectively $N_0$ of $\rw$, are given by the following grammars.
+
 \[
 	\begin{array}{ccc@{~}c@{~}c@{}l}
 		P_0 &\coloneqq& P_1 &\mid& \trm{P_0 \+ P_0}
@@ -459,8 +461,8 @@ The normal forms $P_0$ of $\rw_\perm$, respectively $N_0$ of $\rw$, are given by
 \begin{align*}
 	\trm{!a.(\x.x = x)(\top+a\bot)} 
 			& \fit{\rw_\perm}	\trm{!a.(\x.x=x)\top~+a~(\x.x=x)\bot}	\tag\plusArg
-\\[5pt]		& \fit{\rws_\beta}	\trm{!a.(\top=\top)\,+a\,(\bot=\bot)}
-\\[5pt]		& \fit{=}			\trm{!a. \top +a \top}
+\\		& \fit{\rws_\beta}	\trm{!a.(\top=\top)\,+a\,(\bot=\bot)}
+\\		& \fit{=}			\trm{!a. \top +a \top}
 			  \fit{\rw_\perm} 	\trm{!a. \top} 
 			  \fit{\rw_\perm}	\top           						 	\tag{\idem,\boxVoid}
 \end{align*}
@@ -491,8 +493,8 @@ We observe that the set $\PEL$ endowed with $\rw_\perm$ is a (first-order) term 
 \[
 \begin{array}{rcl@{\qquad\quad}l}
 		\trm{+a} &\prec_M& \trm{+b} & \text{ if } a <_M b
-\\[5pt]	\trm{+a} &\prec_M& \trm{!b} & \text{ for any labels } a,b
-\\[5pt]	\trm{!b} &\prec_M& @,\x		& \text{ for any label } b
+\\	\trm{+a} &\prec_M& \trm{!b} & \text{ for any labels } a,b
+\\	\trm{!b} &\prec_M& @,\x		& \text{ for any label } b
 \end{array}
 \]
 \end{defn}
@@ -1591,13 +1593,13 @@ course different),
   \item
     If reduction happens at the leftmost component $\trm{M +a N}$
     due to the rule $\trm{(P +a Q) +a R}\rw_\perm \trm{P +a R}$,
-    then the IH holds due to the fourth component being strictly
+    then the \ih\ holds due to the fourth component being strictly
     smaller. Similarly when the rule is
     $\trm{P +a (Q +a R)}\rw_\perm \trm{P +a R}$.    
   \item
     If reduction happens in the leftmost application due to
     the rule $\trm{(P +a Q) R}\rw_\perm \trm{(PR) +a (QR)}$,
-    then the IH can be applied, because the number of arguments $m$
+    then the \ih\ can be applied, because the number of arguments $m$
     strictly decreases. Similarly when the rule is
     $\trm{N (M +a P)}\rw_\perm\trm{(NM) +a (NP)}$.
   \item
@@ -1613,7 +1615,7 @@ course different),
     Moreover, $\mathit{sn}^\theta(PL_1\ldots L_m),\mathit{sn}^\theta(QL_1\ldots
     L_m)\leq\mathit{sn}^\theta(\trm{(P +b Q)L_1\ldots L_m}$.  We can then
     conclude that $\trm{(P +a N)}L_1\ldots L_m$ and $\trm{(Q +a
-        N)}L_1\ldots L_m$ are both strongly normalizing by IH, because
+        N)}L_1\ldots L_m$ are both strongly normalizing by \ih, because
     the fourth component is strictly smaller. Finally, we can conclude
     again by induction hypothesis, since the number of arguments stays
     the same, while the level of $b$ must be smaller than that of
@@ -1623,33 +1625,36 @@ course different),
   \end{itemize}
 \end{proof}
 
+\newcounter{lemma:cloredbox}
+\addtocounter{lemma:cloredbox}{\value{defn}}
 \begin{lem}\label{lemma:cloredbox}
   The following rule is sound:
+  \marginpar{\footnotesize Proof in the Appendix}
   $$
   \infer{\trm{(!a.M)}L_1\ldots L_m\in\mathit{SN}^\theta}{\trm{M}L_1\ldots L_m\in\mathit{SN}^{a\cdot\theta} & \forall i.a\not\in L_i}
   $$
 \end{lem}
-\begin{proof}
-  The proof is structurally very similar to the one of
-  Lemma~\ref{lemma:cloredsum}. The lexicographic order
-  is however the following one:
-  $$
-  (m,\sum_{i=1}^m\mathit{sn}^{a\cdot\theta}(L_i)+\mathit{sn}^{a\cdot\theta}(M),|M|)
-  $$
-  There is one case in which we need to use
-  Lemma \ref{lemma:cloredsum}, namely the one in which the
-  considered reduction rule is the following:
-  $$
-  \trm{!b.(P +a Q)}\rw_\perm\trm{(!b.P) +a (!b.Q)}.
-  $$
-  Since $M=\trm{P +a Q}$ and $ML_1\ldots L_m$ by hypothesis,
-  we conclusde that $PL_1\ldots L_m$ and $QL_1\ldots L_m$
-  are both strongly normalizing. By induction hypothesis,
-  since $\mathit{sn}^{a\cdot\theta}(P),\mathit{sn}^{a\cdot\theta}(Q)\leq\mathit{sn}^{a\cdot\theta}(M)$,
-  it holds that $\trm{(!b.P)}L_1\ldots L_m$ and $\trm{(!b.Q)}L_1\ldots L_m$
-  are both strongly normalizing themselves. Lemma~\ref{lemma:cloredsum},
-  yields the thesis.
-\end{proof}
+%\begin{proof}
+%  The proof is structurally very similar to the one of
+%  Lemma~\ref{lemma:cloredsum}. The lexicographic order
+%  is however the following one:
+%  $$
+%  (m,\sum_{i=1}^m\mathit{sn}^{a\cdot\theta}(L_i)+\mathit{sn}^{a\cdot\theta}(M),|M|)
+%  $$
+%  There is one case in which we need to use
+%  Lemma \ref{lemma:cloredsum}, namely the one in which the
+%  considered reduction rule is the following:
+%  $$
+%  \trm{!b.(P +a Q)}\rw_\perm\trm{(!b.P) +a (!b.Q)}.
+%  $$
+%  Since $M=\trm{P +a Q}$ and $ML_1\ldots L_m$ by hypothesis,
+%  we conclusde that $PL_1\ldots L_m$ and $QL_1\ldots L_m$
+%  are both strongly normalizing. By induction hypothesis,
+%  since $\mathit{sn}^{a\cdot\theta}(P),\mathit{sn}^{a\cdot\theta}(Q)\leq\mathit{sn}^{a\cdot\theta}(M)$,
+%  it holds that $\trm{(!b.P)}L_1\ldots L_m$ and $\trm{(!b.Q)}L_1\ldots L_m$
+%  are both strongly normalizing themselves. Lemma~\ref{lemma:cloredsum},
+%  yields the thesis.
+%\end{proof}
 
 \begin{lem}\label{lemma:cloredheadvar}
   The following rule is sound
@@ -1662,75 +1667,79 @@ course different),
 	Trivial, since the term $xL_1\ldots L_m$ cannot create new redexes.
 \end{proof}
 
+\newcounter{lemma:cloredbeta}
+\addtocounter{lemma:cloredbeta}{\value{defn}}
 \begin{lem}\label{lemma:cloredbeta}
   The following rule is sound
+    \marginpar{\footnotesize Proof in the Appendix}
   $$
   \infer{\trm{(\x.M)}L_0\ldots L_m\in\mathit{SN}^\theta}{\trm{M[L_0/x]}L_1\ldots L_m\in\mathit{SN}^\theta & L_0\in\mathit{SN}^\theta}
   $$
 \end{lem}
-\begin{proof}
-  Again, the proof is structurally very similar to the one
-  of Lemma~\ref{lemma:cloredsum}. The underlying order,
-  needs to be slightly adapted, and is the lexicographic
-  order on
-  \begin{equation}\label{equ:redordbet}
-  (\mathit{sn}(\trm{M[L_0/x]}L_1\ldots L_m)+\mathit{sn}(L_0),|M|)
-  \end{equation}
-  As usual, we proceed by showing that all terms to which
-  $\trm{(\x.M)}L_0\ldots L_m$ reduces are strongly normalizing:
-  \begin{itemize}
-  \item
-    If reduction happens in $L_0$, then we can mimick
-    the same reduction in by zero or more reduction
-    steps in $\trm{M[L_0/x]}L_1\ldots L_m$, and conclude
-    by induction hypothesis, because the first component
-    of (\ref{equ:redordbet}) strictly decreases.
-  \item
-    If reduction happens in $M$ or in $L_1,\ldots,L_m$,
-    then we can mimick the same reduction in one or more
-    reduction in $\trm{M[L_0/x]}L_1\ldots L_m$, and conclude
-    by induction hypothesis since, again, the first component
-    of (\ref{equ:redordbet}) strictly decreases.
-  \item
-    If the reduction step we perform reduces
-    $\trm{(\x.M)}L_0$, then the thesis follows from the
-    hypothesis about $\trm{M[L_0/x]}L_1\ldots L_m$.
-  \item
-    If $M$ is in the form $\trm{P +a Q}$ and
-    the reduction step we perform reduces
-    $\trm{(\x.M)}L_0\ldots L_m$
-    to $\trm{((\x.P)+a(\x.Q))}L_0\ldots L_m$,
-    we proceed by observing that
-    $\trm{(\x.P)}L_0\ldots L_m$
-    and $\trm{(\x.Q)}L_0\ldots L_m$ are
-    both in $\mathit{SN}^\theta$ and we
-    can apply the induction hypothesis to them,
-    because the first component of (\ref{equ:redordbet})
-    stays the same, but the second one strictly decreases.
-    We then obtain that
-    $\trm{P[x/L_0])}L_1\ldots L_m$
-    and $\trm{Q[x/L_0]}L_1\ldots L_m$ are both
-    in $\mathit{SN}^\theta$, and from Lemma~\ref{lemma:cloredsum}
-    we get the thesis.
-  \item
-    If $M$ is in the form $\trm{!a.P}$ and
-    the reduction step we perform reduces
-    $\trm{(\x.M)}L_0\ldots L_m$ to
-    $\trm{!a.(\x.P)}L_0\ldots L_m$. We can
-    first of all that we can assume that
-    $a\not\in L_i$ for every $0\leq i\leq m$.
-    We proceed by observing that
-    $\trm{(\x.P)}L_0\ldots L_m$ is in $\mathit{SN}^\theta$
-    and we can apply the \ih\ to it, because
-    the first component of (\ref{equ:redordbet})
-    stays the same, but the second one strictly decreases.
-    We then obtain that
-    $\trm{P[x/L_0]}L_1\ldots L_m$
-    is in $\mathit{SN}^\theta$, and from Lemma~\ref{lemma:cloredbox}
-    we get the thesis.
-    \qedhere
-  \end{itemize}
-\end{proof}
+%\begin{proof}
+%  Again, the proof is structurally very similar to the one
+%  of Lemma~\ref{lemma:cloredsum}. The underlying order,
+%  needs to be slightly adapted, and is the lexicographic
+%  order on
+%  \begin{equation}\label{equ:redordbet}
+%  (\mathit{sn}(\trm{M[L_0/x]}L_1\ldots L_m)+\mathit{sn}(L_0),|M|)
+%  \end{equation}
+%  As usual, we proceed by showing that all terms to which
+%  $\trm{(\x.M)}L_0\ldots L_m$ reduces are strongly normalizing:
+%  \begin{itemize}
+%  \item
+%    If reduction happens in $L_0$, then we can mimick
+%    the same reduction in by zero or more reduction
+%    steps in $\trm{M[L_0/x]}L_1\ldots L_m$, and conclude
+%    by induction hypothesis, because the first component
+%    of (\ref{equ:redordbet}) strictly decreases.
+%  \item
+%    If reduction happens in $M$ or in $L_1,\ldots,L_m$,
+%    then we can mimick the same reduction in one or more
+%    reduction in $\trm{M[L_0/x]}L_1\ldots L_m$, and conclude
+%    by induction hypothesis since, again, the first component
+%    of (\ref{equ:redordbet}) strictly decreases.
+%  \item
+%    If the reduction step we perform reduces
+%    $\trm{(\x.M)}L_0$, then the thesis follows from the
+%    hypothesis about $\trm{M[L_0/x]}L_1\ldots L_m$.
+%  \item
+%    If $M$ is in the form $\trm{P +a Q}$ and
+%    the reduction step we perform reduces
+%    $\trm{(\x.M)}L_0\ldots L_m$
+%    to $\trm{((\x.P)+a(\x.Q))}L_0\ldots L_m$,
+%    we proceed by observing that
+%    $\trm{(\x.P)}L_0\ldots L_m$
+%    and $\trm{(\x.Q)}L_0\ldots L_m$ are
+%    both in $\mathit{SN}^\theta$ and we
+%    can apply the induction hypothesis to them,
+%    because the first component of (\ref{equ:redordbet})
+%    stays the same, but the second one strictly decreases.
+%    We then obtain that
+%    $\trm{P[x/L_0])}L_1\ldots L_m$
+%    and $\trm{Q[x/L_0]}L_1\ldots L_m$ are both
+%    in $\mathit{SN}^\theta$, and from Lemma~\ref{lemma:cloredsum}
+%    we get the thesis.
+%  \item
+%    If $M$ is in the form $\trm{!a.P}$ and
+%    the reduction step we perform reduces
+%    $\trm{(\x.M)}L_0\ldots L_m$ to
+%    $\trm{!a.(\x.P)}L_0\ldots L_m$. We can
+%    first of all that we can assume that
+%    $a\not\in L_i$ for every $0\leq i\leq m$.
+%    We proceed by observing that
+%    $\trm{(\x.P)}L_0\ldots L_m$ is in $\mathit{SN}^\theta$
+%    and we can apply the \ih\ to it, because
+%    the first component of (\ref{equ:redordbet})
+%    stays the same, but the second one strictly decreases.
+%    We then obtain that
+%    $\trm{P[x/L_0]}L_1\ldots L_m$
+%    is in $\mathit{SN}^\theta$, and from Lemma~\ref{lemma:cloredbox}
+%    we get the thesis.
+%    \qedhere
+%  \end{itemize}
+%\end{proof}
+
 \newcommand{\RedSet}[1]{\mathit{Red}_{#1}}
 The definition of a reducible term stays the same:
 \begin{align*}
@@ -1783,7 +1792,7 @@ The following is the so-called Main Lemma:
 \begin{prop}\label{lemma:mainlemma}
   Suppose $\judg{y_1:\tau_1,\ldots,y_n:\tau_n}{M}{\rho}$,
   $\labjudg{\theta}{M}$, and let
-  $(\Gamma,\theta,N_j)\in\RedSet{\tau_j}$ for every $1\leq j\leq
+  $(\Gamma,\theta,N_j)\in\RedSet{\tau_j}$ for all $1\leq j\leq
   n$. Then
   $(\Gamma,\theta,M[N_1/y_1,\ldots,N_n/y_n])\in\RedSet{\rho}$.
 \end{prop}
@@ -2143,6 +2152,123 @@ If $N\rw_\val M+P$ and $\unopen N=\labjudg\theta{N'}$ then there is a permutatio
 \bibliographystyle{splncs04}
 \bibliography{biblio}
 \addcontentsline{toc}{section}{References}
+
+\newpage
+\appendix
+
+\section{Technical appendix: omitted proofs and lemmas}
+\label{sect:proofs}
+
+\setcounter{lemmaAppendix}{\value{lemma:cloredbox}}
+\begin{lemmaAppendix}\label{lemmaAppendix:cloredbox}
+	The following rule is sound:
+	$$
+	\infer{\trm{(!a.M)}L_1\ldots L_m\in\mathit{SN}^\theta}{\trm{M}L_1\ldots L_m\in\mathit{SN}^{a\cdot\theta} & \forall i.a\not\in L_i}
+	$$
+\end{lemmaAppendix}
+\begin{proof}
+	The proof is structurally very similar to the one of
+	Lemma~\ref{lemma:cloredsum}. The lexicographic order
+	is however the following one:
+	$$
+	(m,\sum_{i=1}^m\mathit{sn}^{a\cdot\theta}(L_i)+\mathit{sn}^{a\cdot\theta}(M),|M|)
+	$$
+	There is one case in which we need to use
+	Lemma \ref{lemma:cloredsum}, namely the one in which the
+	considered reduction rule is the following:
+	$$
+	\trm{!b.(P +a Q)}\rw_\perm\trm{(!b.P) +a (!b.Q)}.
+	$$
+	Since $M=\trm{P +a Q}$ and $ML_1\ldots L_m$ by hypothesis,
+	we conclusde that $PL_1\ldots L_m$ and $QL_1\ldots L_m$
+	are both strongly normalizing. By induction hypothesis,
+	since $\mathit{sn}^{a\cdot\theta}(P),\mathit{sn}^{a\cdot\theta}(Q)\leq\mathit{sn}^{a\cdot\theta}(M)$,
+	it holds that $\trm{(!b.P)}L_1\ldots L_m$ and $\trm{(!b.Q)}L_1\ldots L_m$
+	are both strongly normalizing themselves. Lemma~\ref{lemma:cloredsum},
+	yields the thesis.
+\end{proof}
+
+%\begin{lem}\label{lemma:cloredheadvar}
+%	The following rule is sound
+%	$$
+%	\infer{xL_1\ldots L_m\in\mathit{SN}^\theta}{L_1\in\mathit{SN}^\theta &\cdots & L_m\in\mathit{SN}^\theta}
+%	$$
+%\end{lem}
+%
+%\begin{proof}
+%	Trivial, since the term $xL_1\ldots L_m$ cannot create new redexes.
+%\end{proof}
+
+\setcounter{lemmaAppendix}{\value{lemma:cloredbeta}}
+\begin{lemmaAppendix}\label{lemmaAppendix:cloredbeta}
+	The following rule is sound
+	$$
+	\infer{\trm{(\x.M)}L_0\ldots L_m\in\mathit{SN}^\theta}{\trm{M[L_0/x]}L_1\ldots L_m\in\mathit{SN}^\theta & L_0\in\mathit{SN}^\theta}
+	$$
+\end{lemmaAppendix}
+\begin{proof}
+	Again, the proof is structurally very similar to the one
+	of Lemma~\ref{lemma:cloredsum}. The underlying order,
+	needs to be slightly adapted, and is the lexicographic
+	order on
+	\begin{equation}\label{equ:redordbet}
+	(\mathit{sn}(\trm{M[L_0/x]}L_1\ldots L_m)+\mathit{sn}(L_0),|M|)
+	\end{equation}
+	As usual, we proceed by showing that all terms to which
+	$\trm{(\x.M)}L_0\ldots L_m$ reduces are strongly normalizing:
+	\begin{itemize}
+		\item
+		If reduction happens in $L_0$, then we can mimick
+		the same reduction in by zero or more reduction
+		steps in $\trm{M[L_0/x]}L_1\ldots L_m$, and conclude
+		by induction hypothesis, because the first component
+		of (\ref{equ:redordbet}) strictly decreases.
+		\item
+		If reduction happens in $M$ or in $L_1,\ldots,L_m$,
+		then we can mimick the same reduction in one or more
+		reduction in $\trm{M[L_0/x]}L_1\ldots L_m$, and conclude
+		by induction hypothesis since, again, the first component
+		of (\ref{equ:redordbet}) strictly decreases.
+		\item
+		If the reduction step we perform reduces
+		$\trm{(\x.M)}L_0$, then the thesis follows from the
+		hypothesis about $\trm{M[L_0/x]}L_1\ldots L_m$.
+		\item
+		If $M$ is in the form $\trm{P +a Q}$ and
+		the reduction step we perform reduces
+		$\trm{(\x.M)}L_0\ldots L_m$
+		to $\trm{((\x.P)+a(\x.Q))}L_0\ldots L_m$,
+		we proceed by observing that
+		$\trm{(\x.P)}L_0\ldots L_m$
+		and $\trm{(\x.Q)}L_0\ldots L_m$ are
+		both in $\mathit{SN}^\theta$ and we
+		can apply the induction hypothesis to them,
+		because the first component of (\ref{equ:redordbet})
+		stays the same, but the second one strictly decreases.
+		We then obtain that
+		$\trm{P[x/L_0])}L_1\ldots L_m$
+		and $\trm{Q[x/L_0]}L_1\ldots L_m$ are both
+		in $\mathit{SN}^\theta$, and from Lemma~\ref{lemma:cloredsum}
+		we get the thesis.
+		\item
+		If $M$ is in the form $\trm{!a.P}$ and
+		the reduction step we perform reduces
+		$\trm{(\x.M)}L_0\ldots L_m$ to
+		$\trm{!a.(\x.P)}L_0\ldots L_m$. We can
+		first of all that we can assume that
+		$a\not\in L_i$ for every $0\leq i\leq m$.
+		We proceed by observing that
+		$\trm{(\x.P)}L_0\ldots L_m$ is in $\mathit{SN}^\theta$
+		and we can apply the \ih\ to it, because
+		the first component of (\ref{equ:redordbet})
+		stays the same, but the second one strictly decreases.
+		We then obtain that
+		$\trm{P[x/L_0]}L_1\ldots L_m$
+		is in $\mathit{SN}^\theta$, and from Lemma~\ref{lemma:cloredbox}
+		we get the thesis.
+		\qedhere
+	\end{itemize}
+\end{proof}
 
 \end{document}
 
