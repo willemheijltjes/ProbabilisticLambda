@@ -1,0 +1,25 @@
+I've been thinking about how to best present the way probabilities are handled in the final parts of the paper. In particular, the following: one would expect that the order of evaluating probabilities is irrelevant, as expressed by the following isomorphism on terms.
+
+   [a].[b].N  ~  [b].[a].N
+
+We don't consider this, and certainly we don't have permutative rewriting rules for it (how could we!). But we also don't make this explicit for projective reduction, by restricting it to head context.
+
+   H[] = [] | \x.H[] | H[] N
+    
+We could incorporate it, and other expected isomorphisms, by widening the context for projective reduction to a general "non-argument" context Z[].
+
+   Z[] = [] | \x.Z[] | Z[] N | [a].Z[] | Z[] a N | N a Z[]
+
+(The above would need to take care with label names, in the case of [a].Z[] in particular.) However, I propose a different direction.
+
+In line with the direction we're taking in generalizing the calculus to other I/O effects, instead of evaluating probabilities in projective reduction by an external sum +, we could supply a stream over {0,1} representing the probabilistic outcomes as a parameter. Using "s" for streams and "i.s" for a stream with head i in {0,1}:
+
+   [a].N (i.s)  ~>  N[i/a] (s)
+
+where [i/a] is the projection that takes every subterm (M0 a M1) to Mi. The isomorphism at the top then disappears, justifying our lack of permuting generators, and instead we get:
+
+   [a].[b].N (i.j.s)  ~  [b].[a].N (j.i.s)
+
+I've briefly contemplated trying to prove SN in this way, by encoding the stream s (and assuming that the result can still be typed), but of course the stream is infinite. This train of thought leads to an interesting question. An infinite random stream has infinite "entropy", in that it contains infinite information. It's not very likely that to create an infinite reduction from a probabilistic term, a stream needs to be infinitely random in this way. So we have the question: if N (s) is non-terminating, then is there a finitely presentable stream s' such that N (s') is also non-terminating? Giulio called this a "compactness theorem" for probabilistic lambda-calculus, which I like the sound of very much.
+
+Turning to call-by-value, this way of looking at our calculus gives an argument for the permutations that are needed. If we evaluate by providing streams, a normal call-by-value probabilistic lambda-calculus, if allows any choice in reduction, is non-confluent: the order in which sums are evaluated determines which sum is paired with which value in the stream. That is why, to capture it in our calculus, which is confluent even with streams, we need to look at individual reduction paths to determine the order of generators in the translation.

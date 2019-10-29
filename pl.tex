@@ -131,8 +131,8 @@
 
 \newcommand\+[1][{}]{\kern1pt{\smallbin\oplus}_{#1}\kern1pt}
 
-\newcommand\lab{\bullet}
-\newcommand{\labtwo}{\circ}
+\newcommand\lab{\circ}
+\newcommand{\full}{\bullet}
 
 \newcommand\ttrm[1]{\smash{\trm{#1}}}
 
@@ -959,7 +959,7 @@ We denote the unique $\perm$-normal form of a term $N$ by $N^\perm$.
 \section{Confluence}
 \label{sec:confluence}
 
-We aim to prove that $\rw \,=\, \rw_\beta \cup \rw_\perm$ is confluent. We will use the standard technique of \emph{parallel} $\beta$-reduction, a simultaneous reduction step on an arbitrary number of $\beta$-redexes in the source term, which we define via a labeling of the redexes to be reduced. The central point is to find a notion of reduction that is \emph{diamond}, \ie\ every critical pair can be closed in one (or zero) steps. This will be our \emph{complete} reduction, which consists of parallel $\beta$-reduction followed by $\perm$-reduction to normal form.
+We aim to prove that $\rw \,=\, \rw_\beta \cup \rw_\perm$ is confluent. We will use the standard technique of \emph{parallel} $\beta$-reduction~\cite{Takahashi95}, a simultaneous reduction step on an arbitrary number of $\beta$-redexes in the source term, which we define via a labeling of the redexes to be reduced. The central point is to find a notion of reduction that is \emph{diamond}, \ie\ every critical pair can be closed in one (or zero) steps. This will be our \emph{complete} reduction, which consists of parallel $\beta$-reduction followed by $\perm$-reduction to normal form.
 %
 %\begin{lem}[Substitution for $\rw_\perm$]
 %	\label{lemma:substitution}
@@ -1119,7 +1119,7 @@ A \emph{labeled} term $\trm{N*}$ is a term $N$ with chosen $\beta$-redexes annot
 \\	\trm{<x>}		&= x						&	\trm{<N*+aM*>}	&= \trm{<N*>+a<M*>}
 \\	\trm{<\x.N*>}	&= \trm{\x.<N*>}			&	\trm{<\,!a.N*>}	&= \trm{!a.<N*>}
 \end{align*}
-A \emph{parallel $\beta$-step} is a reduction $N\rwp_\beta\trm{<N*>}$ for some labelling $\trm{N*}$ of $N$.
+A \emph{parallel $\beta$-step} is a reduction $N\rwp_\beta\trm{<N*>}$ for some labelling $\trm{N*}$ of $N$. The \emph{full} labelling $N^\full$ of $N$ labels every redex and induces the \emph{full} parallel $\beta$-step $N\rwp_\beta\trm{<N^\full>}$.
 \end{defn}
 
 \noindent
@@ -1132,6 +1132,200 @@ A parallel $\beta$-step $N\rwp_\beta M$ is a $\beta$-reduction $N\rws_\beta M$.
 \begin{proof}
 By induction on the labelled term $\trm{N*}$ generating $N\rwp_\beta\trm{<N*>}=M$.
 \end{proof}
+
+The crucial property of parallel reduction is that any parallel step can be extended to the full one by another parallel step, as illustrated below.
+\[
+	N\rwp_\beta\trm{<N*>}\rwp_\beta\trm{<N^\full>}
+\]
+We prove this in \Cref{lemma:full-development}. As a direct corollary, parallel reduction is diamond. We need some simple technical results first.
+
+\begin{lem}
+\label{lem:parallel-properties}
+If $M\rwp_\beta M'$ and $N\rwp_\beta N'$ then:\\
+\begin{tabular}{@{\quad}l@{\quad}r@{~}c@{~}l}
+		1. & $MN$		& $\rwp_\beta$ & $M'N'$
+\\		2. & $(\x.M)N$	& $\rwp_\beta$ & $M'[N'/x]$
+\\		3. & $M[N/x]$	& $\rwp_\beta$ & $M'[N'/x]$
+\end{tabular}
+\end{lem}
+
+%
+%\newcounter{lemma:application-parallel-beta}
+%\addtocounter{lemma:application-parallel-beta}{\value{defn}}
+%\begin{lem}
+%\label{lemma:application-parallel-beta}
+%	If $\trm{M} \rwp_\beta \trm{M'}$ and $\trm{N} \rwp_\beta \trm{N'}$, 
+%\marginpar{\footnotesize Proof in the Appendix}
+%	then $\trm{MN} \rwp_\beta \trm{M'N'}$.
+%	If moreover $M = \lambda x.R$ and $M'^ = \lambda x R'$ with $R \rwp_\beta R'$, then  $\trm{MN} \rwp_\beta \trm{R'[N'/x]}$.
+%\end{lem}
+
+%\begin{proof}
+%	Since $\trm{M} \rwp_\beta \trm{<M*>} = M'$ and $\trm{N} \rwp_\beta \trm{<N*>} = N'$ for some labelings $\trm{M*}$ and $\trm{N*}$ of $M$ and $N$ respectively, let $\trm{(MN)*}$ be the labeling of $\trm{MN}$ obtained by putting together the labelings $\trm{M*}$ and $\trm{N*}$.
+%	Clearly, $\trm{MN} \rwp_\beta \trm{<(MN)*>} = \trm{<M*><N*>} = M'N'$.
+%	
+%	Concerning the part of the statement after ``moreover'', since $\trm{R} \rwp_\beta \trm{<R*>} = R'$ and $\trm{N} \rwp_\beta \trm{<N*>} = N'$ for some labelings $\trm{R*}$ and $\trm{N*}$ of $R$ and $N$ respectively, let $\trm{(MN)*}$ be the labeling of $\trm{MN}$ obtained by putting together the labelings $\trm{R*}$ and $\trm{N*}$ plus the labeled $\beta$-redex $\trm{(\x.R)*N}$.
+%	Clearly, $\trm{MN} \rwp_\beta \trm{<(MN)*>} = \trm{<R*>[<N*>/x]} = \trm{R'[N'/x]}$.
+%\end{proof}
+
+%\begin{lem}[Substitution]
+%\label{lemma:substitution}
+%	If $\trm{M} \rwp_\beta \trm{M'}$ and $\trm{N} \rwp_\beta \trm{N'}$, then $\trm{M<N/x>} \rwp_\beta \trm{M'<N'/x>}$.
+%\end{lem}
+%
+%\begin{proof}
+%	By straightforward induction on $M$.
+%\end{proof}
+
+
+\begin{lem}[Full reduction]
+\label{lemma:full-development}
+Any parallel step $P\rwp_\beta\trm{<P*>}$ can be extended by $\trm{<P*>}\rwp_\beta\trm{<P^\full>}$ to a full step.
+\end{lem}
+
+\begin{proof}
+By induction on $\trm{P*}$. We treat the two main cases below, where the inductive hypothesis gives $\trm{<M*>}\rwp_\beta\trm{<M^\full>}$ and $\trm{<N*>}\rwp_\beta\trm{<N^\full>}$. The remaining cases are immediate from the inductive hypothesis and \Cref{lem:parallel-properties}.1. Observe that the full step on $P$ reduces every redex as follows.
+\[
+	\trm{(\x.M^\full)^\full N^\full} \rwp_\beta \trm{<M^\full>[<N^\full>/x]}
+\]
+
+\begin{itemize}
+	\item 
+\emph{Labelled redex}: $\trm{(\x.M*)*N*}\rwp_\beta \trm{<M*>[<N*>/x]}$. By the inductive hypothesis and \Cref{lem:parallel-properties}.3 $\trm{<M*>[<N*>/x]}\rwp_\beta\trm{<M^\full>[<N^\full>/x]}$, as required.
+
+	\medskip
+	\item
+\emph{Unlabelled redex}: $\trm{(\x.M*)N*}\rwp_\beta\trm{(\x.<M*>)<N*>}$. By the inductive hypothesis and \Cref{lem:parallel-properties}.2 $\trm{(\x.<M*>)<N*>}\rwp_\beta\trm{<M^\full>[<N^\full>/x]}$, as required.\qedhere
+\end{itemize}
+\end{proof}
+
+\hrule
+
+\bigskip
+{\color{red} Alternatively:}
+
+\addtocounter{section}{-1}
+
+\section{Confluence}
+\label{sec:confluence}
+
+We aim to prove that $\rw \,=\, \rw_\beta \cup \rw_\perm$ is confluent. We will use the standard technique of \emph{parallel} $\beta$-reduction~\cite{Takahashi95}, a simultaneous reduction step on an arbitrary number of $\beta$-redexes in the source term, which we define via a labeling of the redexes to be reduced. The central point is to find a notion of reduction that is \emph{diamond}, \ie\ every critical pair can be closed in one (or zero) steps. This will be our \emph{complete} reduction, which consists of parallel $\beta$-reduction followed by $\perm$-reduction to normal form.
+
+
+\begin{defn}
+A \emph{labeled} term $P^\lab$ is a term $P$ with chosen $\beta$-redexes annotated as $\trm{(\x.N)*M}$. The unique \emph{labelled $\beta$-step} $P^\lab\rwp_\beta P_\lab$ from $P^\lab$ to the \emph{labelled reduct} $P_\lab$ reduces every labelled redex, and is defined inductively as follows.
+\begin{align*}
+	\trm{(\x.N*)*M*} &\rwp_\beta \trm{N_\lab[M_\lab/x]}	&	\trm{N*M*} 	 &\rwp_\beta \trm{N_\lab M_\lab}
+\\	\trm{x}		 	 &\rwp_\beta x						&	\trm{N*+aM*} &\rwp_\beta \trm{N_\lab +a M_\lab}
+\\	\trm{\x.N*}		 &\rwp_\beta \trm{\x.N_\lab}		&	\trm{!a.N*}	 &\rwp_\beta \trm{!a.N_\lab}
+\end{align*}
+A \emph{parallel $\beta$-step} $P\rwp_\beta P_\lab$ is a labelled step for some labelling $\trm{P*}$ of $P$.
+\end{defn}
+
+\noindent
+Observe that $P_\lab$ is a regular unlabeled term, since all labels are removed in the reduction. For the empty labelling, $P^\lab = P_\lab = P$, so that parallel reduction is reflexive: $P \rwp_\beta P$.
+
+\begin{lem}
+A parallel $\beta$-step $P\rwp_\beta P_\lab$ is a $\beta$-reduction $P\rws_\beta P_\lab$.
+\end{lem}
+
+\begin{proof}
+By induction on the labelled term $P^\lab$ generating $P\rwp_\beta P_\lab$.
+\end{proof}
+
+\begin{lem}
+Parallel $\beta$-reduction is diamond.
+%\[
+%\begin{tikzpicture}
+%	\matrix (m) [matrix of math nodes] {
+%	  \trm{N} &[20pt] & \trm{M} \\[20pt] \\ \trm{P} && \trm{Q} \\
+%	};
+%	\draw[rwb] (m-1-1) --node[above]{$\scriptstyle\perm$} (m-1-3);
+%	\draw[rwp] (m-1-1) --node[left] {$\scriptstyle\beta$} (m-3-1);
+%	\draw[rwp] (m-1-3) --node[right]{$\scriptstyle\beta$} (m-3-3);
+%	\draw[rwp] (m-3-1) --node[below]{$\scriptstyle\beta$} (m-3-3);
+%\end{tikzpicture}
+%\]
+\end{lem}
+
+\begin{proof}
+Let $P^\lab\rwp_\beta P_\lab$ and $P^\full\rwp_\beta P_\full$ be two labelled reduction steps on a term $P$. We annotate each step with the  label of the other, preserved by reduction, to give the following span from the doubly labelled term $P^{\lab\full}=P^{\full\lab}$.
+\[
+	P_\lab^\full 
+		\quad \mathrel{{}_\beta{\rwpleft}} \quad
+	P^{\lab\full} 
+		= 
+	P^{\full\lab} 
+		\quad \rwp_\beta \quad
+	P_\full^\lab
+\]
+Reducing the remaining labels closes the diagram.
+\[
+	P_\lab^\full 
+		\quad \rwp_\beta \quad
+	P_{\lab\full}
+		=
+	P_{\full\lab} 
+		\quad \mathrel{{}_\beta{\rwpleft}} \quad
+	P_\full^\lab 
+\qedhere
+\]
+%This is proved by induction on $N^{\lab\full}$, where only two cases are not immediate by the inductive hypothesis: those where a redex is labelled by one but not the other labelling. We show one below; the other is symmetric.
+%\[
+%\begin{array}{ccccc}
+%				(\x.N^{\lab\full})^\lab M^{\lab\full} 
+%&\rwp_\beta&	\trm{<N*>}^\full[\trm{<M*>}^\full/x]
+%&\rwp_\beta&	\trm{<<N*>^\full>}[\trm{<<M*>^\full>}/x]
+%\\ = &&&& = \\
+%				(\x.N^{\full\lab})^\lab M^{\full\lab}
+%&\rwp_\beta&	(\x.\trm{<N^\full>*})^\lab\trm{<M^\full>*}
+%&\rwp_\beta&	\trm{<<N^\full>*>}[\trm{<<M^\full>*>}/x]
+%\end{array}
+%\]
+
+\end{proof}
+
+
+
+\hrule
+
+
+%\item \emph{Variable}: $\trm{M} = x$.
+%			Then $\trm{N} = x$ since $x$ is normal. 
+%			Moreover, $\trm{M*} = x$ and hence $\trm{<M*>} = x$.
+%			Therefore, $\trm{N} \rwp \trm{<M*>}$ because $\rwp_\beta$ is reflexive.
+%			
+%			\item \emph{Abstraction}: $\trm{M} = \trm{\x.P}$.
+%			Then $\trm{N} = \trm{\x.<P^\circ>}$ for some labeling $\trm{P^\circ}$ of $\trm{P}$.
+%			Since $\trm{P} \rwp_\beta \trm{<P^\circ>}$, one has $\trm{<P^\circ>} \rwp_\beta \trm{<P*>}$ and hence $\trm{N} = \trm{\x.<P^\circ>} \rwp_\beta \trm{\x.<P*>} = \trm{<M*>}$.
+%			
+%			\item \emph{Application}: $\trm{M} = \trm{PQ}$.
+%			Let $\trm{M^\circ}$ be a labeling of $\trm{M}$ such that $N = \trm{<M^\circ>}$.
+%			There are three subcases:
+%			\begin{enumerate}
+%				\item $\trm{M} \neq \trm{(\x.R)Q}$. 
+%				Then $\trm{N} = \trm{<P^\circ><Q^\circ>}$.
+%				By \ih\ (since $\trm{P} \rwp_\beta \trm{<P^\circ>}$ and $\trm{Q} \rwp_\beta \trm{<Q^\circ>}$), one has $\trm{<P^\circ>} \rwp_\beta \trm{<P*>}$ and $\trm{<Q^\circ>} \rwp_\beta \trm{<Q*>}$.
+%				Therefore, by \Cref{lemma:application-parallel-beta}, $\trm{N} \rwp_\beta \trm{<P*><Q*>} = \trm{<M*>}$, where the equality holds because $\trm{M} \neq \trm{(\x.R)Q}$.
+%				
+%				\item $\trm{M^\circ} = \trm{(\x.R)*Q}$.
+%				Then $\trm{N} = \trm{<R^\circ>[<Q^\circ>/x]}$.
+%				By \ih\ (since $\trm{R} \rwp_\beta \trm{<R^\circ>}$ and $\trm{Q} \rwp_\beta \trm{<Q^\circ>}$), one has $\trm{<R^\circ>} \rwp_\beta \trm{<R*>}$ and $\trm{<Q^\circ>} \rwp_\beta \trm{<Q*>}$.
+%				By \Cref{lemma:substitution}, $\trm{N} = \trm{<R^\circ>[<Q^\circ>/x]} \rwp_\beta \trm{<R*>[<Q*>/x]}  = \trm{<M*>}$ where the last equality holds because $\trm{M} = \trm{(\x.R)Q}$ and $\trm{M*}$ is the full labeling of $M$.
+%				
+%				\item $\trm{M^\circ} \neq \trm{(\x.R)*Q}$ but $\trm{M} = \trm{(\x.R)Q}$ (\ie\ $P = \lambda x.R $). 
+%				Then $\trm{N} = \trm{<P^\circ><Q^\circ>}$.
+%				By \ih\ (since $\trm{P} \rwp_\beta \trm{<P^\circ>} = \trm{<\x.R^\circ>}$ and $\trm{Q} \rwp_\beta \trm{<Q^\circ>}$), one has $\trm{<P^\circ>} \rwp_\beta \trm{<P*>} = \trm{<\x.R*>}$ and $\trm{<Q^\circ>} \rwp_\beta \trm{<Q*>}$.
+%				Therefore, by \Cref{lemma:application-parallel-beta}, $\trm{N} \rwp_\beta \trm{<R*>[<Q*>/x]} = \trm{<M*>}$, where the equality holds because $\trm{M} = \trm{(\x.R)Q}$ and $\trm{M*}$ is the full labeling of $M$.
+%			\end{enumerate}
+%		\end{itemize}
+%	
+%		\item Since $\trm{M} \rwp \trm{N}$, then $\trm{M} \rwp_\beta \trm{P} \rwn_\perm \trm{N}$ for some term $\trm{P}$ such that $\trm{N} = \trm{P}^\perm$.
+%		By \Cref{lemma:full-development}.\ref{lemma:full-development-beta}, $\trm{P} \rwp_\beta \trm{<M*>}$ and hence $\trm{P} \rwp \trm{<M*>^\perm}$.
+%		According to \Cref{lem:p to complete reduction}, $\trm{N} = \trm{P}^\perm \rwp \trm{(<M*>^\perm)^\perm} = \trm{<M*>^\perm}$.
+%		\qedhere
+%	\end{enumerate}
+
 
 %\begin{proof}
 %	Since $N\rwp_\beta M$ means that $\trm{M} = \trm{<N*>}$ for some labeling $\trm{N*}$ of $\trm{N}$, we prove that $\trm{N} \rws_\beta \trm{<N*>}$ for any labeling $\trm{N*}$ of $\trm{N}$, by induction on $\trm{N}$.
@@ -1167,7 +1361,9 @@ By induction on the labelled term $\trm{N*}$ generating $N\rwp_\beta\trm{<N*>}=M
 %	\end{itemize}
 %\end{proof}
 
-For the commutation of (parallel) $\beta$-reduction with $\perm$-reduction, we run into the minor issue that a permuting generator or choice operator may block a redex: in both cases below, on the left the term has a redex, but on the right it is blocked. We address by an adaptation of $\perm$-reduction $\rwb_\perm$ on labelled terms, which is a strategy in $\rws_\perm$ that permutes past a labelled redex in one step.
+\subsection{Parallel reduction and permutative reduction}
+
+For the commutation of (parallel) $\beta$-reduction with $\perm$-reduction, we run into the minor issue that a permuting generator or choice operator may block a redex: in both cases below, on the left the term has a redex, but on the right it is blocked. We address this by an adaptation of $\perm$-reduction $\rwb_\perm$ on labelled terms, which is a strategy in $\rws_\perm$ that permutes past a labelled redex in one step.
 \[
 \begin{array}{rcl}
 	\trm{(\x.N+aM)\,P} & \rw_\perm & \trm{((\x.N)+a(\x.M))\,P}
@@ -1250,7 +1446,9 @@ Using \Cref{lem:parallel p-reduction} we decompose $\trm{N*}\rwn_\perm\trm{M*}$ 
 for which \Cref{lem:parallel p - parallel beta} gives $\trm{<N_i*>}=_\perm\trm{<N_{i+1}*>}$.
 \end{proof}
 
+\subsection{Complete reduction}
 
+{\color{red}TO DO: explain the rest of the proof here}
 
 \begin{defn}
 A \emph{complete} reduction step $\rwp$ is a parallel $\beta$-step followed by $\perm$-reduction to normal form:
@@ -1284,18 +1482,35 @@ By confluence and strong normalization of $\rw_\perm$ then $\trm{<P*>}^\perm=M^\
 
 % TO DO: clarify further with "Full parallel step"
 
-Following \cite{Takahashi95}, the idea to prove that complete reduction $\rwp$ is diamond is: first, to prove that if $M \rwp_\beta N$ then $N \rwp_\beta M^*$, where $M^*$ is a term obtained from $M$ (and independent of $N$) by reducing all the $\beta$-redexes existing in $M$ simultaneously (\Cref{lemma:full-development}.\ref{lemma:full-development-beta} below); second, via \Cref{lem:p to complete reduction}, to lift this property to complete reduction $\rwp$ by computing the $\perm$-normal form of $M^*$ (\Cref{lemma:full-development}.\ref{lemma:full-development-complete} below).
-To prove \Cref{lemma:full-development}.\ref{lemma:full-development-beta} we need the two following technical lemmata.
+The crucial property of parallel reduction is that any parallel step can be extended to the full one by another parallel step, as illustrated below.
+\[
+	M\rwp_\beta\trm{<M*>}\rwp_\beta\trm{<M^\full>}
+\]
+We lift this property to complete reduction: any complete reduction step can be extended to the full complete step, \ie\ that generated by the full labelling.
+\[
+	M\rwp\trm{<M*>^\perm}\rwp\trm{<M^\full>^\perm}
+\]
+We prove both in \Cref{lemma:full-development}. As a direct corollary, both parallel and complete reduction are diamond. We need some simple technical results first.
 
-\newcounter{lemma:application-parallel-beta}
-\addtocounter{lemma:application-parallel-beta}{\value{defn}}
 \begin{lem}
-\label{lemma:application-parallel-beta}
-	If $\trm{M} \rwp_\beta \trm{M'}$ and $\trm{N} \rwp_\beta \trm{N'}$, 
-\marginpar{\footnotesize Proof in the Appendix}
-	then $\trm{MN} \rwp_\beta \trm{M'N'}$.
-	If moreover $M = \lambda x.R$ and $M'^ = \lambda x R'$ with $R \rwp_\beta R'$, then  $\trm{MN} \rwp_\beta \trm{R'[N'/x]}$.
+If $M\rwp_\beta M'$ and $N\rwp_\beta N'$ then:\\
+\begin{tabular}{@{\quad}l@{\quad}r@{~}c@{~}l}
+		1. & $MN$		& $\rwp_\beta$ & $M'N'$
+\\		2. & $(\x.M)N$	& $\rwp_\beta$ & $M'[N'/x]$
+\\		3. & $M[N/x]$	& $\rwp_\beta$ & $M'[N'/x]$
+\end{tabular}
 \end{lem}
+
+%
+%\newcounter{lemma:application-parallel-beta}
+%\addtocounter{lemma:application-parallel-beta}{\value{defn}}
+%\begin{lem}
+%\label{lemma:application-parallel-beta}
+%	If $\trm{M} \rwp_\beta \trm{M'}$ and $\trm{N} \rwp_\beta \trm{N'}$, 
+%\marginpar{\footnotesize Proof in the Appendix}
+%	then $\trm{MN} \rwp_\beta \trm{M'N'}$.
+%	If moreover $M = \lambda x.R$ and $M'^ = \lambda x R'$ with $R \rwp_\beta R'$, then  $\trm{MN} \rwp_\beta \trm{R'[N'/x]}$.
+%\end{lem}
 
 %\begin{proof}
 %	Since $\trm{M} \rwp_\beta \trm{<M*>} = M'$ and $\trm{N} \rwp_\beta \trm{<N*>} = N'$ for some labelings $\trm{M*}$ and $\trm{N*}$ of $M$ and $N$ respectively, let $\trm{(MN)*}$ be the labeling of $\trm{MN}$ obtained by putting together the labelings $\trm{M*}$ and $\trm{N*}$.
@@ -1305,63 +1520,68 @@ To prove \Cref{lemma:full-development}.\ref{lemma:full-development-beta} we need
 %	Clearly, $\trm{MN} \rwp_\beta \trm{<(MN)*>} = \trm{<R*>[<N*>/x]} = \trm{R'[N'/x]}$.
 %\end{proof}
 
-\begin{lem}[Substitution]
-\label{lemma:substitution}
-	If $\trm{M} \rwp_\beta \trm{M'}$ and $\trm{N} \rwp_\beta \trm{N'}$, then $\trm{M<N/x>} \rwp_\beta \trm{M'<N'/x>}$.
+%\begin{lem}[Substitution]
+%\label{lemma:substitution}
+%	If $\trm{M} \rwp_\beta \trm{M'}$ and $\trm{N} \rwp_\beta \trm{N'}$, then $\trm{M<N/x>} \rwp_\beta \trm{M'<N'/x>}$.
+%\end{lem}
+%
+%\begin{proof}
+%	By straightforward induction on $M$.
+%\end{proof}
+
+
+
+\begin{lem}[Full reduction]
+\label{lemma:full-development}
+For any labelling $\trm{M*}$ of $M$:\\
+\begin{tabular}{@{\quad}l@{\quad}l@{~}l@{~}l}
+		1. & $\trm{<M*>}$		& $\rwp_\beta$	& $\trm{<M^\full>}$
+\\		2. & $\trm{<M*>^\perm}$	& $\rwp$		& $\trm{<M^\full>^\perm}$
+\end{tabular}
 \end{lem}
 
 \begin{proof}
-	By straightforward induction on $M$.
-\end{proof}
+We prove \emph{1.} by induction on $\trm{M*}$. Cases:
+\begin{itemize}
+\item \emph{Labelled redex}: $\trm{(\x.M*)*N*}$. 
 
-\begin{lem}[Full labeling]
-\label{lemma:full-development}
-	Let $\trm{M}$ be a term, and $\trm{M*}$ be its \emph{full labeling}, which labels every $\beta$-redex in $\trm{M}$.
-	\begin{enumerate}
-		\item\label{lemma:full-development-beta} If $\trm{M} \rwp_\beta \trm{N}$ then $\trm{N} \rwp_\beta \trm{<M*>}$.
-		\item\label{lemma:full-development-complete} If $\trm{M} \rwp \trm{N}$ then $\trm{N} \rwp \trm{<M*>}^\perm$.
-	\end{enumerate}
-\end{lem}
-\begin{proof}\hfill
-	\begin{enumerate}
-		\item	By induction on $\trm{M}$.
-		Cases:
-		\begin{itemize}
-			\item \emph{Variable}: $\trm{M} = x$.
-			Then $\trm{N} = x$ since $x$ is normal. 
-			Moreover, $\trm{M*} = x$ and hence $\trm{<M*>} = x$.
-			Therefore, $\trm{N} \rwp \trm{<M*>}$ because $\rwp_\beta$ is reflexive.
-			
-			\item \emph{Abstraction}: $\trm{M} = \trm{\x.P}$.
-			Then $\trm{N} = \trm{\x.<P^\circ>}$ for some labeling $\trm{P^\circ}$ of $\trm{P}$.
-			Since $\trm{P} \rwp_\beta \trm{<P^\circ>}$, one has $\trm{<P^\circ>} \rwp_\beta \trm{<P*>}$ and hence $\trm{N} = \trm{\x.<P^\circ>} \rwp_\beta \trm{\x.<P*>} = \trm{<M*>}$.
-			
-			\item \emph{Application}: $\trm{M} = \trm{PQ}$.
-			Let $\trm{M^\circ}$ be a labeling of $\trm{M}$ such that $N = \trm{<M^\circ>}$.
-			There are three subcases:
-			\begin{enumerate}
-				\item $\trm{M} \neq \trm{(\x.R)Q}$. 
-				Then $\trm{N} = \trm{<P^\circ><Q^\circ>}$.
-				By \ih\ (since $\trm{P} \rwp_\beta \trm{<P^\circ>}$ and $\trm{Q} \rwp_\beta \trm{<Q^\circ>}$), one has $\trm{<P^\circ>} \rwp_\beta \trm{<P*>}$ and $\trm{<Q^\circ>} \rwp_\beta \trm{<Q*>}$.
-				Therefore, by \Cref{lemma:application-parallel-beta}, $\trm{N} \rwp_\beta \trm{<P*><Q*>} = \trm{<M*>}$, where the equality holds because $\trm{M} \neq \trm{(\x.R)Q}$.
-				
-				\item $\trm{M^\circ} = \trm{(\x.R)*Q}$.
-				Then $\trm{N} = \trm{<R^\circ>[<Q^\circ>/x]}$.
-				By \ih\ (since $\trm{R} \rwp_\beta \trm{<R^\circ>}$ and $\trm{Q} \rwp_\beta \trm{<Q^\circ>}$), one has $\trm{<R^\circ>} \rwp_\beta \trm{<R*>}$ and $\trm{<Q^\circ>} \rwp_\beta \trm{<Q*>}$.
-				By \Cref{lemma:substitution}, $\trm{N} = \trm{<R^\circ>[<Q^\circ>/x]} \rwp_\beta \trm{<R*>[<Q*>/x]}  = \trm{<M*>}$ where the last equality holds because $\trm{M} = \trm{(\x.R)Q}$ and $\trm{M*}$ is the full labeling of $M$.
-				
-				\item $\trm{M^\circ} \neq \trm{(\x.R)*Q}$ but $\trm{M} = \trm{(\x.R)Q}$ (\ie\ $P = \lambda x.R $). 
-				Then $\trm{N} = \trm{<P^\circ><Q^\circ>}$.
-				By \ih\ (since $\trm{P} \rwp_\beta \trm{<P^\circ>} = \trm{<\x.R^\circ>}$ and $\trm{Q} \rwp_\beta \trm{<Q^\circ>}$), one has $\trm{<P^\circ>} \rwp_\beta \trm{<P*>} = \trm{<\x.R*>}$ and $\trm{<Q^\circ>} \rwp_\beta \trm{<Q*>}$.
-				Therefore, by \Cref{lemma:application-parallel-beta}, $\trm{N} \rwp_\beta \trm{<R*>[<Q*>/x]} = \trm{<M*>}$, where the equality holds because $\trm{M} = \trm{(\x.R)Q}$ and $\trm{M*}$ is the full labeling of $M$.
-			\end{enumerate}
-		\end{itemize}
-	
-		\item Since $\trm{M} \rwp \trm{N}$, then $\trm{M} \rwp_\beta \trm{P} \rwn_\perm \trm{N}$ for some term $\trm{P}$ such that $\trm{N} = \trm{P}^\perm$.
-		By \Cref{lemma:full-development}.\ref{lemma:full-development-beta}, $\trm{P} \rwp_\beta \trm{<M*>}$ and hence $\trm{P} \rwp \trm{<M*>^\perm}$.
-		According to \Cref{lem:p to complete reduction}, $\trm{N} = \trm{P}^\perm \rwp \trm{(<M*>^\perm)^\perm} = \trm{<M*>^\perm}$.
-		\qedhere
-	\end{enumerate}
+\end{itemize}
+
+%\item \emph{Variable}: $\trm{M} = x$.
+%			Then $\trm{N} = x$ since $x$ is normal. 
+%			Moreover, $\trm{M*} = x$ and hence $\trm{<M*>} = x$.
+%			Therefore, $\trm{N} \rwp \trm{<M*>}$ because $\rwp_\beta$ is reflexive.
+%			
+%			\item \emph{Abstraction}: $\trm{M} = \trm{\x.P}$.
+%			Then $\trm{N} = \trm{\x.<P^\circ>}$ for some labeling $\trm{P^\circ}$ of $\trm{P}$.
+%			Since $\trm{P} \rwp_\beta \trm{<P^\circ>}$, one has $\trm{<P^\circ>} \rwp_\beta \trm{<P*>}$ and hence $\trm{N} = \trm{\x.<P^\circ>} \rwp_\beta \trm{\x.<P*>} = \trm{<M*>}$.
+%			
+%			\item \emph{Application}: $\trm{M} = \trm{PQ}$.
+%			Let $\trm{M^\circ}$ be a labeling of $\trm{M}$ such that $N = \trm{<M^\circ>}$.
+%			There are three subcases:
+%			\begin{enumerate}
+%				\item $\trm{M} \neq \trm{(\x.R)Q}$. 
+%				Then $\trm{N} = \trm{<P^\circ><Q^\circ>}$.
+%				By \ih\ (since $\trm{P} \rwp_\beta \trm{<P^\circ>}$ and $\trm{Q} \rwp_\beta \trm{<Q^\circ>}$), one has $\trm{<P^\circ>} \rwp_\beta \trm{<P*>}$ and $\trm{<Q^\circ>} \rwp_\beta \trm{<Q*>}$.
+%				Therefore, by \Cref{lemma:application-parallel-beta}, $\trm{N} \rwp_\beta \trm{<P*><Q*>} = \trm{<M*>}$, where the equality holds because $\trm{M} \neq \trm{(\x.R)Q}$.
+%				
+%				\item $\trm{M^\circ} = \trm{(\x.R)*Q}$.
+%				Then $\trm{N} = \trm{<R^\circ>[<Q^\circ>/x]}$.
+%				By \ih\ (since $\trm{R} \rwp_\beta \trm{<R^\circ>}$ and $\trm{Q} \rwp_\beta \trm{<Q^\circ>}$), one has $\trm{<R^\circ>} \rwp_\beta \trm{<R*>}$ and $\trm{<Q^\circ>} \rwp_\beta \trm{<Q*>}$.
+%				By \Cref{lemma:substitution}, $\trm{N} = \trm{<R^\circ>[<Q^\circ>/x]} \rwp_\beta \trm{<R*>[<Q*>/x]}  = \trm{<M*>}$ where the last equality holds because $\trm{M} = \trm{(\x.R)Q}$ and $\trm{M*}$ is the full labeling of $M$.
+%				
+%				\item $\trm{M^\circ} \neq \trm{(\x.R)*Q}$ but $\trm{M} = \trm{(\x.R)Q}$ (\ie\ $P = \lambda x.R $). 
+%				Then $\trm{N} = \trm{<P^\circ><Q^\circ>}$.
+%				By \ih\ (since $\trm{P} \rwp_\beta \trm{<P^\circ>} = \trm{<\x.R^\circ>}$ and $\trm{Q} \rwp_\beta \trm{<Q^\circ>}$), one has $\trm{<P^\circ>} \rwp_\beta \trm{<P*>} = \trm{<\x.R*>}$ and $\trm{<Q^\circ>} \rwp_\beta \trm{<Q*>}$.
+%				Therefore, by \Cref{lemma:application-parallel-beta}, $\trm{N} \rwp_\beta \trm{<R*>[<Q*>/x]} = \trm{<M*>}$, where the equality holds because $\trm{M} = \trm{(\x.R)Q}$ and $\trm{M*}$ is the full labeling of $M$.
+%			\end{enumerate}
+%		\end{itemize}
+%	
+%		\item Since $\trm{M} \rwp \trm{N}$, then $\trm{M} \rwp_\beta \trm{P} \rwn_\perm \trm{N}$ for some term $\trm{P}$ such that $\trm{N} = \trm{P}^\perm$.
+%		By \Cref{lemma:full-development}.\ref{lemma:full-development-beta}, $\trm{P} \rwp_\beta \trm{<M*>}$ and hence $\trm{P} \rwp \trm{<M*>^\perm}$.
+%		According to \Cref{lem:p to complete reduction}, $\trm{N} = \trm{P}^\perm \rwp \trm{(<M*>^\perm)^\perm} = \trm{<M*>^\perm}$.
+%		\qedhere
+%	\end{enumerate}
 \end{proof}
 
 \begin{cor}[Complete reduction is diamond]
@@ -1403,7 +1623,7 @@ To prove \Cref{lemma:full-development}.\ref{lemma:full-development-beta} we need
 	\draw[rw]  (m-1-1) -- (m-1-3);
 	\draw[rwn] (m-1-1) --node[left] {$\scriptstyle\perm$} (m-3-1);
 	\draw[rwn] (m-1-3) --node[right]{$\scriptstyle\perm$} (m-3-3);
-	\draw[rwx] (m-3-1) -- (m-3-3);
+	\draw[rwp] (m-3-1) -- (m-3-3);
 \end{tikzpicture}}}
 &
 \vcenter{\hbox{\begin{tikzpicture}
@@ -2170,6 +2390,8 @@ If $N\rw_\val M+P$ and $\unopen N=\labjudg\theta{N'}$ then there is a permutatio
 
 \newpage
 \appendix
+
+\end{document}
 
 \section{Technical appendix: omitted proofs}
 \label{sect:proofs}
