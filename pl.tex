@@ -2116,7 +2116,7 @@ ingredients for our proof of strong normalization:
 \section{Projective reduction}
 \label{sec:projective-reduction}
 
-Permutative reduction $\rw_\perm$ evaluates probabilistic sums purely by rewriting. Here we look at an alternative \emph{projective} notion of reduction, which conforms more closely to the intuition that $\ttrm{!a}$ generates a probabilistic event to determine the choice $\ttrm{+a}$. We evaluate a term with reference to a binary stream $s\in\{0,1\}^{\mathbb N}$, which provides the outcomes to probabilistic events during reduction. Writing $N^s$ for the term $N$ with stream $s$, and $i\cdot s$ for the stream with $i\in\{0,1\}$ as first element, we expect to reduce $\trm{(!a.N)}^{i\cdot s}$ to $M^s$ where $M$ is obtained from $N$ by projecting every subformula $\ttrm{P+aQ}$ to $P$. To avoid introducing any permutation rules, we will evaluate a generator not just at top-level, but anywhere along the \emph{spine} of a term: under abstractions, in function position, and under (other) generators and choices.
+Permutative reduction $\rw_\perm$ evaluates probabilistic sums purely by rewriting. Here we look at an alternative \emph{projective} notion of reduction, which conforms more closely to the intuition that $\ttrm{!a}$ generates a probabilistic event to determine the choice $\ttrm{+a}$. We evaluate a term with reference to a binary stream $s\in\{0,1\}^{\mathbb N}$, which provides the outcomes to probabilistic events during reduction. Writing $N^s$ for the term $N$ with stream $s$, and $i\cdot s$ for the stream with $i\in\{0,1\}$ as first element, we expect to reduce $\trm{(!a.N)}^{i\cdot s}$ to $M^s$ where $M$ is obtained from $N$ by projecting every subformula $\ttrm{P+aQ}$ to $P$ if $i = 0$, and to $Q$ otherwise. To avoid introducing any permutation rules, we will evaluate a generator not just at top-level, but anywhere along the \emph{spine} of a term: under abstractions, in function position, and under (other) generators and choices, but not in arguments.
 
 \begin{defn}
 The \emph{$a$-projections} $\proj a0N$ and $\proj a1N$ are defined as follows, where $a\neq b$.
@@ -2131,18 +2131,18 @@ The \emph{$a$-projections} $\proj a0N$ and $\proj a1N$ are defined as follows, w
 Let $\Streams=\{0,1\}$ be the space of streams, ranged over by $r,s,t$.
 
 \begin{defn}
-The \emph{stream labelling} $N^s$ of a term $N$ with a stream $s\in\Streams$, which annotates generators as $\trm{!ai}$ with $i\in\{0,1\}$ and variables as $x^s$ with a stream $s$, is given inductively as follows.
+The \emph{stream labeling} $N^s$ of a term $N$ with a stream $s\in\Streams$, which annotates generators as $\trm{!ai}$ with $i\in\{0,1\}$ and variables as $x^s$ with a stream $s$, is given inductively as follows.
 \begin{align*}
 	\trm{(\x.N)^s} &= \trm{\x.N^s} & \trm{(!a.N)^{i\cdot s}} &= \trm{!ai.N^s} \\[5pt]	
 	\trm{(N\,M)^s} &= \trm{N^s\,M} & \trm{(N+a M)^s}		 &= \trm{N^s +a M^s}
 \end{align*}
-We lift $\beta$-reduction to stream-labelled terms by introducing a substitution case for stream-labelled variables: $x^s[M/x] = M^s$.
+We lift $\beta$-reduction to stream-labeled terms by introducing a substitution case for stream-labelled variables: $x^s[M/x] = M^s$.
 \end{defn}
 
-Observe that in $N^s$ a generator that occurs under $n$ other generators on the spine of $N$, is labelled with the element of $s$ at position $n+1$. Generators in argument position remain unlabelled, until a $\beta$-step places them on the spine, in which case they become labelled by the new substitution case. We allow to annotate a term with a finite prefix of a stream, e.g.\ $N^i$ with a singleton $i$, so that only part of the spine is labelled. Subsequent labelling of an already labelled term is then by $(N^r)^s=N^{r\cdot s}$.
+Observe that in $N^s$ a generator that occurs under $n$ other generators on the spine of $N$, is labeled with the element of $s$ at position $n+1$. Generators in argument position remain unlabeled, until a $\beta$-step places them on the spine, in which case they become labeled by the new substitution case. We allow to annotate a term with a finite prefix of a stream, e.g.\ $N^i$ with a singleton $i$, so that only part of the spine is labeled. Subsequent labeling of an already labeled term is then by $(N^r)^s=N^{r\cdot s}$.
 
 \begin{defn}
-\emph{Projective} reduction $\rw_\pi$ is the following reduction step on stream-labelled terms.
+\emph{Projective} reduction $\rw_\pi$ is the following reduction step on stream-labeled terms.
 \[
 	\trm{!ai.N} ~\rw_\pi~\proj aiN
 \]
@@ -2168,9 +2168,9 @@ Commonly, probabilistic events (with the same probability) are considered interc
 \]
 \end{rmrk}
 
-To relate projective with permutative reduction, we lift the latter to stream-labelled terms simply by preserving labels. We have the following basic result.
+To relate projective with permutative reduction, we lift the latter to stream-labeled terms simply by preserving labels. We have the following basic result.
 
-\begin{prop}[Stream-labelling commutes with reduction]
+\begin{prop}[Stream-labeling commutes with reduction]
 If $M \rw N$ with a $\beta$-step or $\perm$-step other than $\boxVoid$ then $M^s \rw N^s$.
 \end{prop}
 
@@ -2181,12 +2181,12 @@ The statement is false for the $\boxVoid$ rule $\trm{!a.N}\rw_\perm N~(a\notin\f
 \]
 \end{rmrk}
 
-In effect, the above states that labelling is deterministic: even if a generator remains unlabelled in $M$, and becomes labelled after a ($\beta$-)step $M\rw N$, what label it receives is predetermined. The deep reason is that the stream-labelling algorithm assigns an outcome to each generator in a way that corresponds to a call-by-name strategy for probabilistic reduction.
+In effect, the above states that labeling is deterministic: even if a generator remains unlabeled in $M$, and becomes labeled after a ($\beta$-)step $M\rw N$, what label it receives is predetermined. The deep reason is that the stream-labeling algorithm assigns an outcome to each generator in a way that corresponds to a call-by-name strategy for probabilistic reduction.
 
 We can now relate projective and permutative reduction in one direction.
 
 \begin{prop}
-Projective reduction is an invariant for permutative reduction on labelled generators $\ttrm{!ai}$ and their bound choices $\ttrm{+a}$, in the following ways (with a case for $\cancelR$ symmetric to $\cancelL$).
+Projective reduction is an invariant for permutative reduction on labeled generators $\ttrm{!ai}$ and their bound choices $\ttrm{+a}$, in the following ways (with a case for $\cancelR$ symmetric to $\cancelL$).
 \[
 \begin{tikzpicture}[x=40pt,y=30pt]
 	\node (A) at (0,1) {$\trm{!ai.C[N+aN]}$};
@@ -2271,7 +2271,7 @@ If we consider $i$ as an even probabilistic choice between $0$ and $1$, we may c
 \[
 	N = N^0 + N^1
 \]
-Thus, by stream-labelling we may lift an external probabilistic space, in our case the formal sum over all $s\in\{0,1\}^{\mathbb N}$, to the probabilistic space for a term $N$, as $\sum_{s\in\{0,1\}^{\mathbb N}}N^s$. Labelling makes reduction deterministic, but does not execute it, separating choice from computation; the normal forms of $N$ are obtained by reduction in this probabilistic space. With the above equation and \Cref{prop:projective head reduction}, we get the following notion of \emph{probabilistic head reduction}.
+Thus, by stream-labeling we may lift an external probabilistic space, in our case the formal sum over all $s\in\{0,1\}^{\mathbb N}$, to the probabilistic space for a term $N$, as $\sum_{s\in\{0,1\}^{\mathbb N}}N^s$. Labeling makes reduction deterministic, but does not execute it, separating choice from computation; the normal forms of $N$ are obtained by reduction in this probabilistic space. With the above equation and \Cref{prop:projective head reduction}, we get the following notion of \emph{probabilistic head reduction}.
 \[
 	\trm{H[\,!a.N]} \rws_\pi H[\proj a0N] + H[\proj a1N]
 \]
@@ -2339,7 +2339,7 @@ Our call-by-value reduction may choose an arbitrary order in which to evaluate t
 %	\draw[rw] (A) --node[above]{$\scriptstyle\val$} (B);
 %	\draw[rw] (C) --node[above]{$\scriptstyle\pi$}   (D);
 %\end{tikzpicture}
-Here, $\unopen{\trm{C[N_0vN_1]}}=\labjudg{\theta}{\trm{D[P_0+bP_1]}}$ with $D[\,]$ a $\PEL$-context, and $\theta$ giving rise to the sequence of generators $\ttrm{\dots!a.!b.!c\dots}$ in the call-by-value translation. To simulate the reduction step, if $b$ occupies the $n$-th position in $\theta$, then the $n$-th position in the context stream $s$ must be the element $j$. Since $\beta$-reduction survives the translation and labelling process intact, we may simulate the call-by-value by projective and $\beta$-reduction.
+Here, $\unopen{\trm{C[N_0vN_1]}}=\labjudg{\theta}{\trm{D[P_0+bP_1]}}$ with $D[\,]$ a $\PEL$-context, and $\theta$ giving rise to the sequence of generators $\ttrm{\dots!a.!b.!c\dots}$ in the call-by-value translation. To simulate the reduction step, if $b$ occupies the $n$-th position in $\theta$, then the $n$-th position in the context stream $s$ must be the element $j$. Since $\beta$-reduction survives the translation and labeling process intact, we may simulate the call-by-value by projective and $\beta$-reduction.
 
 \begin{thm}
 If $N\rws_{\val,\beta\val}V$ then $\uncbv N^s\rws_{\pi,\beta}\uncbv V$ for some stream $s\in\Streams$.
