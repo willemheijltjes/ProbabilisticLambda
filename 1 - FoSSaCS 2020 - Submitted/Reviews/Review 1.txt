@@ -1,0 +1,24 @@
+----------------------- REVIEW 1 ---------------------
+SUBMISSION: 93
+TITLE: Decomposing Probabilistic Lambda-calculi
+AUTHORS: Ugo Dal Lago, Giulio Guerrieri and Willem Heijltjes
+
+----------- Overall evaluation -----------
+SCORE: 2 (accept)
+----- TEXT:
+The paper presents a new interpretation of probabilistic choice for probabilistic lambda-calculus that solves the issue of the loss of confluence in the reduction operational semantics. The idea, yet simple, is very ingenious: slitting the generation of the event from the choice of what to do when such an event occurs. This separation of concerns makes much more clear why there is a problem in "copying" a probabilistic choice in the standard probabilistic lambda-calculus. Roughly, the reason is that one might have different interpretations of what a copied probabilistic choice should do. On the one hand, one might want to just copy the result of the choice, on the other hand one could interpret it as having the possibility of drawing another completely new event. The solution proposed in this paper does not suffer of this "double" interpretation and consequently it recovers in a rather standard way (which is a good thing) confluence for the reduction operational semantics.
+
+The main contributions of the paper are the following:
+
+1. Definition of Probabilistic Event Lambda-calculus
+2. Definition of two notions of reduction semantic: one by fine-grained local rewrite steps and one by generation and consumption of probabilistic events.
+3. Proof of confluence for both of the above reduction semantics.
+4. Proof of strong normalization for simple typed terms
+5. Show how to recover standard call-by-value interpretation of lambda-calculus via a syntactical translation of standard probabilistic lambda terms to term of the event lambda-calculus.
+
+Overall, the paper is well written (I found only one minor typo in a definition) and well structured. A nice "feature" is that not only it recovers the long longed confluence result, but it does it using the usual techniques. I particularly like also the idea of presenting two different reduction semantics because it shows that confluence can be recovered for different interpretation of a reduction step for the calculus.
+To conclude, I think this is a solid contribution that deserve publication in a prestigious conference such as FoSSaCS.
+
+TYPO:
+-pg 3, line -5: "binds the label a in M" (replace M with N)
+

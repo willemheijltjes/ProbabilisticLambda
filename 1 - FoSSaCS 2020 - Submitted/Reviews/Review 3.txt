@@ -1,0 +1,15 @@
+----------------------- REVIEW 3 ---------------------
+SUBMISSION: 93
+TITLE: Decomposing Probabilistic Lambda-calculi
+AUTHORS: Ugo Dal Lago, Giulio Guerrieri and Willem Heijltjes
+
+----------- Overall evaluation -----------
+SCORE: 2 (accept)
+----- TEXT:
+The paper is motivated by the lack of confluence in the probabilistic lambda calculus, which requires an early commitment to a specific reduction strategy, e.g. CBV or CBN. The authors propose a formalism called the Probabilistic Event Lambda Calculus, which is confluent and expressive enough to accommodate the two. The main technical idea is the treatment of probabilistic events as binders, helping one to separate the moment of a probabilistic event (coin toss) from the ensuing outcome. The separation then makes it possible to specify the requisite commutation/distributivity properties that should hold in each case, e.g. duplicates of events must not be identified. The resultant calculus is shown to be confluent and its typed variant - strongly normalizing.
+
+The paper is written well and constitutes an elegant/simple addition to the literature on probabilistic lambda calculi.
+
+I was missing a deeper comparison of the merits of the proposed approach with potential alternative solutions based on linear logic or CBPV. Could the latter lead to a simpler reduction system, e.g. without so many instances of copying present in ->_p?
+
+p17: contend -> content
