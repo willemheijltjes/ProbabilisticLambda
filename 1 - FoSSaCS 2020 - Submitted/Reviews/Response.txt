@@ -16,7 +16,7 @@ We agree: we would have liked to be more precise, but were struggling against ti
 
 *** Proposition 35 claims a kind of of simulation but the authors do not discuss the converse, neither the asymptotic behaviour of the semantics, even not with examples. 
 
-We do not expect a converse, as our reduction is more refined; but confluence ensures that a normal form of [[N]]_cbv is the translation of the CBV normal form of N. We would be happy to include a further example.
+Indeed, there is _almost_ a bisimulation: probabilistic steps in N and projective steps in [[N]]_cbv are in 1-1 correspondence. But [[N]]_cbv allows beta-steps that duplicate a labelled choice, which are unavailable in N. Still, confluence ensures that a normal form of [[N]]_cbv is the translation of the CBV normal form of N. We would be happy to include a further example.
 
 *** I do not see a similar discussion for the lazy cbn or the head-reduction.
 
