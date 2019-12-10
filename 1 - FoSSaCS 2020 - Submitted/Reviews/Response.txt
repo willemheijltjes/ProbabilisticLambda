@@ -8,8 +8,7 @@ We are aware of the work by Faggian and Ronchi della Rocca. The main difference 
 
 *** Leventis' MSCS 2019 paper "A deterministic rewrite system for the probabilistic lambda-calculus"
 
-We are grateful for the reference, which we knew but whose publication we were not aware. Indeed, Leventis gives an account of standard CBN probabilistic lambda-calculus by similar rewriting to ours - in fact, our system simulates
-Leventis' $M\oplus N$ as $[a].M\oplus_a B. The difference is our decomposition: Leventis can only express CBN reduction, and not CBV as we do, because the box $[a]$ is always next to the probabilistic choice operator $\oplus_a$.
+We are grateful for the reference, which we knew but whose publication we were not aware. Indeed, Leventis gives an account of standard CBN probabilistic lambda-calculus by similar rewriting to ours - in fact, our system simulates Leventis' $M\oplus N$ as $[a].M\oplus_a B. The difference is our decomposition: Leventis can only express CBN reduction, and not CBV as we do, because the box $[a]$ is always next to the probabilistic choice operator $\oplus_a$.
 
 *** (2) The second issue is more problematic from my point of view. The authors claim in the abstract that their calculus "interprets the call-by-name and call-by-value strategies", but, as far as I understand, the paper misses a clear account of these interpretations.
 
@@ -26,6 +25,7 @@ Indeed, there is _almost_ a bisimulation: probabilistic steps in N and projectiv
 *** I do not see a similar discussion for the lazy cbn or the head-reduction.
 
 [I don't think we can say too much here, but I am not sure. Maybe we can make $[a]$ to be blocked by $\lambda$s, this way modeling lazyness?].
+[WBH: We could offer to say something about head reduction, which (I think) we get immediately by using projective and beta-reduction only in our head context H[]. For CBNeed, we could remark that in practice (meaning: Haskell), monads are used precisely because effects such as probabilities are otherwise too unpredictable. Our syntax is, effectively, the same as monadic computation, which we can make precise.]
 
 Review 3:
 
