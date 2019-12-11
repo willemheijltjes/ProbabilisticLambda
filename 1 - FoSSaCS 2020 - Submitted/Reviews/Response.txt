@@ -1,38 +1,42 @@
-﻿First, we would like to thank the three anonymous reviewers for the many useful and interesting observations. We agree with most of them. Below, we only comment on the main points raised by the three reviewers. 
+First, we would like to thank the three anonymous reviewers for the many useful and interesting observations. We agree with most of them. Below, we only comment on the main points raised by the three reviewers. 
 
 Review 2:
 
-*** (1) The authors should compare more in detail their contribution with the existing literature (the shortcut "This is deeply different from what we do here" [p.3] is too coarse, in fact I disagree on this point). The idea of implementing probabilistic lambda-calculi by a deterministic rewriting enjoying a confluence property is already present in the literature, e.g. Faggian and Ronchi della Rocca's [12], but also (not cited) Alberti's PhD thesis "On operational properties of quantitative extensions of λ-calculus" and (also not cited) 
+*** (1) The authors should compare more in detail their contribution with the existing literature (the shortcut "This is deeply different from what we do here" [p.3] is too coarse, in fact I disagree on this point). The idea of implementing probabilistic lambda-calculi by a deterministic rewriting enjoying a confluence property is already present in the literature, e.g. Faggian and Ronchi della Rocca's [12], but also (not cited) Alberti's PhD thesis "On operational properties of quantitative extensions of λ-calculus"
 
-We are aware of the work by Faggian and Ronchi della Rocca. The main difference with this work is that the bang operator $!$ in their calculus $\Lambda_\oplus^!$ plays both the role of a marker for duplicability and of a checkpoint for any probabilistic choice "flowing out" of the term (i.e. being fired). In our calculus, we do not control duplication, but we definitely make use of checkpoints, in the form of the $[a]$ operator. Saying it another way, Faggian and Ronchi's work is inspired by lineare logic, while our approach is inspired by deep inference, even though this is, on purpose, not evident in the design of our calculus. We will add a paragraph to compare our work with the existing literature, in particular with Faggian and Ronchi [12]: we can move some proofs in the appendix to make room
+The main difference with the work by Faggian and Ronchi della Rocca [12] is that the bang operator $!$ in their calculus $\Lambda_\oplus^!$ plays both the role of a marker for duplicability and of a checkpoint for any probabilistic choice "flowing out" of the term (i.e. being fired). In our calculus, we do not control duplication, but we definitely make use of checkpoints, in the form of the $[a]$ operator. Saying it another way, Faggian and Ronchi's work is inspired by linear logic, while our approach is inspired by deep inference, even though this is, on purpose, not evident in the design of our calculus. We will add a paragraph to compare our work with the existing literature, in particular with [12]: we can move some proofs into the appendix to make room.
+
+As far as we understood, Alberti's PhD thesis contains a semantic and operational study of probabilistic lambda-calculus with a weak call-by-name strategy. This would not address the problem of confluence between CBV and CBN, as we do. If we are mistaken, we would be happy to be corrected.
 
 *** Leventis' MSCS 2019 paper "A deterministic rewrite system for the probabilistic lambda-calculus"
 
-We are grateful for the reference, which we knew but whose publication we were not aware. Indeed, Leventis gives an account of standard CBN probabilistic lambda-calculus by similar rewriting to ours - in fact, our system simulates Leventis' $M\oplus N$ as $[a].M\oplus_a B. The difference is our decomposition: Leventis can only express CBN reduction, and not CBV as we do, because the box $[a]$ is always next to the probabilistic choice operator $\oplus_a$.
+We are grateful for the reference, of whose publication we were not aware. Indeed, Leventis gives an account of standard CBN probabilistic lambda-calculus by similar rewriting to ours - in fact, our permutative reduction simulates Leventis's by encoding $M\oplus N$ as $[a].M\oplus_a N$. The difference is our decomposition: Leventis can only express CBN reduction, and not CBV as we do, because the generator $[a]$ is always next to the choice $\oplus_a$.
 
 *** (2) The second issue is more problematic from my point of view. The authors claim in the abstract that their calculus "interprets the call-by-name and call-by-value strategies", but, as far as I understand, the paper misses a clear account of these interpretations.
 
-Call-by-name can be interpreted as above. Call-by-value (or, better, an eager normalization strategy) can be captured by making each $\oplus_a$ to occur deeper than the corresponding binder $[a]$. This way, the former can be copied, but each one of these copies solved by referring to *the same* probabilistic event, since they are all bound by $[a]$. 
+Call-by-name can be interpreted as above. Call-by-value (or, better, an eager normalization strategy) can be captured by making each $\oplus_a$ occur deeper than the corresponding binder $[a]$. This way, the former can be copied, but each one of these copies is resolved by referring to *the same* probabilistic event, since they are all bound by $[a]$. We explore this in Section 7. We will be more explicit about both interpretations.
 
 *** Section 7 is devoted to a translation of cbv into their calculus, but I feel this one-page section sketched and much less accurate than the rest of the paper. 
 
-We agree: we would have liked to be more precise, but were struggling against time. We have since improved the exposition by using explicit streams in {0,1}^* to represent probabilistic events.
+We agree: we would have liked to be more precise, but were struggling against time. The technical issue is that our order of generators [a],[b] etc. in a translation needs to be fixed, yet they should be able to "fire" in any order. Since submitting, we have resolved this by using explicit streams in {0,1}^* to represent probabilistic events. This allows us to be much more accurate in our exposition.
 
 *** Proposition 35 claims a kind of of simulation but the authors do not discuss the converse, neither the asymptotic behaviour of the semantics, even not with examples. 
 
-Indeed, there is _almost_ a bisimulation: probabilistic steps in N and projective steps in [[N]]_cbv are in 1-1 correspondence. But [[N]]_cbv allows beta-steps that duplicate a labelled choice, which are unavailable in N. Still, confluence ensures that a normal form of [[N]]_cbv is the translation of the CBV normal form of N. We would be happy to include a further example.
+Indeed, there is _almost_ a bisimulation: probabilistic steps in N and projective steps in [[N]]_cbv are in 1-1 correspondence. But [[N]]_cbv allows beta-steps that duplicate a labelled choice $\oplus_a$, which are unavailable in N, since CBV forbids duplicating the corresponding $\oplus$. Still, confluence ensures that a normal form of [[N]]_cbv is the translation of the CBV normal form of N. We would be happy to include a further example.
 
 *** I do not see a similar discussion for the lazy cbn or the head-reduction.
 
-[I don't think we can say too much here, but I am not sure. Maybe we can make $[a]$ to be blocked by $\lambda$s, this way modeling lazyness?].
-[WBH: We could offer to say something about head reduction, which (I think) we get immediately by using projective and beta-reduction only in our head context H[]. For CBNeed, we could remark that in practice (meaning: Haskell), monads are used precisely because effects such as probabilities are otherwise too unpredictable. Our syntax is, effectively, the same as monadic computation, which we can make precise.]
-[Giulio: I agree with Willem, we can say that head reduction can be simulated by closing beta and projective reductions by head contexts, it's immediate. 
-We can say something about laziness, but only in a informal way, as future work, because in my opinoin it's risky to be precise at the moment: laziness it's a subtle matter where it's easy to say something wrong.]
+Head reduction in our calculus would be standard: a restriction of reduction to head contexts. This would be very natural for our projective reduction, which already performs probabilistic steps in head context. We can add a remark about this.
+
+For laziness, this is best expressed with explicit substitutions, which we don't currently have. This would certainly be interesting to look at in future work.
+
 
 Review 3:
 
 *** I was missing a deeper comparison of the merits of the proposed approach with potential alternative solutions based on linear logic or CBPV. Could the latter lead to a simpler reduction system, e.g. without so many instances of copying present in ->_p?
 
-We point to projective reduction as the simpler reduction system.
-[Giulio: In my opinion, this answer is too short and hasty. I would point to the answer we give to point 1 of Referee 2, and I would say that our approach is finer than Faggian and Ronchi Della Rocca because we show that we don't need a marker for duplicability to restore confluence in a probabilistic setting.]
+See also our first response above, regarding the work of Faggian and Ronchi Della Rocca. We believe our approach to be more fine-grained than those via CBPV or linear logic, since we place no restrictions on beta-reduction and our permutative reduction is on individual operators. 
+
+For a simpler reduction system, we have proposed our projective reduction. (Our new formulation with streams drastically improves this notion.)
+
 
