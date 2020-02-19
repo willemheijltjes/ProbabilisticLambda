@@ -357,14 +357,17 @@ The \emph{probabilistic event $\lambda$-calculus} ($\PEL$) is given by the follo
 \end{defn}
 %
 In a term $\trm{\x.M}$ the abstraction $\x$ binds the free occurrences of the variable $x$ in its scope $\trm{M}$, and in $\ttrm{!a.N}$ the generator $\ttrm{!a}$ binds the \emph{label} $a$ in $\trm{N}$. The calculus features a decomposition of the usual probabilistic sum $\trm{\+}$, as follows.
-\[
+\begin{align}
+\label{eq:unlabeled}
 	N\+M \quad\stackrel\Delta=\quad \trm{!a. N +a M}
-\]
-The generator $\ttrm{!a}$ represents a probabilistic \emph{event}, whose outcome, a binary value $\{0,1\}$ represented by the label $a$, is used by the choice operator $\ttrm{+a}$. That is, $\ttrm{!a}$ flips a coin setting $a$ to $0$ or $1$, and depending on this $\ttrm{N+aM}$ reduces to $N$ respectively $M$. We will use the unlabelled choice $\+$ as the above abbreviation. This convention also gives the translation from a \emph{call-by-name} probabilistic lambda-calculus into $\PEL$ (we formalize the interpretation of a \emph{call-by-value} probabilistic calculus in Section~\ref{sec:cbv}).
+\end{align}
+The generator $\ttrm{!a}$ represents a probabilistic \emph{event}, whose outcome, a binary value $\{0,1\}$ represented by the label $a$, is used by the choice operator $\ttrm{+a}$. That is, $\ttrm{!a}$ flips a coin setting $a$ to $0$ or $1$, and depending on this $\ttrm{N+aM}$ reduces to $N$ respectively $M$. We will use the unlabelled choice $\+$ as in \eqref{eq:unlabeled} %the above abbreviation. 
+This convention also gives the translation from a \emph{call-by-name} probabilistic $\lambda$-calculus into $\PEL$ %(we formalize
+(the interpretation of a \emph{call-by-value} probabilistic calculus is in Section~\ref{sec:cbv}).
 
 
 
-\begin{figure}[!ht]
+\begin{figure}[!t]
   \fbox{
 \begin{minipage}{.97\textwidth}
 \begin{align}
@@ -377,12 +380,12 @@ The generator $\ttrm{!a}$ represents a probabilistic \emph{event}, whose outcome
 \\	\trm{\x.(N +a M)}		&\rw_\perm \trm{(\x.N) +a (\x.M)}									\tag{\plusAbs}
 \\	\trm{(N +a M) P}		&\rw_\perm \trm{(NP) +a (MP)}			\rstrut						\tag{\plusFun}
 \\	\trm{N (M +a P)}		&\rw_\perm \trm{(NM) +a (NP)}			\rstrut						\tag{\plusArg}
-\\	\trm{(N +a M) +b P}		&\rw_\perm \trm{(N +b P) +a (M +b P)} 	\rstrut	&& (a\smallbin<b)	\tag{\plusL}
-\\	\trm{N +b (M +a P)}		&\rw_\perm \trm{(N +b M) +a (N +b P)} 	\rstrut	&& (a\smallbin<b)	\tag{\plusR}
+\\	\trm{(N +a M) +b P}		&\rw_\perm \trm{(N +b P) +a (M +b P)} 	\rstrut	&& (\text{if } a\smallbin<b)	\tag{\plusL}
+\\	\trm{N +b (M +a P)}		&\rw_\perm \trm{(N +b M) +a (N +b P)} 	\rstrut	&& (\text{if } a\smallbin<b)	\tag{\plusR}
 %\\	\trm{!b.(N +a M)}		&\rw_\perm \trm{(!b.N) +a (!c M[c/b])}	\rstrut	&& (a\neq b)		\tag{\plusBox}
-\\	\trm{!b.(N +a M)}		&\rw_\perm \trm{(!b.N) +a (!b.M)}		\rstrut	&& (a\neq b)		\tag{\plusBox}
+\\	\trm{!b.(N +a M)}		&\rw_\perm \trm{(!b.N) +a (!b.M)}		\rstrut	&& (\text{if } a\neq b)		\tag{\plusBox}
 \\																								\notag
-\\	\trm{!a.N}				&\rw_\perm N 									&& (a\notin N)		\tag{\boxVoid}
+\\	\trm{!a.N}				&\rw_\perm N 									&& (\text{if } a\notin \fl{N})		\tag{\boxVoid}
 \\	\trm{\x.!a.N} 			&\rw_\perm \trm{!a.\x. N}				\rstrut						\tag{\boxAbs}
 \\	\trm{(!a.N)M}			&\rw_\perm \trm{!a.(NM)}				\rstrut						\tag{\boxFun}
 \end{align}
@@ -455,12 +458,12 @@ The normal forms $P_0$ of $\rw_\perm$, respectively $N_0$ of $\rw$, are given by
 
 \[
 	\begin{array}{ccc@{~}c@{~}c@{}l}
-		P_0 &\coloneqq& P_1 &\mid& \trm{P_0 \+ P_0}
+		P_0 &\coloneqq& P_1 &\mid& \trm{P_0 \+ P_0'}
 	\\	P_1	&\coloneqq& x   &\mid& \x.P_1 			 &~\mid~ P_1\,P_0
 	\end{array}
 	\qquad\qquad
 	\begin{array}{ccc@{~}c@{~}c}
-		N_0 &\coloneqq& N_1 &\mid& \trm{N_0 \+ N_0}
+		N_0 &\coloneqq& N_1 &\mid& \trm{N_0 \+ N_0'}
 	\\	N_1	&\coloneqq& N_2 &\mid& \x.N_1
 	\\	N_2 &\coloneqq& x	&\mid& N_2\,N_0
 	\end{array}
@@ -487,7 +490,9 @@ The normal forms $P_0$ of $\rw_\perm$, respectively $N_0$ of $\rw$, are given by
 \section{Properties of permutative reduction}
 \label{sec:p-reduction}
 
-We will prove strong normalization (\SN) and confluence of $\rw_\perm$. For strong normalization, the obstacle is the interaction between different choice operators, which may duplicate each other, and even themselves, creating super-exponential growth.\footnote{This was inferred from only a simple simulation; we would be interested to know a rigorous complexity result.} Fortunately, Dershowitz's \emph{recursive path orders}~\cite{Dershowitz82} seem tailor-made for our situation.
+We will prove strong normalization and confluence of $\rw_\perm$. 
+For strong normalization, the obstacle is the interaction between different choice operators, which may duplicate each other, %and even themselves, 
+creating super-exponential growth.\footnote{This was inferred from only a simple simulation; we would be interested to know a rigorous complexity result.} Fortunately, Dershowitz's \emph{recursive path orders}~\cite{Dershowitz82} seem tailor-made for our situation.
 
 %\subsection{Strong normalization of permutative reduction}
 
@@ -1221,7 +1226,9 @@ We denote the unique $\perm$-normal form of a term $N$ by $N_\perm$.
 \section{Confluence}
 \label{sec:confluence}
 
-We aim to prove that $\rw \,=\, \rw_\beta \cup \rw_\perm$ is confluent. We will use the standard technique of \emph{parallel} $\beta$-reduction~\cite{Takahashi95}, a simultaneous reduction step on an arbitrary number of $\beta$-redexes in the source term, which we define via a labeling of the redexes to be reduced. The central point is to find a notion of reduction that is \emph{diamond}, \ie\ every critical pair can be closed in one (or zero) steps. This will be our \emph{complete} reduction, which consists of parallel $\beta$-reduction followed by $\perm$-reduction to normal form.
+We aim to prove that $\rw \,=\, \rw_\beta \cup \rw_\perm$ is confluent. We will use the standard technique of \emph{parallel} $\beta$-reduction~\cite{Takahashi95}, a simultaneous reduction step on %an arbitrary
+a number of $\beta$-redexes, %in the source term, 
+which we define via a labeling of the redexes to be reduced. The central point is to find a notion of reduction that is \emph{diamond}, \ie\ every critical pair can be closed in one (or zero) steps. This will be our \emph{complete} reduction, which consists of parallel $\beta$-reduction followed by $\perm$-reduction to normal form.
 
 
 \begin{defn}
@@ -1708,10 +1715,10 @@ normalisation is based on the classic reducibility technique,
 and inherently has to deal with label-open terms. It thus make great
 sense to turn the order $<_{{\trm{M}}}$ from
 Definition~\ref{def:orderlabels} into something more formal, at the same time
-allowing terms to be label-\emph{open}. This is in
-Figure~\ref{fig:order}.
+allowing terms to be label-\emph{open}. 
+This is in Figure~\ref{fig:order}.
 %
-\begin{figure}
+\begin{figure}[!t]
   \fbox{
     \begin{minipage}{.97\textwidth}
       \begin{tabular}{ll}
@@ -1734,8 +1741,8 @@ Figure~\ref{fig:order}.
       \end{tabular}
     \end{minipage}
   }
-  \label{fig:order}
   \caption{Labelling Terms}
+    \label{fig:order}
 \end{figure}
 %\begin{figure}
 %  \fbox{
@@ -1775,14 +1782,15 @@ to normal forms become themselves parametric:
 \item
   The set $\mathit{SN}^\theta$ of those terms $M$ such
   that $\labjudg{\theta}{M}$ and $(M,\theta)$ is strongly
-  normalizing modullo $\rw^\theta$;
+  normalizing modulo $\rw^\theta$;
 \item
   The function $\mathit{sn}^\theta$ assigning to any
   term in $\mathit{SN}^\theta$ the maximal number of $\rw^\theta$
   steps to normal form.
 \end{itemize}
 
-Now, let us define types, environments, judgments, and typing rules in
+Now, %let us 
+we define types, environments, judgments, and typing rules in
 Figure~\ref{fig:typing}.
 \newcommand{\arrow}{\Rightarrow}
 \newcommand{\judg}[3]{#1\vdash #2:#3}
@@ -1824,7 +1832,7 @@ course different),
 \label{lemma:cloredsum}
   The following rule is sound:
   $$
-  \infer{\trm{M +a N}L_1\in\mathit{SN}^\theta\ldots L_m\in\mathit{SN}^\theta}{ML_1\ldots L_m & NL_1\ldots L_m\in\mathit{SN}^\theta & a\in\theta}
+  \infer{\trm{M +a N}L_1 \ldots L_m\in\mathit{SN}^\theta}{ML_1\ldots L_m\in\mathit{SN}^\theta & NL_1\ldots L_m\in\mathit{SN}^\theta & a\in\theta}
   $$
 \end{lem}
 \begin{proof}
@@ -2000,7 +2008,7 @@ course different),
 The definition of a reducible term stays the same:
 \begin{align*}
   \RedSet{\alpha}&=\{(\Gamma,\theta,M)\mid M\in\mathit{SN}^\theta\wedge\judg{\Gamma}{M}{\alpha}\};\\
-  \RedSet{\tau\arrow\rho}&=\{(\Gamma,\theta,M)\mid(\judg{\Gamma}{M}{\tau\arrow\rho})\wedge(\labjudg{\theta}{M})\wedge\\
+  \RedSet{\tau\arrow\rho}&=\{(\Gamma,\theta,M)\mid(\judg{\Gamma}{M}{\tau\arrow\rho})\wedge(\labjudg{\theta}{M}) \ \wedge\\
     &\qquad\forall(\Gamma\Delta,\theta,N)\in\RedSet{\tau}.(\Gamma\Delta,\theta,MN)\in\RedSet{\rho}\}.
 \end{align*}
 \begin{lem}\label{lemma:redprop}
@@ -2011,16 +2019,16 @@ The definition of a reducible term stays the same:
     If $\judg{\Gamma}{x L_1\ldots L_m}{\tau}$ and $L_1,\ldots,L_m\in\mathit{SN}^\theta$,
     then $(\Gamma,\theta,x L_1\ldots L_m)\in\RedSet{\tau}$.
   \item\label{point:beta}
-    If $(\Gamma,\theta,\trm{M[L_0/x]}L_1\ldots L_m)\in\RedSet{\tau}$,
-    $\judg{\Gamma}{L_0}{\rho}$ and $L_0\in\mathit{SN}^\theta$
+    If $(\Gamma,\theta,\trm{M[L_0/x]}L_1\ldots L_m)\in\RedSet{\tau}$
+    with $\judg{\Gamma}{L_0}{\rho}$ and $L_0\in\mathit{SN}^\theta$,
     then $(\Gamma,\theta,\trm{(\x.M)}L_0\ldots L_m)\in\RedSet{\tau}$.
   \item\label{point:sum}
-    If $(\Gamma,\theta,ML_1\ldots L_m)\in\RedSet{\tau}$,
-    $(\Gamma,\theta,NL_1\ldots L_m)\in\RedSet{\tau}$, and $a\in\theta$,
+    If $(\Gamma,\theta,ML_1\ldots L_m)\in\RedSet{\tau}$ with
+    $(\Gamma,\theta,NL_1\ldots L_m)\in\RedSet{\tau}$ and $a\in\theta$,
     then $(\Gamma,\theta,\trm{(M +a N)}L_1\ldots L_m)\in\RedSet{\tau}$.
   \item\label{point:box}
     If $(\Gamma,a\cdot\theta,ML_1\ldots L_m)\in\RedSet{\tau}$
-    and $a\not\in L_i$ for every $i$,
+    and $a\not\in L_i$ for all $i$,
     then $(\Gamma,\theta,\trm{(!a.M)}L_1\ldots L_m)\in\RedSet{\tau}$.
   \end{enumerate}
 \end{lem}
@@ -2119,21 +2127,22 @@ ingredients for our proof of strong normalization:
 Permutative reduction $\rw_\perm$ evaluates probabilistic sums purely by rewriting. Here we look at an alternative \emph{projective} notion of reduction, which conforms more closely to the intuition that $\ttrm{!a}$ generates a probabilistic event to determine the choice $\ttrm{+a}$. We evaluate a term with reference to a binary stream $s\in\{0,1\}^{\mathbb N}$, which provides the outcomes to probabilistic events during reduction. Writing $N^s$ for the term $N$ with stream $s$, and $i\cdot s$ for the stream with $i\in\{0,1\}$ as first element, we expect to reduce $\trm{(!a.N)}^{i\cdot s}$ to $M^s$ where $M$ is obtained from $N$ by projecting every subformula $\ttrm{P_0+aP_1}$ to $P_i$. To avoid introducing any permutation rules, we will evaluate a generator not just at top-level, but anywhere along the \emph{spine} of a term: under abstractions, in function position, and under (other) generators and choices.
 
 \begin{defn}
-The \emph{$a$-projections} $\proj a0N$ and $\proj a1N$ are defined as follows, where $a\neq b$.
+The \emph{$a$-projections} $\proj a0N$ and $\proj a1N$ are defined as follows: %, where $a\neq b$.
 \begin{align*}
 	\proj a0{N+aM} &= \proj a0N		&	\proj ai{\x.N} &= \x.\proj aiN
 \\	\proj a1{N+aM} &= \proj a1M		&	\proj ai{NM}   &= \proj aiN\,\proj aiM
-\\	\proj ai{!a.N} &= \trm{!a.N}	& 	\proj ai{N+bM} &= \proj aiN\,\trm{+b}\,\proj aiM
-\\	\proj aix      &= x				&	\proj ai{!b.N} &= \trm{!b.}\proj aiN
+\\	\proj ai{!a.N} &= \trm{!a.N}	& 	\proj ai{N+bM} &= \proj aiN\,\trm{+b}\,\proj aiM \quad \text{if } a \neq b
+\\	\proj aix      &= x				&	\proj ai{!b.N} &= \trm{!b.}\proj aiN \quad \text{if } a \neq b.
 \end{align*}
 \end{defn}
 
-Let $\Streams=\{0,1\}$ be the space of streams, ranged over by $r,s,t$.
+Let $\Streams=\{0,1\}^\mathbb{N}$ be the space of streams, ranged over by $r,s,t$.
 
 \begin{defn}
 The \emph{stream labeling} $N^s$ of a term $N$ with a stream $s\in\Streams$, which annotates generators as $\trm{!ai}$ with $i\in\{0,1\}$ and variables as $x^s$ with a stream $s$, is given inductively as follows.
 \begin{align*}
-	\trm{(\x.N)^s} &= \trm{\x.N^s} & \trm{(!a.N)^{i\cdot s}} &= \trm{!ai.N^s} \\[5pt]
+	\trm{(\x.N)^s} &= \trm{\x.N^s} & \trm{(!a.N)^{i\cdot s}} &= \trm{!ai.N^s} 
+	\\
 	\trm{(N\,M)^s} &= \trm{N^s\,M} & \trm{(N+a M)^s}		 &= \trm{N^s +a M^s}
 \end{align*}
 We lift $\beta$-reduction to stream-labeled terms by introducing a substitution case for stream-labelled variables: $x^s[M/x] = M^s$.
