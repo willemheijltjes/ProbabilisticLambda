@@ -340,8 +340,7 @@ The resulting \emph{probabilistic event lambda-calculus} $\PEL$, which we presen
 \end{array}
 \]
 %
-In this paper, we introduce $\PEL$ and its reduction mechanisms (Sections~\ref{sec:PEL},~\ref{sec:p-reduction},~\ref{sec:projective-reduction}); we prove confluence (Section~\ref{sec:confluence}); we give a system of simple types and prove strong normalization for typed terms (Section~\ref{sec:SN}); and we demonstrate the translation to interpret call-by-value evaluation (Section~\ref{sec:cbv}).
-
+In this paper, we introduce $\PEL$ (Section~\ref{sec:PEL}) with two reduction relations, \emph{permutative} (Sections~\ref{sec:PEL},~\ref{sec:p-reduction}) and \emph{projective} reduction (Section~\ref{sec:projective-reduction}); we prove confluence (Section~\ref{sec:confluence}); we give a system of simple types and prove strong normalization for typed terms by reducibility (Section~\ref{sec:SN}); and we demonstrate the translations to interpret call-by-name (Section~\ref{sec:PEL}) and call-by-value evaluation (Section~\ref{sec:cbv}).
 
 \subsection{Related work}
 
@@ -368,12 +367,15 @@ The \emph{probabilistic event $\lambda$-calculus} ($\PEL$) is given by the follo
 \]
 \end{defn}
 %
+\noindent
 In a term $\trm{\x.M}$ the abstraction $\x$ binds the free occurrences of the variable $x$ in its scope $\trm{M}$, and in $\ttrm{!a.N}$ the generator $\ttrm{!a}$ binds the \emph{label} $a$ in $\trm{N}$. The calculus features a decomposition of the usual probabilistic sum $\trm{\+}$, as follows.
+%
 \begin{align}
 \label{eq:unlabeled}
 	N\+M \quad\stackrel\Delta=\quad \trm{!a. N +a M}
 \end{align}
-The generator $\ttrm{!a}$ represents a probabilistic \emph{event}, whose outcome, a binary value $\{0,1\}$ represented by the label $a$, is used by the choice operator $\ttrm{+a}$. That is, $\ttrm{!a}$ flips a coin setting $a$ to $0$ or $1$, and depending on this $\ttrm{N+aM}$ reduces to $N$ respectively $M$. We will use the unlabelled choice $\+$ as in \eqref{eq:unlabeled} %the above abbreviation. 
+%
+The generator $\ttrm{!a}$ represents a probabilistic \emph{event}, whose outcome, a binary value $\{0,1\}$ represented by the label $a$, is used by the choice operator $\ttrm{+a}$. That is, $\ttrm{!a}$ flips a coin setting $a$ to $0$ or $1$, and depending on this $\ttrm{N+aM}$ reduces to $N$ respectively $M$. We will use the unlabelled choice $\+$ as in \eqref{eq:unlabeled}. %the above abbreviation. 
 This convention also gives the translation from a \emph{call-by-name} probabilistic $\lambda$-calculus into $\PEL$ %(we formalize
 (the interpretation of a \emph{call-by-value} probabilistic calculus is in Section~\ref{sec:cbv}).
 
