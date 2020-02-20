@@ -338,7 +338,7 @@ We address these issues by a decomposition of the probabilistic operator into a 
 \]
 Semantically, $\ttrm{!a}$ represents a probabilistic event, that generates a boolean value recorded as $a$. The choice $\ttrm{N+aM}$ is simply a conditional on $a$, choosing $N$ if $a$ is false and $M$ if $a$ is true. Syntactically, $a$ is a boolean variable with an occurrence in $\ttrm{+a}$, and $\ttrm{!a}$ acts as a quantifier, binding all occurrences in its scope. (To capture a non-equal chance, one would attach a probability $p$ to a generator, as $\ttrm{!a}{\kern1pt}_p$, though we will not do so in this paper.)
 
-The resulting \emph{probabilistic event lambda-calculus} $\PEL$, which we present in this paper, is confluent. Our decomposition allows us to separate duplicating an \emph{event}, represented by the generator $\ttrm{!a}$, from duplicating only its \emph{outcome} $a$, through having multiple choice operators $\trm{+a}$. In this way our calculus may interpret both original strategies, call-by-name and call-by-value, by different translations of standard probabilistic terms into $\PEL$. For the above example, we get the following translations and reductions.
+The resulting \emph{probabilistic event lambda-calculus} $\PEL$, which we present in this paper, is confluent. Our decomposition allows us to separate duplicating an \emph{event}, represented by the generator $\ttrm{!a}$, from duplicating only its \emph{outcome} $a$, through having multiple choice operators $\trm{+a}$. In this way our calculus may interpret both original strategies, call-by-name and call-by-value, by different translations of standard probabilistic terms into $\PEL$: call-by-name by the above decomposition (see also Section~\ref{sec:PEL}), and for call-by-value see Section~\ref{sec:cbv}. For our initial example, we get the following translations and reductions.
 \[
 \begin{array}{l@{\quad}l@{\quad}l@{\quad}l@{\quad}l@{\quad}l}
 	\cbn: & \trm{(\x.x = x)(!a.\top+a\bot)} & \rw_\beta & \trm{(!a.\top+a\bot)=(!b.\top+b\bot)} & \rws & \top\+\bot
@@ -347,7 +347,10 @@ The resulting \emph{probabilistic event lambda-calculus} $\PEL$, which we presen
 \end{array}
 \]
 %
-In this paper, we introduce $\PEL$ (Section~\ref{sec:PEL}) with two reduction relations, \emph{permutative} (Sections~\ref{sec:PEL},~\ref{sec:p-reduction}) and \emph{projective} reduction (Section~\ref{sec:projective-reduction}); we prove confluence (Section~\ref{sec:confluence}); we give a system of simple types and prove strong normalization for typed terms by reducibility (Section~\ref{sec:SN}); and we demonstrate the translations to interpret call-by-name (Section~\ref{sec:PEL}) and call-by-value evaluation (Section~\ref{sec:cbv}).
+We present two reduction relations for our probabilistic constructs, both independent of beta-reduction. Our main focus will be on \emph{permutative} reduction (Sections~\ref{sec:PEL},~\ref{sec:p-reduction}), a small-step local rewrite relation which is computationally inefficient but gives a natural and very fine-grained operational semantics. \emph{Projective} reduction (Section~\ref{sec:projective-reduction}) is a more standard reduction, following the intuition that $\ttrm{!a}$ generates a coin flip to evaluate $\ttrm{+a}$, and is courser but more efficient.
+
+%In this paper, we introduce $\PEL$ (Section~\ref{sec:PEL}),   and \emph{projective} reduction (Section~\ref{sec:projective-reduction}); 
+We further prove confluence (Section~\ref{sec:confluence}), and we give a system of simple types and prove strong normalization for typed terms by reducibility (Section~\ref{sec:SN}).
 
 \subsection{Related work}
 
