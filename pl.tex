@@ -27,6 +27,13 @@
 
 \usepackage{cleveref}
 
+% 0 = SHORT VERSION     %
+% 1 = LONG VERSION      %
+\newcommand{\version}{0}%%Text to appear only in the short/long version
+%Text to appear only in the short/long version
+\newcommand{\SLV}[2]{\ifthenelse{\equal{\version}{0}}{#1}{#2}}
+
+
 %% theorem environments
 
 \theoremstyle{definition}
@@ -928,7 +935,7 @@ We prove local confluence; by Newman's lemma and strong normalization of $\rw_\p
 }
 
 %=====
-The remaining cases are considered in the proof in the Appendix (p.~\pageref{lemmaAppendix:confluence-perm}).
+\SLV{The remaining cases are considered in \cite{}}{The remaining cases are considered in the proof in the Appendix (p.~\pageref{lemmaAppendix:confluence-perm}).}
 \qedhere
 
 %\itm\plusFun{\trm{(N+aM)P}\rw\trm{(NP)+a(MP)}}
