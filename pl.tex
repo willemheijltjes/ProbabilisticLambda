@@ -376,7 +376,7 @@ Our permutative reduction is a refinement of that for the call-by-name probabili
 \label{sec:PEL}
 
 \begin{defn}
-The \emph{probabilistic event $\lambda$-calculus} ($\PEL$) is given by the following grammar, with from left to right: a \emph{variable}, an \emph{abstraction}, an \emph{application}, a \emph{(labelled) choice}, and a \emph{(probabilistic) generator}.
+The \emph{probabilistic event $\lambda$-calculus} ($\PEL$) is given by the following grammar, with from left to right: a \emph{variable} (denoted by $x, y, z, \dots$), an \emph{abstraction}, an \emph{application}, a \emph{(labelled) choice}, and a \emph{(probabilistic) generator}.
 \[
 	M,N \quad\coloneqq\quad x ~\mid~ \x.N ~\mid~ NM ~\mid~ \trm{N +a M} ~\mid~ \trm{!a.N}
 \]
@@ -529,7 +529,8 @@ creating super-exponential growth.\footnote{This was inferred from only a simple
 
 %\subsection{Strong normalization of permutative reduction}
 
-We observe that the set $\PEL$ endowed with $\rw_\perm$ is a (first-order) term rewriting system over a countably infinite set of variables (denoted by $x, y, z, \dots$) and the signature $\Sigma$ given by:
+We observe that the set $\PEL$ endowed with $\rw_\perm$ is a first-order term rewriting system over a countably infinite set of variables %(denoted by $x, y, z, \dots$) 
+and the signature $\Sigma$ given by:
 \begin{itemize}
 	\item the binary function symbol $\trm{+a}$, for any label $a$;
 	\item the unary function symbol $\trm{!a}$, for any label $a$;
@@ -547,6 +548,13 @@ We observe that the set $\PEL$ endowed with $\rw_\perm$ is a (first-order) term 
 \\	\trm{!b} &\prec_M& @,\x		& \text{ for any label } b
 \end{array}
 \]
+%	\begin{align*}
+%	\trm{+a} &\prec_M \trm{+b} \quad \text{ if } a <_M b
+%	&
+%	\trm{+a} &\prec_M \trm{!b} \quad \text{ for any labels } a,b
+%	&
+%	\trm{!b} &\prec_M @,\x		\quad \text{ for any label } b
+%	\end{align*}
 \end{defn}
 
 \begin{lem}
@@ -579,7 +587,7 @@ With strong normalization, confluence of $\rw_\perm$ requires only local conflue
 We reduce the number of cases to consider, by casting the permutations of $\ttrm{+a}$ as instances of a common shape.
 
 \begin{defn}
-We define a \emph{context} $C[\,]$ as follows.
+We define a \emph{context} $C[\,]$ (with exactly one hole $[\,]$) as follows.
 \[
 \begin{array}{lll@{~}l@{~}l@{~}l@{~}l}
 	C[\,] &\coloneqq& [\,] &\mid& \lambda x.C[\,] &\mid& C[\,]M ~\mid~ NC[\,] ~\mid~ \trm{C[\,]+aM} ~\mid~ \trm{N+aC[\,]} ~\mid~ \trm{!a.C[\,]}
@@ -947,7 +955,7 @@ We prove local confluence; by Newman's lemma and strong normalization of $\rw_\p
 }
 
 %=====
-\SLV{The remaining cases are considered in \cite{}}{The remaining cases are considered in the proof in the Appendix (p.~\pageref{lemmaAppendix:confluence-perm}).}
+\SLV{The remaining cases are considered in the Appendix of \cite{arXiv}}{The remaining cases are considered in the proof in the Appendix (p.~\pageref{lemmaAppendix:confluence-perm}).}
 \qedhere
 
 %\itm\plusFun{\trm{(N+aM)P}\rw\trm{(NP)+a(MP)}}
@@ -1276,7 +1284,9 @@ A \emph{parallel $\beta$-step} $P\rwp_\beta P_\1$ is a labelled step $P^\1\rwp_\
 \end{defn}
 
 \noindent
-Observe that $P_\1$ is a regular unlabeled term, since all labels are removed in the reduction. For the empty labelling, $P^\1 = P_\1 = P$, so that parallel reduction is reflexive: $P \rwp_\beta P$.
+Note that $P_\1$ is a %regular 
+unlabeled term, since all labels are removed in the reduction. For the empty labelling, $P^\1 = P_\1 = P$, so %that 
+parallel reduction is reflexive: $P \rwp_\beta P$.
 
 \begin{lem}
 A parallel $\beta$-step $P\rwp_\beta P_\1$ is a $\beta$-reduction $P\rws_\beta P_\1$.
@@ -1413,14 +1423,22 @@ This is proved by induction on $P^{\1\0}$, where only two cases are not immediat
 
 \subsection{Parallel reduction and permutative reduction}
 
-For the commutation of (parallel) $\beta$-reduction with $\perm$-reduction, we run into the minor issue that a permuting generator or choice operator may block a redex: in both cases below, on the left the term has a redex, but on the right it is blocked.
-\[
-\begin{array}{rcl}
-	\trm{(\x.N+aM)\,P} & \rw_\perm & \trm{((\x.N)+a(\x.M))\,P}
-\\[5pt]
-	\trm{(\x.!a.N)\,M} & \rw_\perm & \trm{(!a.\x.N)\,M}
-\end{array}
-\]
+For the commutation of (parallel) $\beta$-reduction with $\perm$-reduction, we run into the minor issue that a permuting generator or choice operator may block a redex: in both cases below, 
+%on the left the term has a redex, but on the right it is blocked.
+before $\rw_\perm$ the term has a redex, but after $\rw_\perm$ it is blocked.
+%\[
+%\begin{array}{rcl}
+%	\trm{(\x.N+aM)\,P} & \rw_\perm & \trm{((\x.N)+a(\x.M))\,P}
+%\\%[5pt]
+%	\trm{(\x.!a.N)\,M} & \rw_\perm & \trm{(!a.\x.N)\,M}
+%\end{array}
+%\]
+\begin{align*}
+\trm{(\x.N+aM)\,P} & \rw_\perm  \trm{((\x.N)+a(\x.M))\,P}
+%	\\%[5pt]
+&&&
+\trm{(\x.!a.N)\,M} & \rw_\perm  \trm{(!a.\x.N)\,M}
+\end{align*}
 We address this by an adaptation of $\perm$-reduction $\rwb_\perm$ on labelled terms, which is a strategy in $\rws_\perm$ that permutes past a labelled redex in one step.
 
 \begin{defn}
@@ -1480,6 +1498,7 @@ By induction on the rewrite step $\rwb_\perm$. The two interesting cases are:
 &	(x\notin\fv M)
 \end{array}
 \]
+The way to join the critical pairs in the above diagrams shows that we cannot use Hindley-Rosen lemma \cite[Prop. 3.3.5]{Barendregt84} to prove confluence of $\rw_\beta \cup \rw_\perm$.
 \end{proof}
 
 \begin{lem}
