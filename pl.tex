@@ -3,9 +3,9 @@
 \let\proof\relax %To avoid incompatibility between llncs and amsthm
 \let\endproof\relax %To avoid incompatibility between llncs and amsthm
 
-\usepackage[hidelinks]{hyperref}
+%\usepackage[hidelinks]{hyperref}
 \usepackage{amsmath,amssymb,amsthm,mathtools,stmaryrd}
-
+\usepackage{marvosym}
 \usepackage{nicefrac}
 
 %\usepackage{fullpage}
@@ -15,10 +15,17 @@
   \usetikzlibrary{arrows.meta}
   \usetikzlibrary{calc}
   \usetikzlibrary{matrix}
-\usepackage{cleveref}
 \usepackage{proof}
 
 \makeatletter
+\RequirePackage[bookmarks,unicode,colorlinks=true]{hyperref}%
+\def\@citecolor{blue}%
+\def\@urlcolor{blue}%
+\def\@linkcolor{blue}%
+\def\UrlFont{\rmfamily}
+\def\orcidID#1{\smash{\href{http://orcid.org/#1}{\protect\raisebox{-1.25pt}{\protect\includegraphics{orcid_color.eps}}}}}
+
+\usepackage{cleveref}
 
 %% theorem environments
 
@@ -268,16 +275,22 @@
 
 \title{Decomposing Probabilistic Lambda-calculi}
 
-%\author{Ugo Dal Lago, Giulio Guerrieri, and Willem Heijltjes}
 
 \author{
-	 Ugo Dal Lago\inst1
-\and Giulio Guerrieri\inst2
-\and Willem Heijltjes\inst2
+	 Ugo Dal Lago\inst{1}
+\and Giulio Guerrieri\inst{2}\textsuperscript{(\Letter)}\orcidID{0000-0002-0469-4279}
+\and Willem Heijltjes\inst{2}
 }
 
 \authorrunning{U.\ Dal Lago et al.}
 
+%\institute{%
+%Dipartimento di Informatica -- Scienza e Ingegneria, Universit\`a di Bologna, Bologna, Italy\\
+%\email{ugo.dallago@unibo.it}\\[10pt]
+%\and%
+%Department of Computer Science, University of Bath \\ Bath, UK\\
+%\email{\{w.b.heijltjes,g.guerrieri\}@bath.ac.uk}
+%}
 \institute{%
 	Dipartimento di Informatica - Scienza e Ingegneria
 \\	Universit\`a di Bologna, Bologna, Italy
@@ -287,6 +300,7 @@
 \\	University of Bath, Bath, UK
 \\	\email{\{w.b.heijltjes,g.guerrieri\}@bath.ac.uk}
 }
+
 
 
 %============================================================ DOCUMENT
@@ -435,6 +449,7 @@ For a well-labeled and label-closed representative $\trm{M}$, $<_{\trm{M}}$ is a
 
 \begin{defn}
 \emph{Reduction} $\rw \,=\, \rw_\beta \cup \rw_\perm$ in $\PEL$ consists of \emph{$\beta$-reduction}~$\rw_\beta$ and \emph{permutative} or \emph{$\perm$-reduction}~$\rw_\perm$, both given in Figure~\ref{fig:reduction rules}. We write $\rws$ for the reflexive-transitive closure of reduction and $\rwn$ for reduction to normal form, and similarly for $\rw_\beta$ and $\rw_\perm$.
+We write $=_\perm$ for the symmetric and reflexive-transitive closure of $\rw_\perm$.
 %\[
 %\begin{array}{rcl}
 %	C[(\lambda x.N)M] &\rw_\beta& C[M[N/x]]
@@ -2869,6 +2884,16 @@ This work was supported by EPSRC Project EP/R029121/1 \emph{Typed Lambda-Calculi
 \bibliographystyle{splncs04}
 \bibliography{biblio}
 \addcontentsline{toc}{section}{References}
+
+%%%%% To display Open Access text and logo, Please add below text and copy the cc_by_4-0.eps in the manuscript package %%%
+
+\vfill
+
+{\small\medskip\noindent{\bf Open Access} This chapter is licensed under the terms of the Creative Commons\break Attribution 4.0 International License (\url{http://creativecommons.org/licenses/by/4.0/}), which permits use, sharing, adaptation, distribution and reproduction in any medium or format, as long as you give appropriate credit to the original author(s) and the source, provide a link to the Creative Commons license and indicate if changes were made.}
+
+{\small \spaceskip .28em plus .1em minus .1em The images or other third party material in this chapter are included in the chapter's Creative Commons license, unless indicated otherwise in a credit line to the material.~If material is not included in the chapter's Creative Commons license and your intended\break use is not permitted by statutory regulation or exceeds the permitted use, you will need to obtain permission directly from the copyright holder.}
+
+\medskip\noindent\includegraphics{cc_by_4-0.eps}
 
 \newpage
 \appendix
