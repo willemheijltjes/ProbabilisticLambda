@@ -320,9 +320,6 @@ We present two notions of reduction, one via fine-grained local rewrite steps, a
 Probabilistic lambda-calculi \cite{SahebDjahromi78,Manber-Tompa-1982,JonesPlotkin89,deLiguoroPiperno95,JungTix98,DalLagoZorzi12,FaggianRonchi19} extend the lambda-calculus with a probabilistic choice operator $N\+[p]M$, which chooses $N$ with probability $p$ and $M$ with probability $1-p$ (throughout this paper, we let $p=0.5$ and will omit it). Duplication of $N\+M$, as is wont to happen in lambda-calculus, raises a fundamental question about its semantics: do the duplicate occurrences represent \emph{the same} probabilistic event, or \emph{different} ones with the same probability? For example, take the formula $\top\+\bot$ that represents a coin flip between boolean values \emph{true} $\top$ and \emph{false} $\bot$. If we duplicate this formula, do the copies represent two distinct coin flips with possibly distinct outcomes, or do these represent a single coin flip that determines the outcome for both copies? Put differently again, when we duplicate $\top\+\bot$, do we duplicate the \emph{event}, or only its \emph{outcome}?
 
 In probabilistic lambda-calculus, these two interpretations are captured by the evaluation strategies of call-by-name ($\rw_\cbn$), which duplicates events, and call-by-value ($\rw_\cbv$), which evaluates any probabilistic choice before it is duplicated, and thus only duplicates outcomes. Consider the following example, where $=$ tests equality of boolean values.
-%\[
-%(\x.\,x = x)(\top\+\bot) \qquad\begin{array}{ll}\rws_\cbn &\quad \trm{\top\+\bot} \\[5pt] \rws_\cbv &\quad \top\end{array}
-%\]
 \[
 	\top \quad {}_\cbv\!\rwsleft \quad (\x.\,x = x)(\top\+\bot) \quad \rws_\cbn \quad \trm{\top\+\bot}
 \]
@@ -356,7 +353,7 @@ In all the aforementioned works, probabilistic $\lambda$-calculi have been taken
 
 %\cite{Ramsey-Preffer-2002}
 
-Our permutative reduction implements the equational theory of \emph{(ordered) binary decision trees} via rewriting~\cite{Zantema-Pol-2001}. Probabilistic decision trees have been proposed with a primitive binary probabilistic operator~\cite{Manber-Tompa-1982}, but not a decomposition as we explore here.
+Our permutative reduction is a refinement of that for the call-by-name probabilistic $\lambda$-calculus~\cite{Leventis-2019}, and is an implementation of the equational theory of \emph{(ordered) binary decision trees} via rewriting~\cite{Zantema-Pol-2001}. Probabilistic decision trees have been proposed with a primitive binary probabilistic operator~\cite{Manber-Tompa-1982}, but not a decomposition as we explore here.
 
 
 %============================================================ PEL
