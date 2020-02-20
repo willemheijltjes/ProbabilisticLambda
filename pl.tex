@@ -2932,10 +2932,14 @@ This work was supported by EPSRC Project EP/R029121/1 \emph{Typed Lambda-Calculi
 
 \medskip\noindent\includegraphics{cc_by_4-0.eps}
 
+\SLV{
+\end{document}
+}
+
+{
 \newpage
 \appendix
 
-\end{document}
 
 \section{Technical appendix: omitted proofs}
 \label{sect:proofs}
@@ -3165,22 +3169,22 @@ The enumeration of lemmas already stated in the body of the article is unchanged
 	}
 \end{proof}
 
-\setcounter{lemmaAppendix}{\value{lemma:application-parallel-beta}}
-\begin{lemmaAppendix}
-	\label{lemmaAppendix:application-parallel-beta}
-	If $\trm{M} \rwp_\beta \trm{M'}$ and $\trm{N} \rwp_\beta \trm{N'}$,
-%	\marginpar{\footnotesize Proof in the Appendix}
-	then $\trm{MN} \rwp_\beta \trm{M'N'}$.
-	If moreover $M = \lambda x.R$ and $M'^ = \lambda x R'$ with $R \rwp_\beta R'$, then  $\trm{MN} \rwp_\beta \trm{R'[N'/x]}$.
-\end{lemmaAppendix}
-
-\begin{proof}
-	Since $\trm{M} \rwp_\beta \trm{Mo} = M'$ and $\trm{N} \rwp_\beta \trm{No} = N'$ for some labelings $\trm{M*}$ and $\trm{N*}$ of $M$ and $N$ respectively, let $\trm{(MN)*}$ be the labeling of $\trm{MN}$ obtained by putting together the labelings $\trm{M*}$ and $\trm{N*}$.
-	Clearly, $\trm{MN} \rwp_\beta \trm{<(MN)*>} = \trm{MoNo} = M'N'$.
-
-	Concerning the part of the statement after ``moreover'', since $\trm{R} \rwp_\beta \trm{<R*>} = R'$ and $\trm{N} \rwp_\beta \trm{No} = N'$ for some labelings $\trm{R*}$ and $\trm{N*}$ of $R$ and $N$ respectively, let $\trm{(MN)*}$ be the labeling of $\trm{MN}$ obtained by putting together the labelings $\trm{R*}$ and $\trm{N*}$ plus the labeled $\beta$-redex $\trm{(\x.R)*N}$.
-	Clearly, $\trm{MN} \rwp_\beta \trm{<(MN)*>} = \trm{<R*>[No/x]} = \trm{R'[N'/x]}$.
-\end{proof}
+%\setcounter{lemmaAppendix}{\value{lemma:application-parallel-beta}}
+%\begin{lemmaAppendix}
+%	\label{lemmaAppendix:application-parallel-beta}
+%	If $\trm{M} \rwp_\beta \trm{M'}$ and $\trm{N} \rwp_\beta \trm{N'}$,
+%%	\marginpar{\footnotesize Proof in the Appendix}
+%	then $\trm{MN} \rwp_\beta \trm{M'N'}$.
+%	If moreover $M = \lambda x.R$ and $M'^ = \lambda x R'$ with $R \rwp_\beta R'$, then  $\trm{MN} \rwp_\beta \trm{R'[N'/x]}$.
+%\end{lemmaAppendix}
+%
+%\begin{proof}
+%	Since $\trm{M} \rwp_\beta \trm{Mo} = M'$ and $\trm{N} \rwp_\beta \trm{No} = N'$ for some labelings $\trm{M*}$ and $\trm{N*}$ of $M$ and $N$ respectively, let $\trm{(MN)*}$ be the labeling of $\trm{MN}$ obtained by putting together the labelings $\trm{M*}$ and $\trm{N*}$.
+%	Clearly, $\trm{MN} \rwp_\beta \trm{<(MN)*>} = \trm{MoNo} = M'N'$.
+%
+%	Concerning the part of the statement after ``moreover'', since $\trm{R} \rwp_\beta \trm{<R*>} = R'$ and $\trm{N} \rwp_\beta \trm{No} = N'$ for some labelings $\trm{R*}$ and $\trm{N*}$ of $R$ and $N$ respectively, let $\trm{(MN)*}$ be the labeling of $\trm{MN}$ obtained by putting together the labelings $\trm{R*}$ and $\trm{N*}$ plus the labeled $\beta$-redex $\trm{(\x.R)*N}$.
+%	Clearly, $\trm{MN} \rwp_\beta \trm{<(MN)*>} = \trm{<R*>[No/x]} = \trm{R'[N'/x]}$.
+%\end{proof}
 
 \setcounter{lemmaAppendix}{\value{lemma:cloredbox}}
 \begin{lemmaAppendix}\label{lemmaAppendix:cloredbox}
@@ -3294,5 +3298,5 @@ The enumeration of lemmas already stated in the body of the article is unchanged
 \end{proof}
 
 \end{document}
-
+}
 %============================================================
