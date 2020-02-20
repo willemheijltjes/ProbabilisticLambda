@@ -284,7 +284,7 @@
 
 
 \author{
-	 Ugo Dal Lago\inst{1}
+	 Ugo Dal Lago\inst{1}\orcidID{0000-0001-9200-070X}
 \and Giulio Guerrieri\inst{2}\textsuperscript{(\Letter)}\orcidID{0000-0002-0469-4279}
 \and Willem Heijltjes\inst{2}
 }
@@ -357,7 +357,7 @@ We present two reduction relations for our probabilistic constructs, both indepe
 %In this paper, we introduce $\PEL$ (Section~\ref{sec:PEL}),   and \emph{projective} reduction (Section~\ref{sec:projective-reduction}); 
 We further prove confluence (Section~\ref{sec:confluence}), and we give a system of simple types and prove strong normalization for typed terms by reducibility (Section~\ref{sec:SN}).
 
-\subsection{Related work}
+\subsection{Related Work}
 
 Probabilistic $\lambda$-calculi are a topic of study since the pioneering work by Saheb-Djaromi~\cite{SahebDjahromi78}, the first to give the syntax and operational semantics of a $\lambda$-calculus with binary probabilistic choice. Giving well-behaved denotational models for probabilistic $\lambda$-calculi has proved to be challenging, as witnessed by the many contributions spanning the last thirty years: from Jones and Plotkin early study of the probabilistic powerdomain~\cite{JonesPlotkin89}, to Jung and Tix's remarkable (and mostly negative) observations~\cite{JungTix98}, to the very recent encouraging results by Goubault-Larrecq~\cite{GoubaultLarrecq19}. A particularly well-behaved model for probabilistic $\lambda$-calculus can be obtained by taking a probabilistic variation of Girard's coherent spaces~\cite{DanosEhrhard11}, this way getting full abstraction~\cite{EPT18}.
 
@@ -372,7 +372,7 @@ Our permutative reduction is a refinement of that for the call-by-name probabili
 
 %============================================================ PEL
 
-\section{\texorpdfstring{The probabilistic event $\lambda$-calculus $\PEL$}{The probabilistic event lambda-claculus PEL}}
+\section{\texorpdfstring{The Probabilistic Event $\lambda$-Calculus $\PEL$}{The Probabilistic Event Lambda-Calculus PEL}}
 \label{sec:PEL}
 
 \begin{defn}
@@ -520,7 +520,7 @@ The normal forms $P_0$ of $\rw_\perm$, respectively $N_0$ of $\rw$, are given by
 
 %============================================================ P-REDUCTION
 
-\section{Properties of permutative reduction}
+\section{Properties of Permutative Reduction}
 \label{sec:p-reduction}
 
 We will prove strong normalization and confluence of $\rw_\perm$. 
@@ -1421,7 +1421,7 @@ This is proved by induction on $P^{\1\0}$, where only two cases are not immediat
 %	\end{itemize}
 %\end{proof}
 
-\subsection{Parallel reduction and permutative reduction}
+\subsection{Parallel Reduction and Permutative Reduction}
 
 For the commutation of (parallel) $\beta$-reduction with $\perm$-reduction, we run into the minor issue that a permuting generator or choice operator may block a redex: in both cases below, 
 %on the left the term has a redex, but on the right it is blocked.
@@ -1515,7 +1515,7 @@ Using \Cref{lem:parallel p-reduction} we decompose $\trm{N*}\rwn_\perm\trm{N*p}$
 where $\trm{(N_i)o}=_\perm\trm{(N_{i+1})o}$ by \Cref{lem:parallel p - parallel beta}.
 \end{proof}
 
-\subsection{Complete reduction}
+\subsection{Complete Reduction}
 
 To obtain a reduction strategy with the diamond property for $\rw$, we combine parallel reduction $\rwp_\beta$ with permutative reduction to normal form $\rwn_\perm$ into a notion of \emph{complete reduction} $\rwp$. We will show that it is diamond (\Cref{lem:complete diamond}), and that any step in $\rw$ maps onto a complete step of $\perm$-normal forms (\Cref{lem:p to complete reduction}). Confluence of $\rw$ (\Cref{thm:confluence}) then follows: any two paths $\rws$ map onto complete paths $\rwps$ on $\perm$-normal forms, which then converge by the diamond property.
 
@@ -1759,7 +1759,7 @@ By the following diagram. For the top and left areas, by Lemma~\ref{lem:p to com
 
 %=====================================================================================
 
-\section{Strong normalization for simply typed terms}
+\section{Strong Normalization for Simply-Typed Terms}
 \label{sec:SN}
 
 In this section, we prove that the relation $\rw$ enjoys strong
@@ -1876,11 +1876,33 @@ Figure~\ref{fig:typing}.
 \end{figure}
 Please notice that the type structure is precisely the one of the
 usual, vanilla, simply-typed $\lambda$-calculus (although terms are of
-course different),
-%we can reuse most of the usual proof of strong normalization, for
-%example in the version given by Ralph Loader's notes, page 17. In the following, we only
-%report the elements which make our proof different.
+course different), and we can thus reuse most of the usual proof of
+strong normalization, for example in the version given by Ralph
+Loader's notes~\cite{Loader}, page 17.
 
+\SLV{
+  \begin{lem}\label{lemma:closure}
+    The closure rules in Figure~\ref{fig:rules} are all sound.
+  \end{lem}
+  \begin{figure}[!t]
+    \fbox{
+      \begin{minipage}{.97\textwidth}
+        $$
+        \infer{\trm{M +a N}L_1 \ldots L_m\in\mathit{SN}^\theta}{ML_1\ldots L_m\in\mathit{SN}^\theta & NL_1\ldots L_m\in\mathit{SN}^\theta & a\in\theta}
+        \quad
+        \infer{\trm{(!a.M)}L_1\ldots L_m\in\mathit{SN}^\theta}{\trm{M}L_1\ldots L_m\in\mathit{SN}^{a\cdot\theta} & \forall i.a\not\in L_i}
+        $$
+        $$
+        \infer{xL_1\ldots L_m\in\mathit{SN}^\theta}{L_1\in\mathit{SN}^\theta &\cdots & L_m\in\mathit{SN}^\theta}
+        \qquad\quad
+        \infer{\trm{(\x.M)}L_0\ldots L_m\in\mathit{SN}^\theta}{\trm{M[L_0/x]}L_1\ldots L_m\in\mathit{SN}^\theta & L_0\in\mathit{SN}^\theta}
+        $$
+      \end{minipage}
+    }
+    \caption{Closure rules for sets $\mathit{SN}^\theta$}
+    \label{fig:rules}
+  \end{figure}
+}{
 \begin{lem}
 \label{lemma:cloredsum}
   The following rule is sound:
@@ -1992,7 +2014,7 @@ course different),
   $$
   \infer{\trm{(\x.M)}L_0\ldots L_m\in\mathit{SN}^\theta}{\trm{M[L_0/x]}L_1\ldots L_m\in\mathit{SN}^\theta & L_0\in\mathit{SN}^\theta}
   $$
-\end{lem}
+\end{lem}}
 %\begin{proof}
 %  Again, the proof is structurally very similar to the one
 %  of Lemma~\ref{lemma:cloredsum}. The underlying order,
@@ -2058,12 +2080,15 @@ course different),
 %\end{proof}
 
 \newcommand{\RedSet}[1]{\mathit{Red}_{#1}}
-The definition of a reducible term stays the same:
+Since the structure of the type system is the one of plain, simple
+types, the definition of a reducibility sets is the classic one:
 \begin{align*}
   \RedSet{\alpha}&=\{(\Gamma,\theta,M)\mid M\in\mathit{SN}^\theta\wedge\judg{\Gamma}{M}{\alpha}\};\\
   \RedSet{\tau\arrow\rho}&=\{(\Gamma,\theta,M)\mid(\judg{\Gamma}{M}{\tau\arrow\rho})\wedge(\labjudg{\theta}{M}) \ \wedge\\
     &\qquad\forall(\Gamma\Delta,\theta,N)\in\RedSet{\tau}.(\Gamma\Delta,\theta,MN)\in\RedSet{\rho}\}.
 \end{align*}
+Before giving the proving that all terms are reducible, we need some
+auxiliary results
 \begin{lem}\label{lemma:redprop}
   \begin{enumerate}
   \item\label{point:impl}
@@ -2087,22 +2112,17 @@ The definition of a reducible term stays the same:
 \end{lem}
 \begin{proof}
   The proof is an induction on $\tau$:
-  \begin{itemize}
-  \item
-    If $\tau$ is an atom $\alpha$, then Point \ref{point:impl} follows
-    by definition, while points \ref{point:headvar} to \ref{point:box}
-    come from Lemma~\ref{lemma:cloredsum}, Lemma~\ref{lemma:cloredbox},
-    Lemma~\ref{lemma:cloredheadvar}, and Lemma~\ref{lemma:cloredbeta}.
-  \item
-    If $\tau$ is $\rho\arrow\mu$, points \ref{point:headvar} to \ref{point:box}
-    come directly from the induction hypothesis, while \ref{point:impl}
-    can be proved by observing that $M$ is in $\mathit{SN}^\theta$
-    if $Mx$ is itself $\mathit{SN}^\theta$, where $x$ is a fresh variable.
-    By induction hypothesis (on point~\ref{point:headvar}), we can
-    say that $(\Gamma(x:\rho),\theta,x)\in\RedSet{\rho}$, and
-    conclude that $(\Gamma(x:\rho),\theta,Mx)\in\RedSet{\mu}$.
-    \qedhere
-  \end{itemize}
+  If $\tau$ is an atom $\alpha$, then Point \ref{point:impl} follows
+  by definition, while points \ref{point:headvar} to \ref{point:box}
+  come from \SLV{Lemma~\ref{lemma:closure}}{Lemma~\ref{lemma:cloredsum}, Lemma~\ref{lemma:cloredbox},
+  Lemma~\ref{lemma:cloredheadvar}, and Lemma~\ref{lemma:cloredbeta}}.
+  If $\tau$ is $\rho\arrow\mu$, points \ref{point:headvar} to \ref{point:box}
+  come directly from the induction hypothesis, while \ref{point:impl}
+  can be proved by observing that $M$ is in $\mathit{SN}^\theta$
+  if $Mx$ is itself $\mathit{SN}^\theta$, where $x$ is a fresh variable.
+  By induction hypothesis (on point~\ref{point:headvar}), we can
+  say that $(\Gamma(x:\rho),\theta,x)\in\RedSet{\rho}$, and
+  conclude that $(\Gamma(x:\rho),\theta,Mx)\in\RedSet{\mu}$.
 \end{proof}
 
 The following is the so-called Main Lemma:
@@ -2174,7 +2194,7 @@ ingredients for our proof of strong normalization:
 
 \newcommand\Streams{\mathbb S}
 
-\section{Projective reduction}
+\section{Projective Reduction}
 \label{sec:projective-reduction}
 
 Permutative reduction $\rw_\perm$ evaluates probabilistic sums purely by rewriting. Here we look at an alternative \emph{projective} notion of reduction, which conforms more closely to the intuition that $\ttrm{!a}$ generates a probabilistic event to determine the choice $\ttrm{+a}$. We evaluate a term with reference to a binary stream $s\in\{0,1\}^{\mathbb N}$, which provides the outcomes to probabilistic events during reduction. Writing $N^s$ for the term $N$ with stream $s$, and $i\cdot s$ for the stream with $i\in\{0,1\}$ as first element, we expect to reduce $\trm{(!a.N)}^{i\cdot s}$ to $M^s$ where $M$ is obtained from $N$ by projecting every subformula $\ttrm{P_0+aP_1}$ to $P_i$. To avoid introducing any permutation rules, we will evaluate a generator not just at top-level, but anywhere along the \emph{spine} of a term: under abstractions, in function position, and under (other) generators and choices.
@@ -2359,7 +2379,7 @@ Given that $a$ is the smallest label in $N$, \ie\ $a<b$ for any other label $b$ 
 
 %============================================================ CALL-BY-VALUE
 
-\section{Call-by-value interpretation}
+\section{Call-by-value Interpretation}
 \label{sec:cbv}
 
 We consider the interpretation of a call-by-value probabilistic lambda-calculus. For simplicity we will only restrict probabilistic reduction to a call-by-value regime, and not $\beta$-reduction; our values $V$ are then just deterministic (the idea is that probabilistic sums cannot be duplicated or erased). We evaluate the internal probabilistic choice $\ttrm{v{}}$ to an external probabilistic choice $+$.
@@ -2909,7 +2929,7 @@ If $N\rws_{\val,\beta\val}V$ then $\uncbv N^s\rws_{\pi,\beta}\uncbv V$ for some 
 %	\end{itemize}
 %\end{proof}
 
-\section{Conclusions and future work}
+\section{Conclusions and Future Work}
 
 
 
