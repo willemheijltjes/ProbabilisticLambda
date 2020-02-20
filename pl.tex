@@ -339,13 +339,19 @@ We address these issues by a decomposition of the probabilistic operator into a 
 Semantically, $\ttrm{!a}$ represents a probabilistic event, that generates a boolean value recorded as $a$. The choice $\ttrm{N+aM}$ is simply a conditional on $a$, choosing $N$ if $a$ is false and $M$ if $a$ is true. Syntactically, $a$ is a boolean variable with an occurrence in $\ttrm{+a}$, and $\ttrm{!a}$ acts as a quantifier, binding all occurrences in its scope. (To capture a non-equal chance, one would attach a probability $p$ to a generator, as $\ttrm{!a}{\kern1pt}_p$, though we will not do so in this paper.)
 
 The resulting \emph{probabilistic event lambda-calculus} $\PEL$, which we present in this paper, is confluent. Our decomposition allows us to separate duplicating an \emph{event}, represented by the generator $\ttrm{!a}$, from duplicating only its \emph{outcome} $a$, through having multiple choice operators $\trm{+a}$. In this way our calculus may interpret both original strategies, call-by-name and call-by-value, by different translations of standard probabilistic terms into $\PEL$. For the above example, we get the following translations and reductions.
-\[
-\begin{array}{l@{\quad}l@{\quad}l@{\quad}l@{\quad}l@{\quad}l}
-	\cbn: & \trm{(\x.x = x)(!a.\top+a\bot)} & \rw_\beta & \trm{(!a.\top+a\bot)=(!b.\top+b\bot)} & \rws & \top\+\bot
-\\[10pt]
-	\cbv: & \trm{!a.(\x.x = x)(\top+a\bot)} & \rw_\beta & \trm{!a.(\top+a\bot)=(\top+a\bot)}    & \rws & \top
-\end{array}
-\]
+%\[
+%\begin{array}{l@{\quad}l@{\quad}l@{\quad}l@{\quad}l@{\quad}l}
+%	\cbn: & \trm{(\x.x = x)(!a.\top+a\bot)} & \rw_\beta & \trm{(!a.\top+a\bot)=(!b.\top+b\bot)} & \rws & \top\+\bot
+%\\ %[5pt]
+%	\cbv: & \trm{!a.(\x.x = x)(\top+a\bot)} & \rw_\beta & \trm{!a.(\top+a\bot)=(\top+a\bot)}    & \rws & \top
+%\end{array}
+%\]
+\begin{alignat}{3}
+\cbn: \quad & \trm{(\x.x = x)(!a.\top+a\bot)} & \quad \rw_\beta \quad & \trm{(!a.\top+a\bot)=(!b.\top+b\bot)} & \quad \rws \quad & \top\+\bot \label{eq:cbn}
+\\ %[5pt]
+\cbv: \quad & \trm{!a.(\x.x = x)(\top+a\bot)} & \quad \rw_\beta \quad & \trm{!a.(\top+a\bot)=(\top+a\bot)}    & \quad \rws \quad & \top \label{eq:cbv}
+\end{alignat}
+
 %
 In this paper, we introduce $\PEL$ (Section~\ref{sec:PEL}) with two reduction relations, \emph{permutative} (Sections~\ref{sec:PEL},~\ref{sec:p-reduction}) and \emph{projective} reduction (Section~\ref{sec:projective-reduction}); we prove confluence (Section~\ref{sec:confluence}); we give a system of simple types and prove strong normalization for typed terms by reducibility (Section~\ref{sec:SN}); and we demonstrate the translations to interpret call-by-name (Section~\ref{sec:PEL}) and call-by-value evaluation (Section~\ref{sec:cbv}).
 
@@ -359,7 +365,7 @@ In all the aforementioned works, probabilistic $\lambda$-calculi have been taken
 
 %\cite{Ramsey-Preffer-2002}
 
-Our permutative reduction is a refinement of that for the call-by-name probabilistic $\lambda$-calculus~\cite{Leventis-2019}, and is an implementation of the equational theory of \emph{(ordered) binary decision trees} via rewriting~\cite{Zantema-Pol-2001}. Probabilistic decision trees have been proposed with a primitive binary probabilistic operator~\cite{Manber-Tompa-1982}, but not a decomposition as we explore here.
+Our permutative reduction is a refinement of that for the call-by-name probabilistic $\lambda$-calculus~\cite{Leventis19}, and is an implementation of the equational theory of \emph{(ordered) binary decision trees} via rewriting~\cite{Zantema-Pol-2001}. Probabilistic decision trees have been proposed with a primitive binary probabilistic operator~\cite{Manber-Tompa-1982}, but not a decomposition as we explore here.
 
 
 %============================================================ PEL
@@ -416,7 +422,7 @@ This convention also gives the translation from a \emph{call-by-name} probabilis
 \end{figure}
 
 
-\subsection{Reduction}
+\subsubsection{Reduction.}
 
 Reduction in $\PEL$ will consist of standard $\beta$-reduction $\rw_\beta$ plus an evaluation mechanism for generators and choice operators, which implements probabilistic choice. We will present two such mechanisms: \emph{projective} reduction~$\rw_\pi$ and \emph{permutative} reduction~$\rw_\perm$. While projective reduction implements the given intuition for the generator and choice operator, we relegate it to Section~\ref{sec:projective-reduction} and make permutative reduction our main evaluation mechanism, for the reason that it is more fine-grained, and thus more general.
 
@@ -435,9 +441,10 @@ To orient this as a rewrite rule, we need to give priority to one label over ano
 	A term $\trm{M}$ is \emph{label-closed} if $\fl{M} = \emptyset$.
 \end{defn}
 
-From now on, we consider only label-closed terms (and we implicitly assume this, unless otherwise stated).
+From now on, we consider only label-closed terms (we implicitly assume this, unless otherwise stated).
 All terms are identified up to renaming of their bound variables and labels.
-Given some terms $\trm{M}$ and $\trm{N}$ and a variable $\trm{x}$, $\trm{M[N/x]}$ stands for the capture-avoiding (for both variables and labels) substitution of $\trm{N}$ for the free occurrences of $\trm{x}$ in $\trm{M}$.
+Given some terms $\trm{M}$ and $\trm{N}$ and a variable $\trm{x}$, $\trm{M[N/x]}$ %stands for
+is the capture-avoiding (for both variables and labels) substitution of $\trm{N}$ for the free occurrences of $\trm{x}$ in $\trm{M}$.
 We talk of a \emph{representative} $\trm{M}$ of a term when $\trm{M}$ is not considered up to such a renaming.
 A representative $\trm{M}$ of a term is \emph{well-labeled} if
 %for every sub-term $\trm{!a.N}$ of $\trm{M}$, the label $a$ may occur only in $\trm{N}$ (if at all).
@@ -454,7 +461,7 @@ For a well-labeled and label-closed representative $\trm{M}$, $<_{\trm{M}}$ is a
 
 
 \begin{defn}
-\emph{Reduction} $\rw \,=\, \rw_\beta \cup \rw_\perm$ in $\PEL$ consists of \emph{$\beta$-reduction}~$\rw_\beta$ and \emph{permutative} or \emph{$\perm$-reduction}~$\rw_\perm$, both given in Figure~\ref{fig:reduction rules}. We write $\rws$ for the reflexive-transitive closure of reduction and $\rwn$ for reduction to normal form, and similarly for $\rw_\beta$ and $\rw_\perm$.
+\emph{Reduction} $\rw \,=\, \rw_\beta \cup \rw_\perm$ in $\PEL$ consists of \emph{$\beta$-reduction}~$\rw_\beta$ and \emph{permutative} or \emph{$\perm$-reduction}~$\rw_\perm$, both defined as the contextual closure of the rules given in Figure~\ref{fig:reduction rules}. We write $\rws$ for the reflexive-transitive closure of $\rw$, and $\rwn$ for reduction to normal form; similarly for $\rw_\beta$ and $\rw_\perm$.
 We write $=_\perm$ for the symmetric and reflexive-transitive closure of $\rw_\perm$.
 %\[
 %\begin{array}{rcl}
@@ -464,8 +471,9 @@ We write $=_\perm$ for the symmetric and reflexive-transitive closure of $\rw_\p
 %\]
 \end{defn}
 
-\noindent
-The introduction briefly sketches two example reductions; a third, complete reduction is given in Figure~\ref{fig:example reduction}.
+%\noindent
+%The introduction briefly sketches two example reductions; a third, complete reduction is given in Figure~\ref{fig:example reduction}.
+Two example reductions are \eqref{eq:cbn}-\eqref{eq:cbv} on p.~\pageref{eq:cbn}; a third, complete reduction is in Figure~\ref{fig:example reduction}.
 The crucial feature of $\perm$-reduction is that a choice $\ttrm{+a}$ \emph{does} permute out of the argument position of an application, but a generator $\ttrm{!a}$ does \emph{not}, as below. Since the argument of a redex may be duplicated, this is how we characterize the difference between the \emph{outcome} of a probabilistic event, whose duplicates may be identified, and the event itself, whose duplicates may yield different outcomes.
 \[
 	\trm{N\,(M +a P)}~\rw_\perm~ \trm{(NM) +a (NP)}
@@ -503,7 +511,8 @@ The normal forms $P_0$ of $\rw_\perm$, respectively $N_0$ of $\rw$, are given by
 			  \fit{\rw_\perm} 	\trm{!a. \top}
 			  \fit{\rw_\perm}	\top           						 	\tag{\idem,\boxVoid}
 \end{align*}
-\caption{Example reduction of the $\cbv$-translation of the term in the introduction.}
+\caption{Example reduction of the $\cbv$-translation of the term %in the introduction.}
+	on p.~\pageref{eq:cbv}.}
 \label{fig:example reduction}
 \end{figure}
 
@@ -562,9 +571,10 @@ While $\prec_M$ is defined only relative to $\Sigma_M$, reduction may only reduc
 Of course, there is not to prove $\rw$ being strongly normalizing,
 due to the presence of $\beta$-reduction rules and the absence of types.
 
-\subsection{Confluence of permutative reduction}
+\subsubsection{Confluence of permutative reduction.}
 
-With strong normalization, confluence of $\rw_\perm$ requires only local confluence. We begin by reducing the number of cases to consider, by casting the permutations of $\ttrm{+a}$ as instances of a common shape.
+With strong normalization, confluence of $\rw_\perm$ requires only local confluence. %We begin by reducing 
+We reduce the number of cases to consider, by casting the permutations of $\ttrm{+a}$ as instances of a common shape.
 
 \begin{defn}
 We define a \emph{context} $C[\,]$ as follows.
