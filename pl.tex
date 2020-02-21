@@ -278,9 +278,28 @@
 \makeatother
 
 
+% environments
+
+\newenvironment{varitemize}
+{
+\begin{list}{\SLV{\labelitemii}{\labelitemi}}
+{\setlength{\itemsep}{0pt}
+ \setlength{\topsep}{0pt}
+ \setlength{\parsep}{0pt}
+ \setlength{\partopsep}{0pt}
+ \setlength{\leftmargin}{15pt}
+ \setlength{\rightmargin}{0pt}
+ \setlength{\itemindent}{0pt}
+ \setlength{\labelsep}{5pt}
+ \setlength{\labelwidth}{10pt}
+}}
+{
+ \end{list}
+}
+
 %============================================================ FRONTMATTER
 
-\title{Decomposing Probabilistic Lambda-calculi}
+\title{Decomposing Probabilistic Lambda-Calculi}
 
 
 \author{
@@ -338,7 +357,7 @@ We address these issues by a decomposition of the probabilistic operator into a 
 \]
 Semantically, $\ttrm{!a}$ represents a probabilistic event, that generates a boolean value recorded as $a$. The choice $\ttrm{N+aM}$ is simply a conditional on $a$, choosing $N$ if $a$ is false and $M$ if $a$ is true. Syntactically, $a$ is a boolean variable with an occurrence in $\ttrm{+a}$, and $\ttrm{!a}$ acts as a quantifier, binding all occurrences in its scope. (To capture a non-equal chance, one would attach a probability $p$ to a generator, as $\ttrm{!a}{\kern1pt}_p$, though we will not do so in this paper.)
 
-The resulting \emph{probabilistic event lambda-calculus} $\PEL$, which we present in this paper, is confluent. Our decomposition allows us to separate duplicating an \emph{event}, represented by the generator $\ttrm{!a}$, from duplicating only its \emph{outcome} $a$, through having multiple choice operators $\trm{+a}$. In this way our calculus may interpret both original strategies, call-by-name and call-by-value, by different translations of standard probabilistic terms into $\PEL$: call-by-name by the above decomposition (see also Section~\ref{sec:PEL}), and for call-by-value see Section~\ref{sec:cbv}. For our initial example, we get the following translations and reductions.
+The resulting \emph{probabilistic event lambda-calculus} $\PEL$, which we present in this paper, is confluent. Our decomposition allows us to separate duplicating an \emph{event}, represented by the generator $\ttrm{!a}$, from duplicating only its \emph{outcome} $a$, through having multiple choice operators $\trm{+a}$. In this way our calculus may interpret both original strategies, call-by-name and call-by-value, by different translations of standard probabilistic terms into $\PEL$: call-by-name by the above decomposition (see also Section~\ref{sec:PEL}), and call-by-value by a different one (see Section~\ref{sec:cbv}). For our initial example, we get the following translations and reductions.
 %\[
 %\begin{array}{l@{\quad}l@{\quad}l@{\quad}l@{\quad}l@{\quad}l}
 %	\cbn: & \trm{(\x.x = x)(!a.\top+a\bot)} & \rw_\beta & \trm{(!a.\top+a\bot)=(!b.\top+b\bot)} & \rws & \top\+\bot
@@ -365,7 +384,9 @@ On the operational side, one could mention a study about the various ways the op
 
 In all the aforementioned works, probabilistic $\lambda$-calculi have been taken as implicitly endowed with either call-by-name or call-by-value strategies, for the reasons outlined above. There are only a few exceptions, namely some works on Geometry of Interaction~\cite{DLFVY17}, Probabilistic Coherent Spaces~\cite{EhrhardTasson19}, and Standardization~\cite{FaggianRonchi19}, which achieve, in different contexts, a certain degree of independence from the underlying strategy, thus accomodating both call-by-name and call-by-value evaluation. The way this is achieved, however, invariably relies on Linear Logic or related concepts. This is deeply different from what we do here.
 
-%\cite{Ramsey-Preffer-2002}
+Some words of comparison with Faggian and Ronchi's work on Confluence and Standadization~\cite{FaggianRonchi19} are also in order. The main difference between their approach and the one we pursue here is that the operator $!$ in their calculus $\Lambda_\oplus^!$ plays \emph{both} the roles of a marker for duplicability and of a checkpoint for any probabilistic choice "flowing out" of the term (i.e. being fired). In our calculus, we do not control duplication, but we definitely make use of checkpoints. Saying it another way, Faggian and Ronchi's work is inspired by linear logic, while our approach is inspired by deep inference, even though this is, on purpose, not evident in the design of our calculus. 
+
+Probabilistic $\lambda$-calculi can also be seen as vehicles for expressing probabilistic models in the sense of bayesian programming~\cite{Ramsey-Pfeffer-2002,BDLGS16}. This, however, requires an operator for modeling conditioning, which complictes the metatheory considerably, and that we do not consider here.
 
 Our permutative reduction is a refinement of that for the call-by-name probabilistic $\lambda$-calculus~\cite{Leventis19}, and is an implementation of the equational theory of \emph{(ordered) binary decision trees} via rewriting~\cite{Zantema-Pol-2001}. Probabilistic decision trees have been proposed with a primitive binary probabilistic operator~\cite{Manber-Tompa-1982}, but not a decomposition as we explore here.
 
@@ -390,7 +411,7 @@ In a term $\trm{\x.M}$ the abstraction $\x$ binds the free occurrences of the va
 	N\+M \quad\stackrel\Delta=\quad \trm{!a. N +a M}
 \end{align}
 %
-The generator $\ttrm{!a}$ represents a probabilistic \emph{event}, whose outcome, a binary value $\{0,1\}$ represented by the label $a$, is used by the choice operator $\ttrm{+a}$. That is, $\ttrm{!a}$ flips a coin setting $a$ to $0$ or $1$, and depending on this $\ttrm{N+aM}$ reduces to $N$ respectively $M$. We will use the unlabelled choice $\+$ as in \eqref{eq:unlabeled}. %the above abbreviation. 
+The generator $\ttrm{!a}$ represents a probabilistic \emph{event}, whose outcome, a binary value $\{0,1\}$ represented by the label $a$, is used by the choice operator $\ttrm{+a}$. That is, $\ttrm{!a}$ flips a coin setting $a$ to $0$ (respectively, $1$), and depending on this $\ttrm{N+aM}$ reduces to $N$ (respectively, $M$). We will use the unlabelled choice $\+$ as in \eqref{eq:unlabeled}. %the above abbreviation. 
 This convention also gives the translation from a \emph{call-by-name} probabilistic $\lambda$-calculus into $\PEL$ %(we formalize
 (the interpretation of a \emph{call-by-value} probabilistic calculus is in Section~\ref{sec:cbv}).
 
@@ -416,10 +437,10 @@ This convention also gives the translation from a \emph{call-by-name} probabilis
 \\																								\notag
 \\	\trm{!a.N}				&\rw_\perm N 									&& (\text{if } a\notin \fl{N})		\tag{\boxVoid}
 \\	\trm{\x.!a.N} 			&\rw_\perm \trm{!a.\x. N}				\rstrut						\tag{\boxAbs}
-\\	\trm{(!a.N)M}			&\rw_\perm \trm{!a.(NM)}				\rstrut						\tag{\boxFun}
+\\	\trm{(!a.N)M}			&\rw_\perm \trm{!a.(NM)}				\rstrut						\tag{\boxFun}\\ \vspace{-20pt} \notag
 \end{align}
 \end{minipage}}
-\caption{Reduction rules}
+\caption{Reduction Rules}
 \label{fig:reduction rules}
 \end{figure}
 
@@ -504,18 +525,21 @@ The normal forms $P_0$ of $\rw_\perm$, respectively $N_0$ of $\rw$, are given by
 
 
 \begin{figure}[!t]
-\newcommand\fit[1]{\makebox[36pt][c]{$#1$}}%
-\begin{align*}
+  \newcommand\fit[1]{\makebox[36pt][c]{$#1$}}%
+    \fbox{
+    \begin{minipage}{.97\textwidth}
+      \begin{align*}
 	\trm{!a.(\x.x = x)(\top+a\bot)}
-			& \fit{\rw_\perm}	\trm{!a.(\x.x=x)\top~+a~(\x.x=x)\bot}	\tag\plusArg
-\\		& \fit{\rws_\beta}	\trm{!a.(\top=\top)\,+a\,(\bot=\bot)}
-\\		& \fit{=}			\trm{!a. \top +a \top}
-			  \fit{\rw_\perm} 	\trm{!a. \top}
-			  \fit{\rw_\perm}	\top           						 	\tag{\idem,\boxVoid}
-\end{align*}
-\caption{Example reduction of the $\cbv$-translation of the term %in the introduction.}
-	on p.~\pageref{eq:cbv}.}
-\label{fig:example reduction}
+	& \fit{\rw_\perm}	\trm{!a.(\x.x=x)\top~+a~(\x.x=x)\bot}	\tag\plusArg
+        \\		& \fit{\rws_\beta}	\trm{!a.(\top=\top)\,+a\,(\bot=\bot)}
+        \\		& \fit{=}			\trm{!a. \top +a \top}
+	\fit{\rw_\perm} 	\trm{!a. \top}
+	\fit{\rw_\perm}	\top           						 	\tag{\idem,\boxVoid}
+      \end{align*}
+      \end{minipage}}
+  \caption{Example Reduction of the $\cbv$-translation of the Term %in the introduction.}
+    on p.~\pageref{eq:cbv}.}
+  \label{fig:example reduction}
 \end{figure}
 
 %============================================================ P-REDUCTION
@@ -531,12 +555,12 @@ creating super-exponential growth.\footnote{This was inferred from only a simple
 
 We observe that the set $\PEL$ endowed with $\rw_\perm$ is a first-order term rewriting system over a countably infinite set of variables %(denoted by $x, y, z, \dots$) 
 and the signature $\Sigma$ given by:
-\begin{itemize}
+\begin{varitemize}
 	\item the binary function symbol $\trm{+a}$, for any label $a$;
 	\item the unary function symbol $\trm{!a}$, for any label $a$;
 	\item the unary function symbol $\trm{\x}$, for any variable $x$;
 	\item the binary function symbol $\trm{@}$, letting $@(\trm{M},\trm{N})$ stand for $MN$.
-\end{itemize}
+\end{varitemize}
 
 \begin{defn}
 	Let $\trm{M}$ be a well-labeled representative of a label-closed term, and let $\Sigma_M$ be the set of signature symbols occurring in $\trm{M}$.
@@ -578,10 +602,10 @@ N < M \iff
 \]
 While $\prec_M$ is defined only relative to $\Sigma_M$, reduction may only reduce the signature. Inspection of Figure~\ref{fig:reduction rules} then shows that $M \rw_\perm N$ implies $N<M$.
 \end{proof}
-Of course, there is not to prove $\rw$ being strongly normalizing,
+Of course, there is no hope to prove $\rw$ being strongly normalizing,
 due to the presence of $\beta$-reduction rules and the absence of types.
 
-\subsubsection{Confluence of permutative reduction.}
+\subsubsection{Confluence of Permutative Reduction.}
 
 With strong normalization, confluence of $\rw_\perm$ requires only local confluence. %We begin by reducing 
 We reduce the number of cases to consider, by casting the permutations of $\ttrm{+a}$ as instances of a common shape.
@@ -1682,54 +1706,57 @@ For a $\beta$-step $N\rw_\beta M$ we label the reduced redex in $N$ to get $\trm
 
 
 \begin{figure}[!t]
-\[
-\begin{array}{c@{\qquad}c@{\qquad}c@{\qquad}c}
-\vcenter{\hbox{\begin{tikzpicture}
-	\matrix (m) [matrix of math nodes] {
-	  \trm{N} && \trm{M} \\[20pt] \\ \trm{P} & =_\perm & \trm{Q} \\
-	};
-	\draw[rwb] (m-1-1) --node[above]{$\scriptstyle\perm$} (m-1-3);
-	\draw[rwp] (m-1-1) --node[left] {$\scriptstyle\beta$} (m-3-1);
-	\draw[rwp] (m-1-3) --node[right]{$\scriptstyle\beta$} (m-3-3);
-\end{tikzpicture}}}
-&
-\vcenter{\hbox{\begin{tikzpicture}
-	\matrix (m) [matrix of math nodes] {
-	  \trm{N} && \trm{M} \\[20pt] \\ \trm{P} & =_\perm & \trm{Q} \\
-	};
-	\draw[rwn] (m-1-1) --node[above]{$\scriptstyle\perm$} (m-1-3);
-	\draw[rwp] (m-1-1) --node[left] {$\scriptstyle\beta$} (m-3-1);
-	\draw[rwp] (m-1-3) --node[right]{$\scriptstyle\beta$} (m-3-3);
-\end{tikzpicture}}}
-&
-\vcenter{\hbox{\begin{tikzpicture}
-	\matrix (m) [matrix of math nodes] {
-	  \trm{N} &[20pt] & \trm{M} \\[20pt] \\ \trm{P} && \trm{Q} \\
-	};
-	\draw[rwp] (m-1-1) -- (m-1-3);
-	\draw[rwp] (m-1-1) -- (m-3-1);
-	\draw[rwp] (m-1-3) -- (m-3-3);
-	\draw[rwp] (m-3-1) -- (m-3-3);
-\end{tikzpicture}}}
-&
-\vcenter{\hbox{\begin{tikzpicture}
-	\matrix (m) [matrix of math nodes] {
-	  \trm{N} &[20pt] & \trm{M} \\[20pt] \\ P && Q \\
-	};
-	\draw[rw]  (m-1-1) -- (m-1-3);
-	\draw[rwn] (m-1-1) --node[left] {$\scriptstyle\perm$} (m-3-1);
-	\draw[rwn] (m-1-3) --node[right]{$\scriptstyle\perm$} (m-3-3);
-	\draw[rwp] (m-3-1) -- (m-3-3);
-\end{tikzpicture}}}
-\\ \\
-  \text{\Cref{lem:parallel p - parallel beta}}
-& \text{\Cref{lem:exhaustive p - parallel beta}}
-& \text{\Cref{lem:complete diamond}}
-& \text{\Cref{lem:p to complete reduction}}
-\end{array}
-\]
-\caption{Diagrams for the lemmata leading up to confluence}
-\label{fig:confluence diagrams}
+  \fbox{
+      \begin{minipage}{.97\textwidth}
+        \[
+        \begin{array}{c@{\qquad}c@{\qquad}c@{\qquad}c}
+          \vcenter{\hbox{\begin{tikzpicture}
+	        \matrix (m) [matrix of math nodes,ampersand replacement=\&] {
+	          \trm{N} \&\& \trm{M} \\[20pt] \\ \trm{P} \& =_\perm \& \trm{Q} \\
+	        };
+	        \draw[rwb] (m-1-1) --node[above]{$\scriptstyle\perm$} (m-1-3);
+	        \draw[rwp] (m-1-1) --node[left] {$\scriptstyle\beta$} (m-3-1);
+	        \draw[rwp] (m-1-3) --node[right]{$\scriptstyle\beta$} (m-3-3);
+          \end{tikzpicture}}}
+          &
+          \vcenter{\hbox{\begin{tikzpicture}
+	        \matrix (m) [matrix of math nodes,ampersand replacement=\&] {
+	          \trm{N} \&\& \trm{M} \\[20pt] \\ \trm{P} \& =_\perm \& \trm{Q} \\
+	        };
+	        \draw[rwn] (m-1-1) --node[above]{$\scriptstyle\perm$} (m-1-3);
+	        \draw[rwp] (m-1-1) --node[left] {$\scriptstyle\beta$} (m-3-1);
+	        \draw[rwp] (m-1-3) --node[right]{$\scriptstyle\beta$} (m-3-3);
+          \end{tikzpicture}}}
+          &
+          \vcenter{\hbox{\begin{tikzpicture}
+	        \matrix (m) [matrix of math nodes,ampersand replacement=\&] {
+	          \trm{N} \&[20pt] \& \trm{M} \\[20pt] \\ \trm{P} \&\& \trm{Q} \\
+	        };
+	        \draw[rwp] (m-1-1) -- (m-1-3);
+	        \draw[rwp] (m-1-1) -- (m-3-1);
+	        \draw[rwp] (m-1-3) -- (m-3-3);
+	        \draw[rwp] (m-3-1) -- (m-3-3);
+          \end{tikzpicture}}}
+          &
+          \vcenter{\hbox{\begin{tikzpicture}
+	        \matrix (m) [matrix of math nodes,ampersand replacement=\&] {
+	          \trm{N} \&[20pt] \& \trm{M} \\[20pt] \\ P \&\& Q \\
+	        };
+	        \draw[rw]  (m-1-1) -- (m-1-3);
+	        \draw[rwn] (m-1-1) --node[left] {$\scriptstyle\perm$} (m-3-1);
+	        \draw[rwn] (m-1-3) --node[right]{$\scriptstyle\perm$} (m-3-3);
+	        \draw[rwp] (m-3-1) -- (m-3-3);
+          \end{tikzpicture}}}
+          \\ \\
+          \text{\Cref{lem:parallel p - parallel beta}}
+          & \text{\Cref{lem:exhaustive p - parallel beta}}
+          & \text{\Cref{lem:complete diamond}}
+          & \text{\Cref{lem:p to complete reduction}}
+        \end{array}
+        \]
+    \end{minipage}}
+  \caption{Diagrams for the Lemmata Leading up to Confluence}
+  \label{fig:confluence diagrams}
 \end{figure}
 
 %Since complete reduction $\rwp$ is diamond, the confluence of $\rw$ easily follows.
@@ -1836,7 +1863,7 @@ of labels $\theta$, i.e., one can define a family of reduction
 relations $\rw^\theta$ on pairs in the form $(M,\theta)$.
 The set of strongly normalizable terms, and the number of steps
 to normal forms become themselves parametric:
-\begin{itemize}
+\begin{varitemize}
 \item
   The set $\mathit{SN}^\theta$ of those terms $M$ such
   that $\labjudg{\theta}{M}$ and $(M,\theta)$ is strongly
@@ -1845,10 +1872,9 @@ to normal forms become themselves parametric:
   The function $\mathit{sn}^\theta$ assigning to any
   term in $\mathit{SN}^\theta$ the maximal number of $\rw^\theta$
   steps to normal form.
-\end{itemize}
+\end{varitemize}
 
-Now, %let us 
-we define types, environments, judgments, and typing rules in
+We can now define types, environments, judgments, and typing rules in
 Figure~\ref{fig:typing}.
 \newcommand{\arrow}{\Rightarrow}
 \newcommand{\judg}[3]{#1\vdash #2:#3}
@@ -1883,7 +1909,7 @@ Please notice that the type structure is precisely the one of the
 usual, vanilla, simply-typed $\lambda$-calculus (although terms are of
 course different), and we can thus reuse most of the usual proof of
 strong normalization, for example in the version given by Ralph
-Loader's notes~\cite{Loader}, page 17.
+Loader's notes~\cite{Loader98}, page 17.
 
 \SLV{
   \begin{lem}\label{lemma:closure}
@@ -1902,9 +1928,10 @@ Loader's notes~\cite{Loader}, page 17.
         \qquad\quad
         \infer{\trm{(\x.M)}L_0\ldots L_m\in\mathit{SN}^\theta}{\trm{M[L_0/x]}L_1\ldots L_m\in\mathit{SN}^\theta & L_0\in\mathit{SN}^\theta}
         $$
+        \vspace{-3pt}
       \end{minipage}
     }
-    \caption{Closure rules for sets $\mathit{SN}^\theta$}
+    \caption{Closure Rules for Sets $\mathit{SN}^\theta$}
     \label{fig:rules}
   \end{figure}
 }{
@@ -1924,7 +1951,7 @@ Loader's notes~\cite{Loader}, page 17.
   We proceed by showing that all terms to which
   $\trm{M +a N}L_1\ldots L_m$ reduces are in $\mathit{SN}^\theta$, and thus
   $\trm{M +a N}L_1\ldots L_m$ is itself in $\mathit{SN}^\theta$:
-  \begin{itemize}
+  \begin{varitemize}
   \item
     If reduction happens in one between $M,N,L_1,\ldots,L_m$, then we
     are done, because we get an instance of the rule where the first two
@@ -1966,7 +1993,7 @@ Loader's notes~\cite{Loader}, page 17.
     $a$. Similarly if the rule applied is $\trm{P +a (Q +b
       R)}\rw_\perm \trm{(P +a Q) +b (P +a R)}$.
     \qedhere
-  \end{itemize}
+  \end{varitemize}
 \end{proof}
 
 \newcounter{lemma:cloredbox}
@@ -2092,7 +2119,7 @@ types, the definition of a reducibility sets is the classic one:
   \RedSet{\tau\arrow\rho}&=\{(\Gamma,\theta,M)\mid(\judg{\Gamma}{M}{\tau\arrow\rho})\wedge(\labjudg{\theta}{M}) \ \wedge\\
     &\qquad\forall(\Gamma\Delta,\theta,N)\in\RedSet{\tau}.(\Gamma\Delta,\theta,MN)\in\RedSet{\rho}\}.
 \end{align*}
-Before giving the proving that all terms are reducible, we need some
+Before proving that all terms are reducible, we need some
 auxiliary results
 \begin{lem}\label{lemma:redprop}
   \begin{enumerate}
@@ -2110,9 +2137,11 @@ auxiliary results
     $(\Gamma,\theta,NL_1\ldots L_m)\in\RedSet{\tau}$ and $a\in\theta$,
     then $(\Gamma,\theta,\trm{(M +a N)}L_1\ldots L_m)\in\RedSet{\tau}$.
   \item\label{point:box}
+    \begin{sloppypar}
     If $(\Gamma,a\cdot\theta,ML_1\ldots L_m)\in\RedSet{\tau}$
     and $a\not\in L_i$ for all $i$,
     then $(\Gamma,\theta,\trm{(!a.M)}L_1\ldots L_m)\in\RedSet{\tau}$.
+    \end{sloppypar}
   \end{enumerate}
 \end{lem}
 \begin{proof}
@@ -2140,7 +2169,7 @@ The following is the so-called Main Lemma:
 \end{prop}
 \begin{proof}
   This is an induction on the structure of the term $M$:
-  \begin{itemize}
+  \begin{varitemize}
   \item
     If $M$ is a variable, necessarily one among $y_1,\ldots,y_n$,
     then the result is trivial.
@@ -2162,6 +2191,7 @@ The following is the so-called Main Lemma:
     (\Gamma,\theta,(LP)[\overline{N}/\overline{y}])\in\RedSet{\rho}
     $$
   \item
+    \begin{sloppypar}
     If $M$ is an abstraction $\trm{\x.L}$, then $\rho$
     is an arrow type $\xi\arrow\mu$ and
     $\judg{y_1:\tau_1,\ldots,y_n:\tau_n,x:\xi}{L}{\mu}$.
@@ -2171,6 +2201,7 @@ The following is the so-called Main Lemma:
     By induction hypothesis, since $(\Gamma\Delta,N_i)\in\RedSet{\tau_i}$,
     we get that $(\Gamma\Delta,\theta,L[\overline{N}/\overline{y},P/x])\in\RedSet{\mu}$.
     The thesis follows from Lemma~\ref{lemma:redprop}.
+    \end{sloppypar}
   \item
     If $M$ is a sum $\trm{L+a P}$, we can make use of Lemma~\ref{lemma:redprop}
     and the induction hypothesis, and conclude.
@@ -2179,7 +2210,7 @@ The following is the so-called Main Lemma:
     and the induction hypothesis. We should however observe, that $\labjudg{a\cdot\theta}{P}$,
     since $\labjudg{\theta}{M}$.
     \qedhere
-  \end{itemize}
+  \end{varitemize}
 \end{proof}
 We now have all the %necessary
 ingredients for our proof of strong normalization:
@@ -2214,7 +2245,7 @@ The \emph{$a$-projections} $\proj a0N$ and $\proj a1N$ are defined as follows: %
 \end{align*}
 \end{defn}
 
-Let $\Streams=\{0,1\}^\mathbb{N}$ be the space of streams, ranged over by $r,s,t$.
+Let $\Streams=\{0,1\}^\mathbb{N}$ be the space of streams of bits, ranged over by $r,s,t$.
 
 \begin{defn}
 The \emph{stream labeling} $N^s$ of a term $N$ with a stream $s\in\Streams$, which annotates generators as $\trm{!ai}$ with $i\in\{0,1\}$ and variables as $x^s$ with a stream $s$, is given inductively as follows.
@@ -2257,8 +2288,8 @@ Commonly, probabilistic events (with the same probability) are considered interc
 
 To relate projective with permutative reduction, we lift the latter to stream-labeled terms simply by preserving labels. We have the following basic result.
 
-\begin{prop}[Stream-labeling commutes with reduction]
-If $M \rw N$ with a $\beta$-step or $\perm$-step other than $\boxVoid$ then $M^s \rw N^s$.
+\begin{prop}[Stream-labeling Commutes with Reduction]
+If $M \rw N$ with a $\beta$-step or $\perm$-step other than $\boxVoid$, then $M^s \rw N^s$.
 \end{prop}
 
 \begin{rmrk}
@@ -2268,7 +2299,7 @@ The statement is false for the $\boxVoid$ rule $\trm{!a.N}\rw_\perm N~(a\notin\f
 \]
 \end{rmrk}
 
-In effect, the above states that labeling is deterministic: even if a generator remains unlabeled in $M$, and becomes labeled after a ($\beta$-)step $M\rw N$, what label it receives is predetermined. The deep reason is that the stream-labeling algorithm assigns an outcome to each generator in a way that corresponds to a call-by-name strategy for probabilistic reduction.
+In effect, the way the states above states are labeled is deterministic: even if a generator remains unlabeled in $M$, and becomes labeled after a ($\beta$-)step $M\rw N$, what label it receives is predetermined. The deep reason is that the stream-labeling algorithm assigns an outcome to each generator in a way that corresponds to a call-by-name strategy for probabilistic reduction.
 
 We can now relate projective and permutative reduction in one direction.
 
@@ -2334,8 +2365,7 @@ Projective reduction is an invariant for permutative reduction on labeled genera
 \end{prop}
 
 Here, $D[\,]$ is a context as used in a $\plusX$-step, and in the first, second, and last cases $\pi^a_i$ remains to capture other instances of $\ttrm{+a}$.
-
-In the other direction, we will show how permutative reduction can simulate an outermost projective step; that is, one generated by a single label $N^i$. The $i$ will attach to the generator with $\ttrm{!ai}$ with the minimal label, i.e.\ $a<b$ for any other label $b$ in $N$; then all bound choice operators $\ttrm{+a}$ can permute to reach $\ttrm{!ai}$. We formalize this by a \emph{head context} $H[\,]$.
+In the other direction, we will show how permutative reduction can simulate an outermost projective step; that is, one generated by a single label $N^i$. The $i$ will attach to the generator with $\ttrm{!ai}$ with the minimal label, i.e.\ $a<b$ for any other label $b$ in $N$; then all bound choice operators $\ttrm{+a}$ can permute and reach $\ttrm{!ai}$. We formalize this by a \emph{head context} $H[\,]$.
 
 \begin{defn}
 A \emph{head context} $H[\,]$ is given by the following grammar.
@@ -2940,7 +2970,10 @@ If $N\rws_{\val,\beta\val}V$ then $\uncbv N^s\rws_{\pi,\beta}\uncbv V$ for some 
 
 \subsection*{Acknowledgements}
 
-This work was supported by EPSRC Project EP/R029121/1 \emph{Typed Lambda-Calculi with Sharing and Unsharing}. We thank the referees for their diligence.
+This work was supported by EPSRC Project EP/R029121/1 \emph{Typed Lambda-Calculi with Sharing and Unsharing}.
+The first author is partially by the ANR project 19CE480014 PPS, the ERC Consolidator Grant 
+818616 DIAPASoN, and the MIUR PRIN 201784YSZ5 ASPRA.
+We thank the referees for their diligence.
 
 
 \bibliographystyle{splncs04}
