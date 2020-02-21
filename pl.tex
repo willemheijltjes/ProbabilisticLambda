@@ -562,23 +562,23 @@ N < M \iff
 \]
 While $\prec_M$ is defined only relative to $\Sigma_M$, reduction may only reduce the signature. Inspection of Figure~\ref{fig:reduction rules} then shows that $M \rw_\perm N$ implies $N<M$.
 \end{proof}
-Of course, there is not to prove $\rw$ being strongly normalizing,
-due to the presence of $\beta$-reduction rules and the absence of types.
+
+%Of course, there is not to prove $\rw$ being strongly normalizing, due to the presence of $\beta$-reduction rules and the absence of types.
 
 \subsection{Confluence of permutative reduction}
 
-With strong normalization, confluence of $\rw_\perm$ requires only local confluence. We begin by reducing the number of cases to consider, by casting the permutations of $\ttrm{+a}$ as instances of a common shape.
+With strong normalization of $\rw_\perm$, confluence requires only local confluence. We begin by reducing the number of cases to consider, by casting the permutations of $\ttrm{+a}$ as instances of a common shape.
 
 \begin{defn}
-We define a \emph{context} $C[\,]$ as follows.
+We define a \emph{context} $C[\,]$ as follows, and let $C[N]$ represent $C[\,]$ with the hole $[\,]$ replaced by $N$.
 \[
 \begin{array}{lll@{~}l@{~}l@{~}l@{~}l}
 	C[\,] &\coloneqq& [\,] &\mid& \lambda x.C[\,] &\mid& C[\,]M ~\mid~ NC[\,] ~\mid~ \trm{C[\,]+aM} ~\mid~ \trm{N+aC[\,]} ~\mid~ \trm{!a.C[\,]}
 \end{array}
 \]
-The term $C[N]$ represents $C[\,]$ with the hole $[\,]$ replaced by $N$.
 \end{defn}
-
+%
+\noindent
 Observe that the six reduction rules $\plusAbs$ through $\plusBox$ in Figure~\ref{fig:reduction rules} are all of the following form. We refer to these collectively as $\plusX$.
 \begin{align}
 	\trm{C[N+aM]} \rw_\perm \trm{C[N]+aC[M]}
@@ -781,42 +781,44 @@ We prove local confluence; by Newman's lemma and strong normalization of $\rw_\p
 
 %=====
 \itm\idem{\trm{N +a N}\rw N}
-{\small
-\[
-\vc{\begin{tikzpicture}[x=20pt,y=1.5ex]
+\\[-10pt]
+$\small%
+\vc{\begin{tikzpicture}[x=18pt,y=1.5ex]
 	\node[anchor=base east] (a) at (0,0) {$\trm{(N+aN)+aM}$};
 	\node[anchor=base west] (b) at (1,0) {$\trm{N+aM}$};
 	\draw[rw] (0,1) --node[above]{$\idem$}    (1,1);
 	\draw[rw] (0,0) --node[below]{$\cancelL$} (1,0);
 \end{tikzpicture}}
-\]
-\[
+\hfill
 \vcenter{\hbox{\begin{tikzpicture}
 	\matrix [matrix of math nodes] (m) {
-	  		\trm{(N+aM)+a(N+aM)} &[20pt] \trm{N+aM}
+	  		\trm{(N+aM)+a(N+aM)} &[15pt] \trm{N+aM}
 	\\[20pt]\trm{N+a(N+aM)}
 	\\ };
 	\draw[rw] (m-1-1) --node[above]{$\idem$}    (m-1-2);
 	\draw[rw] (m-1-1) --node[left] {$\cancelL$} (m-2-1);
 	\draw[rw,implied] (m-2-1) --node[below right=-2pt] {$\cancelR$} (m-1-2);
 \end{tikzpicture}}}
-\qquad
+\hfill
 \vcenter{\hbox{\begin{tikzpicture}
 	\matrix [matrix of math nodes] (m) {
-	  		\trm{C[N+aN]}    &[20pt] C[N]
+	  		\trm{C[N+aN]}    &[15pt] C[N]
 	\\[20pt]\trm{C[N]+aC[N]}
 	\\ };
 	\draw[rw] (m-1-1) --node[above]{$\idem$}  (m-1-2);
 	\draw[rw] (m-1-1) --node[left] {$\plusX$} (m-2-1);
 	\draw[rw,implied] (m-2-1) --node[below right=-2pt] {$\idem$} (m-1-2);
-\end{tikzpicture}}}
-\]
+\end{tikzpicture}}}%
+$
+
+{
+\small
 \[
 \vcenter{\hbox{\begin{tikzpicture}
 	\matrix [matrix of math nodes] (m) {
 	  		\trm{(N+aM)+b(N+aM)} &[30pt] \trm{N+aM}
-	\\[20pt]\trm{(N+b(N+aM))+a(M+b(N+aM))} %&&[10pt] (a<b)
-	\\[20pt]\trm{((N+bN)+a(N+bM))+a((M+bN)+a(M+bM))} & \trm{(N+bN)+a(M+bM)}
+	\\[15pt]\trm{(N+b(N+aM))+a(M+b(N+aM))} %&&[10pt] (a<b)
+	\\[15pt]\trm{((N+bN)+a(N+bM))+a((M+bN)+a(M+bM))} & \trm{(N+bN)+a(M+bM)}
 	\\ };
 	\draw[rw] (m-1-1) --node[above]{$\idem$}    (m-1-2);
 	\draw[rw] (m-1-1) --node[left] {$\plusL$} (m-2-1);
@@ -824,11 +826,11 @@ We prove local confluence; by Newman's lemma and strong normalization of $\rw_\p
 	\draw[rws,implied] (m-3-2) --node[right]{$\idem$}    (m-1-2);
 	\draw[rws,implied] (m-3-1) --node[below]{$\cancelL,\cancelR$} (m-3-2);
 \end{tikzpicture}}}
-\]
-}
+\]}
 
 %=====
 \itm\cancelL{\trm{(N +a M) +a P}\rw\trm{N +a P}}
+\\[-20pt]
 {\small
 \[
 \vcenter{\hbox{\begin{tikzpicture}
@@ -844,8 +846,8 @@ We prove local confluence; by Newman's lemma and strong normalization of $\rw_\p
 \vcenter{\hbox{\begin{tikzpicture}
 	\matrix [matrix of math nodes] (m) {
 	  		\trm{C[(N+aM)+aP]} &[15pt] \trm{C[N+aM]}
-	\\[20pt]\trm{C[N+aM]+aC[P]}
-	\\[20pt]\trm{(C[N]+aC[M])+aC[P]} & \trm{C[N]+aC[M]}
+	\\[15pt]\trm{C[N+aM]+aC[P]}
+	\\[15pt]\trm{(C[N]+aC[M])+aC[P]} & \trm{C[N]+aC[M]}
 	\\ };
 	\draw[rw] (m-1-1) --node[above]{$\cancelL$} (m-1-2);
 	\draw[rw] (m-1-1) --node[left] {$\plusX$}   (m-2-1);
@@ -871,13 +873,14 @@ We prove local confluence; by Newman's lemma and strong normalization of $\rw_\p
 
 %=====
 \itm\plusX{\trm{C[N+aM]}\rw\trm{C[N]+a C[M]}}
+\\[-20pt]
 {\small
 \[
 \vcenter{\hbox{\begin{tikzpicture}
 	\matrix [matrix of math nodes] (m) {
 	  		\trm{C[(N+aM)+bP]}      &[20pt] \trm{C[N+aM]+bC[P]}
-	\\[20pt]\trm{C[(N+bP)+a(M+bP)]} &       \trm{(C[N]+aC[M])+bC[P]}		 %&[10pt] (a<b)
-	\\[20pt]\trm{C[N+bP]+aC[M+bP]}  &       \trm{(C[N]+bC[P])+a(C[M]+bC[P])}
+	\\[15pt]\trm{C[(N+bP)+a(M+bP)]} &       \trm{(C[N]+aC[M])+bC[P]}		 %&[10pt] (a<b)
+	\\[15pt]\trm{C[N+bP]+aC[M+bP]}  &       \trm{(C[N]+bC[P])+a(C[M]+bC[P])}
 	\\ };
 	\draw[rw] (m-1-1) --node[above]{$\plusX$} (m-1-2);
 	\draw[rw] (m-1-1) --node[left] {$\plusL$} (m-2-1);
@@ -890,8 +893,10 @@ We prove local confluence; by Newman's lemma and strong normalization of $\rw_\p
 
 %=====
 \itm\plusL{\trm{(N+aM)+bP}\rw\trm{(N+bP)+a(M+bP)}}
-\[
-\vcenter{\hbox{\begin{tikzpicture}[x=340pt,y=40pt]
+\\[-10pt]
+{\small
+$\hspace*{\fill}
+\vcenter{\hbox{\begin{tikzpicture}[x=300pt,y=36pt]
 	\node[anchor=west] (a) at (0,2) {$\trm{(N+aM)+b(P+aQ)}$};
 	\node[anchor=west] (b) at (0,1) {$\trm{((N+aM)+bP)+a((N+aM)+bQ)}$};
 	\node[anchor=west] (c) at (0,0) {$\trm{((N+bP)+a(M+bP))+a((N+bQ)+a(M+bQ))}$};
@@ -920,7 +925,7 @@ We prove local confluence; by Newman's lemma and strong normalization of $\rw_\p
 %	\draw[rws,implied] (m-2-2) --node[right]{$\cancelL,\cancelR$} (m-3-2);
 %	\draw[rws,implied] (m-3-1) --node[below]{$\cancelL,\cancelR$} (m-3-2);
 %\end{tikzpicture}}}
-\]
+$}
 \[
 \vcenter{\hbox{\begin{tikzpicture}
 	\matrix [matrix of math nodes] (m) {
@@ -1294,26 +1299,43 @@ Parallel $\beta$-reduction is diamond.
 \end{lem}
 
 \begin{proof}
-Let $P^\1\rwp_\beta P_\1$ and $P^\0\rwp_\beta P_\0$ be two labelled reduction steps on a term $P$. We annotate each step with the  label of the other, preserved by reduction, to give the following span from the doubly labelled term $P^{\1\0}=P^{\0\1}$.
+Let $P^\1\rwp_\beta P_\1$ and $P^\0\rwp_\beta P_\0$ be two labelled reduction steps on a term $P$. We annotate each step with the  label of the other, preserved by reduction, to give the span from the doubly labelled term $P^{\1\0}=P^{\0\1}$ below left. Reducing the remaining labels will close the diagram, as below right.
 \[
 	P_\1^\0
-		\quad \mathrel{{}_\beta{\rwpleft}} \quad
+		~\mathrel{{}_\beta{\rwpleft}}~
 	P^{\1\0}
 		=
 	P^{\0\1}
-		\quad \rwp_\beta \quad
+		~\rwp_\beta~
 	P_\0^\1
-\]
-Reducing the remaining labels will close the diagram.
-\[
+\qquad\qquad
 	P_\1^\0
-		\quad \rwp_\beta \quad
+		~\rwp_\beta~
 	P_{\1\0}
 		=
 	P_{\0\1}
-		\quad \mathrel{{}_\beta{\rwpleft}} \quad
+		~\mathrel{{}_\beta{\rwpleft}}~
 	P_\0^\1
 \]
+%\[
+%	P_\1^\0
+%		\quad \mathrel{{}_\beta{\rwpleft}} \quad
+%	P^{\1\0}
+%		=
+%	P^{\0\1}
+%		\quad \rwp_\beta \quad
+%	P_\0^\1
+%\]
+%Reducing the remaining labels will close the diagram.
+%\[
+%	P_\1^\0
+%		\quad \rwp_\beta \quad
+%	P_{\1\0}
+%		=
+%	P_{\0\1}
+%		\quad \mathrel{{}_\beta{\rwpleft}} \quad
+%	P_\0^\1
+%\]
 This is proved by induction on $P^{\1\0}$, where only two cases are not immediate: those where a redex carries one but not the other label. One case follows by the below diagram; for the step above right, induction on $N^\1$ shows that $N^\1[M^\1/x]\rwp_\beta N_\1[M_\1/x]$. The other case is symmetric.
 \[
 \begin{array}[b]{ccccc}
@@ -2149,7 +2171,7 @@ ingredients for our proof of strong normalization:
 \section{Projective reduction}
 \label{sec:projective-reduction}
 
-Permutative reduction $\rw_\perm$ evaluates probabilistic sums purely by rewriting. Here we look at an alternative \emph{projective} notion of reduction, which conforms more closely to the intuition that $\ttrm{!a}$ generates a probabilistic event to determine the choice $\ttrm{+a}$. We evaluate a term with reference to a binary stream $s\in\{0,1\}^{\mathbb N}$, which provides the outcomes to probabilistic events during reduction. Writing $N^s$ for the term $N$ with stream $s$, and $i\cdot s$ for the stream with $i\in\{0,1\}$ as first element, we expect to reduce $\trm{(!a.N)}^{i\cdot s}$ to $M^s$ where $M$ is obtained from $N$ by projecting every subformula $\ttrm{P_0+aP_1}$ to $P_i$. To avoid introducing any permutation rules, we will evaluate a generator not just at top-level, but anywhere along the \emph{spine} of a term: under abstractions, in function position, and under (other) generators and choices.
+Permutative reduction $\rw_\perm$ evaluates probabilistic sums purely by rewriting. Here we look at an alternative \emph{projective} notion of reduction, which conforms more closely to the intuition that $\ttrm{!a}$ generates a probabilistic event to determine the choice $\ttrm{+a}$. We evaluate a term with reference to a binary stream $s\in\{0,1\}^{\mathbb N}$, which provides the outcomes to probabilistic events during reduction. Writing $N^s$ for the term $N$ with stream $s$, and $i\cdot s$ for the stream with $i\in\{0,1\}$ as first element, we expect to reduce $\trm{(!a.N)}^{i\cdot s}$ to $M^s$ where $M$ is obtained from $N$ by projecting every subformula $\ttrm{P_0+aP_1}$ to $P_i$. To avoid introducing any permutation rules, we will evaluate a generator not just at top-level, but anywhere along the \emph{spine} of a term: under abstractions, in function position, and under (other) generators and choices---but not in argument position.
 
 \begin{defn}
 The \emph{$a$-projections} $\proj a0N$ and $\proj a1N$ are defined as follows: %, where $a\neq b$.
@@ -2185,19 +2207,19 @@ Observe that in $N^s$ a generator that occurs under $n$ other generators on the 
 \begin{rmrk}
 Commonly, probabilistic events (with the same probability) are considered interchangeable; hence $\ttrm{!a.!b.N}$ would be equivalent to $\ttrm{!b.!a.N}$. Using streams, we can refine this proposition: these are equivalent by simultaneously exchanging the corresponding events in the context stream.
 \[
-\begin{tikzpicture}[x=44pt,y=30pt]
-	\node     at (0,2) {$\trm{(!a.!b.N)}^{i\cdot j\cdot s}$};
-	\node     at (2,2) {$\trm{(!b.!a.N)}^{j\cdot i\cdot s}$};
-	\node (A) at (0,1) {$\trm{!ai.!b{}^j.N^s}$};
-	\node (B) at (2,1) {$\trm{!b{}^j.!ai.N^s}$};
-	\node (C) at (0,0) {$\pi^a_i(\proj bj{N^s})$};
-	\node (D) at (2,0) {$\pi^b_j(\proj ai{N^s})$};
-	\draw[rws] (A) --node[left] {$\scriptstyle\pi$}   (C);
-	\draw[rws] (B) --node[right]{$\scriptstyle\pi$}   (D);
-	\node at (1,2) {$\sim$};
-	\node at (0,1.5) {$=$};
-	\node at (2,1.5) {$=$};
-	\node at (1,0) {$=$};
+\begin{tikzpicture}[x=80pt,y=15pt]
+	\node     at (0,0) {$\trm{(!a.!b.N)}^{i\cdot j\cdot s}$};
+	\node     at (0,2) {$\trm{(!b.!a.N)}^{j\cdot i\cdot s}$};
+	\node (A) at (1,0) {$\trm{!ai.!b{}^j.N^s}$};
+	\node (B) at (1,2) {$\trm{!b{}^j.!ai.N^s}$};
+	\node (C) at (2,0) {$\pi^a_i(\proj bj{N^s})$};
+	\node (D) at (2,2) {$\pi^b_j(\proj ai{N^s})$};
+	\draw[rws] (A) --node[above] {$\scriptstyle\pi$}   (C);
+	\draw[rws] (B) --node[above]{$\scriptstyle\pi$}   (D);
+	\node at (0,1) {$\sim$};
+	\node at (0.5,0) {$=$};
+	\node at (0.5,2) {$=$};
+	\node at (2,1) {$=$};
 \end{tikzpicture}
 \]
 \end{rmrk}
@@ -2205,6 +2227,7 @@ Commonly, probabilistic events (with the same probability) are considered interc
 To relate projective with permutative reduction, we lift the latter to stream-labeled terms simply by preserving labels. We have the following basic result.
 
 \begin{prop}[Stream-labeling commutes with reduction]
+\label{prop:labelling-commutes}
 If $M \rw N$ with a $\beta$-step or $\perm$-step other than $\boxVoid$ then $M^s \rw N^s$.
 \end{prop}
 
@@ -2215,7 +2238,7 @@ The statement is false for the $\boxVoid$ rule $\trm{!a.N}\rw_\perm N~(a\notin\f
 \]
 \end{rmrk}
 
-In effect, the above states that labeling is deterministic: even if a generator remains unlabeled in $M$, and becomes labeled after a ($\beta$-)step $M\rw N$, what label it receives is predetermined. The deep reason is that the stream-labeling algorithm assigns an outcome to each generator in a way that corresponds to a call-by-name strategy for probabilistic reduction.
+In effect, Proposition~\ref{prop:labelling-commutes} states that labeling is deterministic: even if a generator remains unlabeled in $M$, and becomes labeled after a ($\beta$-)step $M\rw N$, what label it receives is predetermined. The deep reason is that the stream-labeling algorithm assigns an outcome to each generator in a way that corresponds to a call-by-name strategy for probabilistic reduction.
 
 We can now relate projective and permutative reduction in one direction.
 
