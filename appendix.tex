@@ -1,0 +1,574 @@
+\section{Technical appendix: omitted proofs}
+\label{sect:proofs}
+
+The enumeration of lemmas already stated in the body of the article is unchanged.
+
+\setcounter{lemmaAppendix}{\value{lem:confluence-perm}}
+\begin{lemmaAppendix}[Confluence of $\rw_\perm$]
+	\label{lemmaAppendix:confluence-perm}
+	Reduction $\rw_\perm$ is confluent.
+\end{lemmaAppendix}
+
+\begin{proof}
+	We prove local confluence; by Newman's lemma and strong normalization of $\rw_\perm$ (\Cref{lemma:strong-normalization}), confluence follows. We consider each reduction rule against those lower down in Figure~\ref{fig:reduction rules}. For the symmetric rule pairs $\cancelL$/$\cancelR$, $\plusL$/$\plusR$, and $\plusFun/\plusArg$ we present only the first case. Unless otherwise specified, we let $a<b<c$.
+	
+	\newcommand\itm[2]{\medskip\noindent(#1)}% \qquad$#2$}
+	
+	%=====
+	\itm\idem{\trm{N +a N}\rw N}
+	{\small
+		\[
+		\vc{\begin{tikzpicture}[x=20pt,y=1.5ex]
+			\node[anchor=base east] (a) at (0,0) {$\trm{(N+aN)+aM}$};
+			\node[anchor=base west] (b) at (1,0) {$\trm{N+aM}$};
+			\draw[rw] (0,1) --node[above]{$\idem$}    (1,1);
+			\draw[rw] (0,0) --node[below]{$\cancelL$} (1,0);
+			\end{tikzpicture}}
+		\]
+		\[
+		\vcenter{\hbox{\begin{tikzpicture}
+				\matrix [matrix of math nodes] (m) {
+					\trm{(N+aM)+a(N+aM)} &[20pt] \trm{N+aM}
+					\\[20pt]\trm{N+a(N+aM)}
+					\\ };
+				\draw[rw] (m-1-1) --node[above]{$\idem$}    (m-1-2);
+				\draw[rw] (m-1-1) --node[left] {$\cancelL$} (m-2-1);
+				\draw[rw,implied] (m-2-1) --node[below right=-2pt] {$\cancelR$} (m-1-2);
+				\end{tikzpicture}}}
+		\qquad
+		\vcenter{\hbox{\begin{tikzpicture}
+				\matrix [matrix of math nodes] (m) {
+					\trm{C[N+aN]}    &[20pt] C[N]
+					\\[20pt]\trm{C[N]+aC[N]}
+					\\ };
+				\draw[rw] (m-1-1) --node[above]{$\idem$}  (m-1-2);
+				\draw[rw] (m-1-1) --node[left] {$\plusX$} (m-2-1);
+				\draw[rw,implied] (m-2-1) --node[below right=-2pt] {$\idem$} (m-1-2);
+				\end{tikzpicture}}}
+		\]
+		\[
+		\vcenter{\hbox{\begin{tikzpicture}
+				\matrix [matrix of math nodes] (m) {
+					\trm{(N+aM)+b(N+aM)} &[30pt] \trm{N+aM}
+					\\[20pt]\trm{(N+b(N+aM))+a(M+b(N+aM))} %&&[10pt] (a<b)
+					\\[20pt]\trm{((N+bN)+a(N+bM))+a((M+bN)+a(M+bM))} & \trm{(N+bN)+a(M+bM)}
+					\\ };
+				\draw[rw] (m-1-1) --node[above]{$\idem$}    (m-1-2);
+				\draw[rw] (m-1-1) --node[left] {$\plusL$} (m-2-1);
+				\draw[rws,implied] (m-2-1) --node[left] {$\plusR$}   (m-3-1);
+				\draw[rws,implied] (m-3-2) --node[right]{$\idem$}    (m-1-2);
+				\draw[rws,implied] (m-3-1) --node[below]{$\cancelL,\cancelR$} (m-3-2);
+				\end{tikzpicture}}}
+		\]
+	}
+	
+	%=====
+	\itm\cancelL{\trm{(N +a M) +a P}\rw\trm{N +a P}}
+	{\small
+		\[
+		\vcenter{\hbox{\begin{tikzpicture}
+				\matrix [matrix of math nodes] (m) {
+					\trm{(N+aM)+a(P+aQ)} &[15pt] \trm{N+a(P+aQ)}
+					\\[20pt]\trm{(N+aM)+a Q} & \trm{N+aQ}
+					\\ };
+				\draw[rw] (m-1-1) --node[above]{$\cancelL$} (m-1-2);
+				\draw[rw] (m-1-1) --node[left] {$\cancelR$} (m-2-1);
+				\draw[rw,implied] (m-1-2) --node[right]{$\cancelR$} (m-2-2);
+				\draw[rw,implied] (m-2-1) --node[below]{$\cancelL$} (m-2-2);
+				\end{tikzpicture}}}
+		\vcenter{\hbox{\begin{tikzpicture}
+				\matrix [matrix of math nodes] (m) {
+					\trm{C[(N+aM)+aP]} &[15pt] \trm{C[N+aM]}
+					\\[20pt]\trm{C[N+aM]+aC[P]}
+					\\[20pt]\trm{(C[N]+aC[M])+aC[P]} & \trm{C[N]+aC[M]}
+					\\ };
+				\draw[rw] (m-1-1) --node[above]{$\cancelL$} (m-1-2);
+				\draw[rw] (m-1-1) --node[left] {$\plusX$}   (m-2-1);
+				\draw[rw,implied] (m-2-1) --node[left] {$\plusX$}   (m-3-1);
+				\draw[rw,implied] (m-1-2) --node[right]{$\plusX$}   (m-3-2);
+				\draw[rw,implied] (m-3-1) --node[below]{$\cancelL$} (m-3-2);
+				\end{tikzpicture}}}
+		\]
+		\[
+		\vcenter{\hbox{\begin{tikzpicture}
+				\matrix [matrix of math nodes] (m) {
+					\trm{(N+bM)+b(P+aQ)} &[20pt]  \trm{N+b(P+aQ)}
+					\\[20pt]\trm{((N+bM)+bP)+a((N+bM)+bQ)} & \trm{(N+bP)+a(N+bQ)}
+					\\ };
+				\draw[rw] (m-1-1) --node[above]{$\cancelL$} (m-1-2);
+				\draw[rw] (m-1-1) --node[left] {$\plusR$}   (m-2-1);
+				\draw[rw, implied] (m-1-2) --node[right]{$\plusR$} (m-2-2);
+				\draw[rws,implied] (m-2-1) --node[below]{$\cancelL$} (m-2-2);
+				\end{tikzpicture}}}
+		%\qquad(a<b)
+		\]
+	}
+	
+	%=====
+	\itm\plusX{\trm{C[N+aM]}\rw\trm{C[N]+a C[M]}}
+	{\small
+		\[
+		\vcenter{\hbox{\begin{tikzpicture}
+				\matrix [matrix of math nodes] (m) {
+					\trm{C[(N+aM)+bP]}      &[20pt] \trm{C[N+aM]+bC[P]}
+					\\[20pt]\trm{C[(N+bP)+a(M+bP)]} &       \trm{(C[N]+aC[M])+bC[P]}		 %&[10pt] (a<b)
+					\\[20pt]\trm{C[N+bP]+aC[M+bP]}  &       \trm{(C[N]+bC[P])+a(C[M]+bC[P])}
+					\\ };
+				\draw[rw] (m-1-1) --node[above]{$\plusX$} (m-1-2);
+				\draw[rw] (m-1-1) --node[left] {$\plusL$} (m-2-1);
+				\draw[rw, implied] (m-1-2) --node[right]{$\plusX$} (m-2-2);
+				\draw[rw, implied] (m-2-1) --node[left] {$\plusX$} (m-3-1);
+				\draw[rw, implied] (m-2-2) --node[right]{$\plusL$} (m-3-2);
+				\draw[rws,implied] (m-3-1) --node[below]{$\plusX$} (m-3-2);
+				\end{tikzpicture}}}
+		\]
+		
+		%=====
+		\itm\plusL{\trm{(N+aM)+bP}\rw\trm{(N+bP)+a(M+bP)}}
+		\[
+		\vcenter{\hbox{\begin{tikzpicture}[x=340pt,y=40pt]
+				\node[anchor=west] (a) at (0,2) {$\trm{(N+aM)+b(P+aQ)}$};
+				\node[anchor=west] (b) at (0,1) {$\trm{((N+aM)+bP)+a((N+aM)+bQ)}$};
+				\node[anchor=west] (c) at (0,0) {$\trm{((N+bP)+a(M+bP))+a((N+bQ)+a(M+bQ))}$};
+				%
+				\node[anchor=east] (d) at (1,2) {$\trm{(N+b(P+aQ))+a(M+b(P+aQ))}$};
+				\node[anchor=east] (e) at (1,1) {$\trm{((N+bP)+a(N+bQ))+a((M+bP)+a(M+bQ))}$};
+				\node[anchor=east] (f) at (1,0) {$\trm{(N+bP)+a(M+bQ)}$};
+				%
+				\draw[rw] (a) --node[above]{$\plusL$} (d);
+				\draw[rw] 			($(a.south west)+( 43.5pt,0pt)$) --node[left] {$\plusR$} ($(b.north west)+( 43.5pt,0pt)$);
+				\draw[rws,implied]	($(d.south east)+(-43.5pt,0pt)$) --node[right]{$\plusR$} ($(e.north east)+(-43.5pt,0pt)$);
+				\draw[rws,implied]	($(b.south west)+( 43.5pt,0pt)$) --node[left] {$\plusL$} ($(c.north west)+( 43.5pt,0pt)$);
+				\draw[rws,implied]	($(e.south east)+(-43.5pt,0pt)$) --node[right]{$\cancelL,\cancelR$} ($(f.north east)+(-43.5pt,0pt)$);
+				\draw[rws,implied] (c) --node[below]{$\cancelL,\cancelR$} (f);
+				\end{tikzpicture}}}
+		%\vcenter{\hbox{\begin{tikzpicture}
+		%	\matrix [matrix of math nodes] (m) {
+		%	  		\trm{(N+aM)+b(P+aQ)}                      &[10pt] \trm{(N+b(P+aQ))+a(M+b(P+aQ))}
+		%	\\[20pt]\trm{((N+aM)+bP)+a((N+aM)+bQ)}            &       \trm{((N+bP)+a(N+bQ))+a((M+bP)+a(M+bQ))} %&[10pt] (a<b)
+		%	\\[20pt]\trm{((N+bP)+a(M+bP))+a((N+bQ)+a(M+bQ))}  &       \trm{(N+bP)+a(M+bQ)}
+		%	\\ };
+		%	\draw[rw] (m-1-1) --node[above]{$\plusL$} (m-1-2);
+		%	\draw[rw] (m-1-1) --node[left] {$\plusR$} (m-2-1);
+		%	\draw[rws,implied] (m-1-2) --node[right]{$\plusR$} (m-2-2);
+		%	\draw[rws,implied] (m-2-1) --node[left] {$\plusL$} (m-3-1);
+		%	\draw[rws,implied] (m-2-2) --node[right]{$\cancelL,\cancelR$} (m-3-2);
+		%	\draw[rws,implied] (m-3-1) --node[below]{$\cancelL,\cancelR$} (m-3-2);
+		%\end{tikzpicture}}}
+		\]
+		\[
+		\vcenter{\hbox{\begin{tikzpicture}
+				\matrix [matrix of math nodes] (m) {
+					\trm{(N+bM)+c(P+aQ)}            &[20pt] \trm{(N+c(P+aQ))+b(M+c(P+aQ))}
+					\\[20pt]                                &       \trm{((N+cP)+a(N+cQ))+b((M+cP)+a(M+cQ))} %&[10pt] (a<b<c)
+					\\[20pt]\trm{((N+bM)+cP)+a((N+bM)+cQ)}  &       \trm{((N+cP)+b(M+cP))+a((N+cQ)+b(M+cQ))}
+					\\ };
+				\draw[rw] (m-1-1) --node[above]{$\plusL$} (m-1-2);
+				\draw[rw] (m-1-1) --node[left] {$\plusR$} (m-3-1);
+				\draw[rws,implied] (m-1-2) --node[right]{$\plusR$} (m-2-2);
+				\draw[rws,implied] (m-2-2) --node[right]{$\plusL,\plusR,\cancelL,\cancelR$} (m-3-2);
+				\draw[rws,implied] (m-3-1) --node[below]{$\plusL$} (m-3-2);
+				\end{tikzpicture}}}
+		\]
+	}
+	
+	%=====
+%	\SLV{The remaining cases are considered in the Appendix of \cite{arXiv}}{The remaining cases are considered in the proof in the Appendix (p.~\pageref{lemmaAppendix:confluence-perm}).}
+%	\qedhere
+	
+	%\itm\plusFun{\trm{(N+aM)P}\rw\trm{(NP)+a(MP)}}
+	%{\small
+	%\[
+	%\vcenter{\hbox{\begin{tikzpicture}
+	%	\matrix [matrix of math nodes] (m) {
+	%	  		\trm{(N+aM)(P+aQ)}                &[10pt] \trm{(N(P+aQ))+a(M(P+aQ))}
+	%	\\[20pt]\trm{((N+aM)P)+a((N+aM)Q)}        &       \trm{((NP)+a(NQ))+a((MP)+a(MQ))}
+	%	\\[20pt]\trm{((NP)+a(MP))+a((NQ)+a(MQ))}  &       \trm{(NP)+a(MQ)}
+	%	\\ };
+	%	\draw[rw] (m-1-1) --node[above]{$\plusFun$} (m-1-2);
+	%	\draw[rw] (m-1-1) --node[left] {$\plusArg$} (m-2-1);
+	%	\draw[rws,implied] (m-1-2) --node[right]{$\plusArg$} (m-2-2);
+	%	\draw[rws,implied] (m-2-1) --node[left] {$\plusFun$} (m-3-1);
+	%	\draw[rws,implied] (m-2-2) --node[right]{$\cancelL,\cancelR$} (m-3-2);
+	%	\draw[rws,implied] (m-3-1) --node[below]{$\cancelL,\cancelR$} (m-3-2);
+	%\end{tikzpicture}}}
+	%\]
+	%\[
+	%\vcenter{\hbox{\begin{tikzpicture}
+	%	\matrix [matrix of math nodes] (m) {
+	%	  		\trm{(N+bM)(P+aQ)}         &[20pt] \trm{(N(P+aQ))+b(M(P+aQ))}
+	%	\\[20pt]                           &       \trm{((NP)+a(NQ))+b((MP)+a(MQ))} %&[10pt] (a<b)
+	%	\\[20pt]\trm{((N+bM)P)+a((N+bM)Q)} &       \trm{((NP)+b(MP))+a((NQ)+b(MQ))}
+	%	\\ };
+	%	\draw[rw] (m-1-1) --node[above]{$\plusFun$} (m-1-2);
+	%	\draw[rw] (m-1-1) --node[left] {$\plusArg$} (m-3-1);
+	%	\draw[rws,implied] (m-1-2) --node[right]{$\plusArg$} (m-2-2);
+	%	\draw[rws,implied] (m-2-2) --node[right]{$\plusL,\plusR,\cancelL,\cancelR$} (m-3-2);
+	%	\draw[rws,implied] (m-3-1) --node[below]{$\plusFun$} (m-3-2);
+	%\end{tikzpicture}}}
+	%\]
+	%}
+	%
+	%%=====
+	%\itm\plusBox{\trm{!b.(N +a M)} \rw \trm{(!b.N) +a (!b.M)}}
+	%{\small
+	%\[
+	%\vcenter{\hbox{\begin{tikzpicture}
+	%	\matrix [matrix of math nodes] (m) {
+	%	  		\trm{!b.(N+aM)}    &[20pt] \trm{(!b.N)+a(!b.M)}
+	%	\\[20pt]\trm{N+aM}
+	%	\\ };
+	%	\draw[rw] (m-1-1) --node[above]{$\plusBox$} (m-1-2);
+	%	\draw[rw] (m-1-1) --node[left] {$\boxVoid$} (m-2-1);
+	%	\draw[rws,implied] (m-1-2) --node[below right=-2pt] {$\boxVoid$} (m-2-1);
+	%\end{tikzpicture}}}
+	%\quad (a \neq b, \ b \notin\trm{N+a M})
+	%\]
+	%}
+%\end{proof}
+
+%\begin{proof}
+%	We prove local confluence; by Newman's lemma and strong normalization of $\rw_\perm$ (\Cref{lemma:strong-normalization}), confluence follows. We consider each reduction rule against those lower down in Figure~\ref{fig:reduction rules}. For the symmetric rule pairs $\cancelL$/$\cancelR$, $\plusL$/$\plusR$, and $\plusFun/\plusArg$ we present only the first case. Unless otherwise specified, we let $a<b<c$.
+%
+%\newcommand\itm[2]{\medskip\noindent(#1)}% \qquad$#2$}
+%
+%	%=====
+%	\itm\idem{\trm{N +a N}\rw N}
+%	{\small
+%		\[
+%		\vc{\begin{tikzpicture}[x=20pt,y=1.5ex]
+%			\node[anchor=base east] (a) at (0,0) {$\trm{(N+aN)+aM}$};
+%			\node[anchor=base west] (b) at (1,0) {$\trm{N+aM}$};
+%			\draw[rw] (0,1) --node[above]{$\idem$}    (1,1);
+%			\draw[rw] (0,0) --node[below]{$\cancelL$} (1,0);
+%			\end{tikzpicture}}
+%		\]
+%		\[
+%		\vcenter{\hbox{\begin{tikzpicture}
+%				\matrix [matrix of math nodes] (m) {
+%					\trm{(N+aM)+a(N+aM)} &[20pt] \trm{N+aM}
+%					\\[20pt]\trm{N+a(N+aM)}
+%					\\ };
+%				\draw[rw] (m-1-1) --node[above]{$\idem$}    (m-1-2);
+%				\draw[rw] (m-1-1) --node[left] {$\cancelL$} (m-2-1);
+%				\draw[rw,implied] (m-2-1) --node[below right=-2pt] {$\cancelR$} (m-1-2);
+%				\end{tikzpicture}}}
+%		\qquad
+%		\vcenter{\hbox{\begin{tikzpicture}
+%				\matrix [matrix of math nodes] (m) {
+%					\trm{C[N+aN]}    &[20pt] C[N]
+%					\\[20pt]\trm{C[N]+aC[N]}
+%					\\ };
+%				\draw[rw] (m-1-1) --node[above]{$\idem$}  (m-1-2);
+%				\draw[rw] (m-1-1) --node[left] {$\plusX$} (m-2-1);
+%				\draw[rw,implied] (m-2-1) --node[below right=-2pt] {$\idem$} (m-1-2);
+%				\end{tikzpicture}}}
+%		\]
+%		\[
+%		\vcenter{\hbox{\begin{tikzpicture}
+%				\matrix [matrix of math nodes] (m) {
+%					\trm{(N+aM)+b(N+aM)} &[30pt] \trm{N+aM}
+%					\\[20pt]\trm{(N+b(N+aM))+a(M+b(N+aM))} %&&[10pt] (a<b)
+%					\\[20pt]\trm{((N+bN)+a(N+bM))+a((M+bN)+a(M+bM))} & \trm{(N+bN)+a(M+bM)}
+%					\\ };
+%				\draw[rw] (m-1-1) --node[above]{$\idem$}    (m-1-2);
+%				\draw[rw] (m-1-1) --node[left] {$\plusL$} (m-2-1);
+%				\draw[rws,implied] (m-2-1) --node[left] {$\plusR$}   (m-3-1);
+%				\draw[rws,implied] (m-3-2) --node[right]{$\idem$}    (m-1-2);
+%				\draw[rws,implied] (m-3-1) --node[below]{$\cancelL,\cancelR$} (m-3-2);
+%				\end{tikzpicture}}}
+%		\]
+%	}
+%
+%	%=====
+%	\itm\cancelL{\trm{(N +a M) +a P}\rw\trm{N +a P}}
+%	{\small
+%		\[
+%		\vcenter{\hbox{\begin{tikzpicture}
+%				\matrix [matrix of math nodes] (m) {
+%					\trm{(N+aM)+a(P+aQ)} &[15pt] \trm{N+a(P+aQ)}
+%					\\[20pt]\trm{(N+aM)+a Q} & \trm{N+aQ}
+%					\\ };
+%				\draw[rw] (m-1-1) --node[above]{$\cancelL$} (m-1-2);
+%				\draw[rw] (m-1-1) --node[left] {$\cancelR$} (m-2-1);
+%				\draw[rw,implied] (m-1-2) --node[right]{$\cancelR$} (m-2-2);
+%				\draw[rw,implied] (m-2-1) --node[below]{$\cancelL$} (m-2-2);
+%				\end{tikzpicture}}}
+%		\vcenter{\hbox{\begin{tikzpicture}
+%				\matrix [matrix of math nodes] (m) {
+%					\trm{C[(N+aM)+aP]} &[15pt] \trm{C[N+aM]}
+%					\\[20pt]\trm{C[N+aM]+aC[P]}
+%					\\[20pt]\trm{(C[N]+aC[M])+aC[P]} & \trm{C[N]+aC[M]}
+%					\\ };
+%				\draw[rw] (m-1-1) --node[above]{$\cancelL$} (m-1-2);
+%				\draw[rw] (m-1-1) --node[left] {$\plusX$}   (m-2-1);
+%				\draw[rw,implied] (m-2-1) --node[left] {$\plusX$}   (m-3-1);
+%				\draw[rw,implied] (m-1-2) --node[right]{$\plusX$}   (m-3-2);
+%				\draw[rw,implied] (m-3-1) --node[below]{$\cancelL$} (m-3-2);
+%				\end{tikzpicture}}}
+%		\]
+%		\[
+%		\vcenter{\hbox{\begin{tikzpicture}
+%				\matrix [matrix of math nodes] (m) {
+%					\trm{(N+bM)+b(P+aQ)} &[20pt]  \trm{N+b(P+aQ)}
+%					\\[20pt]\trm{((N+bM)+bP)+a((N+bM)+bQ)} & \trm{(N+bP)+a(N+bQ)}
+%					\\ };
+%				\draw[rw] (m-1-1) --node[above]{$\cancelL$} (m-1-2);
+%				\draw[rw] (m-1-1) --node[left] {$\plusR$}   (m-2-1);
+%				\draw[rw, implied] (m-1-2) --node[right]{$\plusR$} (m-2-2);
+%				\draw[rws,implied] (m-2-1) --node[below]{$\cancelL$} (m-2-2);
+%				\end{tikzpicture}}}
+%		%\qquad(a<b)
+%		\]
+%	}
+%
+%	%=====
+%	\itm\plusX{\trm{C[N+aM]}\rw\trm{C[N]+a C[M]}}
+%	{\small
+%		\[
+%		\vcenter{\hbox{\begin{tikzpicture}
+%				\matrix [matrix of math nodes] (m) {
+%					\trm{C[(N+aM)+bP]}      &[20pt] \trm{C[N+aM]+bC[P]}
+%					\\[20pt]\trm{C[(N+bP)+a(M+bP)]} &       \trm{(C[N]+aC[M])+bC[P]}		 %&[10pt] (a<b)
+%					\\[20pt]\trm{C[N+bP]+aC[M+bP]}  &       \trm{(C[N]+bC[P])+a(C[M]+bC[P])}
+%					\\ };
+%				\draw[rw] (m-1-1) --node[above]{$\plusX$} (m-1-2);
+%				\draw[rw] (m-1-1) --node[left] {$\plusL$} (m-2-1);
+%				\draw[rw, implied] (m-1-2) --node[right]{$\plusX$} (m-2-2);
+%				\draw[rw, implied] (m-2-1) --node[left] {$\plusX$} (m-3-1);
+%				\draw[rw, implied] (m-2-2) --node[right]{$\plusL$} (m-3-2);
+%				\draw[rws,implied] (m-3-1) --node[below]{$\plusX$} (m-3-2);
+%				\end{tikzpicture}}}
+%		\]
+%
+%		%=====
+%		\itm\plusL{\trm{(N+aM)+bP}\rw\trm{(N+bP)+a(M+bP)}}
+%		\[
+%		\vcenter{\hbox{\begin{tikzpicture}[x=340pt,y=40pt]
+%				\node[anchor=west] (a) at (0,2) {$\trm{(N+aM)+b(P+aQ)}$};
+%				\node[anchor=west] (b) at (0,1) {$\trm{((N+aM)+bP)+a((N+aM)+bQ)}$};
+%				\node[anchor=west] (c) at (0,0) {$\trm{((N+bP)+a(M+bP))+a((N+bQ)+a(M+bQ))}$};
+%				%
+%				\node[anchor=east] (d) at (1,2) {$\trm{(N+b(P+aQ))+a(M+b(P+aQ))}$};
+%				\node[anchor=east] (e) at (1,1) {$\trm{((N+bP)+a(N+bQ))+a((M+bP)+a(M+bQ))}$};
+%				\node[anchor=east] (f) at (1,0) {$\trm{(N+bP)+a(M+bQ)}$};
+%				%
+%				\draw[rw] (a) --node[above]{$\plusL$} (d);
+%				\draw[rw] 			($(a.south west)+( 43.5pt,0pt)$) --node[left] {$\plusR$} ($(b.north west)+( 43.5pt,0pt)$);
+%				\draw[rws,implied]	($(d.south east)+(-43.5pt,0pt)$) --node[right]{$\plusR$} ($(e.north east)+(-43.5pt,0pt)$);
+%				\draw[rws,implied]	($(b.south west)+( 43.5pt,0pt)$) --node[left] {$\plusL$} ($(c.north west)+( 43.5pt,0pt)$);
+%				\draw[rws,implied]	($(e.south east)+(-43.5pt,0pt)$) --node[right]{$\cancelL,\cancelR$} ($(f.north east)+(-43.5pt,0pt)$);
+%				\draw[rws,implied] (c) --node[below]{$\cancelL,\cancelR$} (f);
+%				\end{tikzpicture}}}
+%		%\vcenter{\hbox{\begin{tikzpicture}
+%		%	\matrix [matrix of math nodes] (m) {
+%		%	  		\trm{(N+aM)+b(P+aQ)}                      &[10pt] \trm{(N+b(P+aQ))+a(M+b(P+aQ))}
+%		%	\\[20pt]\trm{((N+aM)+bP)+a((N+aM)+bQ)}            &       \trm{((N+bP)+a(N+bQ))+a((M+bP)+a(M+bQ))} %&[10pt] (a<b)
+%		%	\\[20pt]\trm{((N+bP)+a(M+bP))+a((N+bQ)+a(M+bQ))}  &       \trm{(N+bP)+a(M+bQ)}
+%		%	\\ };
+%		%	\draw[rw] (m-1-1) --node[above]{$\plusL$} (m-1-2);
+%		%	\draw[rw] (m-1-1) --node[left] {$\plusR$} (m-2-1);
+%		%	\draw[rws,implied] (m-1-2) --node[right]{$\plusR$} (m-2-2);
+%		%	\draw[rws,implied] (m-2-1) --node[left] {$\plusL$} (m-3-1);
+%		%	\draw[rws,implied] (m-2-2) --node[right]{$\cancelL,\cancelR$} (m-3-2);
+%		%	\draw[rws,implied] (m-3-1) --node[below]{$\cancelL,\cancelR$} (m-3-2);
+%		%\end{tikzpicture}}}
+%		\]
+%		\[
+%		\vcenter{\hbox{\begin{tikzpicture}
+%				\matrix [matrix of math nodes] (m) {
+%					\trm{(N+bM)+c(P+aQ)}            &[20pt] \trm{(N+c(P+aQ))+b(M+c(P+aQ))}
+%					\\[20pt]                                &       \trm{((N+cP)+a(N+cQ))+b((M+cP)+a(M+cQ))} %&[10pt] (a<b<c)
+%					\\[20pt]\trm{((N+bM)+cP)+a((N+bM)+cQ)}  &       \trm{((N+cP)+b(M+cP))+a((N+cQ)+b(M+cQ))}
+%					\\ };
+%				\draw[rw] (m-1-1) --node[above]{$\plusL$} (m-1-2);
+%				\draw[rw] (m-1-1) --node[left] {$\plusR$} (m-3-1);
+%				\draw[rws,implied] (m-1-2) --node[right]{$\plusR$} (m-2-2);
+%				\draw[rws,implied] (m-2-2) --node[right]{$\plusL,\plusR,\cancelL,\cancelR$} (m-3-2);
+%				\draw[rws,implied] (m-3-1) --node[below]{$\plusL$} (m-3-2);
+%				\end{tikzpicture}}}
+%		\]
+%	}
+%
+%	%=====
+
+%	We consider only the cases omitted in the proof on p.~\pageref{lem:confluence-perm}.
+
+	\itm\plusFun{\trm{(N+aM)P}\rw\trm{(NP)+a(MP)}}
+	{\small
+		\[
+		\vcenter{\hbox{\begin{tikzpicture}
+				\matrix [matrix of math nodes] (m) {
+					\trm{(N+aM)(P+aQ)}                &[10pt] \trm{(N(P+aQ))+a(M(P+aQ))}
+					\\[20pt]\trm{((N+aM)P)+a((N+aM)Q)}        &       \trm{((NP)+a(NQ))+a((MP)+a(MQ))}
+					\\[20pt]\trm{((NP)+a(MP))+a((NQ)+a(MQ))}  &       \trm{(NP)+a(MQ)}
+					\\ };
+				\draw[rw] (m-1-1) --node[above]{$\plusFun$} (m-1-2);
+				\draw[rw] (m-1-1) --node[left] {$\plusArg$} (m-2-1);
+				\draw[rws,implied] (m-1-2) --node[right]{$\plusArg$} (m-2-2);
+				\draw[rws,implied] (m-2-1) --node[left] {$\plusFun$} (m-3-1);
+				\draw[rws,implied] (m-2-2) --node[right]{$\cancelL,\cancelR$} (m-3-2);
+				\draw[rws,implied] (m-3-1) --node[below]{$\cancelL,\cancelR$} (m-3-2);
+				\end{tikzpicture}}}
+		\]
+		\[
+		\vcenter{\hbox{\begin{tikzpicture}
+				\matrix [matrix of math nodes] (m) {
+					\trm{(N+bM)(P+aQ)}         &[20pt] \trm{(N(P+aQ))+b(M(P+aQ))}
+					\\[20pt]                           &       \trm{((NP)+a(NQ))+b((MP)+a(MQ))} %&[10pt] (a<b)
+					\\[20pt]\trm{((N+bM)P)+a((N+bM)Q)} &       \trm{((NP)+b(MP))+a((NQ)+b(MQ))}
+					\\ };
+				\draw[rw] (m-1-1) --node[above]{$\plusFun$} (m-1-2);
+				\draw[rw] (m-1-1) --node[left] {$\plusArg$} (m-3-1);
+				\draw[rws,implied] (m-1-2) --node[right]{$\plusArg$} (m-2-2);
+				\draw[rws,implied] (m-2-2) --node[right]{$\plusL,\plusR,\cancelL,\cancelR$} (m-3-2);
+				\draw[rws,implied] (m-3-1) --node[below]{$\plusFun$} (m-3-2);
+				\end{tikzpicture}}}
+		\]
+	}
+
+	%=====
+	\itm\plusBox{\trm{!b.(N +a M)} \rw \trm{(!b.N) +a (!b.M)}}
+	{\small
+		\[
+		\vcenter{\hbox{\begin{tikzpicture}
+				\matrix [matrix of math nodes] (m) {
+					\trm{!b.(N+aM)}    &[20pt] \trm{(!b.N)+a(!b.M)}
+					\\[20pt]\trm{N+aM}
+					\\ };
+				\draw[rw] (m-1-1) --node[above]{$\plusBox$} (m-1-2);
+				\draw[rw] (m-1-1) --node[left] {$\boxVoid$} (m-2-1);
+				\draw[rws,implied] (m-1-2) --node[below right=-2pt] {$\boxVoid$} (m-2-1);
+				\end{tikzpicture}}}
+		\quad (a \neq b, \ b \notin\trm{N+a M})
+		\]
+	}
+\end{proof}
+
+%\setcounter{lemmaAppendix}{\value{lemma:application-parallel-beta}}
+%\begin{lemmaAppendix}
+%	\label{lemmaAppendix:application-parallel-beta}
+%	If $\trm{M} \rwp_\beta \trm{M'}$ and $\trm{N} \rwp_\beta \trm{N'}$,
+%%	\marginpar{\footnotesize Proof in the Appendix}
+%	then $\trm{MN} \rwp_\beta \trm{M'N'}$.
+%	If moreover $M = \lambda x.R$ and $M'^ = \lambda x R'$ with $R \rwp_\beta R'$, then  $\trm{MN} \rwp_\beta \trm{R'[N'/x]}$.
+%\end{lemmaAppendix}
+%
+%\begin{proof}
+%	Since $\trm{M} \rwp_\beta \trm{Mo} = M'$ and $\trm{N} \rwp_\beta \trm{No} = N'$ for some labelings $\trm{M*}$ and $\trm{N*}$ of $M$ and $N$ respectively, let $\trm{(MN)*}$ be the labeling of $\trm{MN}$ obtained by putting together the labelings $\trm{M*}$ and $\trm{N*}$.
+%	Clearly, $\trm{MN} \rwp_\beta \trm{<(MN)*>} = \trm{MoNo} = M'N'$.
+%
+%	Concerning the part of the statement after ``moreover'', since $\trm{R} \rwp_\beta \trm{<R*>} = R'$ and $\trm{N} \rwp_\beta \trm{No} = N'$ for some labelings $\trm{R*}$ and $\trm{N*}$ of $R$ and $N$ respectively, let $\trm{(MN)*}$ be the labeling of $\trm{MN}$ obtained by putting together the labelings $\trm{R*}$ and $\trm{N*}$ plus the labeled $\beta$-redex $\trm{(\x.R)*N}$.
+%	Clearly, $\trm{MN} \rwp_\beta \trm{<(MN)*>} = \trm{<R*>[No/x]} = \trm{R'[N'/x]}$.
+%\end{proof}
+
+\setcounter{lemmaAppendix}{\value{lemma:cloredbox}}
+\begin{lemmaAppendix}\label{lemmaAppendix:cloredbox}
+	The following rule is sound:
+	$$
+	\infer{\trm{(!a.M)}L_1\ldots L_m\in\mathit{SN}^\theta}{\trm{M}L_1\ldots L_m\in\mathit{SN}^{a\cdot\theta} & \forall i.a\not\in L_i}
+	$$
+\end{lemmaAppendix}
+\begin{proof}
+	The proof is structurally very similar to the one of
+	Lemma~\ref{lemma:cloredsum}. The lexicographic order
+	is however the following one:
+	$$
+	(m,\sum_{i=1}^m\mathit{sn}^{a\cdot\theta}(L_i)+\mathit{sn}^{a\cdot\theta}(M),|M|)
+	$$
+	There is one case in which we need to use
+	Lemma \ref{lemma:cloredsum}, namely the one in which the
+	considered reduction rule is the following:
+	$$
+	\trm{!b.(P +a Q)}\rw_\perm\trm{(!b.P) +a (!b.Q)}.
+	$$
+	Since $M=\trm{P +a Q}$ and $ML_1\ldots L_m$ by hypothesis,
+	we conclusde that $PL_1\ldots L_m$ and $QL_1\ldots L_m$
+	are both strongly normalizing. By induction hypothesis,
+	since $\mathit{sn}^{a\cdot\theta}(P),\mathit{sn}^{a\cdot\theta}(Q)\leq\mathit{sn}^{a\cdot\theta}(M)$,
+	it holds that $\trm{(!b.P)}L_1\ldots L_m$ and $\trm{(!b.Q)}L_1\ldots L_m$
+	are both strongly normalizing themselves. Lemma~\ref{lemma:cloredsum},
+	yields the thesis.
+\end{proof}
+
+%\begin{lem}\label{lemma:cloredheadvar}
+%	The following rule is sound
+%	$$
+%	\infer{xL_1\ldots L_m\in\mathit{SN}^\theta}{L_1\in\mathit{SN}^\theta &\cdots & L_m\in\mathit{SN}^\theta}
+%	$$
+%\end{lem}
+%
+%\begin{proof}
+%	Trivial, since the term $xL_1\ldots L_m$ cannot create new redexes.
+%\end{proof}
+
+\setcounter{lemmaAppendix}{\value{lemma:cloredbeta}}
+\begin{lemmaAppendix}\label{lemmaAppendix:cloredbeta}
+	The following rule is sound
+	$$
+	\infer{\trm{(\x.M)}L_0\ldots L_m\in\mathit{SN}^\theta}{\trm{M[L_0/x]}L_1\ldots L_m\in\mathit{SN}^\theta & L_0\in\mathit{SN}^\theta}
+	$$
+\end{lemmaAppendix}
+\begin{proof}
+	Again, the proof is structurally very similar to the one
+	of Lemma~\ref{lemma:cloredsum}. The underlying order,
+	needs to be slightly adapted, and is the lexicographic
+	order on
+	\begin{equation}\label{equ:redordbet}
+	(\mathit{sn}(\trm{M[L_0/x]}L_1\ldots L_m)+\mathit{sn}(L_0),|M|)
+	\end{equation}
+	As usual, we proceed by showing that all terms to which
+	$\trm{(\x.M)}L_0\ldots L_m$ reduces are strongly normalizing:
+	\begin{itemize}
+		\item
+		If reduction happens in $L_0$, then we can mimick
+		the same reduction in by zero or more reduction
+		steps in $\trm{M[L_0/x]}L_1\ldots L_m$, and conclude
+		by induction hypothesis, because the first component
+		of (\ref{equ:redordbet}) strictly decreases.
+		\item
+		If reduction happens in $M$ or in $L_1,\ldots,L_m$,
+		then we can mimick the same reduction in one or more
+		reduction in $\trm{M[L_0/x]}L_1\ldots L_m$, and conclude
+		by induction hypothesis since, again, the first component
+		of (\ref{equ:redordbet}) strictly decreases.
+		\item
+		If the reduction step we perform reduces
+		$\trm{(\x.M)}L_0$, then the thesis follows from the
+		hypothesis about $\trm{M[L_0/x]}L_1\ldots L_m$.
+		\item
+		If $M$ is in the form $\trm{P +a Q}$ and
+		the reduction step we perform reduces
+		$\trm{(\x.M)}L_0\ldots L_m$
+		to $\trm{((\x.P)+a(\x.Q))}L_0\ldots L_m$,
+		we proceed by observing that
+		$\trm{(\x.P)}L_0\ldots L_m$
+		and $\trm{(\x.Q)}L_0\ldots L_m$ are
+		both in $\mathit{SN}^\theta$ and we
+		can apply the induction hypothesis to them,
+		because the first component of (\ref{equ:redordbet})
+		stays the same, but the second one strictly decreases.
+		We then obtain that
+		$\trm{P[x/L_0])}L_1\ldots L_m$
+		and $\trm{Q[x/L_0]}L_1\ldots L_m$ are both
+		in $\mathit{SN}^\theta$, and from Lemma~\ref{lemma:cloredsum}
+		we get the thesis.
+		\item
+		If $M$ is in the form $\trm{!a.P}$ and
+		the reduction step we perform reduces
+		$\trm{(\x.M)}L_0\ldots L_m$ to
+		$\trm{!a.(\x.P)}L_0\ldots L_m$. We can
+		first of all that we can assume that
+		$a\not\in L_i$ for every $0\leq i\leq m$.
+		We proceed by observing that
+		$\trm{(\x.P)}L_0\ldots L_m$ is in $\mathit{SN}^\theta$
+		and we can apply the \ih\ to it, because
+		the first component of (\ref{equ:redordbet})
+		stays the same, but the second one strictly decreases.
+		We then obtain that
+		$\trm{P[x/L_0]}L_1\ldots L_m$
+		is in $\mathit{SN}^\theta$, and from Lemma~\ref{lemma:cloredbox}
+		we get the thesis.
+		\qedhere
+	\end{itemize}
+\end{proof}
