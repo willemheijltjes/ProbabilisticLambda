@@ -2,9 +2,12 @@
 
 \let\proof\relax %To avoid incompatibility between llncs and amsthm
 \let\endproof\relax %To avoid incompatibility between llncs and amsthm
+\let\proofname\relax %To avoid incompatibility between llncs and ntheorem
+
 
 %\usepackage[hidelinks]{hyperref}
-\usepackage{amsmath,amssymb,amsthm,mathtools,stmaryrd}
+\usepackage{amsmath,amssymb,mathtools,stmaryrd}
+\usepackage[amsthm,hyperref,thmmarks]{ntheorem}
 \usepackage{marvosym}
 \usepackage{nicefrac}
 
@@ -17,6 +20,8 @@
   \usetikzlibrary{matrix}
 \usepackage{proof}
 
+% Hyperlinks
+
 \makeatletter
 \RequirePackage[bookmarks,unicode,colorlinks=true]{hyperref}%
 \def\@citecolor{blue}%
@@ -25,16 +30,8 @@
 \def\UrlFont{\rmfamily}
 \def\orcidID#1{\smash{\href{http://orcid.org/#1}{\protect\raisebox{-1.25pt}{\protect\includegraphics{orcid_color.eps}}}}}
 
-\usepackage{cleveref}
-
-% 0 = SHORT VERSION     %
-% 1 = LONG VERSION      %
-\newcommand{\version}{0}%%Text to appear only in the short/long version
-%Text to appear only in the short/long version
-\newcommand{\SLV}[2]{\ifthenelse{\equal{\version}{0}}{#1}{#2}}
-
-
 %% theorem environments
+\usepackage{cleveref}
 
 \theoremstyle{definition}
 \newtheorem{defn}{Definition}
@@ -48,6 +45,15 @@
 \newtheorem{thm}  [defn]{Theorem}
 \newtheorem{lemmaAppendix}{Lemma}
 %%
+
+% 0 = SHORT VERSION     %
+% 1 = LONG VERSION      %
+\newcommand{\version}{0}%%Text to appear only in the short/long version
+%Text to appear only in the short/long version
+\newcommand{\SLV}[2]{\ifthenelse{\equal{\version}{0}}{#1}{#2}}
+
+
+
 
 %text
 \newcommand{\ie}{\textit{i.e.}}
@@ -799,7 +805,7 @@ We prove local confluence; by Newman's lemma and strong normalization of $\rw_\p
 %=====
 \itm\idem{\trm{N +a N}\rw N}
 \\[-10pt]
-$\small%
+{\small$%
 \vc{\begin{tikzpicture}[x=18pt,y=1.5ex]
 	\node[anchor=base east] (a) at (0,0) {$\trm{(N+aN)+aM}$};
 	\node[anchor=base west] (b) at (1,0) {$\trm{N+aM}$};
@@ -826,7 +832,7 @@ $\small%
 	\draw[rw] (m-1-1) --node[left] {$\plusX$} (m-2-1);
 	\draw[rw,implied] (m-2-1) --node[below right=-2pt] {$\idem$} (m-1-2);
 \end{tikzpicture}}}%
-$
+$}
 
 {
 \small
@@ -961,7 +967,7 @@ $}
 
 %=====
 \SLV{The remaining cases are considered in the Appendix of \cite{arXiv}}{The remaining cases are considered in the proof in the Appendix (p.~\pageref{lemmaAppendix:confluence-perm}).}
-\qedhere
+%\qedhere
 
 %\itm\plusFun{\trm{(N+aM)P}\rw\trm{(NP)+a(MP)}}
 %{\small
@@ -1023,7 +1029,7 @@ We denote the unique $\perm$-normal form of a term $N$ by $N_\perm$.
 %\section{Confluence}
 %\label{sec:confluence}
 %
-%We aim to prove that $\rw \,=\, \rw_\beta \cup \rw_\perm$ is confluent. We will use the standard technique of \emph{parallel} $\beta$-reduction~\cite{Takahashi95}, a simultaneous reduction step on an arbitrary number of $\beta$-redexes in the source term, which we define via a labeling of the redexes to be reduced. The central point is to find a notion of reduction that is \emph{diamond}, \ie\ every critical pair can be closed in one (or zero) steps. This will be our \emph{complete} reduction, which consists of parallel $\beta$-reduction followed by $\perm$-reduction to normal form.
+%We aim to prove that $\rw \,=\, \rw_\beta \cup \rw_\perm$ is confluent. We will use the standard technique of \emph{parallel} $\beta$-reduction~\cite{Takahashi95}, a simultaneous reduction step on an arbitrary number of $\beta$-redexes in the source term, which we define via a labelling of the redexes to be reduced. The central point is to find a notion of reduction that is \emph{diamond}, \ie\ every critical pair can be closed in one (or zero) steps. This will be our \emph{complete} reduction, which consists of parallel $\beta$-reduction followed by $\perm$-reduction to normal form.
 %%
 %%\begin{lem}[Substitution for $\rw_\perm$]
 %%	\label{lemma:substitution}
@@ -1038,7 +1044,7 @@ We denote the unique $\perm$-normal form of a term $N$ by $N_\perm$.
 %%\begin{proof}\hfill
 %%	\begin{enumerate}
 %%		\item By induction on $\trm{M}$.
-%%		\item By induction on the definition of $\trm{M \rw_\perm M'}$. \qedhere
+%%		\item By induction on the definition of $\trm{M \rw_\perm M'}$. %\qedhere
 %%	\end{enumerate}
 %%\end{proof}
 %
@@ -1104,7 +1110,7 @@ We denote the unique $\perm$-normal form of a term $N$ by $N_\perm$.
 %%			We can suppose without loss of generality that $b \neq a$.
 %%			By \ih, as $\trm{x \in {\fv{M}} = \fv{M'}}$ $\trm{M'[N +a P/x]} \rw_\perm^* \trm{M'[N/x] +a M'[P/x]}$
 %%			So, $\trm{M [N +a P/x] = !b.(M'[N +a P/x]) \rw_\perm^* !b.(M'[N/x] +a M'[P/x]) \rw_\perm !b.(M'[N/x]) +a !b.(M'[P/x])}$ $= \trm{M[N/x] +a M[P/x]}$.
-%%			\qedhere
+%%			%\qedhere
 %%		\end{itemize}
 %%
 %%\begin{remark}
@@ -1187,7 +1193,7 @@ We denote the unique $\perm$-normal form of a term $N$ by $N_\perm$.
 %\end{defn}
 %
 %\noindent
-%We write $\trm{N*}\rwp_\beta\trm{No}$ for the specific parallel step indicated by the labeling $\trm{N*}$. Observe that $\trm{No}$ is a regular unlabeled term, since all labels are removed in the reduction. For the empty labelling, $\trm{N} = \trm{No}$, so that parallel reduction is reflexive: $\trm{N} \rwp_\beta \trm{N}$.
+%We write $\trm{N*}\rwp_\beta\trm{No}$ for the specific parallel step indicated by the labelling $\trm{N*}$. Observe that $\trm{No}$ is a regular unlabeled term, since all labels are removed in the reduction. For the empty labelling, $\trm{N} = \trm{No}$, so that parallel reduction is reflexive: $\trm{N} \rwp_\beta \trm{N}$.
 %
 %\begin{lem}
 %A parallel $\beta$-step $N\rwp_\beta M$ is a $\beta$-reduction $N\rws_\beta M$.
@@ -1225,10 +1231,10 @@ We denote the unique $\perm$-normal form of a term $N$ by $N_\perm$.
 %%\end{lem}
 %
 %%\begin{proof}
-%%	Since $\trm{M} \rwp_\beta \trm{Mo} = M'$ and $\trm{N} \rwp_\beta \trm{No} = N'$ for some labelings $\trm{M*}$ and $\trm{N*}$ of $M$ and $N$ respectively, let $\trm{(MN)*}$ be the labeling of $\trm{MN}$ obtained by putting together the labelings $\trm{M*}$ and $\trm{N*}$.
+%%	Since $\trm{M} \rwp_\beta \trm{Mo} = M'$ and $\trm{N} \rwp_\beta \trm{No} = N'$ for some labellings $\trm{M*}$ and $\trm{N*}$ of $M$ and $N$ respectively, let $\trm{(MN)*}$ be the labelling of $\trm{MN}$ obtained by putting together the labellings $\trm{M*}$ and $\trm{N*}$.
 %%	Clearly, $\trm{MN} \rwp_\beta \trm{<(MN)*>} = \trm{MoNo} = M'N'$.
 %%
-%%	Concerning the part of the statement after ``moreover'', since $\trm{R} \rwp_\beta \trm{<R*>} = R'$ and $\trm{N} \rwp_\beta \trm{No} = N'$ for some labelings $\trm{R*}$ and $\trm{N*}$ of $R$ and $N$ respectively, let $\trm{(MN)*}$ be the labeling of $\trm{MN}$ obtained by putting together the labelings $\trm{R*}$ and $\trm{N*}$ plus the labeled $\beta$-redex $\trm{(\x.R)*N}$.
+%%	Concerning the part of the statement after ``moreover'', since $\trm{R} \rwp_\beta \trm{<R*>} = R'$ and $\trm{N} \rwp_\beta \trm{No} = N'$ for some labellings $\trm{R*}$ and $\trm{N*}$ of $R$ and $N$ respectively, let $\trm{(MN)*}$ be the labelling of $\trm{MN}$ obtained by putting together the labellings $\trm{R*}$ and $\trm{N*}$ plus the labeled $\beta$-redex $\trm{(\x.R)*N}$.
 %%	Clearly, $\trm{MN} \rwp_\beta \trm{<(MN)*>} = \trm{<R*>[No/x]} = \trm{R'[N'/x]}$.
 %%\end{proof}
 %
@@ -1259,7 +1265,7 @@ We denote the unique $\perm$-normal form of a term $N$ by $N_\perm$.
 %
 %	\medskip
 %	\item
-%\emph{Unlabelled redex}: $\trm{(\x.M*)N*}\rwp_\beta\trm{(\x.Mo)No}$. By the inductive hypothesis and \Cref{lem:parallel-properties}.2 $\trm{(\x.Mo)No}\rwp_\beta\trm{<M^\full>[<N^\full>/x]}$, as required.\qedhere
+%\emph{Unlabelled redex}: $\trm{(\x.M*)N*}\rwp_\beta\trm{(\x.Mo)No}$. By the inductive hypothesis and \Cref{lem:parallel-properties}.2 $\trm{(\x.Mo)No}\rwp_\beta\trm{<M^\full>[<N^\full>/x]}$, as required.%\qedhere
 %\end{itemize}
 %\end{proof}
 %
@@ -1275,7 +1281,7 @@ We denote the unique $\perm$-normal form of a term $N$ by $N_\perm$.
 
 We aim to prove that $\rw \,=\, \rw_\beta \cup \rw_\perm$ is confluent. We will use the standard technique of \emph{parallel} $\beta$-reduction~\cite{Takahashi95}, a simultaneous reduction step on %an arbitrary
 a number of $\beta$-redexes, %in the source term, 
-which we define via a labeling of the redexes to be reduced. The central point is to find a notion of reduction that is \emph{diamond}, \ie\ every critical pair can be closed in one (or zero) steps. This will be our \emph{complete} reduction, which consists of parallel $\beta$-reduction followed by $\perm$-reduction to normal form.
+which we define via a labelling of the redexes to be reduced. The central point is to find a notion of reduction that is \emph{diamond}, \ie\ every critical pair can be closed in one (or zero) steps. This will be our \emph{complete} reduction, which consists of parallel $\beta$-reduction followed by $\perm$-reduction to normal form.
 
 
 \begin{defn}
@@ -1366,7 +1372,7 @@ This is proved by induction on $P^{\1\0}$, where only two cases are not immediat
 &\rwp_\beta&	\trm{(\x.N_\1^\0)^\0 M_\1^\0}
 &\rwp_\beta&	\trm{N_{\1\0}[M_{\1\0}/x]}
 \end{array}
-\qedhere
+%\qedhere
 \]
 
 \end{proof}
@@ -1378,11 +1384,11 @@ This is proved by induction on $P^{\1\0}$, where only two cases are not immediat
 %			Therefore, $\trm{N} \rwp \trm{Mo}$ because $\rwp_\beta$ is reflexive.
 %
 %			\item \emph{Abstraction}: $\trm{M} = \trm{\x.P}$.
-%			Then $\trm{N} = \trm{\x.<P^\circ>}$ for some labeling $\trm{P^\circ}$ of $\trm{P}$.
+%			Then $\trm{N} = \trm{\x.<P^\circ>}$ for some labelling $\trm{P^\circ}$ of $\trm{P}$.
 %			Since $\trm{P} \rwp_\beta \trm{<P^\circ>}$, one has $\trm{<P^\circ>} \rwp_\beta \trm{Po}$ and hence $\trm{N} = \trm{\x.<P^\circ>} \rwp_\beta \trm{\x.Po} = \trm{Mo}$.
 %
 %			\item \emph{Application}: $\trm{M} = \trm{PQ}$.
-%			Let $\trm{M^\circ}$ be a labeling of $\trm{M}$ such that $N = \trm{<M^\circ>}$.
+%			Let $\trm{M^\circ}$ be a labelling of $\trm{M}$ such that $N = \trm{<M^\circ>}$.
 %			There are three subcases:
 %			\begin{enumerate}
 %				\item $\trm{M} \neq \trm{(\x.R)Q}$.
@@ -1393,24 +1399,24 @@ This is proved by induction on $P^{\1\0}$, where only two cases are not immediat
 %				\item $\trm{M^\circ} = \trm{(\x.R)*Q}$.
 %				Then $\trm{N} = \trm{<R^\circ>[<Q^\circ>/x]}$.
 %				By \ih\ (since $\trm{R} \rwp_\beta \trm{<R^\circ>}$ and $\trm{Q} \rwp_\beta \trm{<Q^\circ>}$), one has $\trm{<R^\circ>} \rwp_\beta \trm{<R*>}$ and $\trm{<Q^\circ>} \rwp_\beta \trm{<Q*>}$.
-%				By \Cref{lemma:substitution}, $\trm{N} = \trm{<R^\circ>[<Q^\circ>/x]} \rwp_\beta \trm{<R*>[<Q*>/x]}  = \trm{Mo}$ where the last equality holds because $\trm{M} = \trm{(\x.R)Q}$ and $\trm{M*}$ is the full labeling of $M$.
+%				By \Cref{lemma:substitution}, $\trm{N} = \trm{<R^\circ>[<Q^\circ>/x]} \rwp_\beta \trm{<R*>[<Q*>/x]}  = \trm{Mo}$ where the last equality holds because $\trm{M} = \trm{(\x.R)Q}$ and $\trm{M*}$ is the full labelling of $M$.
 %
 %				\item $\trm{M^\circ} \neq \trm{(\x.R)*Q}$ but $\trm{M} = \trm{(\x.R)Q}$ (\ie\ $P = \lambda x.R $).
 %				Then $\trm{N} = \trm{<P^\circ><Q^\circ>}$.
 %				By \ih\ (since $\trm{P} \rwp_\beta \trm{<P^\circ>} = \trm{<\x.R^\circ>}$ and $\trm{Q} \rwp_\beta \trm{<Q^\circ>}$), one has $\trm{<P^\circ>} \rwp_\beta \trm{Po} = \trm{<\x.R*>}$ and $\trm{<Q^\circ>} \rwp_\beta \trm{<Q*>}$.
-%				Therefore, by \Cref{lemma:application-parallel-beta}, $\trm{N} \rwp_\beta \trm{<R*>[<Q*>/x]} = \trm{Mo}$, where the equality holds because $\trm{M} = \trm{(\x.R)Q}$ and $\trm{M*}$ is the full labeling of $M$.
+%				Therefore, by \Cref{lemma:application-parallel-beta}, $\trm{N} \rwp_\beta \trm{<R*>[<Q*>/x]} = \trm{Mo}$, where the equality holds because $\trm{M} = \trm{(\x.R)Q}$ and $\trm{M*}$ is the full labelling of $M$.
 %			\end{enumerate}
 %		\end{itemize}
 %
 %		\item Since $\trm{M} \rwp \trm{N}$, then $\trm{M} \rwp_\beta \trm{P} \rwn_\perm \trm{N}$ for some term $\trm{P}$ such that $\trm{N} = \trm{P}_\perm$.
 %		By \Cref{lemma:full-development}.\ref{lemma:full-development-beta}, $\trm{P} \rwp_\beta \trm{Mo}$ and hence $\trm{P} \rwp \trm{Mo_\perm}$.
 %		According to \Cref{lem:p to complete reduction}, $\trm{N} = \trm{P}_\perm \rwp \trm{(Mo_\perm)_\perm} = \trm{Mo_\perm}$.
-%		\qedhere
+%		%\qedhere
 %	\end{enumerate}
 
 
 %\begin{proof}
-%	Since $N\rwp_\beta M$ means that $\trm{M} = \trm{No}$ for some labeling $\trm{N*}$ of $\trm{N}$, we prove that $\trm{N} \rws_\beta \trm{No}$ for any labeling $\trm{N*}$ of $\trm{N}$, by induction on $\trm{N}$.
+%	Since $N\rwp_\beta M$ means that $\trm{M} = \trm{No}$ for some labelling $\trm{N*}$ of $\trm{N}$, we prove that $\trm{N} \rws_\beta \trm{No}$ for any labelling $\trm{N*}$ of $\trm{N}$, by induction on $\trm{N}$.
 %	Cases:
 %	\begin{itemize}
 %		\item \emph{Variable}: $\trm{N} = x$.
@@ -1439,7 +1445,7 @@ This is proved by induction on $P^{\1\0}$, where only two cases are not immediat
 %
 %		\item \emph{Generator}: $\trm{N} = \trm{!a. M}$.
 %		Analogous to the abstraction case.
-%		\qedhere
+%		%\qedhere
 %	\end{itemize}
 %\end{proof}
 
@@ -1520,8 +1526,10 @@ By induction on the rewrite step $\rwb_\perm$. The two interesting cases are:
 &	(x\notin\fv M)
 \end{array}
 \]
-The way to join the critical pairs in the above diagrams shows that we cannot use Hindley-Rosen lemma \cite[Prop. 3.3.5]{Barendregt84} to prove confluence of $\rw_\beta \cup \rw_\perm$.
 \end{proof}
+
+The way to join the critical pairs in the above diagrams shows that we cannot use the Hindley-Rosen Lemma \cite[Prop. 3.3.5]{Barendregt84} to prove confluence of $\rw_\beta \cup \rw_\perm$.
+
 
 \begin{lem}
 \label{lem:exhaustive p - parallel beta}
@@ -1625,10 +1633,10 @@ For a $\beta$-step $N\rw_\beta M$ we label the reduced redex in $N$ to get $\trm
 %\end{lem}
 
 %\begin{proof}
-%	Since $\trm{M} \rwp_\beta \trm{Mo} = M'$ and $\trm{N} \rwp_\beta \trm{No} = N'$ for some labelings $\trm{M*}$ and $\trm{N*}$ of $M$ and $N$ respectively, let $\trm{(MN)*}$ be the labeling of $\trm{MN}$ obtained by putting together the labelings $\trm{M*}$ and $\trm{N*}$.
+%	Since $\trm{M} \rwp_\beta \trm{Mo} = M'$ and $\trm{N} \rwp_\beta \trm{No} = N'$ for some labellings $\trm{M*}$ and $\trm{N*}$ of $M$ and $N$ respectively, let $\trm{(MN)*}$ be the labelling of $\trm{MN}$ obtained by putting together the labellings $\trm{M*}$ and $\trm{N*}$.
 %	Clearly, $\trm{MN} \rwp_\beta \trm{<(MN)*>} = \trm{MoNo} = M'N'$.
 %
-%	Concerning the part of the statement after ``moreover'', since $\trm{R} \rwp_\beta \trm{<R*>} = R'$ and $\trm{N} \rwp_\beta \trm{No} = N'$ for some labelings $\trm{R*}$ and $\trm{N*}$ of $R$ and $N$ respectively, let $\trm{(MN)*}$ be the labeling of $\trm{MN}$ obtained by putting together the labelings $\trm{R*}$ and $\trm{N*}$ plus the labeled $\beta$-redex $\trm{(\x.R)*N}$.
+%	Concerning the part of the statement after ``moreover'', since $\trm{R} \rwp_\beta \trm{<R*>} = R'$ and $\trm{N} \rwp_\beta \trm{No} = N'$ for some labellings $\trm{R*}$ and $\trm{N*}$ of $R$ and $N$ respectively, let $\trm{(MN)*}$ be the labelling of $\trm{MN}$ obtained by putting together the labellings $\trm{R*}$ and $\trm{N*}$ plus the labeled $\beta$-redex $\trm{(\x.R)*N}$.
 %	Clearly, $\trm{MN} \rwp_\beta \trm{<(MN)*>} = \trm{<R*>[No/x]} = \trm{R'[N'/x]}$.
 %\end{proof}
 
@@ -1665,11 +1673,11 @@ For a $\beta$-step $N\rw_\beta M$ we label the reduced redex in $N$ to get $\trm
 %			Therefore, $\trm{N} \rwp \trm{Mo}$ because $\rwp_\beta$ is reflexive.
 %
 %			\item \emph{Abstraction}: $\trm{M} = \trm{\x.P}$.
-%			Then $\trm{N} = \trm{\x.<P^\circ>}$ for some labeling $\trm{P^\circ}$ of $\trm{P}$.
+%			Then $\trm{N} = \trm{\x.<P^\circ>}$ for some labelling $\trm{P^\circ}$ of $\trm{P}$.
 %			Since $\trm{P} \rwp_\beta \trm{<P^\circ>}$, one has $\trm{<P^\circ>} \rwp_\beta \trm{Po}$ and hence $\trm{N} = \trm{\x.<P^\circ>} \rwp_\beta \trm{\x.Po} = \trm{Mo}$.
 %
 %			\item \emph{Application}: $\trm{M} = \trm{PQ}$.
-%			Let $\trm{M^\circ}$ be a labeling of $\trm{M}$ such that $N = \trm{<M^\circ>}$.
+%			Let $\trm{M^\circ}$ be a labelling of $\trm{M}$ such that $N = \trm{<M^\circ>}$.
 %			There are three subcases:
 %			\begin{enumerate}
 %				\item $\trm{M} \neq \trm{(\x.R)Q}$.
@@ -1680,12 +1688,12 @@ For a $\beta$-step $N\rw_\beta M$ we label the reduced redex in $N$ to get $\trm
 %				\item $\trm{M^\circ} = \trm{(\x.R)*Q}$.
 %				Then $\trm{N} = \trm{<R^\circ>[<Q^\circ>/x]}$.
 %				By \ih\ (since $\trm{R} \rwp_\beta \trm{<R^\circ>}$ and $\trm{Q} \rwp_\beta \trm{<Q^\circ>}$), one has $\trm{<R^\circ>} \rwp_\beta \trm{<R*>}$ and $\trm{<Q^\circ>} \rwp_\beta \trm{<Q*>}$.
-%				By \Cref{lemma:substitution}, $\trm{N} = \trm{<R^\circ>[<Q^\circ>/x]} \rwp_\beta \trm{<R*>[<Q*>/x]}  = \trm{Mo}$ where the last equality holds because $\trm{M} = \trm{(\x.R)Q}$ and $\trm{M*}$ is the full labeling of $M$.
+%				By \Cref{lemma:substitution}, $\trm{N} = \trm{<R^\circ>[<Q^\circ>/x]} \rwp_\beta \trm{<R*>[<Q*>/x]}  = \trm{Mo}$ where the last equality holds because $\trm{M} = \trm{(\x.R)Q}$ and $\trm{M*}$ is the full labelling of $M$.
 %
 %				\item $\trm{M^\circ} \neq \trm{(\x.R)*Q}$ but $\trm{M} = \trm{(\x.R)Q}$ (\ie\ $P = \lambda x.R $).
 %				Then $\trm{N} = \trm{<P^\circ><Q^\circ>}$.
 %				By \ih\ (since $\trm{P} \rwp_\beta \trm{<P^\circ>} = \trm{<\x.R^\circ>}$ and $\trm{Q} \rwp_\beta \trm{<Q^\circ>}$), one has $\trm{<P^\circ>} \rwp_\beta \trm{Po} = \trm{<\x.R*>}$ and $\trm{<Q^\circ>} \rwp_\beta \trm{<Q*>}$.
-%				Therefore, by \Cref{lemma:application-parallel-beta}, $\trm{N} \rwp_\beta \trm{<R*>[<Q*>/x]} = \trm{Mo}$, where the equality holds because $\trm{M} = \trm{(\x.R)Q}$ and $\trm{M*}$ is the full labeling of $M$.
+%				Therefore, by \Cref{lemma:application-parallel-beta}, $\trm{N} \rwp_\beta \trm{<R*>[<Q*>/x]} = \trm{Mo}$, where the equality holds because $\trm{M} = \trm{(\x.R)Q}$ and $\trm{M*}$ is the full labelling of $M$.
 %			\end{enumerate}
 %		\end{itemize}
 %
@@ -1693,7 +1701,7 @@ For a $\beta$-step $N\rw_\beta M$ we label the reduced redex in $N$ to get $\trm
 %Since $\trm{M} \rwp \trm{N}$, then $\trm{M} \rwp_\beta \trm{P} \rwn_\perm \trm{N}$ for some term $\trm{P}$ such that $\trm{N} = \trm{P}_\perm$.
 %		By \Cref{lemma:full-development}.\ref{lemma:full-development-beta}, $\trm{P} \rwp_\beta \trm{Mo}$ and hence $\trm{P} \rwp \trm{Mo_\perm}$.
 %		According to \Cref{lem:p to complete reduction}, $\trm{N} = \trm{P}_\perm \rwp \trm{(Mo_\perm)_\perm} = \trm{Mo_\perm}$.
-%%		\qedhere
+%%		%\qedhere
 %%	\end{enumerate}
 %\end{proof}
 
@@ -1774,7 +1782,7 @@ By the following diagram. For the top and left areas, by Lemma~\ref{lem:p to com
 	\draw[rwx] (m-2-4) -- (m-4-4);
 	\draw[rwx] (m-4-2) -- (m-4-4);
 \end{tikzpicture}
-\qedhere
+%\qedhere
 \]
 \end{proof}
 
@@ -1849,7 +1857,7 @@ It is easy to realize that, of course modulo label $\alpha$-equivalence, for
 every term $M$ there is at least one $\theta$ such that $\labjudg{\theta}{M}$.
 An easy fact to check is that if $\labjudg{\theta}{M}$ and $M\rw^\theta N$, then $\labjudg{\theta}{N}$.
 It thus makes sense to parametrize $\rw$ on a sequence
-of labels $\theta$, i.e., one can define a family of reduction
+of labels $\theta$, \ie, one can define a family of reduction
 relations $\rw^\theta$ on pairs in the form $(M,\theta)$.
 The set of strongly normalizable terms, and the number of steps
 to normal forms become themselves parametric:
@@ -1982,7 +1990,7 @@ Loader's notes~\cite{Loader}, page 17.
     the same, while the level of $b$ must be smaller than that of
     $a$. Similarly if the rule applied is $\trm{P +a (Q +b
       R)}\rw_\perm \trm{(P +a Q) +b (P +a R)}$.
-    \qedhere
+    %\qedhere
   \end{itemize}
 \end{proof}
 
@@ -2097,7 +2105,7 @@ Loader's notes~\cite{Loader}, page 17.
 %    $\trm{P[x/L_0]}L_1\ldots L_m$
 %    is in $\mathit{SN}^\theta$, and from Lemma~\ref{lemma:cloredbox}
 %    we get the thesis.
-%    \qedhere
+%    %\qedhere
 %  \end{itemize}
 %\end{proof}
 
@@ -2195,7 +2203,7 @@ The following is the so-called Main Lemma:
     If $M$ is a sum $\trm{!a.P}$, again, we can make use of Lemma~\ref{lemma:redprop}
     and the induction hypothesis. We should however observe, that $\labjudg{a\cdot\theta}{P}$,
     since $\labjudg{\theta}{M}$.
-    \qedhere
+    %\qedhere
   \end{itemize}
 \end{proof}
 We now have all the %necessary
@@ -2219,42 +2227,107 @@ ingredients for our proof of strong normalization:
 \section{Projective Reduction}
 \label{sec:projective-reduction}
 
-Permutative reduction $\rw_\perm$ evaluates probabilistic sums purely by rewriting. Here we look at an alternative \emph{projective} notion of reduction, which conforms more closely to the intuition that $\ttrm{!a}$ generates a probabilistic event to determine the choice $\ttrm{+a}$. We evaluate a term with reference to a binary stream $s\in\{0,1\}^{\mathbb N}$, which provides the outcomes to probabilistic events during reduction. Writing $N^s$ for the term $N$ with stream $s$, and $i\cdot s$ for the stream with $i\in\{0,1\}$ as first element, we expect to reduce $\trm{(!a.N)}^{i\cdot s}$ to $M^s$ where $M$ is obtained from $N$ by projecting every subformula $\ttrm{P_0+aP_1}$ to $P_i$. To avoid introducing any permutation rules, we will evaluate a generator not just at top-level, but anywhere along the \emph{spine} of a term: under abstractions, in function position, and under (other) generators and choices---but not in argument position.
+Permutative reduction $\rw_\perm$ evaluates probabilistic sums purely by rewriting. Here we look at a more standard \emph{projective} notion of reduction, which conforms more closely to the intuition that $\ttrm{!a}$ generates a probabilistic event to determine the choice $\ttrm{+a}$. Using $+$ for an external probablistic sum, we expect to reduce $\ttrm{!a.N}$ to $N_0+N_1$, where $N_i$ is obtained from $N$ by projecting every subformula $\ttrm{M_0+aM_1}$ to $M_i$. The question is, in what context should we admit this reduction? We first limit ourselves to reducing in \emph{head} position.
 
 \begin{defn}
 The \emph{$a$-projections} $\proj a0N$ and $\proj a1N$ are defined as follows: %, where $a\neq b$.
 \begin{align*}
 	\proj a0{N+aM} &= \proj a0N		&	\proj ai{\x.N} &= \x.\proj aiN
 \\	\proj a1{N+aM} &= \proj a1M		&	\proj ai{NM}   &= \proj aiN\,\proj aiM
-\\	\proj ai{!a.N} &= \trm{!a.N}	& 	\proj ai{N+bM} &= \proj aiN\,\trm{+b}\,\proj aiM \quad \text{if } a \neq b
-\\	\proj aix      &= x				&	\proj ai{!b.N} &= \trm{!b.}\proj aiN \quad \text{if } a \neq b.
+\\	\proj ai{!a.N} &= \trm{!a.N}	& 	\proj ai{N+bM} &= \proj aiN\,\trm{+b}\,\proj aiM && \text{if } a \neq b
+\\	\proj aix      &= x				&	\proj ai{!b.N} &= \trm{!b.}\proj aiN 			 && \text{if } a \neq b.
 \end{align*}
 \end{defn}
 
-Let $\Streams=\{0,1\}^\mathbb{N}$ be the space of streams, ranged over by $r,s,t$.
+\begin{defn}
+A \emph{head context} $H[\,]$ is given by the following grammar.
+\[
+	H[\,] \coloneqq [\,] ~\mid~ \x.\,H[\,] ~\mid~ H[\,]N
+\]
+\end{defn}
+
+\newcommand\ph{{\pi{\mathsf h}}}
 
 \begin{defn}
-The \emph{stream labeling} $N^s$ of a term $N$ with a stream $s\in\Streams$, which annotates generators as $\trm{!ai}$ with $i\in\{0,1\}$ and variables as $x^s$ with a stream $s$, is given inductively as follows.
+\label{defn:projective head reduction}
+\emph{Projective head reduction} $\rw_\ph$ is given by
+\[
+	\trm{H[\,!a.N]} ~\rw_\ph~ H[\proj a0N] + H[\proj a1N]~.
+\]
+\end{defn}
+
+We can simulate $\rw_\ph$ by permutative reduction if we interpret the external sum $+$ by an outermost $\+$ (taking special care if the label doesn't occur).
+
+\begin{prop}
+\label{prop:permutative-simulates-projective}
+Permutative reduction simulates projective head reduction:
+\[
+	H[\,\trm{!a.N}] ~\rws_\perm~
+	\left\{\begin{array}{l@{\qquad}l}
+		H[N]						 & \text{if }a\notin\fl N \\[5pt]
+		H[\proj a0N] \+ H[\proj a1N] & \text{otherwise}.
+	\end{array}\right.
+\]
+\end{prop}
+
+\begin{proof}
+The case $a\notin\fl N$ is immediate by a $\boxVoid$ step. For the other case, observe that $\trm{H[\,!a.N]}\rws_\perm\trm{!a.H[N]}$ by $\boxAbs$ and $\boxFun$ steps, and since $a$ does not occur in $H[\,]$, that $H[\proj aiN]=\proj ai{H[N]}$. By induction on $N$, if $a$ is minimal in $N$ (\ie\ $a\in\fl N$ and $a\leq b$ for all $b\in\fl N$) then $N\rws_\perm \proj a0N\trm{+a}\proj a1N$. As required,
+\[
+	H[\,\trm{!a.N}]~\rws_\perm~ \trm{!a.}\,H[\proj a0N]\, \trm{+a}\, H[\proj a1N] \quad\text{if }a\in\fl N~.%\qedhere
+\]
+%The case $a\notin\fl N$ is immediate by a $\boxVoid$ step. For the other case, observe that $\trm{H[\,!a.N]}\rws_\perm\trm{!a.H[N]}$ by $\boxAbs$ and $\boxFun$ steps, and since $a$ does not occur in $H[\,]$, we have $H[\proj aiN]=\proj ai{H[N]}$. Unfolding also the definition of $\+$, we may thus restrict ourselves to proving the following.
+%\[
+%	\trm{!a.N} ~\rws_\perm~ \trm{!a.} \proj a0N~\trm{+a}~\proj a1N
+%\]
+%Given that $a$ is the smallest label in $N$, \ie\ $a<b$ for any other label $b$ in $N$, a straightforward induction on $N$ gives $N\rws_\perm\proj a0N~\ttrm{+a}~\proj a1N$, with as special base case $N\rws_\perm N$ for $a\notin\fl N$.
+\end{proof}
+
+A gap remains between which generators will not be duplicated, which we \emph{should} be able to reduce, and which generators projective head reduction \emph{can} reduce. In particular, to interpret call-by-value probabilistic reduction in Section~\ref{sec:cbv}, we would like to reduce under other generators. However, permutative reduction does not permit exchanging generators, and so only simulates reducing in head position. While (independent) probabilistic events are generally considered interchangeable, it is a question whether the below equivalence is desirable.
+%
+\begin{align}
+\label{eqn:permute-generators}
+	\trm{!a.!b.N} \quad\smash{\stackrel?\sim}\quad \trm{!b.!a.N}
+\end{align}
+%
+We elide the issue by externalizing probabilistic events, and reducing with reference to a predetermined binary stream $s\in\{0,1\}^{\mathbb N}$. In this way, we will preserve the intuitions of both permutative and projective reduction: we obtain a qualified version of the equivalence~\eqref{eqn:permute-generators} (see \eqref{eqn:permute-generators-streams} below), and will be able to reduce any generator on the \emph{spine} of a term: under (other) generators and choices as well as under abstractions and in function position.
+
+\begin{defn}
+The set of \emph{streams} is $\Streams=\{0,1\}^\mathbb{N}$, ranged over by $r,s,t$, and $i\cdot s$ denotes a stream with $i\in\{0,1\}$ as first element and $s$ as the remainder.
+\end{defn}
+
+\begin{defn}
+The \emph{stream labelling} $N^s$ of a term $N$ with a stream $s\in\Streams$, which annotates generators as $\trm{!ai}$ with $i\in\{0,1\}$ and variables as $x^s$ with a stream $s$, is given inductively below. We lift $\beta$-reduction to stream-labeled terms by introducing a substitution case for stream-labelled variables: $x^s[M/x] = M^s$.
 \begin{align*}
 	\trm{(\x.N)^s} &= \trm{\x.N^s} & \trm{(!a.N)^{i\cdot s}} &= \trm{!ai.N^s} 
 	\\
 	\trm{(N\,M)^s} &= \trm{N^s\,M} & \trm{(N+a M)^s}		 &= \trm{N^s +a M^s}
 \end{align*}
-We lift $\beta$-reduction to stream-labeled terms by introducing a substitution case for stream-labelled variables: $x^s[M/x] = M^s$.
+
 \end{defn}
 
-Observe that in $N^s$ a generator that occurs under $n$ other generators on the spine of $N$, is labeled with the element of $s$ at position $n+1$. Generators in argument position remain unlabeled, until a $\beta$-step places them on the spine, in which case they become labeled by the new substitution case. We allow to annotate a term with a finite prefix of a stream, e.g.\ $N^i$ with a singleton $i$, so that only part of the spine is labeled. Subsequent labeling of an already labeled term is then by $(N^r)^s=N^{r\cdot s}$.
-
 \begin{defn}
-\emph{Projective} reduction $\rw_\pi$ is the following reduction step on stream-labeled terms.
+\emph{Projective reduction} $\rw_\pi$ on stream-labeled terms is the rewrite relation given by
 \[
-	\trm{!ai.N} ~\rw_\pi~\proj aiN
+	\trm{!ai.N} ~\rw_\pi~\proj aiN~.
 \]
 \end{defn}
 
-\begin{rmrk}
-Commonly, probabilistic events (with the same probability) are considered interchangeable; hence $\ttrm{!a.!b.N}$ would be equivalent to $\ttrm{!b.!a.N}$. Using streams, we can refine this proposition: these are equivalent by simultaneously exchanging the corresponding events in the context stream.
+Observe that in $N^s$ a generator that occurs under $n$ other generators on the spine of $N$, is labeled with the element of $s$ at position $n+1$. Generators in argument position remain unlabeled, until a $\beta$-step places them on the spine, in which case they become labeled by the new substitution case. We allow to annotate a term with a finite prefix of a stream, e.g.\ $N^i$ with a singleton $i$, so that only part of the spine is labeled. Subsequent labelling of a partly labeled term is then by $(N^r)^s=N^{r\cdot s}$ (abusing notation). To introduce streams via the external probabilistic sum, and to ignore an unused remaining stream after completing a probabilistic computation, we adopt the following equation.
 \[
+ 	N = N^0 + N^1
+\]
+
+\begin{prop}
+Projective reduction generalizes projective head reduction:
+\[
+	\trm{H[\,!a.N]} ~=~ \trm{H[\,!a{}^0.N]} + \trm{H[\,!a{}^1.N]} ~\rw_\pi~ H[\proj a0N]+H[\proj a1N]~.
+\]
+\end{prop}
+
+Returning to the interchangeability of probabilistic events, we refine~\eqref{eqn:permute-generators} by exchanging the corresponding elements of the annotating streams:
+\begin{align}
+\label{eqn:permute-generators-streams}
+\vcenter{\hbox{
 \begin{tikzpicture}[x=80pt,y=15pt]
 	\node     at (0,0) {$\trm{(!a.!b.N)}^{i\cdot j\cdot s}$};
 	\node     at (0,2) {$\trm{(!b.!a.N)}^{j\cdot i\cdot s}$};
@@ -2268,30 +2341,29 @@ Commonly, probabilistic events (with the same probability) are considered interc
 	\node at (0.5,0) {$=$};
 	\node at (0.5,2) {$=$};
 	\node at (2,1) {$=$};
-\end{tikzpicture}
-\]
-\end{rmrk}
+\end{tikzpicture}}}
+\end{align}
 
-To relate projective with permutative reduction, we lift the latter to stream-labeled terms simply by preserving labels. We have the following basic result.
+Stream-labelling externalizes all probabilities, making reduction deterministic. This is expressed by the following proposition, that stream-labelling commutes with reduction: if a generator remains unlabeled in $M$ and becomes labeled after a reduction step $M\rw N$, what label it receives is predetermined. The deep reason is that stream labelling assigns an outcome to each generator in a way that corresponds to a call-by-name strategy for probabilistic reduction.
 
-\begin{prop}[Stream-labeling commutes with reduction]
+
+\begin{prop}
 \label{prop:labelling-commutes}
-If $M \rw N$ with a $\beta$-step or $\perm$-step other than $\boxVoid$ then $M^s \rw N^s$.
+If $M \rw N$ by a step other than $\boxVoid$ then $M^s \rw N^s$.
 \end{prop}
 
 \begin{rmrk}
 The statement is false for the $\boxVoid$ rule $\trm{!a.N}\rw_\perm N~(a\notin\fl N)$, as it removes a generator but not an element from the stream. Arguably, for this reason the rule should be excluded from the calculus. On the other hand, the rule is necessary to implement idempotence of $\+$, rather than just $\ttrm{+a}$, as follows.
 \[
-	N\+N = \trm{!a.N+aN} \rw_\perm \trm{!a.N} \rw_\perm N \qquad (a\notin\fl N)
+	N\+N ~=~ \trm{!a.N+aN} ~\rw_\perm~ \trm{!a.N} ~\rw_\perm~ N \qquad \text{where } a\notin\fl N
 \]
 \end{rmrk}
 
-In effect, Proposition~\ref{prop:labelling-commutes} states that labeling is deterministic: even if a generator remains unlabeled in $M$, and becomes labeled after a ($\beta$-)step $M\rw N$, what label it receives is predetermined. The deep reason is that the stream-labeling algorithm assigns an outcome to each generator in a way that corresponds to a call-by-name strategy for probabilistic reduction.
+The below proposition then expresses that projective reduction is an \emph{invariant} for permutative reduction. If $N\rw M$ by a step (that is not $\boxVoid$) on a labelled generator $\ttrm{!ai}$ or a corresponding choice $\ttrm{+a}$, then $N$ and $M$ reduce to a common term, $N\rw_\pi P\,{}_\pi\lw\,M$, by the projective steps evaluating $\ttrm{!ai}$.
 
-We can now relate projective and permutative reduction in one direction.
 
 \begin{prop}
-Projective reduction is an invariant for permutative reduction on labeled generators $\ttrm{!ai}$ and their bound choices $\ttrm{+a}$, in the following ways (with a case for $\cancelR$ symmetric to $\cancelL$).
+Projective reduction is an invariant for permutative reduction as follows (with a case for $\cancelR$ symmetric to $\cancelL$, and where $D[\,]$ is a context).
 \[
 \begin{tikzpicture}[x=40pt,y=30pt]
 	\node (A) at (0,1) {$\trm{!ai.C[N+aN]}$};
@@ -2311,6 +2383,17 @@ Projective reduction is an invariant for permutative reduction on labeled genera
 	\draw[rw] (A.south) --node[below] {$\scriptstyle\pi$}  (C.north west);
 	\draw[rw] (B.south) --node[below]{$\scriptstyle\pi$}   (C.north east);
 	\node at (1,.5) {$\cancelL$};
+\end{tikzpicture}
+\]
+\[
+\begin{tikzpicture}[x=60pt,y=30pt]
+	\node (A) at (0,1) {$\trm{!ai.C[D[N_0+aN_1]]}$};
+	\node (B) at (2,1) {$\trm{!ai.C[D[N_0]+aD[N_1]]}$};
+	\node (C) at (1,0) {$\proj ai{C[D[N_i]]}$};
+	\draw[rw] (A) --node[above]{$\scriptstyle\perm$} (B);
+	\draw[rw] (A.south) --node[below] {$\scriptstyle\pi$}  (C.north west);
+	\draw[rw] (B.south) --node[below]{$\scriptstyle\pi$}   (C.north east);
+	\node at (1,.5) {$\plusX$};
 \end{tikzpicture}
 \]
 \[
@@ -2338,67 +2421,152 @@ Projective reduction is an invariant for permutative reduction on labeled genera
 	\node at (1,.5) {$\boxFun$};
 \end{tikzpicture}
 \]
-\[
-\begin{tikzpicture}[x=60pt,y=30pt]
-	\node (A) at (0,1) {$\trm{!ai.C[D[N_0+aN_1]]}$};
-	\node (B) at (2,1) {$\trm{!ai.C[D[N_0]+aD[N_1]]}$};
-	\node (C) at (1,0) {$\proj ai{C[D[N_i]]}$};
-	\draw[rw] (A) --node[above]{$\scriptstyle\perm$} (B);
-	\draw[rw] (A.south) --node[below] {$\scriptstyle\pi$}  (C.north west);
-	\draw[rw] (B.south) --node[below]{$\scriptstyle\pi$}   (C.north east);
-	\node at (1,.5) {$\plusX$};
-\end{tikzpicture}
-\]
 \end{prop}
 
-Here, $D[\,]$ is a context as used in a $\plusX$-step, and in the first, second, and last cases $\pi^a_i$ remains to capture other instances of $\ttrm{+a}$.
+%Here, $D[\,]$ is a context as used in a $\plusX$-step, and in the first, second, and last cases $\pi^a_i$ remains to capture other instances of $\ttrm{+a}$.
 
-In the other direction, we will show how permutative reduction can simulate an outermost projective step; that is, one generated by a single label $N^i$. The $i$ will attach to the generator with $\ttrm{!ai}$ with the minimal label, i.e.\ $a<b$ for any other label $b$ in $N$; then all bound choice operators $\ttrm{+a}$ can permute to reach $\ttrm{!ai}$. We formalize this by a \emph{head context} $H[\,]$.
+%==================================
+%
+%We evaluate a term with reference to a binary stream $s\in\{0,1\}^{\mathbb N}$, which provides the outcomes to probabilistic events during reduction. Writing $N^s$ for the term $N$ with stream $s$, and $i\cdot s$ for the stream with $i\in\{0,1\}$ as first element, we expect to reduce $\trm{(!a.N)}^{i\cdot s}$ to $M^s$ where $M$ is obtained from $N$ by projecting every subformula $\ttrm{P_0+aP_1}$ to $P_i$. To avoid introducing any permutation rules, we will evaluate a generator not just at top-level, but anywhere along the \emph{spine} of a term: under abstractions, in function position, and under (other) generators and choices---but not in argument position.
+%
+%Let $\Streams=\{0,1\}^\mathbb{N}$ be the space of streams, ranged over by $r,s,t$.
+%
+%\begin{defn}
+%The \emph{stream labelling} $N^s$ of a term $N$ with a stream $s\in\Streams$, which annotates generators as $\trm{!ai}$ with $i\in\{0,1\}$ and variables as $x^s$ with a stream $s$, is given inductively as follows.
+%\begin{align*}
+%	\trm{(\x.N)^s} &= \trm{\x.N^s} & \trm{(!a.N)^{i\cdot s}} &= \trm{!ai.N^s} 
+%	\\
+%	\trm{(N\,M)^s} &= \trm{N^s\,M} & \trm{(N+a M)^s}		 &= \trm{N^s +a M^s}
+%\end{align*}
+%We lift $\beta$-reduction to stream-labeled terms by introducing a substitution case for stream-labelled variables: $x^s[M/x] = M^s$.
+%\end{defn}
+%
+%Observe that in $N^s$ a generator that occurs under $n$ other generators on the spine of $N$, is labeled with the element of $s$ at position $n+1$. Generators in argument position remain unlabeled, until a $\beta$-step places them on the spine, in which case they become labeled by the new substitution case. We allow to annotate a term with a finite prefix of a stream, e.g.\ $N^i$ with a singleton $i$, so that only part of the spine is labeled. Subsequent labelling of an already labeled term is then by $(N^r)^s=N^{r\cdot s}$.
+%
+%\begin{defn}
+%\emph{Projective} reduction $\rw_\pi$ is the following reduction step on stream-labeled terms.
+%\[
+%	\trm{!ai.N} ~\rw_\pi~\proj aiN
+%\]
+%\end{defn}
+%
+%
+%
+%\begin{rmrk}
+%Commonly, probabilistic events (with the same probability) are considered interchangeable; hence $\ttrm{!a.!b.N}$ would be equivalent to $\ttrm{!b.!a.N}$. Using streams, we can refine this proposition: these are equivalent by simultaneously exchanging the corresponding events in the context stream.
+%\[
+%\begin{tikzpicture}[x=80pt,y=15pt]
+%	\node     at (0,0) {$\trm{(!a.!b.N)}^{i\cdot j\cdot s}$};
+%	\node     at (0,2) {$\trm{(!b.!a.N)}^{j\cdot i\cdot s}$};
+%	\node (A) at (1,0) {$\trm{!ai.!b{}^j.N^s}$};
+%	\node (B) at (1,2) {$\trm{!b{}^j.!ai.N^s}$};
+%	\node (C) at (2,0) {$\pi^a_i(\proj bj{N^s})$};
+%	\node (D) at (2,2) {$\pi^b_j(\proj ai{N^s})$};
+%	\draw[rws] (A) --node[above] {$\scriptstyle\pi$}   (C);
+%	\draw[rws] (B) --node[above]{$\scriptstyle\pi$}   (D);
+%	\node at (0,1) {$\sim$};
+%	\node at (0.5,0) {$=$};
+%	\node at (0.5,2) {$=$};
+%	\node at (2,1) {$=$};
+%\end{tikzpicture}
+%\]
+%\end{rmrk}
+%
+%To relate projective with permutative reduction, we lift the latter to stream-labeled terms simply by preserving labels. We have the following basic result.
+%
+%\begin{prop}[Stream-labelling commutes with reduction]
+%\label{prop:labelling-commutes}
+%If $M \rw N$ with a $\beta$-step or $\perm$-step other than $\boxVoid$ then $M^s \rw N^s$.
+%\end{prop}
+%
+%\begin{rmrk}
+%The statement is false for the $\boxVoid$ rule $\trm{!a.N}\rw_\perm N~(a\notin\fl N)$, as it removes a generator but not an element from the stream. Arguably, for this reason the rule should be excluded from the calculus. On the other hand, the rule is necessary to implement idempotence of $\+$, rather than just $\ttrm{+a}$, as follows.
+%\[
+%	N\+N = \trm{!a.N+aN} \rw_\perm \trm{!a.N} \rw_\perm N \qquad (a\notin\fl N)
+%\]
+%\end{rmrk}
+%
+%In effect, Proposition~\ref{prop:labelling-commutes} states that labelling is deterministic: even if a generator remains unlabeled in $M$, and becomes labeled after a ($\beta$-)step $M\rw N$, what label it receives is predetermined. The deep reason is that the stream-labelling algorithm assigns an outcome to each generator in a way that corresponds to a call-by-name strategy for probabilistic reduction.
+%
+%We can now relate projective and permutative reduction in one direction.
+%
+%\begin{prop}
+%Projective reduction is an invariant for permutative reduction on labeled generators $\ttrm{!ai}$ and their bound choices $\ttrm{+a}$, in the following ways (with a case for $\cancelR$ symmetric to $\cancelL$).
+%\[
+%\begin{tikzpicture}[x=40pt,y=30pt]
+%	\node (A) at (0,1) {$\trm{!ai.C[N+aN]}$};
+%	\node (B) at (2,1) {$\trm{!ai.C[N]}$};
+%	\node (C) at (1,0) {$\proj ai{C[N]}$};
+%	\draw[rw] (A) --node[above]{$\scriptstyle\perm$} (B);
+%	\draw[rw] (A.south) --node[below] {$\scriptstyle\pi$}  (C.north west);
+%	\draw[rw] (B.south) --node[below]{$\scriptstyle\pi$}   (C.north east);
+%	\node at (1,.5) {$\idem$};
+%\end{tikzpicture}
+%\qquad
+%\begin{tikzpicture}[x=50pt,y=30pt]
+%	\node (A) at (0,1) {$\trm{!ai.C[(N_0 +a M) +a N_1]}$};
+%	\node (B) at (2,1) {$\trm{!ai.C[N_0 +a N_1]}$};
+%	\node (C) at (1,0) {$\proj ai{C[N_i]}$};
+%	\draw[rw] (A) --node[above]{$\scriptstyle\perm$} (B);
+%	\draw[rw] (A.south) --node[below] {$\scriptstyle\pi$}  (C.north west);
+%	\draw[rw] (B.south) --node[below]{$\scriptstyle\pi$}   (C.north east);
+%	\node at (1,.5) {$\cancelL$};
+%\end{tikzpicture}
+%\]
+%\[
+%\begin{tikzpicture}[x=60pt,y=30pt]
+%	\node (A) at (0,1) {$\trm{!ai.C[D[N_0+aN_1]]}$};
+%	\node (B) at (2,1) {$\trm{!ai.C[D[N_0]+aD[N_1]]}$};
+%	\node (C) at (1,0) {$\proj ai{C[D[N_i]]}$};
+%	\draw[rw] (A) --node[above]{$\scriptstyle\perm$} (B);
+%	\draw[rw] (A.south) --node[below] {$\scriptstyle\pi$}  (C.north west);
+%	\draw[rw] (B.south) --node[below]{$\scriptstyle\pi$}   (C.north east);
+%	\node at (1,.5) {$\plusX$};
+%\end{tikzpicture}
+%\]
+%\[
+%\begin{tikzpicture}[x=36pt,y=30pt]
+%	\node (A) at (0,1) {$\trm{\x.!ai.N}$};
+%	\node (B) at (2,1) {$\trm{!ai.\x.N}$};
+%	\node (C) at (0,0) {$\x.\,\proj aiN$};
+%	\node (D) at (2,0) {$\proj ai{\x.N}$};
+%	\draw[rw] (A) --node[above]{$\scriptstyle\perm$} (B);
+%	\draw[rw] (A) --node[left] {$\scriptstyle\pi$}   (C);
+%	\draw[rw] (B) --node[right]{$\scriptstyle\pi$}   (D);
+%	\node at (1,0) {$=$};
+%	\node at (1,.5) {$\boxAbs$};
+%\end{tikzpicture}
+%\qquad\qquad
+%\begin{tikzpicture}[x=36pt,y=30pt]
+%	\node (A) at (0,1) {$\trm{(!ai.N)M}$};
+%	\node (B) at (2,1) {$\trm{!ai.NM}$};
+%	\node (C) at (0,0) {$\proj aiN\,M$};
+%	\node (D) at (2,0) {$\proj ai{N\,M}$};
+%	\draw[rw] (A) --node[above]{$\scriptstyle\perm$} (B);
+%	\draw[rw] (A) --node[left] {$\scriptstyle\pi$}   (C);
+%	\draw[rw] (B) --node[right]{$\scriptstyle\pi$}   (D);
+%	\node at (1,0) {$=$};
+%	\node at (1,.5) {$\boxFun$};
+%\end{tikzpicture}
+%\]
+%\end{prop}
+%
+%Here, $D[\,]$ is a context as used in a $\plusX$-step, and in the first, second, and last cases $\pi^a_i$ remains to capture other instances of $\ttrm{+a}$.
+%
+%In the other direction, we will show how permutative reduction can simulate an outermost projective step; that is, one generated by a single label $N^i$. The $i$ will attach to the generator with $\ttrm{!ai}$ with the minimal label, \ie\ $a<b$ for any other label $b$ in $N$; then all bound choice operators $\ttrm{+a}$ can permute to reach $\ttrm{!ai}$. We formalize this by a \emph{head context} $H[\,]$.
+%
+%
+%If we consider $i$ as an even probabilistic choice between $0$ and $1$, we may characterize probabilistic reduction by an external sum $+$ as follows.
+%\[
+%	N = N^0 + N^1
+%\]
+%Thus, by stream-labelling we may lift an external probabilistic space, in our case the formal sum over all $s\in\{0,1\}^{\mathbb N}$, to the probabilistic space for a term $N$, as $\sum_{s\in\{0,1\}^{\mathbb N}}N^s$. Labelling makes reduction deterministic, but does not execute it, separating choice from computation; the normal forms of $N$ are obtained by reduction in this probabilistic space. With the above equation and \Cref{prop:projective head reduction}, we get the following notion of \emph{probabilistic head reduction}.
+%\[
+%	\trm{H[\,!a.N]} \rws_\pi H[\proj a0N] + H[\proj a1N]
+%\]
+%We simulate this with permutative reduction.
+%
 
-\begin{defn}
-A \emph{head context} $H[\,]$ is given by the following grammar.
-\[
-	H[\,] \coloneqq [\,] ~\mid~ \x.\,H[\,] ~\mid~ H[\,]N
-\]
-\end{defn}
-
-We may then characterize projective head reduction as follows.
-
-\begin{prop}
-\label{prop:projective head reduction}
-We have the following projective reduction.
-\[
-	\trm{H[\,!a.N]i} ~=~ \trm{H[\,!ai.N]} ~\rw_\pi~ H[\proj aiN]
-\]
-\end{prop}
-
-If we consider $i$ as an even probabilistic choice between $0$ and $1$, we may characterize probabilistic reduction by an external sum $+$ as follows.
-\[
-	N = N^0 + N^1
-\]
-Thus, by stream-labeling we may lift an external probabilistic space, in our case the formal sum over all $s\in\{0,1\}^{\mathbb N}$, to the probabilistic space for a term $N$, as $\sum_{s\in\{0,1\}^{\mathbb N}}N^s$. Labeling makes reduction deterministic, but does not execute it, separating choice from computation; the normal forms of $N$ are obtained by reduction in this probabilistic space. With the above equation and \Cref{prop:projective head reduction}, we get the following notion of \emph{probabilistic head reduction}.
-\[
-	\trm{H[\,!a.N]} \rws_\pi H[\proj a0N] + H[\proj a1N]
-\]
-We simulate this with permutative reduction.
-
-\begin{prop}[Permutative reduction simulates projective reduction]
-\[
-	H[\,\trm{!a.N}] ~\rws_\perm~
-	\left\{\begin{array}{l@{\qquad}l}
-		H[N]						 & (a\notin\fl N) \\[5pt]
-		H[\proj a0N] \+ H[\proj a1N] & (a\in\fl N)
-	\end{array}\right.
-\]
-\end{prop}
-
-\begin{proof}
-The case $a\notin\fl N$ is immediate by a $\boxVoid$ step. For the other case, observe that $\trm{H[\,!a.N]}\rws_\perm\trm{!a.H[N]}$ by $\boxAbs$ and $\boxFun$ steps, and since $a$ does not occur in $H[\,]$, we have $H[\proj aiN]=\proj ai{H[N]}$. Unfolding also the definition of $\+$, we may thus restrict ourselves to proving the following.
-\[
-	\trm{!a.N} ~\rws_\perm~ \trm{!a.} \proj a0N~\trm{+a}~\proj a1N
-\]
-Given that $a$ is the smallest label in $N$, \ie\ $a<b$ for any other label $b$ in $N$, a straightforward induction on $N$ gives $N\rws_\perm\proj a0N~\ttrm{+a}~\proj a1N$, with as special base case $N\rws_\perm N$ for $a\notin\fl N$.
-\end{proof}
 
 %============================================================ CALL-BY-VALUE
 
@@ -2444,7 +2612,7 @@ Our call-by-value reduction may choose an arbitrary order in which to evaluate t
 %	\draw[rw] (A) --node[above]{$\scriptstyle\val$} (B);
 %	\draw[rw] (C) --node[above]{$\scriptstyle\pi$}   (D);
 %\end{tikzpicture}
-Here, $\unopen{\trm{C[N_0vN_1]}}=\labjudg{\theta}{\trm{D[P_0+bP_1]}}$ with $D[\,]$ a $\PEL$-context, and $\theta$ giving rise to the sequence of generators $\ttrm{\dots!a.!b.!c\dots}$ in the call-by-value translation. To simulate the reduction step, if $b$ occupies the $n$-th position in $\theta$, then the $n$-th position in the context stream $s$ must be the element $j$. Since $\beta$-reduction survives the translation and labeling process intact, we may simulate the call-by-value by projective and $\beta$-reduction.
+Here, $\unopen{\trm{C[N_0vN_1]}}=\labjudg{\theta}{\trm{D[P_0+bP_1]}}$ with $D[\,]$ a $\PEL$-context, and $\theta$ giving rise to the sequence of generators $\ttrm{\dots!a.!b.!c\dots}$ in the call-by-value translation. To simulate the reduction step, if $b$ occupies the $n$-th position in $\theta$, then the $n$-th position in the context stream $s$ must be the element $j$. Since $\beta$-reduction survives the translation and labelling process intact, we may simulate the call-by-value by projective and $\beta$-reduction.
 
 \begin{thm}
 If $N\rws_{\val,\beta\val}V$ then $\uncbv N^s\rws_{\pi,\beta}\uncbv V$ for some stream $s\in\Streams$.
@@ -2761,7 +2929,7 @@ If $N\rws_{\val,\beta\val}V$ then $\uncbv N^s\rws_{\pi,\beta}\uncbv V$ for some 
 %	\begin{enumerate}
 %		\item By straightforward induction on $N$.
 %		\item By straightforward induction on $H$, the base case is \Cref{lem:plus-projection-base}.
-%		\qedhere
+%		%\qedhere
 %	\end{enumerate}
 %\end{proof}
 %
@@ -2816,7 +2984,7 @@ If $N\rws_{\val,\beta\val}V$ then $\uncbv N^s\rws_{\pi,\beta}\uncbv V$ for some 
 %
 %		\item \emph{Box}, \ie\ $N = H[\trm{!a}.\trm{!b}.Q] \rw_\pi H[\proj{a}{0}{!b.Q}] + H[\proj{a}{1}{!b.Q}] = H[\trm{!b.}\proj{a}{0}{Q}] + H[\trm{!b.}\proj{a}{1}{Q}] = M$ where $a \neq b$ (without loss of generality).
 %		Analogous to the abstraction case.
-%		\qedhere
+%		%\qedhere
 %	\end{itemize}
 %\end{proof}
 
@@ -2948,7 +3116,7 @@ If $N\rws_{\val,\beta\val}V$ then $\uncbv N^s\rws_{\pi,\beta}\uncbv V$ for some 
 %
 %		\item \emph{Box}, \ie\ $N = H[\trm{!a}.\trm{!b}.Q] \rw_\pi H[\proj{a}{0}{!b.Q}] + H[\proj{a}{1}{!b.Q}] = H[\trm{!b.}\proj{a}{0}{Q}] + H[\trm{!b.}\proj{a}{1}{Q}] = M$ where $a \neq b$ (without loss of generality).
 %		Analogous to the abstraction case.
-%		\qedhere
+%		%\qedhere
 %	\end{itemize}
 %\end{proof}
 
@@ -2987,7 +3155,7 @@ This work was supported by EPSRC Project EP/R029121/1 \emph{Typed Lambda-Calculi
 \section{Technical appendix: omitted proofs}
 \label{sect:proofs}
 
-The enumeration of lemmas already stated in the body of the article is unchanged.
+The enumeration of lemmata already stated in the body of the article is unchanged.
 
 \setcounter{lemmaAppendix}{\value{lem:confluence-perm}}
 \begin{lemmaAppendix}[Confluence of $\rw_\perm$]
@@ -3222,10 +3390,10 @@ The enumeration of lemmas already stated in the body of the article is unchanged
 %\end{lemmaAppendix}
 %
 %\begin{proof}
-%	Since $\trm{M} \rwp_\beta \trm{Mo} = M'$ and $\trm{N} \rwp_\beta \trm{No} = N'$ for some labelings $\trm{M*}$ and $\trm{N*}$ of $M$ and $N$ respectively, let $\trm{(MN)*}$ be the labeling of $\trm{MN}$ obtained by putting together the labelings $\trm{M*}$ and $\trm{N*}$.
+%	Since $\trm{M} \rwp_\beta \trm{Mo} = M'$ and $\trm{N} \rwp_\beta \trm{No} = N'$ for some labellings $\trm{M*}$ and $\trm{N*}$ of $M$ and $N$ respectively, let $\trm{(MN)*}$ be the labelling of $\trm{MN}$ obtained by putting together the labellings $\trm{M*}$ and $\trm{N*}$.
 %	Clearly, $\trm{MN} \rwp_\beta \trm{<(MN)*>} = \trm{MoNo} = M'N'$.
 %
-%	Concerning the part of the statement after ``moreover'', since $\trm{R} \rwp_\beta \trm{<R*>} = R'$ and $\trm{N} \rwp_\beta \trm{No} = N'$ for some labelings $\trm{R*}$ and $\trm{N*}$ of $R$ and $N$ respectively, let $\trm{(MN)*}$ be the labeling of $\trm{MN}$ obtained by putting together the labelings $\trm{R*}$ and $\trm{N*}$ plus the labeled $\beta$-redex $\trm{(\x.R)*N}$.
+%	Concerning the part of the statement after ``moreover'', since $\trm{R} \rwp_\beta \trm{<R*>} = R'$ and $\trm{N} \rwp_\beta \trm{No} = N'$ for some labellings $\trm{R*}$ and $\trm{N*}$ of $R$ and $N$ respectively, let $\trm{(MN)*}$ be the labelling of $\trm{MN}$ obtained by putting together the labellings $\trm{R*}$ and $\trm{N*}$ plus the labeled $\beta$-redex $\trm{(\x.R)*N}$.
 %	Clearly, $\trm{MN} \rwp_\beta \trm{<(MN)*>} = \trm{<R*>[No/x]} = \trm{R'[N'/x]}$.
 %\end{proof}
 
@@ -3336,7 +3504,7 @@ The enumeration of lemmas already stated in the body of the article is unchanged
 		$\trm{P[x/L_0]}L_1\ldots L_m$
 		is in $\mathit{SN}^\theta$, and from Lemma~\ref{lemma:cloredbox}
 		we get the thesis.
-		\qedhere
+		%\qedhere
 	\end{itemize}
 \end{proof}
 
