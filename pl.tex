@@ -424,15 +424,16 @@ This convention also gives the translation from a \emph{call-by-name} probabilis
 
 
 \begin{figure}[!t]
-  \fbox{
+\fbox{
 \begin{minipage}{.97\textwidth}
+\vspace{-4pt}
 \begin{align}
 	(\x.N)M 				&\rw_\beta N[M/x]													\tag{$\beta$}
-\\																								\notag
+\\[-4pt]																							\notag
 \\	\trm{N +a N}			&\rw_\perm N														\tag{\idem}
 \\	\trm{(N +a M) +a P}		&\rw_\perm \trm{N +a P}					\rstrut						\tag{\cancelL}
 \\	\trm{N +a (M +a P)}		&\rw_\perm \trm{N +a P}					\rstrut						\tag{\cancelR}
-\\																								\notag
+\\[-4pt]																								\notag
 \\	\trm{\x.(N +a M)}		&\rw_\perm \trm{(\x.N) +a (\x.M)}									\tag{\plusAbs}
 \\	\trm{(N +a M) P}		&\rw_\perm \trm{(NP) +a (MP)}			\rstrut						\tag{\plusFun}
 \\	\trm{N (M +a P)}		&\rw_\perm \trm{(NM) +a (NP)}			\rstrut						\tag{\plusArg}
@@ -440,11 +441,12 @@ This convention also gives the translation from a \emph{call-by-name} probabilis
 \\	\trm{N +b (M +a P)}		&\rw_\perm \trm{(N +b M) +a (N +b P)} 	\rstrut	&& (\text{if } a\smallbin<b)	\tag{\plusR}
 %\\	\trm{!b.(N +a M)}		&\rw_\perm \trm{(!b.N) +a (!c M[c/b])}	\rstrut	&& (a\neq b)		\tag{\plusBox}
 \\	\trm{!b.(N +a M)}		&\rw_\perm \trm{(!b.N) +a (!b.M)}		\rstrut	&& (\text{if } a\neq b)		\tag{\plusBox}
-\\																								\notag
+\\[-4pt]																								\notag
 \\	\trm{!a.N}				&\rw_\perm N 									&& (\text{if } a\notin \fl{N})		\tag{\boxVoid}
 \\	\trm{\x.!a.N} 			&\rw_\perm \trm{!a.\x. N}				\rstrut						\tag{\boxAbs}
-\\	\trm{(!a.N)M}			&\rw_\perm \trm{!a.(NM)}				\rstrut						\tag{\boxFun}\\ \vspace{-20pt} \notag
+\\	\trm{(!a.N)M}			&\rw_\perm \trm{!a.(NM)}				\rstrut						\tag{\boxFun}%\\ \vspace{-24pt} \notag
 \end{align}
+\vspace{-10pt}
 \end{minipage}}
 \caption{Reduction Rules}
 \label{fig:reduction rules}
@@ -534,6 +536,7 @@ The normal forms $P_0$ of $\rw_\perm$, respectively $N_0$ of $\rw$, are given by
   \newcommand\fit[1]{\makebox[36pt][c]{$#1$}}%
     \fbox{
     \begin{minipage}{.97\textwidth}
+      \vspace{-4pt}
       \begin{align*}
 	\trm{!a.(\x.x = x)(\top+a\bot)}
 	& \fit{\rw_\perm}	\trm{!a.(\x.x=x)\top~+a~(\x.x=x)\bot}	\tag\plusArg
@@ -559,7 +562,7 @@ creating super-exponential growth.\footnote{This was inferred from only a simple
 
 %\subsection{Strong normalization of permutative reduction}
 
-We observe that the set $\PEL$ endowed with $\rw_\perm$ is a first-order term rewriting system over a countably infinite set of variables %(denoted by $x, y, z, \dots$) 
+Observe that the set $\PEL$ endowed with $\rw_\perm$ is a first-order term rewriting system over a countably infinite set of variables %(denoted by $x, y, z, \dots$) 
 and the signature $\Sigma$ given by:
 \begin{varitemize}
 	\item the binary function symbol $\trm{+a}$, for any label $a$;
