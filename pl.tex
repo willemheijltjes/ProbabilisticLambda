@@ -56,6 +56,7 @@
 
 
 %text
+\newcommand{\eg}{\textit{e.g.}}
 \newcommand{\ie}{\textit{i.e.}}
 \newcommand{\ih}{\textit{i.h.}}
 
@@ -349,19 +350,19 @@ We present two notions of reduction, one via fine-grained local rewrite steps, a
 
 \section{Introduction}
 
-Probabilistic lambda-calculi \cite{SahebDjahromi78,Manber-Tompa-1982,JonesPlotkin89,deLiguoroPiperno95,JungTix98,DalLagoZorzi12,FaggianRonchi19} extend the lambda-calculus with a probabilistic choice operator $N\+[p]M$, which chooses $N$ with probability $p$ and $M$ with probability $1-p$ (throughout this paper, we let $p=0.5$ and will omit it). Duplication of $N\+M$, as is wont to happen in lambda-calculus, raises a fundamental question about its semantics: do the duplicate occurrences represent \emph{the same} probabilistic event, or \emph{different} ones with the same probability? For example, take the formula $\top\+\bot$ that represents a coin flip between boolean values \emph{true} $\top$ and \emph{false} $\bot$. If we duplicate this formula, do the copies represent two distinct coin flips with possibly distinct outcomes, or do these represent a single coin flip that determines the outcome for both copies? Put differently again, when we duplicate $\top\+\bot$, do we duplicate the \emph{event}, or only its \emph{outcome}?
+Probabilistic lambda-calculi \cite{SahebDjahromi78,Manber-Tompa-1982,JonesPlotkin89,deLiguoroPiperno95,JungTix98,DalLagoZorzi12,FaggianRonchi19} extend the standard lambda-calculus with a probabilistic choice operator $N\+[p]M$, which chooses $N$ with probability $p$ and $M$ with probability $1-p$ (throughout this paper, we let $p$ be $\nicefrac12$ and will omit it). Duplication of $N\+M$, as is wont to happen in lambda-calculus, raises a fundamental question about its semantics: do the duplicate occurrences represent \emph{the same} probabilistic event, or \emph{different} ones with the same probability? For example, take the formula $\top\+\bot$ that represents a coin flip between boolean values \emph{true} $\top$ and \emph{false} $\bot$. If we duplicate this formula, do the copies represent two distinct coin flips with possibly distinct outcomes, or do these represent a single coin flip that determines the outcome for both copies? Put differently again, when we duplicate $\top\+\bot$, do we duplicate the \emph{event}, or only its \emph{outcome}?
 
 In probabilistic lambda-calculus, these two interpretations are captured by the evaluation strategies of call-by-name ($\rw_\cbn$), which duplicates events, and call-by-value ($\rw_\cbv$), which evaluates any probabilistic choice before it is duplicated, and thus only duplicates outcomes. Consider the following example, where $=$ tests equality of boolean values.
 \[
 	\top \quad {}_\cbv\!\rwsleft \quad (\x.\,x = x)(\top\+\bot) \quad \rws_\cbn \quad \trm{\top\+\bot}
 \]
-This situation is not ideal, for several, related reasons. First, it demonstrates how probabilistic lambda-calculus is non-confluent, negating one of the central properties of the lambda-calculus, and one of the main reasons why it is the prominent model of computation that it is. Second, a probabilistic lambda-calculus must derive its semantics from a prescribed reduction strategy, and its terms only have meaning in the context of that strategy. Third, combining different kinds of probabilities becomes highly involved~\cite{FaggianRonchi19}, as it would require specialized reduction strategies. These issues present themselves even in a more general setting, namely that of commutative (algebraic) effects, which in general do not commute with copying.
+This situation is not ideal, for several, related reasons. Firstly, it demonstrates how probabilistic lambda-calculus is non-confluent, negating one of the central properties of the lambda-calculus, and one of the main reasons why it is the prominent model of computation that it is. Secondly, it means that a probabilistic lambda-calculus must derive its semantics from a prescribed reduction strategy, and its terms only have meaning in the context of that strategy. Thirdly, combining different kinds of probabilities becomes highly involved~\cite{FaggianRonchi19}, as it would require specialized reduction strategies. These issues present themselves even in a more general setting, namely that of commutative (algebraic) effects, which in general do not commute with copying.
 
 We address these issues by a decomposition of the probabilistic operator into a \emph{generator} $\ttrm{!a}$ and a \emph{choice} $\ttrm{+a}$, as follows.
 \[
 	\trm{N \+ M} \quad\stackrel\Delta=\quad \trm{!a. N +a M}
 \]
-Semantically, $\ttrm{!a}$ represents a probabilistic event, that generates a boolean value recorded as $a$. The choice $\ttrm{N+aM}$ is simply a conditional on $a$, choosing $N$ if $a$ is false and $M$ if $a$ is true. Syntactically, $a$ is a boolean variable with an occurrence in $\ttrm{+a}$, and $\ttrm{!a}$ acts as a quantifier, binding all occurrences in its scope. (To capture a non-equal chance, one would attach a probability $p$ to a generator, as $\ttrm{!a}{\kern1pt}_p$, though we will not do so in this paper.)
+Semantically, $\ttrm{!a}$ represents a probabilistic event, that generates a boolean value recorded as $a$. The choice $\ttrm{N+aM}$ is simply a conditional on $a$, choosing $N$ if $a$ is false and $M$ if $a$ is true. Syntactically, $a$ is a boolean variable with an occurrence in $\ttrm{+a}$, and $\ttrm{!a}$ acts as a probabilistic quantifier, binding all occurrences in its scope. (To capture a non-equal chance, one would attach a probability $p$ to a generator, as $\ttrm{!a}{\kern1pt}_p$, though we will not do so in this paper.)
 
 The resulting \emph{probabilistic event lambda-calculus} $\PEL$, which we present in this paper, is confluent. Our decomposition allows us to separate duplicating an \emph{event}, represented by the generator $\ttrm{!a}$, from duplicating only its \emph{outcome} $a$, through having multiple choice operators $\trm{+a}$. In this way our calculus may interpret both original strategies, call-by-name and call-by-value, by different translations of standard probabilistic terms into $\PEL$: call-by-name by the above decomposition (see also Section~\ref{sec:PEL}), and call-by-value by a different one (see Section~\ref{sec:cbv}). For our initial example, we get the following translations and reductions.
 %\[
@@ -384,13 +385,13 @@ We further prove confluence (Section~\ref{sec:confluence}), and we give a system
 
 \subsection{Related Work}
 
-Probabilistic $\lambda$-calculi are a topic of study since the pioneering work by Saheb-Djaromi~\cite{SahebDjahromi78}, the first to give the syntax and operational semantics of a $\lambda$-calculus with binary probabilistic choice. Giving well-behaved denotational models for probabilistic $\lambda$-calculi has proved to be challenging, as witnessed by the many contributions spanning the last thirty years: from Jones and Plotkin early study of the probabilistic powerdomain~\cite{JonesPlotkin89}, to Jung and Tix's remarkable (and mostly negative) observations~\cite{JungTix98}, to the very recent encouraging results by Goubault-Larrecq~\cite{GoubaultLarrecq19}. A particularly well-behaved model for probabilistic $\lambda$-calculus can be obtained by taking a probabilistic variation of Girard's coherent spaces~\cite{DanosEhrhard11}, this way getting full abstraction~\cite{EPT18}.
+Probabilistic $\lambda$-calculi are a topic of study since the pioneering work by Saheb-Djaromi~\cite{SahebDjahromi78}, the first to give the syntax and operational semantics of a $\lambda$-calculus with binary probabilistic choice. Giving well-behaved denotational models for probabilistic $\lambda$-calculi has proved to be challenging, as witnessed by the many contributions spanning the last thirty years: from Jones and Plotkin's early study of the probabilistic powerdomain~\cite{JonesPlotkin89}, to Jung and Tix's remarkable (and mostly negative) observations~\cite{JungTix98}, to the very recent encouraging results by Goubault-Larrecq~\cite{GoubaultLarrecq19}. A particularly well-behaved model for probabilistic $\lambda$-calculus can be obtained by taking a probabilistic variation of Girard's coherent spaces~\cite{DanosEhrhard11}, this way getting full abstraction~\cite{EPT18}.
 
 On the operational side, one could mention a study about the various ways the operational semantics of a calculus with binary probabilistic choice can be specified, namely by small-step or big-step semantics, or by inductively or coinductively defined sets of rules~\cite{DalLagoZorzi12}. Termination and complexity analysis of higher-order probabilistic programs seen as $\lambda$-terms have been studied by way of type systems in a series of recent results about size~\cite{DalLagoGrellois19}, intersection~\cite{BreuvartDalLago18}, and refinement type disciplines \cite{AvanziniDalLagoGhyselen19}. Contextual equivalence on probabilistic $\lambda$-calculi has been studied, and compared with equational theories induced by B\"ohm Trees~\cite{Leventis18}, applicative bisimilarity~\cite{DalLagoSangiorgiAlberti14}, or environmental bisimilarity~\cite{SangiorgiVignudelli16}.
 
 In all the aforementioned works, probabilistic $\lambda$-calculi have been taken as implicitly endowed with either call-by-name or call-by-value strategies, for the reasons outlined above. There are only a few exceptions, namely some works on Geometry of Interaction~\cite{DLFVY17}, Probabilistic Coherent Spaces~\cite{EhrhardTasson19}, and Standardization~\cite{FaggianRonchi19}, which achieve, in different contexts, a certain degree of independence from the underlying strategy, thus accomodating both call-by-name and call-by-value evaluation. The way this is achieved, however, invariably relies on Linear Logic or related concepts. This is deeply different from what we do here.
 
-Some words of comparison with Faggian and Ronchi's work on Confluence and Standadization~\cite{FaggianRonchi19} are also in order. The main difference between their approach and the one we pursue here is that the operator $!$ in their calculus $\Lambda_\oplus^!$ plays \emph{both} the roles of a marker for duplicability and of a checkpoint for any probabilistic choice "flowing out" of the term (i.e. being fired). In our calculus, we do not control duplication, but we definitely make use of checkpoints. Saying it another way, Faggian and Ronchi's work is inspired by linear logic, while our approach is inspired by deep inference, even though this is, on purpose, not evident in the design of our calculus. 
+Some words of comparison with Faggian and Ronchi's work on confluence and standardization~\cite{FaggianRonchi19} are also in order. The main difference between their approach and the one we pursue here is that the operator $!$ in their calculus $\Lambda_\oplus^!$ plays \emph{both} the roles of a marker for duplicability and of a checkpoint for any probabilistic choice "flowing out" of the term (\ie\ being fired). In our calculus, we do not control duplication, but we definitely make use of checkpoints. Saying it another way, Faggian and Ronchi's work is inspired by linear logic, while our approach is inspired by deep inference, even though this is, on purpose, not evident in the design of our calculus. 
 
 Probabilistic $\lambda$-calculi can also be seen as vehicles for expressing probabilistic models in the sense of bayesian programming~\cite{Ramsey-Pfeffer-2002,BDLGS16}. This, however, requires an operator for modeling conditioning, which complictes the metatheory considerably, and that we do not consider here.
 
@@ -472,11 +473,11 @@ To orient this as a rewrite rule, we need to give priority to one label over ano
 	A term $\trm{M}$ is \emph{label-closed} if $\fl{M} = \emptyset$.
 \end{defn}
 
-From now on, we consider only label-closed terms (we implicitly assume this, unless otherwise stated).
+From here on, we consider only label-closed terms (we implicitly assume this, unless otherwise stated).
 All terms are identified up to renaming of their bound variables and labels.
 Given some terms $\trm{M}$ and $\trm{N}$ and a variable $\trm{x}$, $\trm{M[N/x]}$ %stands for
 is the capture-avoiding (for both variables and labels) substitution of $\trm{N}$ for the free occurrences of $\trm{x}$ in $\trm{M}$.
-We talk of a \emph{representative} $\trm{M}$ of a term when $\trm{M}$ is not considered up to such a renaming.
+We speak of a \emph{representative} $\trm{M}$ of a term when $\trm{M}$ is not considered up to such a renaming.
 A representative $\trm{M}$ of a term is \emph{well-labeled} if
 %for every sub-term $\trm{!a.N}$ of $\trm{M}$, the label $a$ may occur only in $\trm{N}$ (if at all).
 for every occurrence of $\probox a$ in $\trm{M}$ there is no $\probox a$ occurring in its scope.
@@ -492,8 +493,8 @@ For a well-labeled and label-closed representative $\trm{M}$, $<_{\trm{M}}$ is a
 
 
 \begin{defn}
-\emph{Reduction} $\rw \,=\, \rw_\beta \cup \rw_\perm$ in $\PEL$ consists of \emph{$\beta$-reduction}~$\rw_\beta$ and \emph{permutative} or \emph{$\perm$-reduction}~$\rw_\perm$, both defined as the contextual closure of the rules given in Figure~\ref{fig:reduction rules}. We write $\rws$ for the reflexive-transitive closure of $\rw$, and $\rwn$ for reduction to normal form; similarly for $\rw_\beta$ and $\rw_\perm$.
-We write $=_\perm$ for the symmetric and reflexive-transitive closure of $\rw_\perm$.
+\emph{Reduction} $\rw \,=\, \rw_\beta \cup \rw_\perm$ in $\PEL$ consists of \emph{$\beta$-reduction}~$\rw_\beta$ and \emph{permutative} or \emph{$\perm$-reduction}~$\rw_\perm$, both defined as the contextual closure of the rules given in Figure~\ref{fig:reduction rules}. We write $\rws$ for the reflexive--transitive closure of $\rw$, and $\rwn$ for reduction to normal form; similarly for $\rw_\beta$ and $\rw_\perm$.
+We write $=_\perm$ for the symmetric and reflexive--transitive closure of $\rw_\perm$.
 %\[
 %\begin{array}{rcl}
 %	C[(\lambda x.N)M] &\rw_\beta& C[M[N/x]]
@@ -514,8 +515,8 @@ The crucial feature of $\perm$-reduction is that a choice $\ttrm{+a}$ \emph{does
 \]
 By inspection of the rewrite rules in Figure~\ref{fig:reduction rules}, we can then characterize the normal forms of $\rw_\perm$ and $\rw$ as follows.
 
-\begin{prop}[Syntactic characterization of normal forms]
-The normal forms $P_0$ of $\rw_\perm$, respectively $N_0$ of $\rw$, are given by the following grammars.
+\begin{prop}[Normal forms]
+The normal forms $P_0$ of $\rw_\perm$, respectively $N_0$ of $\rw$, are characterized by the following grammars.
 
 \[
 	\begin{array}{ccc@{~}c@{~}c@{}l}
@@ -545,6 +546,7 @@ The normal forms $P_0$ of $\rw_\perm$, respectively $N_0$ of $\rw$, are given by
 	\fit{\rw_\perm} 	\trm{!a. \top}
 	\fit{\rw_\perm}	\top           						 	\tag{\idem,\boxVoid}
       \end{align*}
+      \vspace{-10pt}
       \end{minipage}}
   \caption{Example Reduction of the $\cbv$-translation of the Term %in the introduction.}
     on p.~\pageref{eq:cbv}.}
@@ -558,7 +560,7 @@ The normal forms $P_0$ of $\rw_\perm$, respectively $N_0$ of $\rw$, are given by
 
 We will prove strong normalization and confluence of $\rw_\perm$. 
 For strong normalization, the obstacle is the interaction between different choice operators, which may duplicate each other, %and even themselves, 
-creating super-exponential growth.\footnote{This was inferred from only a simple simulation; we would be interested to know a rigorous complexity result.} Fortunately, Dershowitz's \emph{recursive path orders}~\cite{Dershowitz82} seem tailor-made for our situation.
+creating super-exponential growth.\footnote{This was inferred only from a simple simulation; we would be interested to know a rigorous complexity result.} Fortunately, Dershowitz's \emph{recursive path orders}~\cite{Dershowitz82} seem tailor-made for our situation.
 
 %\subsection{Strong normalization of permutative reduction}
 
@@ -566,7 +568,7 @@ Observe that the set $\PEL$ endowed with $\rw_\perm$ is a first-order term rewri
 and the signature $\Sigma$ given by:
 \begin{varitemize}
 	\item the binary function symbol $\trm{+a}$, for any label $a$;
-	\item the unary function symbol $\trm{!a}$, for any label $a$;
+	\item the unary function symbol $\ttrm{!a}$, for any label $a$;
 	\item the unary function symbol $\trm{\x}$, for any variable $x$;
 	\item the binary function symbol $\trm{@}$, letting $@(\trm{M},\trm{N})$ stand for $MN$.
 \end{varitemize}
@@ -961,7 +963,7 @@ Reduction $\rw_\perm$ is confluent.
 %	\draw[rws,implied] (c) --node[below]{$\cancelL,\cancelR$} (f);
 %\end{tikzpicture}}}
 %
-By Newman's lemma and strong normalization of $\rw_\perm$ (\Cref{lemma:strong-normalization}), confluence follows from local confluence. The proof of local confluence consists of joining all critical pairs given by $\rw_\perm$. \SLV{Detalis are in the Appendix of \cite{arXiv}.}{Detalis are in the Appendix (p.~\pageref{lemmaAppendix:confluence-perm}).}
+By Newman's lemma and strong normalization of $\rw_\perm$ (\Cref{lemma:strong-normalization}), confluence follows from local confluence. The proof of local confluence consists of joining all critical pairs given by $\rw_\perm$. \SLV{Details are in the Appendix of \cite{arXiv}.}{Details are in the Appendix (p.~\pageref{lemmaAppendix:confluence-perm}).}
 \end{proof}
 % Add reference \cite{Zantema-Pol-2001} again ?
 
@@ -1032,7 +1034,7 @@ By Newman's lemma and strong normalization of $\rw_\perm$ (\Cref{lemma:strong-no
 %\]
 %}
 %=====
-\SLV{The remaining cases are considered in the Appendix of \cite{arXiv}}{The remaining cases are considered in the proof in the Appendix (p.~\pageref{lemmaAppendix:confluence-perm}).}
+%\SLV{The remaining cases are considered in the Appendix of \cite{arXiv}}{The remaining cases are considered in the proof in the Appendix (p.~\pageref{lemmaAppendix:confluence-perm}).}
 %\qedhere
 %
 %\itm\plusFun{\trm{(N+aM)P}\rw\trm{(NP)+a(MP)}}
@@ -1544,7 +1546,7 @@ Let $P^\1\rwp_\beta P_\1$ and $P^\0\rwp_\beta P_\0$ be two labelled reduction st
 %		\quad \mathrel{{}_\beta{\rwpleft}} \quad
 %	P_\0^\1
 %\]
-This is proved by induction on $P^{\1\0}$, where only two cases are not immediate: those where a redex carries one but not the other label. One case follows by the below diagram; for the step above right, induction on $N^\1$ shows that $N^\1[M^\1/x]\rwp_\beta N_\1[M_\1/x]$. The other case is symmetric.
+This is proved by induction on $P^{\1\0}$, where only two cases are not immediate: those where a redex carries one but not the other label. One case follows by the below diagram; the other case is symmetric. Below, for the step top right, induction on $N^\1$ shows that $N^\1[M^\1/x]\rwp_\beta N_\1[M_\1/x]$.
 \[
 \begin{array}[b]{ccccc}
 				\trm{(\x.N^{\0\1})^\0 M^{\0\1}}
@@ -1657,7 +1659,7 @@ A \emph{labelled} $\perm$-reduction $\trm{N*}\rwb_\perm\trm{M*}$ is a $\perm$-re
 \[
 \begin{array}{rcl}
 	\trm{(\x.N*+aM*)*P*} &\rws_\perm& \trm{(\x.N*)*P*+a(\x.M*)*P*}
-\\[5pt]
+\\[8pt]
 	\trm{(\x.!a.N*)*M*} &\rws_\perm& \trm{!a.(\x.N*)*M*}
 \end{array}
 \]
@@ -1711,7 +1713,7 @@ By induction on the rewrite step $\rwb_\perm$. The two interesting cases are:
 \]
 \end{proof}
 
-The way to join the critical pairs in the above diagrams shows that we cannot use the Hindley-Rosen Lemma \cite[Prop. 3.3.5]{Barendregt84} to prove confluence of $\rw_\beta \cup \rw_\perm$.
+How the critical pairs in the above diagrams are joined shows that we cannot use the Hindley-Rosen Lemma \cite[Prop. 3.3.5]{Barendregt84} to prove confluence of $\rw_\beta \cup \rw_\perm$.
 
 
 \begin{lem}
@@ -1741,7 +1743,7 @@ A \emph{complete} reduction step $N\rwp\trm{Nq}$ is a parallel $\beta$-step foll
 
 \begin{lem}[Complete reduction is diamond]
 \label{lem:complete diamond}
-	If $P\rwpleft N\rwp M$ then $P\rwp Q\rwpleft M$ for some $Q$.
+	If $P\rwpleft N\rwp M$ then for some $Q$, $P\rwp Q\rwpleft M$.
 \end{lem}
 
 \begin{proof}
@@ -1773,8 +1775,9 @@ By the following diagram, where $M=N_{\0\perm}$ and $P=N_{\1\perm}$, and $Q=N_{\
 \]
 \end{proof}
 
-\begin{lem}[Reduction maps to complete reduction on $\perm$-normal forms]
-\label{lem:p to complete reduction}
+\begin{lem}%[Reduction maps to complete reduction on $\perm$-normal forms]
+[$\perm$-Normalization maps reduction to complete reduction]%
+\label{lem:p to complete reduction}%
 If $N\rw M$ then $N_\perm\rwp M_\perm$.
 \end{lem}
 
@@ -1892,6 +1895,7 @@ For a $\beta$-step $N\rw_\beta M$ we label the reduced redex in $N$ to get $\trm
 \begin{figure}[!t]
   \fbox{
       \begin{minipage}{.97\textwidth}
+      \vspace{-4pt}
         \[
         \begin{array}{c@{\qquad}c@{\qquad}c@{\qquad}c}
           \vcenter{\hbox{\begin{tikzpicture}
@@ -1936,6 +1940,7 @@ For a $\beta$-step $N\rw_\beta M$ we label the reduced redex in $N$ to get $\trm
           & \text{\Cref{lem:exhaustive p - parallel beta}}
           & \text{\Cref{lem:complete diamond}}
           & \text{\Cref{lem:p to complete reduction}}
+          \\[4pt]
         \end{array}
         \]
     \end{minipage}}
@@ -1990,11 +1995,12 @@ This is in Figure~\ref{fig:order}.
 \begin{figure}[!t]
   \fbox{
     \begin{minipage}{.97\textwidth}
+    \vspace{4pt}
       \begin{tabular}{ll}
         \textsf{Label Sequences}: & $\theta\quad\coloneqq\quad \varepsilon ~\mid~ a\cdot\theta$\\[5pt]
         \textsf{Label Judgments}: & $\xi\quad\coloneqq\quad \labjudg{\theta}{M}$\\
         \begin{minipage}{.25\textwidth}\textsf{Label Rules}:\end{minipage} &
-        \begin{minipage}{.7\textwidth}
+        \begin{minipage}{.70\textwidth}
         \[
         \begin{array}{c}
         \infer{\labjudg{\theta}{x}}{}\qquad\quad
@@ -2008,8 +2014,8 @@ This is in Figure~\ref{fig:order}.
         \end{minipage}
         \\
       \end{tabular}
-    \end{minipage}
-  }
+      \vspace{4pt}
+    \end{minipage}}
   \caption{Labelling Terms}
     \label{fig:order}
 \end{figure}
@@ -2058,6 +2064,7 @@ to normal forms become themselves parametric:
   steps to normal form.
 \end{varitemize}
 
+\noindent
 We can now define types, environments, judgments, and typing rules in
 Figure~\ref{fig:typing}.
 \newcommand{\arrow}{\Rightarrow}
@@ -2065,14 +2072,16 @@ Figure~\ref{fig:typing}.
 \begin{figure}
   \fbox{
     \begin{minipage}{.97\textwidth}
-      \begin{tabular}{ll}
-        \textsf{Types}: & $\tau\quad\coloneqq\quad \alpha ~\mid~ \tau\arrow\rho$\\[5pt]
-        \textsf{Environments}: & $\Gamma\quad\coloneqq\quad x_1:\tau_1,\ldots,x_n:\tau_n$\\[5pt]
-        \textsf{Judgments}: & $\pi\quad\coloneqq\quad \judg{\Gamma}{M}{\tau}$\\
-        \begin{minipage}{.25\textwidth}\textsf{Typing Rules}:\end{minipage} &
-        \begin{minipage}{.7\textwidth}
+    \vspace{4pt}
+      \begin{tabular}{ll@{}l}
+        \textsf{Types}: & $\tau$ & $\quad\coloneqq\quad \alpha ~\mid~ \tau\arrow\rho$\\[5pt]
+        \textsf{Environments}: & $\Gamma$ & $\quad\coloneqq\quad x_1:\tau_1,\ldots,x_n:\tau_n$\\[5pt]
+        \textsf{Judgments}: & $\pi$ & $\quad\coloneqq\quad \judg{\Gamma}{M}{\tau}$\\
+        \begin{minipage}{.20\textwidth}\textsf{Typing Rules}:\end{minipage} &
+        \multicolumn{2}{@{}c@{}}{
+        \begin{minipage}{.75\textwidth}
         \[
-        \begin{array}{c}
+        \begin{array}{@{}c@{}}
         \infer{\judg{\Gamma,x:\tau}{x}{\tau}}{}\qquad\quad
         \infer{\judg{\Gamma}{\x.M}{\tau\arrow\rho}}{\judg{\Gamma,x:\tau}M\rho}\qquad\quad
         \infer{\judg{\Gamma}{\ttrm{!a.M}}{\tau}}{\judg{\Gamma}{M}{\tau}}
@@ -2081,10 +2090,11 @@ Figure~\ref{fig:typing}.
         \infer{\judg{\Gamma}{\ttrm{M +a N}}{\tau}}{\judg{\Gamma}{M}{\tau} & \judg{\Gamma}{N}{\tau}}
         \end{array}
         \]
-        \end{minipage}
+        \end{minipage}}
         \\
       \end{tabular}
-    \end{minipage}
+      \vspace{4pt}
+    \end{minipage}%
   }
   \caption{Types, Environments, Judgments, and Rules}
   \label{fig:typing}
@@ -2095,6 +2105,7 @@ course different), and we can thus reuse most of the usual proof of
 strong normalization, for example in the version given by Ralph
 Loader's notes~\cite{Loader98}, page 17.
 
+
 \SLV{
   \begin{lem}\label{lemma:closure}
     The closure rules in Figure~\ref{fig:rules} are all sound.
@@ -2102,18 +2113,20 @@ Loader's notes~\cite{Loader98}, page 17.
   \begin{figure}[!t]
     \fbox{
       \begin{minipage}{.97\textwidth}
-        $$
-        \infer{\trm{M +a N}L_1 \ldots L_m\in\mathit{SN}^\theta}{ML_1\ldots L_m\in\mathit{SN}^\theta & NL_1\ldots L_m\in\mathit{SN}^\theta & a\in\theta}
-        \quad
-        \infer{\trm{(!a.M)}L_1\ldots L_m\in\mathit{SN}^\theta}{\trm{M}L_1\ldots L_m\in\mathit{SN}^{a\cdot\theta} & \forall i.a\not\in L_i}
-        $$
-        $$
+      \vspace{10pt}
+        $\quad
         \infer{xL_1\ldots L_m\in\mathit{SN}^\theta}{L_1\in\mathit{SN}^\theta &\cdots & L_m\in\mathit{SN}^\theta}
-        \qquad\quad
-        \infer{\trm{(\x.M)}L_0\ldots L_m\in\mathit{SN}^\theta}{\trm{M[L_0/x]}L_1\ldots L_m\in\mathit{SN}^\theta & L_0\in\mathit{SN}^\theta}
-        $$
-        \vspace{-3pt}
-      \end{minipage}
+        \hfill
+        \infer{\trm{M +a N}L_1 \ldots L_m\in\mathit{SN}^\theta}{ML_1\ldots L_m\in\mathit{SN}^\theta & NL_1\ldots L_m\in\mathit{SN}^\theta & a\in\theta}
+        \quad$
+        \\[15pt]
+        ${}\quad
+    	\infer{\trm{(\x.M)}L_0\ldots L_m\in\mathit{SN}^\theta}{\trm{M[L_0/x]}L_1\ldots L_m\in\mathit{SN}^\theta & L_0\in\mathit{SN}^\theta}
+        \hfill
+        \infer{\trm{(!a.M)}L_1\ldots L_m\in\mathit{SN}^\theta}{\trm{M}L_1\ldots L_m\in\mathit{SN}^{a\cdot\theta} & \forall i.a\not\in L_i}    
+        \quad$
+      \vspace{10pt}
+      \end{minipage}%
     }
     \caption{Closure Rules for Sets $\mathit{SN}^\theta$}
     \label{fig:rules}
@@ -2224,12 +2237,13 @@ Loader's notes~\cite{Loader98}, page 17.
 
 \newcounter{lemma:cloredbeta}
 \addtocounter{lemma:cloredbeta}{\value{defn}}
-\begin{lem}\label{lemma:cloredbeta}
+\begin{lem}
+\label{lemma:cloredbeta}
   The following rule is sound
     \marginpar{\footnotesize Proof in the Appendix}
-  $$
+  \[
   \infer{\trm{(\x.M)}L_0\ldots L_m\in\mathit{SN}^\theta}{\trm{M[L_0/x]}L_1\ldots L_m\in\mathit{SN}^\theta & L_0\in\mathit{SN}^\theta}
-  $$
+  \]
 \end{lem}}
 %\begin{proof}
 %  Again, the proof is structurally very similar to the one
@@ -2297,18 +2311,18 @@ Loader's notes~\cite{Loader98}, page 17.
 
 \newcommand{\RedSet}[1]{\mathit{Red}_{#1}}
 Since the structure of the type system is the one of plain, simple
-types, the definition of a reducibility sets is the classic one:
+types, the definition of reducibility sets is the classic one:
 \begin{align*}
   \RedSet{\alpha}&=\{(\Gamma,\theta,M)\mid M\in\mathit{SN}^\theta\wedge\judg{\Gamma}{M}{\alpha}\};\\
   \RedSet{\tau\arrow\rho}&=\{(\Gamma,\theta,M)\mid(\judg{\Gamma}{M}{\tau\arrow\rho})\wedge(\labjudg{\theta}{M}) \ \wedge\\
     &\qquad\forall(\Gamma\Delta,\theta,N)\in\RedSet{\tau}.(\Gamma\Delta,\theta,MN)\in\RedSet{\rho}\}.
 \end{align*}
 Before proving that all terms are reducible, we need some
-auxiliary results
+auxiliary results.
 \begin{lem}\label{lemma:redprop}
   \begin{enumerate}
   \item\label{point:impl}
-    If $(\Gamma,\theta,M)\in\RedSet{\tau}$, then $M\in\mathit{SN}^\theta$;
+    If $(\Gamma,\theta,M)\in\RedSet{\tau}$, then $M\in\mathit{SN}^\theta$.
   \item\label{point:headvar}
     If $\judg{\Gamma}{x L_1\ldots L_m}{\tau}$ and $L_1,\ldots,L_m\in\mathit{SN}^\theta$,
     then $(\Gamma,\theta,x L_1\ldots L_m)\in\RedSet{\tau}$.
@@ -2323,7 +2337,7 @@ auxiliary results
   \item\label{point:box}
     \begin{sloppypar}
     If $(\Gamma,a\cdot\theta,ML_1\ldots L_m)\in\RedSet{\tau}$
-    and $a\not\in L_i$ for all $i$,
+    and $a\not\in L_i$ for all $i$,\\
     then $(\Gamma,\theta,\trm{(!a.M)}L_1\ldots L_m)\in\RedSet{\tau}$.
     \end{sloppypar}
   \end{enumerate}
@@ -2368,11 +2382,11 @@ The following is the so-called Main Lemma:
     $$
     (\Gamma,\theta,L[\overline{N}/\overline{y}])\in\RedSet{\xi\arrow\rho}
     \qquad
-    (\Gamma,\theta,P[\overline{N}/\overline{y}])\in\RedSet{\xi}
+    (\Gamma,\theta,P[\overline{N}/\overline{y}])\in\RedSet{\xi}~.
     $$
     By definition, we get
     $$
-    (\Gamma,\theta,(LP)[\overline{N}/\overline{y}])\in\RedSet{\rho}
+    (\Gamma,\theta,(LP)[\overline{N}/\overline{y}])\in\RedSet{\rho}~.
     $$
   \item
     \begin{sloppypar}
@@ -2417,7 +2431,7 @@ ingredients for our proof of strong normalization:
 \section{Projective Reduction}
 \label{sec:projective-reduction}
 
-Permutative reduction $\rw_\perm$ evaluates probabilistic sums purely by rewriting. Here we look at a more standard \emph{projective} notion of reduction, which conforms more closely to the intuition that $\ttrm{!a}$ generates a probabilistic event to determine the choice $\ttrm{+a}$. Using $+$ for an external probablistic sum, we expect to reduce $\ttrm{!a.N}$ to $N_0+N_1$, where $N_i$ is obtained from $N$ by projecting every subformula $\ttrm{M_0+aM_1}$ to $M_i$. The question is, in what context should we admit this reduction? We first limit ourselves to reducing in \emph{head} position.
+Permutative reduction $\rw_\perm$ evaluates probabilistic sums purely by rewriting. Here we look at a more standard \emph{projective} notion of reduction, which conforms more closely to the intuition that $\ttrm{!a}$ generates a probabilistic event to determine the choice $\ttrm{+a}$. Using $+$ for an external probabilistic sum, we expect to reduce $\ttrm{!a.N}$ to $N_0+N_1$ where each $N_i$ is obtained from $N$ by projecting every subformula $\ttrm{M_0+aM_1}$ to $M_i$. The question is, in what context should we admit this reduction? We first limit ourselves to reducing in \emph{head} position.
 
 \begin{defn}
 The \emph{$a$-projections} $\proj a0N$ and $\proj a1N$ are defined as follows: %, where $a\neq b$.
@@ -2472,14 +2486,14 @@ The case $a\notin\fl N$ is immediate by a $\boxVoid$ step. For the other case, o
 %Given that $a$ is the smallest label in $N$, \ie\ $a<b$ for any other label $b$ in $N$, a straightforward induction on $N$ gives $N\rws_\perm\proj a0N~\ttrm{+a}~\proj a1N$, with as special base case $N\rws_\perm N$ for $a\notin\fl N$.
 \end{proof}
 
-A gap remains between which generators will not be duplicated, which we \emph{should} be able to reduce, and which generators projective head reduction \emph{can} reduce. In particular, to interpret call-by-value probabilistic reduction in Section~\ref{sec:cbv}, we would like to reduce under other generators. However, permutative reduction does not permit exchanging generators, and so only simulates reducing in head position. While (independent) probabilistic events are generally considered interchangeable, it is a question whether the below equivalence is desirable.
+A gap remains between which generators will not be duplicated, which we \emph{should} be able to reduce, and which generators projective head reduction \emph{does} reduce. In particular, to interpret call-by-value probabilistic reduction in Section~\ref{sec:cbv}, we would like to reduce under other generators. However, permutative reduction does not permit exchanging generators, and so only simulates reducing in head position. While (independent) probabilistic events are generally considered interchangeable, it is a question whether the below equivalence is desirable.
 %
 \begin{align}
 \label{eqn:permute-generators}
 	\trm{!a.!b.N} \quad\smash{\stackrel?\sim}\quad \trm{!b.!a.N}
 \end{align}
 %
-We elide the issue by externalizing probabilistic events, and reducing with reference to a predetermined binary stream $s\in\{0,1\}^{\mathbb N}$. In this way, we will preserve the intuitions of both permutative and projective reduction: we obtain a qualified version of the equivalence~\eqref{eqn:permute-generators} (see \eqref{eqn:permute-generators-streams} below), and will be able to reduce any generator on the \emph{spine} of a term: under (other) generators and choices as well as under abstractions and in function position.
+We elide the issue by externalizing probabilistic events, and reducing with reference to a predetermined binary stream $s\in\{0,1\}^{\mathbb N}$ representing their outcomes. In this way, we will preserve the intuitions of both permutative and projective reduction: we obtain a qualified version of the equivalence~\eqref{eqn:permute-generators} (see \eqref{eqn:permute-generators-streams} below), and will be able to reduce any generator on the \emph{spine} of a term: under (other) generators and choices as well as under abstractions and in function position.
 
 \begin{defn}
 The set of \emph{streams} is $\Streams=\{0,1\}^\mathbb{N}$, ranged over by $r,s,t$, and $i\cdot s$ denotes a stream with $i\in\{0,1\}$ as first element and $s$ as the remainder.
@@ -2502,7 +2516,7 @@ The \emph{stream labelling} $N^s$ of a term $N$ with a stream $s\in\Streams$, wh
 \]
 \end{defn}
 
-Observe that in $N^s$ a generator that occurs under $n$ other generators on the spine of $N$, is labeled with the element of $s$ at position $n+1$. Generators in argument position remain unlabeled, until a $\beta$-step places them on the spine, in which case they become labeled by the new substitution case. We allow to annotate a term with a finite prefix of a stream, e.g.\ $N^i$ with a singleton $i$, so that only part of the spine is labeled. Subsequent labelling of a partly labeled term is then by $(N^r)^s=N^{r\cdot s}$ (abusing notation). To introduce streams via the external probabilistic sum, and to ignore an unused remaining stream after completing a probabilistic computation, we adopt the following equation.
+Observe that in $N^s$ a generator that occurs under $n$ other generators on the spine of $N$, is labeled with the element of $s$ at position $n+1$. Generators in argument position remain unlabeled, until a $\beta$-step places them on the spine, in which case they become labeled by the new substitution case. We allow to annotate a term with a finite prefix of a stream, \eg\ $N^i$ with a singleton $i$, so that only part of the spine is labeled. Subsequent labelling of a partly labeled term is then by $(N^r)^s=N^{r\cdot s}$ (abusing notation). To introduce streams via the external probabilistic sum, and to ignore an unused remaining stream after completing a probabilistic computation, we adopt the following equation.
 \[
  	N = N^0 + N^1
 \]
@@ -2518,7 +2532,7 @@ Returning to the interchangeability of probabilistic events, we refine~\eqref{eq
 \begin{align}
 \label{eqn:permute-generators-streams}
 \vcenter{\hbox{
-\begin{tikzpicture}[x=80pt,y=15pt]
+\begin{tikzpicture}[x=80pt,y=-15pt]
 	\node     at (0,0) {$\trm{(!a.!b.N)}^{i\cdot j\cdot s}$};
 	\node     at (0,2) {$\trm{(!b.!a.N)}^{j\cdot i\cdot s}$};
 	\node (A) at (1,0) {$\trm{!ai.!b{}^j.N^s}$};
@@ -2549,10 +2563,10 @@ The statement is false for the $\boxVoid$ rule $\trm{!a.N}\rw_\perm N~(a\notin\f
 \]
 \end{rmrk}
 
-The below proposition then expresses that projective reduction is an \emph{invariant} for permutative reduction. If $N\rw M$ by a step (that is not $\boxVoid$) on a labelled generator $\ttrm{!ai}$ or a corresponding choice $\ttrm{+a}$, then $N$ and $M$ reduce to a common term, $N\rw_\pi P\,{}_\pi\lw\,M$, by the projective steps evaluating $\ttrm{!ai}$.
+The below proposition then expresses that projective reduction is an \emph{invariant} for permutative reduction. If $N\rw_\perm M$ by a step (that is not $\boxVoid$) on a labelled generator $\ttrm{!ai}$ or a corresponding choice $\ttrm{+a}$, then $N$ and $M$ reduce to a common term, $N\rw_\pi P\,{}_\pi\lw\,M$, by the projective steps evaluating $\ttrm{!ai}$.
 
 \begin{prop}
-Projective reduction is an invariant for permutative reduction as follows (with a case for $\cancelR$ symmetric to $\cancelL$, and where $D[\,]$ is a context).
+Projective reduction is an invariant for permutative reduction, as follows (with a case for $\cancelR$ symmetric to $\cancelL$, and where $D[\,]$ is a context).
 \[
 \begin{tikzpicture}[x=40pt,y=30pt]
 	\node (A) at (0,1) {$\trm{!ai.C[N+aN]}$};
@@ -2628,7 +2642,7 @@ Projective reduction is an invariant for permutative reduction as follows (with 
 %We lift $\beta$-reduction to stream-labeled terms by introducing a substitution case for stream-labelled variables: $x^s[M/x] = M^s$.
 %\end{defn}
 %
-%Observe that in $N^s$ a generator that occurs under $n$ other generators on the spine of $N$, is labeled with the element of $s$ at position $n+1$. Generators in argument position remain unlabeled, until a $\beta$-step places them on the spine, in which case they become labeled by the new substitution case. We allow to annotate a term with a finite prefix of a stream, e.g.\ $N^i$ with a singleton $i$, so that only part of the spine is labeled. Subsequent labelling of an already labeled term is then by $(N^r)^s=N^{r\cdot s}$.
+%Observe that in $N^s$ a generator that occurs under $n$ other generators on the spine of $N$, is labeled with the element of $s$ at position $n+1$. Generators in argument position remain unlabeled, until a $\beta$-step places them on the spine, in which case they become labeled by the new substitution case. We allow to annotate a term with a finite prefix of a stream, \eg\ $N^i$ with a singleton $i$, so that only part of the spine is labeled. Subsequent labelling of an already labeled term is then by $(N^r)^s=N^{r\cdot s}$.
 %
 %\begin{defn}
 %\emph{Projective} reduction $\rw_\pi$ is the following reduction step on stream-labeled terms.
@@ -2760,7 +2774,11 @@ Projective reduction is an invariant for permutative reduction as follows (with 
 \section{Call-by-value Interpretation}
 \label{sec:cbv}
 
-We consider the interpretation of a call-by-value probabilistic lambda-calculus. For simplicity we will only restrict probabilistic reduction to a call-by-value regime, and not $\beta$-reduction; our values $V$ are then just deterministic (the idea is that probabilistic sums cannot be duplicated or erased). We evaluate the internal probabilistic choice $\ttrm{v{}}$ to an external probabilistic choice $+$.
+We consider the interpretation of a call-by-value probabilistic lambda-calculus. 
+%For simplicity we will only restrict probabilistic reduction to a call-by-value regime, and not $\beta$-reduction; our values $V$ are then just deterministic (the idea is that probabilistic sums cannot be duplicated or erased). 
+For simplicity we will allow duplicating (or deleting) beta-redexes, and only restrict duplicating probabilities; our values $V$ are then just deterministic, and not necessarily beta-normal. 
+%
+We evaluate the internal probabilistic choice $\ttrm{v{}}$ to an external probabilistic choice $+$.
 \[
 \begin{array}{l@{\qquad}rcl}
 	N \coloneqq x \mid \x.N \mid MN \mid \trm{M v N}  & (\x.N)V 		&\rw_{\beta\val} & N[V/x]
@@ -2799,7 +2817,7 @@ Our call-by-value reduction may choose an arbitrary order in which to evaluate t
 %	\draw[rw] (A) --node[above]{$\scriptstyle\val$} (B);
 %	\draw[rw] (C) --node[above]{$\scriptstyle\pi$}   (D);
 %\end{tikzpicture}
-Here, $\unopen{\trm{C[N_0vN_1]}}=\labjudg{\theta}{\trm{D[P_0+bP_1]}}$ with $D[\,]$ a $\PEL$-context, and $\theta$ giving rise to the sequence of generators $\ttrm{\dots!a.!b.!c\dots}$ in the call-by-value translation. To simulate the reduction step, if $b$ occupies the $n$-th position in $\theta$, then the $n$-th position in the context stream $s$ must be the element $j$. Since $\beta$-reduction survives the translation and labelling process intact, we may simulate the call-by-value by projective and $\beta$-reduction.
+Here, $\unopen{\trm{C[N_0vN_1]}}=\labjudg{\theta}{\trm{D[P_0+bP_1]}}$ with $D[\,]$ a $\PEL$-context, and $\theta$ giving rise to the sequence of generators $\ttrm{\dots!a.!b.!c\dots}$ in the call-by-value translation. To simulate the reduction step, if $b$ occupies the $n$-th position in $\theta$, then the $n$-th position in the context stream $s$ must be the element $j$. Since $\beta$-reduction survives the translation and labelling process intact, we may simulate call-by-value probabilistic reduction by projective and $\beta$-reduction.
 
 \begin{thm}
 If $N\rws_{\val,\beta\val}V$ then $\uncbv N^s\rws_{\pi,\beta}\uncbv V$ for some stream $s\in\Streams$.
@@ -3309,14 +3327,16 @@ If $N\rws_{\val,\beta\val}V$ then $\uncbv N^s\rws_{\pi,\beta}\uncbv V$ for some 
 
 \section{Conclusions and Future Work}
 
+We believe our decomposition of probabilistic choice in $\lambda$-calculus to be an elegant and compelling way of restoring confluence, one of the core properties of the $\lambda$-calculus. Our probabilistic event $\lambda$-calculus captures traditional call-by-name and call-by-value probabilistic reduction, and offers finer control beyond those strategies. Permutative reduction implements a natural and fine-grained equivalence on probabilistic terms as internal rewriting, while projective reduction provides a complementary and more traditional external perspective.
 
+There are a few immediate areas for future work. Firstly, within probabilistic $\lambda$-calculus, it is worth exploring if our decomposition opens up new avenues in semantics. Secondly, our approach might apply to probabilistic reasoning more widely, outside the lambda-calculus. Most importantly, we will explore if our approach can be extended to other computational effects. Our use of streams interprets probabilistic choice as a \emph{read} operation from an external source, which means other read operations can be treated similarly. A complementary treatment of \emph{write} operations would allow us to express a considerable range of effects, including input/output and state.
 
 \subsection*{Acknowledgements}
 
 This work was supported by EPSRC Project EP/R029121/1 \emph{Typed Lambda-Calculi with Sharing and Unsharing}.
-The first author is partially by the ANR project 19CE480014 PPS, the ERC Consolidator Grant 
+The first author is partially supported by the ANR project 19CE480014 PPS, the ERC Consolidator Grant 
 818616 DIAPASoN, and the MIUR PRIN 201784YSZ5 ASPRA.
-We thank the referees for their diligence.
+We thank the referees for their diligence and their helpful comments.
 
 
 \bibliographystyle{splncs04}
