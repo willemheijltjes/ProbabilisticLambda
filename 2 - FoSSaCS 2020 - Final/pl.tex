@@ -2781,7 +2781,7 @@ Projective reduction is an invariant for permutative reduction, as follows (with
 We consider the interpretation of a call-by-value probabilistic $\lambda$-calculus. 
 %For simplicity we will only restrict probabilistic reduction to a call-by-value regime, and not $\beta$-reduction; our values $V$ are then just deterministic (the idea is that probabilistic sums cannot be duplicated or erased). 
 For simplicity we will allow duplicating (or deleting) $\beta$-redexes, and only restrict duplicating probabilities; our \emph{values} $V$ are then just deterministic---\ie~without choices---terms, %and not necessarily $\beta$-normal
-possibly applications and not necessarily $\beta$-normal (unlike \cite{DalLagoZorzi12}, so that our $\rw_{\beta\val}$ is actually $\beta$-reduction on deterministic terms). 
+possibly applications and not necessarily $\beta$-normal (so that our $\rw_{\beta\val}$ is actually $\beta$-reduction on deterministic terms, unlike \cite{DalLagoZorzi12}). 
 %
 We evaluate the internal probabilistic choice $\ttrm{v{}}$ to an external probabilistic choice $+$.
 %\[
@@ -3342,7 +3342,7 @@ We believe our decomposition of probabilistic choice in $\lambda$-calculus to be
 
 There are a few immediate areas for future work. Firstly, within probabilistic $\lambda$-calculus, it is worth exploring if our decomposition opens up new avenues in semantics. Secondly, our approach might apply to probabilistic reasoning more widely, outside the $\lambda$-calculus. Most importantly, we will explore if our approach can be extended to other computational effects. Our use of streams interprets probabilistic choice as a \emph{read} operation from an external source, which means other read operations can be treated similarly. A complementary treatment of \emph{write} operations would allow us to express a considerable range of effects, including input/output and state.
 
-\subsection*{Acknowledgements}
+\subsubsection*{Acknowledgements.}
 
 This work was supported by EPSRC Project EP/R029121/1 \emph{Typed Lambda-Calculi with Sharing and Unsharing}.
 The first author is partially supported by the ANR project 19CE480014 PPS, the ERC Consolidator Grant 
@@ -3641,7 +3641,7 @@ We are grateful to Chris Barrett and---indirectly---Anupam Das for pointing us t
 %	\trm{!b.(P +a Q)}\rw_\perm\trm{(!b.P) +a (!b.Q)}.
 %	$$
 %	Since $M=\trm{P +a Q}$ and $ML_1\ldots L_m$ by hypothesis,
-%	we conclusde that $PL_1\ldots L_m$ and $QL_1\ldots L_m$
+%	we conclude that $PL_1\ldots L_m$ and $QL_1\ldots L_m$
 %	are both strongly normalizing. By induction hypothesis,
 %	since $\mathit{sn}^{a\cdot\theta}(P),\mathit{sn}^{a\cdot\theta}(Q)\leq\mathit{sn}^{a\cdot\theta}(M)$,
 %	it holds that $\trm{(!b.P)}L_1\ldots L_m$ and $\trm{(!b.Q)}L_1\ldots L_m$
@@ -3679,14 +3679,14 @@ We are grateful to Chris Barrett and---indirectly---Anupam Das for pointing us t
 %	$\trm{(\x.M)}L_0\ldots L_m$ reduces are strongly normalizing:
 %	\begin{itemize}
 %		\item
-%		If reduction happens in $L_0$, then we can mimick
+%		If reduction happens in $L_0$, then we can mimic
 %		the same reduction in by zero or more reduction
 %		steps in $\trm{M[L_0/x]}L_1\ldots L_m$, and conclude
 %		by induction hypothesis, because the first component
 %		of (\ref{equ:redordbet}) strictly decreases.
 %		\item
 %		If reduction happens in $M$ or in $L_1,\ldots,L_m$,
-%		then we can mimick the same reduction in one or more
+%		then we can mimic the same reduction in one or more
 %		reduction in $\trm{M[L_0/x]}L_1\ldots L_m$, and conclude
 %		by induction hypothesis since, again, the first component
 %		of (\ref{equ:redordbet}) strictly decreases.
