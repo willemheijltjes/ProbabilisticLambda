@@ -46,14 +46,6 @@
 \newtheorem{lemmaAppendix}{Lemma}
 %%
 
-% 0 = SHORT VERSION     %
-% 1 = LONG VERSION      %
-\newcommand{\version}{0}%%Text to appear only in the short/long version
-%Text to appear only in the short/long version
-\newcommand{\SLV}[2]{\ifthenelse{\equal{\version}{0}}{#1}{#2}}
-
-
-
 
 %text
 \newcommand{\eg}{\textit{e.g.}}
@@ -289,7 +281,7 @@
 
 \newenvironment{varitemize}
 {
-\begin{list}{\SLV{\labelitemii}{\labelitemi}}
+\begin{list}{\labelitemi}
 {\setlength{\itemsep}{0pt}
  \setlength{\topsep}{0pt}
  \setlength{\parsep}{0pt}
@@ -382,8 +374,6 @@ We present two reduction relations for our probabilistic constructs, both indepe
 
 %In this paper, we introduce $\PEL$ (Section~\ref{sec:PEL}),   and \emph{projective} reduction (Section~\ref{sec:projective-reduction}); 
 We further prove confluence (Section~\ref{sec:confluence}), and we give a system of simple types and prove strong normalization for typed terms by reducibility (Section~\ref{sec:SN}).
-
-\SLV{Omitted proofs can be found in \cite{arXiv}, the long version of this paper.}{}
 
 \subsection{Related Work}
 
@@ -965,7 +955,7 @@ Reduction $\rw_\perm$ is confluent.
 %	\draw[rws,implied] (c) --node[below]{$\cancelL,\cancelR$} (f);
 %\end{tikzpicture}}}
 %
-By Newman's lemma and strong normalization of $\rw_\perm$ (\Cref{lemma:strong-normalization}), confluence follows from local confluence. The proof of local confluence consists of joining all critical pairs given by $\rw_\perm$. \SLV{Details are in the Appendix of \cite{arXiv}.}{Details are in the Appendix (p.~\pageref{lemmaAppendix:confluence-perm}).}
+By Newman's lemma and strong normalization of $\rw_\perm$ (\Cref{lemma:strong-normalization}), confluence follows from local confluence. The proof of local confluence consists of joining all critical pairs given by $\rw_\perm$.
 \end{proof}
 % Add reference \cite{Zantema-Pol-2001} again ?
 
@@ -2107,33 +2097,6 @@ course different), and we can thus reuse most of the usual proof of
 strong normalization, for example in the version given by Ralph
 Loader's notes~\cite{Loader98}, page 17.
 
-
-\SLV{
-  \begin{lem}\label{lemma:closure}
-    The closure rules in Figure~\ref{fig:rules} are all sound.
-  \end{lem}
-  \begin{figure}[!t]
-    \fbox{
-      \begin{minipage}{.97\textwidth}
-      \vspace{10pt}
-        $\quad
-        \infer{xL_1\ldots L_m\in\mathit{SN}^\theta}{L_1\in\mathit{SN}^\theta &\cdots & L_m\in\mathit{SN}^\theta}
-        \hfill
-        \infer{\trm{M +a N}L_1 \ldots L_m\in\mathit{SN}^\theta}{ML_1\ldots L_m\in\mathit{SN}^\theta & NL_1\ldots L_m\in\mathit{SN}^\theta & a\in\theta}
-        \quad$
-        \\[15pt]
-        ${}\quad
-    	\infer{\trm{(\x.M)}L_0\ldots L_m\in\mathit{SN}^\theta}{\trm{M[L_0/x]}L_1\ldots L_m\in\mathit{SN}^\theta & L_0\in\mathit{SN}^\theta}
-        \hfill
-        \infer{\trm{(!a.M)}L_1\ldots L_m\in\mathit{SN}^\theta}{\trm{M}L_1\ldots L_m\in\mathit{SN}^{a\cdot\theta} & \forall i.a\not\in L_i}    
-        \quad$
-      \vspace{10pt}
-      \end{minipage}%
-    }
-    \caption{Closure Rules for Sets $\mathit{SN}^\theta$}
-    \label{fig:rules}
-  \end{figure}
-}{
 \begin{lem}
 \label{lemma:cloredsum}
   The following rule is sound:
@@ -2246,7 +2209,7 @@ Loader's notes~\cite{Loader98}, page 17.
   \[
   \infer{\trm{(\x.M)}L_0\ldots L_m\in\mathit{SN}^\theta}{\trm{M[L_0/x]}L_1\ldots L_m\in\mathit{SN}^\theta & L_0\in\mathit{SN}^\theta}
   \]
-\end{lem}}
+\end{lem}
 %\begin{proof}
 %  Again, the proof is structurally very similar to the one
 %  of Lemma~\ref{lemma:cloredsum}. The underlying order,
@@ -2312,6 +2275,7 @@ Loader's notes~\cite{Loader98}, page 17.
 %\end{proof}
 
 \newcommand{\RedSet}[1]{\mathit{Red}_{#1}}
+
 Since the structure of the type system is the one of plain, simple
 types, the definition of reducibility sets is the classic one:
 \begin{align*}
@@ -2348,8 +2312,8 @@ auxiliary results.
   The proof is an induction on $\tau$:
   If $\tau$ is an atom $\alpha$, then Point \ref{point:impl} follows
   by definition, while points \ref{point:headvar} to \ref{point:box}
-  come from \SLV{Lemma~\ref{lemma:closure}}{Lemma~\ref{lemma:cloredsum}, Lemma~\ref{lemma:cloredbox},
-  Lemma~\ref{lemma:cloredheadvar}, and Lemma~\ref{lemma:cloredbeta}}.
+  come from Lemma~\ref{lemma:cloredsum}, Lemma~\ref{lemma:cloredbox},
+  Lemma~\ref{lemma:cloredheadvar}, and Lemma~\ref{lemma:cloredbeta}.
   If $\tau$ is $\rho\arrow\mu$, Points \ref{point:headvar} to \ref{point:box}
   come directly from the induction hypothesis, while Point \ref{point:impl}
   can be proved by observing that $M$ is in $\mathit{SN}^\theta$
@@ -3365,14 +3329,6 @@ We are grateful to Chris Barrett and---indirectly---Anupam Das for pointing us t
 
 \medskip\noindent\includegraphics{cc_by_4-0.eps}
 
-\SLV{
-\end{document}
-}
-
-{
-\newpage
-\appendix
-\input{appendix}
 
 %
 %\section{Technical appendix: omitted proofs}
