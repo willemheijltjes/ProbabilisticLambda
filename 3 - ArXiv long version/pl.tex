@@ -311,6 +311,7 @@
 %============================================================ FRONTMATTER
 
 \title{Decomposing Probabilistic Lambda-Calculi}
+\subtitle{(Long version)}
 
 
 \author{
@@ -320,6 +321,7 @@
 }
 
 \authorrunning{U.\ Dal Lago, G.\ Guerrieri, and W.\ Heijltjes}
+%\titlerunning{
 
 \institute{%
 	Dipartimento di Informatica - Scienza e Ingegneria
@@ -372,6 +374,8 @@ The resulting \emph{probabilistic event lambda-calculus} $\PEL$, which we presen
 We present two reduction relations for our probabilistic constructs, both independent of beta-reduction. Our main focus will be on \emph{permutative} reduction (Sections~\ref{sec:PEL},~\ref{sec:p-reduction}), a small-step local rewrite relation which is computationally inefficient but gives a natural and very fine-grained operational semantics. \emph{Projective} reduction (Section~\ref{sec:projective-reduction}) is a more standard reduction, following the intuition that $\ttrm{!a}$ generates a coin flip to evaluate $\ttrm{+a}$, and is courser but more efficient.
 
 We further prove confluence (Section~\ref{sec:confluence}), and we give a system of simple types and prove strong normalization for typed terms by reducibility (Section~\ref{sec:SN}).
+
+This is the longer version of~\cite{fossacs} that includes all proofs.
 
 \subsection{Related Work}
 
