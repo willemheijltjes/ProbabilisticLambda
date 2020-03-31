@@ -329,14 +329,14 @@
 \maketitle
 
 \begin{abstract}
-A notion of probabilistic lambda-calculus usually comes with a prescribed reduction strategy, typically call-by-name or call-by-value, as the calculus is non-confluent and these strategies yield different results. This is a break with one of the main advantages of lambda-calculus: confluence, which means results are independent from the choice of strategy.
+A notion of probabilistic lambda-calculus usually comes with a prescribed reduction strategy, typically call-by-name or call-by-value, as the calculus is non-confluent and these strategies yield different results. This is a break with one of the main advantages of lambda-calculus: confluence, which means results that are independent from the choice of strategy.
 We present a probabilistic lambda-calculus where the probabilistic operator is decomposed into two syntactic constructs: a generator, which represents a probabilistic event; and a consumer, which acts on the term depending on a given event. The resulting calculus, the Probabilistic Event Lambda-Calculus, is confluent, and interprets the call-by-name and call-by-value strategies through different interpretations of the probabilistic operator into our generator and consumer constructs.
 We present two notions of reduction, one via fine-grained local rewrite steps, and one by generation and consumption of probabilistic events. Simple types for the calculus are essentially standard, and they convey strong normalization. We demonstrate how we can encode call-by-name and call-by-value probabilistic evaluation.
 \end{abstract}
 
 \section{Introduction}
 
-Probabilistic lambda-calculi \cite{SahebDjahromi78,Manber-Tompa-1982,JonesPlotkin89,deLiguoroPiperno95,JungTix98,DalLagoZorzi12,FaggianRonchi19} extend the standard lambda-calculus with a probabilistic choice operator $N\+[p]M$, which chooses $N$ with probability $p$ and $M$ with probability $1-p$ (throughout this paper, we let $p$ be $\nicefrac12$ and will omit it). Duplication of $N\+M$, as is wont to happen in lambda-calculus, raises a fundamental question about its semantics: do the duplicate occurrences represent \emph{the same} probabilistic event, or \emph{different} ones with the same probability? For example, take the formula $\top\+\bot$ that represents a coin flip between boolean values \emph{true} $\top$ and \emph{false} $\bot$. If we duplicate this formula, do the copies represent two distinct coin flips with possibly distinct outcomes, or do these represent a single coin flip that determines the outcome for both copies? Put differently again, when we duplicate $\top\+\bot$, do we duplicate the \emph{event}, or only its \emph{outcome}?
+Probabilistic lambda-calculi \cite{SahebDjahromi78,Manber-Tompa-1982,JonesPlotkin89,deLiguoroPiperno95,JungTix98,DalLagoZorzi12,FaggianRonchi19} extend the standard lambda-calculus with a probabilistic choice operator $N\+[p]M$, which chooses $N$ with probability $p$ and $M$ with probability $1-p$ (throughout this paper, we let $p$ be $\nicefrac12$ and will omit it). Duplication of $N\+M$, as is wont to happen in lambda-calculus, raises a fundamental question about its semantics: do the duplicate occurrences represent \emph{the same} probabilistic event, or \emph{different} ones with the same probability? For example, take the term $\top\+\bot$ that represents a coin flip between boolean values \emph{true} $\top$ and \emph{false} $\bot$. If we duplicate this term, do the copies represent two distinct coin flips with possibly distinct outcomes, or do these represent a single coin flip that determines the outcome for both copies? Put differently again, when we duplicate $\top\+\bot$, do we duplicate the \emph{event}, or only its \emph{outcome}?
 
 In probabilistic lambda-calculus, these two interpretations are captured by the evaluation strategies of call-by-name ($\rw_\cbn$), which duplicates events, and call-by-value ($\rw_\cbv$), which evaluates any probabilistic choice before it is duplicated, and thus only duplicates outcomes. Consider the following example, where $=$ tests equality of boolean values.
 \[
@@ -358,7 +358,7 @@ The resulting \emph{probabilistic event lambda-calculus} $\PEL$, which we presen
 \cbv: \quad & \trm{!a.(\x.x = x)(\top+a\bot)} & \quad \rw_\beta \quad & \trm{!a.(\top+a\bot)=(\top+a\bot)}    & \quad \rws \quad & \top \label{eq:cbv}
 \end{alignat}
 
-We present two reduction relations for our probabilistic constructs, both independent of beta-reduction. Our main focus will be on \emph{permutative} reduction (Sections~\ref{sec:PEL},~\ref{sec:p-reduction}), a small-step local rewrite relation which is computationally inefficient but gives a natural and very fine-grained operational semantics. \emph{Projective} reduction (Section~\ref{sec:projective-reduction}) is a more standard reduction, following the intuition that $\ttrm{!a}$ generates a coin flip to evaluate $\ttrm{+a}$, and is courser but more efficient.
+We present two reduction relations for our probabilistic constructs, both independent of beta-reduction. Our main focus will be on \emph{permutative} reduction (Sections~\ref{sec:PEL},~\ref{sec:p-reduction}), a small-step local rewrite relation which is computationally inefficient but gives a natural and very fine-grained operational semantics. \emph{Projective} reduction (Section~\ref{sec:projective-reduction}) is a more standard reduction, following the intuition that $\ttrm{!a}$ generates a coin flip to evaluate $\ttrm{+a}$, and is coarser but more efficient.
 
 We further prove confluence (Section~\ref{sec:confluence}), and we give a system of simple types and prove strong normalization for typed terms by reducibility (Section~\ref{sec:SN}). Omitted proofs can be found in \cite{arXiv}, the long version of this paper.
 
@@ -368,13 +368,13 @@ Probabilistic $\lambda$-calculi are a topic of study since the pioneering work b
 
 On the operational side, one could mention a study about the various ways the operational semantics of a calculus with binary probabilistic choice can be specified, namely by small-step or big-step semantics, or by inductively or coinductively defined sets of rules~\cite{DalLagoZorzi12}. Termination and complexity analysis of higher-order probabilistic programs seen as $\lambda$-terms have been studied by way of type systems in a series of recent results about size~\cite{DalLagoGrellois19}, intersection~\cite{BreuvartDalLago18}, and refinement type disciplines \cite{AvanziniDalLagoGhyselen19}. Contextual equivalence on probabilistic $\lambda$-calculi has been studied, and compared with equational theories induced by B\"ohm Trees~\cite{Leventis18}, applicative bisimilarity~\cite{DalLagoSangiorgiAlberti14}, or environmental bisimilarity~\cite{SangiorgiVignudelli16}.
 
-In all the aforementioned works, probabilistic $\lambda$-calculi have been taken as implicitly endowed with either call-by-name or call-by-value strategies, for the reasons outlined above. There are only a few exceptions, namely some works on Geometry of Interaction~\cite{DLFVY17}, Probabilistic Coherent Spaces~\cite{EhrhardTasson19}, and Standardization~\cite{FaggianRonchi19}, which achieve, in different contexts, a certain degree of independence from the underlying strategy, thus accomodating both call-by-name and call-by-value evaluation. The way this is achieved, however, invariably relies on Linear Logic or related concepts. This is deeply different from what we do here.
+In all the aforementioned works, probabilistic $\lambda$-calculi have been taken as implicitly endowed with either call-by-name or call-by-value strategies, for the reasons outlined above. There are only a few exceptions, namely some works on Geometry of Interaction~\cite{DLFVY17}, Probabilistic Coherent Spaces~\cite{EhrhardTasson19}, and Standardization~\cite{FaggianRonchi19}, which achieve, in different contexts, a certain degree of independence from the underlying strategy, thus accommodating both call-by-name and call-by-value evaluation. The way this is achieved, however, invariably relies on Linear Logic or related concepts. This is deeply different from what we do here.
 
-Some words of comparison with Faggian and Ronchi's work on confluence and standardization~\cite{FaggianRonchi19} are also in order. The main difference between their approach and the one we pursue here is that the operator $!$ in their calculus $\Lambda_\oplus^!$ plays \emph{both} the roles of a marker for duplicability and of a checkpoint for any probabilistic choice "flowing out" of the term (\ie\ being fired). In our calculus, we do not control duplication, but we definitely make use of checkpoints. Saying it another way, Faggian and Ronchi's work is inspired by linear logic, while our approach is inspired by deep inference, even though this is, on purpose, not evident in the design of our calculus. 
+Some words of comparison with Faggian and Ronchi Della Rocca's work on confluence and standardization~\cite{FaggianRonchi19} are also in order. The main difference between their approach and the one we pursue here is that the operator $!$ in their calculus $\Lambda_\oplus^!$ plays \emph{both} the roles of a marker for duplicability and of a checkpoint for any probabilistic choice "flowing out" of the term (\ie\ being fired). In our calculus, we do not control duplication, but we definitely make use of checkpoints. Saying it another way, Faggian and Ronchi Della Rocca's work is inspired by linear logic, while our approach is inspired by deep inference, even though this is, on purpose, not evident in the design of our calculus. 
 
-Probabilistic $\lambda$-calculi can also be seen as vehicles for expressing probabilistic models in the sense of bayesian programming~\cite{Ramsey-Pfeffer-2002,BDLGS16}. This, however, requires an operator for modeling conditioning, which complictes the metatheory considerably, and that we do not consider here.
+Probabilistic $\lambda$-calculi can also be seen as vehicles for expressing probabilistic models in the sense of bayesian programming~\cite{Ramsey-Pfeffer-2002,BDLGS16}. This, however, requires an operator for modeling conditioning, which complicates the metatheory considerably, and that we do not consider here.
 
-Our permutative reduction is a refinement of that for the call-by-name probabilistic $\lambda$-calculus~\cite{Leventis19}, and is an implementation of the equational theory of \emph{(ordered) binary decision trees} via rewriting~\cite{Zantema-Pol-2001}. Probabilistic decision trees have been proposed with a primitive binary probabilistic operator~\cite{Manber-Tompa-1982}, but not a decomposition as we explore here.
+Our permutative reduction is a refinement of that for the call-by-name probabilistic $\lambda$-calculus~\cite{Leventis19}, and is an implementation of the equational theory of \emph{(ordered) binary decision trees} via rewriting~\cite{Zantema-Pol-2001}. Probabilistic decision trees have been proposed with a primitive binary probabilistic operator~\cite{Manber-Tompa-1982}, but not with a decomposition as we explore here.
 
 
 %============================================================ PEL
@@ -932,7 +932,7 @@ This is in Figure~\ref{fig:order}.
 %
 It is easy to realize that, of course modulo label $\alpha$-equivalence, for
 every term $M$ there is at least one $\theta$ such that $\labjudg{\theta}{M}$.
-An easy fact to check is that if $\labjudg{\theta}{M}$ and $M\rw^\theta N$, then $\labjudg{\theta}{N}$.
+An easy fact to check is that if $\labjudg{\theta}{M}$ and $M\rw N$, then $\labjudg{\theta}{N}$.
 It thus makes sense to parametrize $\rw$ on a sequence
 of labels $\theta$, \ie, one can define a family of reduction
 relations $\rw^\theta$ on pairs in the form $(M,\theta)$.
@@ -1371,13 +1371,13 @@ We believe our decomposition of probabilistic choice in $\lambda$-calculus to be
 
 There are a few immediate areas for future work. Firstly, within probabilistic $\lambda$-calculus, it is worth exploring if our decomposition opens up new avenues in semantics. Secondly, our approach might apply to probabilistic reasoning more widely, outside the $\lambda$-calculus. Most importantly, we will explore if our approach can be extended to other computational effects. Our use of streams interprets probabilistic choice as a \emph{read} operation from an external source, which means other read operations can be treated similarly. A complementary treatment of \emph{write} operations would allow us to express a considerable range of effects, including input/output and state.
 
-\subsection*{Acknowledgements}
+\subsection*{Acknowledgments}
 
 This work was supported by EPSRC Project EP/R029121/1 \emph{Typed Lambda-Calculi with Sharing and Unsharing}.
 The first author is partially supported by the ANR project 19CE480014 PPS, the ERC Consolidator Grant 
 818616 DIAPASoN, and the MIUR PRIN 201784YSZ5 ASPRA.
-We thank the referees for their diligence and their helpful comments. 
-We are grateful to Chris Barrett and---indirectly---Anupam Das for pointing us to Zantema and Van de Pol's work \cite{Zantema-Pol-2001}.
+We thank the referees for their diligence and helpful comments. 
+We are grateful to Chris Barrett and---indirectly---Anupam Das for pointing us to Zantema and Van de Pol's work~\cite{Zantema-Pol-2001}.
 
 
 \bibliographystyle{splncs04}
