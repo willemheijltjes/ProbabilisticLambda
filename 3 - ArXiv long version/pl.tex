@@ -488,6 +488,7 @@ Two example reductions are \eqref{eq:cbn}-\eqref{eq:cbv} on p.~\pageref{eq:cbn};
 By inspection of the rewrite rules in Figure~\ref{fig:reduction rules}, we can then characterize the normal forms of $\rw_\perm$ and $\rw$ as follows.
 
 \begin{prop}[Normal forms]
+\label{prop:normal-forms}
 The normal forms $P_0$ of $\rw_\perm$, respectively $N_0$ of $\rw$, are characterized by the following grammars.
 \[
 	\begin{array}{ccc@{~}c@{~}c@{}l}
@@ -1780,7 +1781,51 @@ The case $a\notin\fl N$ is immediate by a $\boxVoid$ step. For the other case, o
 %Given that $a$ is the smallest label in $N$, \ie\ $a<b$ for any other label $b$ in $N$, a straightforward induction on $N$ gives $N\rws_\perm\proj a0N~\ttrm{+a}~\proj a1N$, with as special base case $N\rws_\perm N$ for $a\notin\fl N$.
 \end{proof}
 
-A gap remains between which generators will not be duplicated, which we \emph{should} be able to reduce, and which generators projective head reduction \emph{does} reduce. In particular, to interpret call-by-value probabilistic reduction in Section~\ref{sec:cbv}, we would like to reduce under other generators. However, permutative reduction does not permit exchanging generators, and so only simulates reducing in head position. While (independent) probabilistic events are generally considered interchangeable, it is a question whether the below equivalence is desirable.
+Using projections and head contexts, we may characterize $\perm$-normal forms directly, by applying projective head reduction recursively.
+
+\begin{prop}
+Permutative normal forms are given by: $(H[x])_\perm=H_\perm[x]$ and
+\[
+	(H[\,\trm{!a.N}])_\perm =
+	\left\{\begin{array}{l@{\qquad}l}
+		H_\perm[N_\perm]           & \text{if}~a\notin\fl N
+	\\\\H_\perm[\proj a0N_\perm]\+
+		H_\perm[\proj a1N_\perm]   & \text{otherwise}
+	\end{array}\right.
+\]
+where the $\perm$-normal form $H_\perm[\,]$ of a head context $H[\,]$ is given by:
+\[
+	[\,]_\perm = [\,]
+\qquad
+	(\x.H[\,])_\perm = \x.H_\perm[\,]
+\qquad
+	(H[\,]\,N)_\perm = H_\perm[\,]\,N_\perm
+\]
+\end{prop}
+
+\begin{proof}
+Observe that the above defines a term in $\perm$-normal form (Proposition~\ref{prop:normal-forms}). Then by confluence of $\rw_\perm$ (Lemma~\ref{lem:confluence-perm}), all we need to exhibit is a $\perm$-reduction from a term $M$ to the above characterization of $M_\perm$. We proceed by induction on the size of $M$. The case $M=H[x]\rws_\perm H_\perm[x]$ is immediate by induction. The case $M=H[\trm{!a.N}]$ follows by a projective head step $\rw_\ph$, which is simulated by permutative reduction by Proposition~\ref{prop:permutative-simulates-projective} above; and then by induction.
+\[
+\begin{array}{rcl@{\qquad}l@{\qquad}l}
+	H[\trm{!a.N}] 
+	 & \rws_\perm & H[N]  
+	  & \text{if}~a\notin\fl N
+       & (\text{Prop.~\ref{prop:permutative-simulates-projective}})
+\\   & \rws_\perm & H_\perm[N_\perm] 
+      && (\ih)
+\\ \\
+	H[\trm{!a.N}] 
+	 & \rws_\perm & H[\proj a0N]\+H[\proj a1N] 
+	  & \text{if}~a\in\fl N
+	   & (\text{Prop.~\ref{prop:permutative-simulates-projective}})
+\\	 &\rws_\perm & H_\perm[\proj a0N_\perm]\+ H_\perm[\proj a1N_\perm] 
+      && (\ih)
+\end{array}
+\]
+\end{proof}
+
+
+A gap remains between which generators projective head reduction \emph{does} reduce, and which generators we \emph{should} be able to reduce, because they will not be duplicated. In particular, to interpret call-by-value probabilistic reduction in Section~\ref{sec:cbv}, we would like to reduce under other generators. However, permutative reduction does not permit exchanging generators, and so only simulates reducing in head position. While (independent) probabilistic events are generally considered interchangeable, it is a question whether the below equivalence is desirable.
 %
 \begin{align}
 \label{eqn:permute-generators}
@@ -1968,7 +2013,7 @@ Our call-by-value reduction may choose an arbitrary order in which to evaluate t
 Here, $\unopen{\trm{C[N_0vN_1]}}=\labjudg{\theta}{\trm{D[P_0+bP_1]}}$ with $D[\,]$ a $\PEL$-context, and $\theta$ giving rise to the sequence of generators $\ttrm{\dots!a.!b.!c\dots}$ in the call-by-value translation. To simulate the reduction step, if $b$ occupies the $n$-th position in $\theta$, then the $n$-th position in the context stream $s$ must be the element $j$. Since $\beta$-reduction survives the translation and labeling process intact, we may simulate call-by-value probabilistic reduction by projective and $\beta$-reduction.
 
 \begin{thm}
-If $N\rws_{\val,\beta\val}V$ then $\uncbv N^s\rws_{\pi,\beta}\uncbv V$ for some stream $s\in\Streams$.
+If $N\rws_{\val,\beta\val}V$ (\ie\ $N$ reduces to a sum containing the value $V$) then $\uncbv N^s\rws_{\pi,\beta}\uncbv V$ for some stream $s\in\Streams$.
 \end{thm}
 
 
