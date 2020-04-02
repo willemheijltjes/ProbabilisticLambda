@@ -1725,8 +1725,8 @@ We now have all the ingredients for our proof of strong normalization:
 %============================================================ PROJECTIVE
 
 
-\section{Projective Reduction}
-\label{sec:projective-reduction}
+\section{Projective Head Reduction and Call-By-Name}
+\label{sec:projective-head-reduction}
 
 Permutative reduction $\rw_\perm$ evaluates probabilistic sums purely by rewriting. Here we look at a more standard \emph{projective} notion of reduction, which conforms more closely to the intuition that $\ttrm{!a}$ generates a probabilistic event to determine the choice $\ttrm{+a}$. Using $+$ for an external probabilistic sum, we expect to reduce $\ttrm{!a.N}$ to $N_0+N_1$ where each $N_i$ is obtained from $N$ by projecting every subterm $\ttrm{M_0+aM_1}$ to $M_i$. The question is, in what context should we admit this reduction? We first limit ourselves to reducing in \emph{head} position.
 
@@ -1781,8 +1781,10 @@ The case $a\notin\fl N$ is immediate by a $\boxVoid$ step. For the other case, o
 %Given that $a$ is the smallest label in $N$, \ie\ $a<b$ for any other label $b$ in $N$, a straightforward induction on $N$ gives $N\rws_\perm\proj a0N~\ttrm{+a}~\proj a1N$, with as special base case $N\rws_\perm N$ for $a\notin\fl N$.
 \end{proof}
 
-Using projections and head contexts, we may characterize $\perm$-normal forms directly, by applying projective head reduction recursively.
+Observe that while projective head reduction cannot reduce under a sum $\+$, permutative reduction \emph{can}, so that a $\rw_\ph$ step under an external sum $+$ can be simulated by a $\rws_\perm$ reduction under an internal sum $\+$.
 
+Then by applying projective head reduction recursively, we may characterize $\perm$-normal forms directly.
+ 
 \begin{prop}
 Permutative normal forms are given by: $(H[x])_\perm=H_\perm[x]$ and
 \[
@@ -1824,6 +1826,25 @@ Observe that the above defines a term in $\perm$-normal form (Proposition~\ref{p
 \]
 \end{proof}
 
+We use the above to give a more formal connection between our Probabilistic Event $\lambda$-Calculus and a call-by-name probabilistic $\lambda$-calculus. Via the encoding
+\[
+	N\+M \quad\stackrel\Delta=\quad \trm{!a. N +a M}
+\]
+the following calculus emerges as a fragment of the $\PEL$, using standard $\beta$-reduction together with projective head reduction for probabilistic evaluation.
+\[
+	N,M \quad\coloneqq\quad x ~\mid~ \x.N ~\mid~ NM ~\mid~ N\+M
+\]
+\[
+	C[\,(\lambda x.N)M\,]~\rw_\beta~C[\,M[N/x]\,]
+	\qquad
+	H[N\+M]~\rw_\ph~H[N] + H[M]
+\]
+Here, $\beta$-reduction is unrestricted, but one may obtain a more standard call-by-name probabilistic $\lambda$-calculus by restricting $\beta$-reduction to a head context $H[\,]$, or by restricting both reductions to \emph{applicative} contexts $A[\,]~\coloneqq~[\,]\mid A[\,]\,N$ for a calculus with \emph{weak head reduction}. 
+
+Any term of the $\PEL$ maps into this calculus by $\perm$-normalization, since $\perm$-normal forms are within the call-by-name fragment above. Note however that $\perm$-normalization may induce exponential growth. On a practical level, this gives our calculus greater expressiveness than standard probabilistic calculi.
+
+\section{Projective reduction}
+\label{sec:projective-reduction-x}
 
 A gap remains between which generators projective head reduction \emph{does} reduce, and which generators we \emph{should} be able to reduce, because they will not be duplicated. In particular, to interpret call-by-value probabilistic reduction in Section~\ref{sec:cbv}, we would like to reduce under other generators. However, permutative reduction does not permit exchanging generators, and so only simulates reducing in head position. While (independent) probabilistic events are generally considered interchangeable, it is a question whether the below equivalence is desirable.
 %
