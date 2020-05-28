@@ -1,4 +1,4 @@
-
+ 
 ----------
 
 Our probabilistic lambda-calculus splits probabilistic choice
@@ -192,3 +192,110 @@ Much of this is reminiscent also of pi-calculus. I don't know to what extent it 
 ----------
 
 I have not had time to consider typing. The obvious corresponding annotation of the type system with channel names might just work, or it might not.
+
+----------
+
+Continuations
+
+The calculus shares with continuation calculi that it employs multiple argument stacks. The exact mechanisms are different - the question remains whether this is superficial or deep. The /\C calculus, which extends /\ with a continuation operator C :: ((A -> R) -> R) -> A, puts stacks on the stack. The /\mu calculus puts stacks in the environment, as an explicit substitution [S/a] for a continuation variable a. This means stacks are readily duplicated and deleted, and bound to local names. There is only one channel for reading, so control is passed between stacks.
+
+/\C
+
+  N  ::=  x  |  \x.N  |  NN  |  CN
+
+Stack evaluation:
+
+  < \x.M , N.S >   ~>   < M[N/x] ,     S >
+  < MN   ,   S >   ~>   < M      ,   N.S >
+  < CM   ,   S >   ~>   < M      , [S].e >
+  < [S]  , N.T >   ~>   < N      ,     S >
+
+
+Lambda-mu
+
+  N  ::=  x  |  \x.N  |  NN  |  ma.[b]N
+
+  (\x.M)N    ~>  M[N/x]
+  (ma.[b]M)N ~> ma.[b]M[PNa/Pa]
+
+Stack evaluation:
+
+  < x       , e ,   S >   ~>   < e(x) , e      ,       S >
+  < \x.M    , e , N.S >   ~>   < M    , e[N/x] ,       S >
+  < MN      , e ,   S >   ~>   < M    , e      , (N,e).S >
+  < ma.[b]M , e ,   S >   ~>   < M    , e[S/a] ,    e(b) >
+
+  
+Lambda-mu-S
+
+  N  ::=  x  |  \x.N  |  NN  |  N[N...a]  |  ma.N
+
+  (\x.M)N  ~>  M[N/x]
+  (ma.M)N  ~>  M[Na/a]
+  (ma.M)b  ~>  M[b/a]
+  M[N.P...a] ~> MN[P...a]
+  
+----------
+
+Recursion
+
+
+     (\x.xx)(\x.f(xx))
+=>   (\x.f(xx))(\x.f(xx))
+=> f((\x.f(xx))(\x.f(xx)))
+
+     (\x.xx)(f(\x.xx))
+
+    [<x>.[[x].x].F].<x>.[x].x
+=>  [<x>.[[x].x].F].<x>.[[x].x].F
+=>  [[<x>.[[x].x].F].<x>.[[x].x].F].F
+=>  [[[<x>.[[x].x].F].[<x>.[[x].x].F].F].F
+=>  ...
+    [[[[... F].F].F].F].F
+
+With "recursion" channel r:
+
+    [<x>r.[[x]r.x].F]r.<x>r.[x]r.x    
+=>  [<x>r.[[x]r.x].F]r.<x>r.[[x]r.x].F
+=>  [[<x>r.[[x]r.x].F]r.<x>r.[[x]r.x].F].F
+=>  [[[<x>r.[[x]r.x].F]r.<x>r.[[x]r.x].F].F].F
+
+
+----------
+
+Function composition
+
+  F o G = <x>.[[x].G].F
+
+QUESTION
+
+Can we have a two-sorted calculus where G.F is expressible and gives composition of (linear) functions?
+
+Recursion with "composition":
+
+      [F.<x>r.[x]r.x]r.<x>r.[x]r.x =>     [F.<x>r.[x]r.x]r.F.<x>r.[x]r.x
+=   F.[F.<x>r.[x]r.x]r.<x>r.[x]r.x =>   F.[F.<x>r.[x]r.x]r.F.<x>r.[x]r.x
+= F.F.[F.<x>r.[x]r.x]r.<x>r.[x]r.x => F.F.[F.<x>r.[x]r.x]r.F.<x>r.[x]r.x
+
+CONSIDERATION
+
+The grammar
+
+  H  :=  {} | <x>i.H | [N]i.H
+
+is that of head contexts.
+
+----------
+
+ENCODING SCI
+
+  skip     {}
+  c ; d    |c| . |d|
+  x := N   <_>x.[N]x
+  M := N   can't encode this
+  
+
+
+
+
+
