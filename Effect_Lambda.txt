@@ -5,27 +5,27 @@ Our probabilistic lambda-calculus splits probabilistic choice
 
   N + M
 
-into 1) generating a coin flip with the operator [a], where the variable a represents the result; 2) using this coin flip as N a M, meaning "if a then M else N", to determine a choice between terms N and M.
+into 1) generating a coin flip with the operator <a>, where the variable a represents the result; 2) using this coin flip as N a M, meaning "if a then M else N", to determine a choice between terms N and M.
 
 We get the calculus
 
-  M,N  ::=  x | \x.N | NM | [a].N | MaN
+  M,N  ::=  x | \x.N | NM | <a>.N | MaN
 
 with the following rewrite rules.
 
-  (\x.M)N   ~>  M[N/x]
+  (\x.M)N   ~>  M<N/x>
 
   Ma(NaP)   ~>  MaP
   (MaN)aP   ~>  MaP
-  C[MaN]    ~>  C[M] a C[N]   (conditions apply)
+  C{MaN}    ~>  C{M} a C{N}   (conditions apply)
 
-  [a].N     ~>  N   (a not in N)
-  \x.[a].N  ~>  [a].\x.N
-  ([a].M)N  ~>  [a].MN
+  <a>.N     ~>  N   (a not in N)
+  \x.<a>.N  ~>  <a>.\x.N
+  (<a>.M)N  ~>  <a>.MN
 
 Then probabilistic choice is captured as follows.
 
-  N + M  :=  [a].MaN
+  N + M  :=  <a>.MaN
 
 The resulting calculus is confluent, and it evaluates effects purely by rewriting (which is slightly non-local, though), by bubbling choice to the surface.
 
@@ -35,14 +35,14 @@ We want to see if this idea generalises to other effects.
 
 First, some observations.
 
-* The effect [a] is a "read" operation, which (probabilistically) receives an input 0 or 1. We may expect other "read" operations, such as I/O input and reading from state, to behave analogously. We may further expect corresponding "write" operations <0> and <1>.
+* The effect <a> is a "read" operation, which (probabilistically) receives an input 0 or 1. We may expect other "read" operations, such as I/O input and reading from state, to behave analogously. We may further expect corresponding "write" operations [0] and [1].
 
-* The operator [a] in [a].N is a binder: it binds every variable a in N. A difference with \x.N is the type of the variable: a is a boolean, x represents any subterm. But, if we expect to read from memory using [a].N, then a should be able to represent any term, as well.
+* The operator <a> in <a>.N is a binder: it binds every variable a in N. A difference with \x.N is the type of the variable: a is a boolean, x represents any subterm. But, if we expect to read from memory using <a>.N, then a should be able to represent any term, as well.
 
-* With <0> and <1> as write operations and [a] as a read operation that binds a, we may give an alternative set of rewrite rules for the calculus. The obvious interaction of read and write would be:
+* With [0] and [1] as write operations and <a> as a read operation that binds a, we may give an alternative set of rewrite rules for the calculus. The obvious interaction of read and write would be:
 
-  <0>.[a].N  ~>  N[0/a]
-  <1>.[a].N  ~>  N[1/a]
+  [0].<a>.N  ~>  N<0/a>
+  [1].<a>.N  ~>  N<1/a>
 
 with the equations or substitution rules
 
@@ -51,87 +51,90 @@ with the equations or substitution rules
 
 We would then only need the following rules.
 
-  (\x.M)N   ~>  M[N/x]
+  (\x.M)N   ~>  M<N/x>
 
-  \x.[a].N  ~>  [a].\x.N
-  ([a].M)N  ~>  [a].MN
+  \x.<a>.N  ~>  <a>.\x.N
+  (<a>.M)N  ~>  <a>.MN
 
-The evaluation of a term would be given by placing it in an environment that generates coin flips, i.e., a stream of <0> and <1> operators.
+The evaluation of a term would be given by placing it in an environment that generates coin flips, i.e., a stream of [0] and [1] operators.
 
 * The rewrite rules 
 
   Ma(NaP)   ~>  MaP
   (MaN)aP   ~>  MaP
-  C[MaN]    ~>  C[M] a C[N]   (conditions apply)
+  C{MaN}    ~>  C{M} a C{N}   (conditions apply)
 
-  [a].N     ~>  N   (a not in N)
+  <a>.N     ~>  N   (a not in N)
 
-become obsolete. This is consistent and natural: the first three are a reflection of the nature of (labelled) sums in general, and do not depend on [a]. The fourth is simply an instance of the new evaluation rule.
+become obsolete. This is consistent and natural: the first three are a reflection of the nature of (labelled) sums in general, and do not depend on <a>. The fourth is simply an instance of the new evaluation rule.
 
 ----------
 
 To capture other effects, such as state or I/O, we need to distinguish our probabilistic read/write operators from, for instance, read/write for a given memory location or global variable. That is, we need names, or channels. Using i,j,k etc. we get the following extension of our calculus:
 
-  M,N  ::=  x | \x.N | NM | [a]i.N | <N>i.M
+  M,N  ::=  x | \x.N | NM | [N]i.M | i<a>.N
 
 The meaning of the new constructs is:
 
- [a]i.N  =>  Read from the channel i and use this as a in N
- <N>i.M  =>  Write N to the channel i and continue with M
+ i<a>.N  =>  Read from the channel i and use this as a in N
+ [N]i.M  =>  Write N to the channel i and continue with M
 
-Since we are generalising from reading/writing bits <0>, <1> to any term <N>, we may drop the construction N a M. Instead, our probabilistic channel, which we may give a reserved name "p" as [a]p, can then become a stream of projections rather than bits, i.e. <N>p must be one of
+Since we are generalising from reading/writing bits [0], [1] to any term [N], we may drop the construction N a M. Instead, our probabilistic channel, which we may give a reserved name "p" as p<a>, can then become a stream of projections rather than bits, i.e. [N]p must be one of
 
-  <\x.\y.x>p  or  <\x.\y.y>p .
+  [\x.\y.x]p  or  [\x.\y.y]p .
 
 Then we can use 
 
-  M + N = [a].a N M  
+  M + N = p<a>.a N M  
 
-similar to what we had before. We should not admit <N>p within the calculus, though: this operation should be reserved to the evaluation context, which supplies a stream of them.
+similar to what we had before. We should not admit [N]p within the calculus, though: this operation should be reserved to the evaluation context, which supplies a stream of them.
 
-We can similarly imagine reading from standard I/O as a reserved channel r, admitting read operations [a]r in the calculus but with the evaluation context providing write operations <N>r. Dually, writing to standard I/O could be the reserved channel w, with <N>w in the calculus but no accompanying read operation [a]w.
+We can similarly imagine reading from standard I/O as a reserved channel r, admitting read operations <a>r in the calculus but with the evaluation context providing write operations [N]r. Dually, writing to standard I/O could be the reserved channel w, with [N]w in the calculus but no accompanying read operation <a>w.
 
 ----------
 
 For computation with state, we may simply let any non-reserved channel name represent a global variable. The interaction on variable i, 
 
-  <N>i.[a]i.M  ~>  M[N/a]
+  [N]i.i<a>.M  ~>  M{N/a}
 
 is then almost as expected: we don't want reading to be destructive. That is, we would expect instead
 
-?? <N>i.[a]i.M  ~>  <N>i.M[N/a] .
+?? [N]i.i<a>.M  ~>  [N]i.M{N/a} .
 
 But that is OK: we can simulate a non-destructive read operation  with a quick shorthand,
 
-  read a from i. M  :=  [a]i.<a>i.M
+  read a from i. M  :=  i<a>.[a]i.M
 
 which reinstates the write operation (the interacting pairs are underlined):
 
-     <N>i. read a from i. M
-  =  <N>i.[a]i.<a>i.M
-     ---------
-  ~>           <N>i.M[N/a]
+     [N]i. read a from i. M
+
+  =  [N]i.i<a>.[a]i.M
+
+  ~>           [N]i.M{N/a}
 
 Writing to a global variable is also slightly different: we expect it to be destructive. That is, we expect the following rewrite rule.
 
-?? <N>i.<M>i.P  ~>  <M>i.P
+?? [N]i.[M]i.P  ~>  [M]i.P
 
 Again, we can easily simulate a destructive write operation by introducing a "dummy" (destructive) read operation, where _ is a special non-binding variable (any non-occurring variable would do, though).
 
-  write N to i. M  :=  [_]i.<N>i.M
+  write N to i. M  :=  i<_>.[N]i.M
 
 As expected:
 
      write N to i. write M to i. P
-  =  [_]i.<N>i.[_]i.<M>i.P
-          ---------
-  ~> [_]i.          <M>i.P
+
+  =  i<_>.[N]i.i<_>.[M]i.P
+
+  ~> <_>i.          [M]i.P
+
   =  write M to i. P
 
-Interestingly, we can make use of the non-destructive nature of <N>i to implement the idea of "new" variable names, as programming languages do. This is subtle, though: what we're trying to do is implement local variable names, with their own name-spaces. That means we also need to be able to "end" a name-space, and revert to the previous one. For instance, for the simple imperative program
+Interestingly, we can make use of the non-destructive nature of [N]i to implement the idea of "new" variable names, as programming languages do. This is subtle, though: what we're trying to do is implement local variable names, with their own name-spaces. That means we also need to be able to "end" a name-space, and revert to the previous one. For instance, for the simple imperative program
 
   new i = 12;
-  for j = 1 , j++ , j < 5 {
+  for j = 1 , j++ , j [ 5 {
     new i = 7;
     i++;
     print i;
@@ -140,27 +143,24 @@ Interestingly, we can make use of the non-destructive nature of <N>i to implemen
 
 we expect to get the output sequence 8 8 8 8 8 12. So, the following is speculative, but we might do the following:
 
-  new i. N  ~>  <_>i.N'
+  new i. N  ~>  [_]i.N'
 
-where N' is N with every free variable x replaced with [_]i.x. In other words, the name space generated by "new i. N" extends into N, but not into anything that will be substituted into N.
+where N' is N with every free variable x replaced with i<_>.x. In other words, the name space generated by "new i. N" extends into N, but not into anything that will be substituted into N.
 
 ----------
 
-Observe! If our name space is the singleton {*} (which we omit, writing [a]* as [a] and <N>* as <N>) then the interaction of <N> and <a> is just the lambda-calculus! That is:
+Observe! If our name space is the singleton {*} (which we omit, writing *<a> as <a> and [N]* as [N]) then the interaction of [N] and [a] is just the lambda-calculus! That is:
 
-  \x.N  :=  [x].N'
-  NM    :=  <N'>.M'
+  \x.N  :=  <x>.N
+  NM    :=  [N].M
 
 where N' and M' are the recursive translations of N and M. We get just beta-reduction:
 
-     (\x.N)M
-  =  <N'>.[x].M'
-  ~> M'[N'/x]
-  =  M[N/x]'
+     (\x.N)M  =  [N].<x>.M  ~>  M{N/x}
 
 We can thus reduce our syntax, if we reserve a name * for lambda-abstraction:
 
-  M,N  ::=  x | [x]i.N | <N>i.M
+  M,N  ::=  x | [N]i.M | i<x>.N
 
 How simple!
 
@@ -168,20 +168,20 @@ How simple!
 
 The interaction between different channels is simple:
 
-  <M>j.[x]i.N  ~>  [x]i.<M>j.N   if i /= j, avoiding capture
-  [y]j.[x]i.N  ~>  [x]i.[y]j.N   if i < j
+  [M]j.i<x>.N  ~>  i<x>.[M]j.N   if i /= j, avoiding capture
+  j<y>.i<x>.N  ~>  i<x>.j<y>.N   if i < j
 
-where i < j means that the last write operation on i or j is one on i.
+where i [ j means that the last write operation on i or j is one on i.
 
 Alternatively, read/write interaction could be "at-a-distance":
 
-  <N>i. (...) [x]i.M  ~>  (...) M[N/x]
+  [N]i. (...) <x>i.M  ~>  (...) M<N/x>
 
 if there are no actions on the channel i in (...).
 
 ----------
 
-The terminology read/write for [.] and <.> is not great, since they are not like stateful read/write operations, for which we have defined shortcuts. They are rather pop/push stack operations.
+The terminology read/write for <.> and [.] is not great, since they are not like stateful read/write operations, for which we have defined shortcuts. They are rather pop/push stack operations.
 
 The expected operational semantics is akin to a generalised Krivine machine, where we may omit the environment in favour of direct substitution, and instead of one stack we have one for every name i.
 
@@ -197,7 +197,7 @@ I have not had time to consider typing. The obvious corresponding annotation of 
 
 Continuations
 
-The calculus shares with continuation calculi that it employs multiple argument stacks. The exact mechanisms are different - the question remains whether this is superficial or deep. The /\C calculus, which extends /\ with a continuation operator C :: ((A -> R) -> R) -> A, puts stacks on the stack. The /\mu calculus puts stacks in the environment, as an explicit substitution [S/a] for a continuation variable a. This means stacks are readily duplicated and deleted, and bound to local names. There is only one channel for reading, so control is passed between stacks.
+The calculus shares with continuation calculi that it employs multiple argument stacks. The exact mechanisms are different - the question remains whether this is superficial or deep. The /\C calculus, which extends /\ with a continuation operator C :: ((A -> R) -> R) -> A, puts stacks on the stack. The /\mu calculus puts stacks in the environment, as an explicit substitution <S/a> for a continuation variable a. This means stacks are readily duplicated and deleted, and bound to local names. There is only one channel for reading, so control is passed between stacks.
 
 /\C
 
@@ -205,46 +205,166 @@ The calculus shares with continuation calculi that it employs multiple argument 
 
 Stack evaluation:
 
-  < \x.M , N.S >   ~>   < M[N/x] ,     S >
-  < MN   ,   S >   ~>   < M      ,   N.S >
-  < CM   ,   S >   ~>   < M      , [S].e >
-  < [S]  , N.T >   ~>   < N      ,     S >
+  [ \x.M , N.S ]   ~>   [ M<N/x> ,     S ]
+  [ MN   ,   S ]   ~>   [ M      ,   N.S ]
+  [ CM   ,   S ]   ~>   [ M      , <S>.e ]
+  [ <S>  , N.T ]   ~>   [ N      ,     S ]
 
 
 Lambda-mu
 
-  N  ::=  x  |  \x.N  |  NN  |  ma.[b]N
+  N  ::=  x  |  \x.N  |  NN  |  ma.<b>N
 
-  (\x.M)N    ~>  M[N/x]
-  (ma.[b]M)N ~> ma.[b]M[PNa/Pa]
+  (\x.M)N    ~>  M<N/x>
+  (ma.<b>M)N ~> ma.<b>M<PNa/Pa>
 
 Stack evaluation:
 
-  < x       , e ,   S >   ~>   < e(x) , e      ,       S >
-  < \x.M    , e , N.S >   ~>   < M    , e[N/x] ,       S >
-  < MN      , e ,   S >   ~>   < M    , e      , (N,e).S >
-  < ma.[b]M , e ,   S >   ~>   < M    , e[S/a] ,    e(b) >
+  [ x       , e ,   S ]   ~>   [ e(x) , e      ,       S ]
+  [ \x.M    , e , N.S ]   ~>   [ M    , e<N/x> ,       S ]
+  [ MN      , e ,   S ]   ~>   [ M    , e      , (N,e).S ]
+  [ ma.<b>M , e ,   S ]   ~>   [ M    , e<S/a> ,    e(b) ]
 
   
 Lambda-mu-S
 
-  N  ::=  x  |  \x.N  |  NN  |  N[N...a]  |  ma.N
+  N  ::=  x  |  \x.N  |  NN  |  N<N...a>  |  ma.N
 
-  (\x.M)N  ~>  M[N/x]
-  (ma.M)N  ~>  M[Na/a]
-  (ma.M)b  ~>  M[b/a]
-  M[N.P...a] ~> MN[P...a]
+  (\x.M)N  ~>  M<N/x>
+  (ma.M)N  ~>  M<Na/a>
+  (ma.M)b  ~>  M<b/a>
+  M<N.P...a> ~> MN<P...a>
   
+----------
+
+Function composition
+
+  F o G = <x>.[[x].G].F
+
+QUESTION
+
+Can we have a two-sorted calculus where G.F is expressible and gives composition of (linear) functions?
+
+Recursion with "composition":
+
+
+CONSIDERATION
+
+The grammar
+
+  H  ::=  {} | [N]i.H | <x>i.H
+
+is that of head contexts. Equivalently,
+
+  H  ::=  [N]i | <x>i | e | H.H
+
+where (.) is associative and has unit e.
+
+----------
+
+ENCODING IMPERATIVE STRUCTURES
+
+We can directly embed imperative commands as head contexts and values as terms.
+
+  skip      :=  e
+  H ; G     :=  H . G
+  N/i       :=  <_>i.[N]i        "write N to i", or "i := N"
+  i\x       :=  <x>i.[x]i        "read x from i"
+  !i        :=  <x>i.[x]i.x      "use value i"
+  new i; N  :=  [_].Ns           where s is the substitution map
+                                 { <{_>i.x/x} | x in FV(N) }
+
+For an "updating" write operation
+
+  N/i       :=  <x>i.[N{x/i}]i   where x is fresh
+
+IMPORTANT: DIRECTLY MIRRORS STANDARD IMPERATIVE STRUCTURE
+
+  comm ; A  ~>  A  (by executing the command)
+
+------- 
+
+QUESTIONS
+
+Recursion instead of update:
+
+  x := Fx
+
+  UPDATE:  do this with the STACK
+  RECURSE: do this with the ENVIRONMENT
+
+  letrec x = Fx in N
+
+  (\x.N)(Fx)  but \x binds x
+
+Proposition: the machine's environment is acyclic.
+
+---------
+
+Head contexts:
+
+  H.N = H{N}  <~  [N].<0>.H.0    where 0 is the hole
+
+BUT: only when H does not bind in N! i.e. never....
+
+Saving a head context for reuse:
+
+  [H] . <x> . N{x.M1}..{x.Mn}  ~>  N{H.M1}..{H.Mn}
+
+  [<y>.H.y] . <x> . N{[M1].x}..{[Mn].x}
+  ~>  N{[M1].<y>.H.y}..{[M2].<y>.H.y}
+  ~>  N{H.M1}..{H.Mn}
+
+WHILE
+
+  while B do H
+   ~>  if B then H ; while B do H else skip
+  
+  [B].[<x>.H.x].W
+   ~>  [ [[B].[<x>.H.x].W].<x>.H.x ] . [<x>.x] . B
+   ~>  [H.[B].[<x>.H.x].W] . [<x>.x] . B
+
+Note: W is still a head context, not a term
+
+  [B].[<x>.C.x].W
+
+  W =  <c>.<b>. [[b].[c].W].c] . [<x>.x] . b
+
+While operationally:
+
+  while B do H --> B -- 0 --> skip
+       ^           |
+       \           /
+        --- H [-- 1
+                
+  W = while B do H
+
+           w := if B then (H;w) else skip ; w
+  h := H ; w := if B then (h;w) else skip ; w
+
+=> Basically the same as Landin
+
+----------
+
+  (\x.xx)(\x.F(xx))
+
+  \r.rr = !r
+  
+  \x.F(xx) = <x>r.[[x]r.x].F
+
+   (\x.xx)(\y.F((\x.xx)y)
+=> (\x.xx)(\y.F(yy))
+
 ----------
 
 Recursion
 
 
-     (\x.xx)(\x.f(xx))
-=>   (\x.f(xx))(\x.f(xx))
-=> f((\x.f(xx))(\x.f(xx)))
 
-     (\x.xx)(f(\x.xx))
+     (\x.xx)(\x.F(xx))
+=>   (\x.F(xx))(\x.F(xx))
+=> F((\x.F(xx))(\x.F(xx)))
+=> ...
 
     [<x>.[[x].x].F].<x>.[x].x
 =>  [<x>.[[x].x].F].<x>.[[x].x].F
@@ -260,40 +380,265 @@ With "recursion" channel r:
 =>  [[<x>r.[[x]r.x].F]r.<x>r.[[x]r.x].F].F
 =>  [[[<x>r.[[x]r.x].F]r.<x>r.[[x]r.x].F].F].F
 
+Landin fixed point (uses higher-order store)
 
-----------
+r := F(!r) ; !r
 
-Function composition
+  write (F (read x from r . x)) to r . read x from r . x
 
-  F o G = <x>.[[x].G].F
+  write ([<x>r.[x]r.x].F) to r . read x from r . x
+ 
+  <_>r . [ [<x>r.[x]r.x] . F ]r . <x>i . [x]r . x
 
-QUESTION
 
-Can we have a two-sorted calculus where G.F is expressible and gives composition of (linear) functions?
+Landin:
+  r := F(!r) ; !r    =>  <_>r . [[<x>r. [x]r.x].F]r . <x>r. [x]r. x
 
-Recursion with "composition":
+Y:
+  (\x.xx)(\x.F(xx))  =>         [ <x> .[[x] .x].F]  . <x> . [x] . x
 
-      [F.<x>r.[x]r.x]r.<x>r.[x]r.x =>     [F.<x>r.[x]r.x]r.F.<x>r.[x]r.x
-=   F.[F.<x>r.[x]r.x]r.<x>r.[x]r.x =>   F.[F.<x>r.[x]r.x]r.F.<x>r.[x]r.x
-= F.F.[F.<x>r.[x]r.x]r.<x>r.[x]r.x => F.F.[F.<x>r.[x]r.x]r.F.<x>r.[x]r.x
+Landin without channels:
+  (\x.xx)(F(\x.xx))  =>         [[<x> . [x] .x].F]  . <x> . [x] . x
 
-CONSIDERATION
+Mixed:
+  (x [- r ; Fx) -> r ; !r  
+                     =>  <_>r . [<x>r.[x]r.[x].F]r . <x>r. [x]r. x
 
-The grammar
+You can see how Landin and Y behave the same way, and that they *have* to be slightly different, because the language of lambda-calculus cannnot express Landin's operator literally (as in, Landin's without channels doesn't work), and store operations are not sufficiently fine-grained to express Y literally.
 
-  H  :=  {} | <x>i.H | [N]i.H
+     (\x.xx)(F(\x.xx))
+=>  F(\x.xx)(F(\x.xx))
+=>        ?
 
-is that of head contexts.
+Note by the way how the "read" operator is encoded, and how it immediately shows an interesting aspect of the proposed typing discipline.
 
-----------
+  (!r)   =>  <x>r . [x]r . x
+  \x.xx  =>  <x>  . [x]  . x
 
-ENCODING SCI
+With channels, the beta-step
 
-  skip     {}
-  c ; d    |c| . |d|
-  x := N   <_>x.[N]x
-  M := N   can't encode this
+  (\x.xx)N  => NN
+
+instead becomes
+
+  [N]r . <x>r . [x]r . x  =>  [N]r . N
+
+which need not be a redex even if N is an abstraction, since it may read from other channels than r.
+
+   <_>r . [[<x>r. [x]r.x].F]r .  <x>r. [x]r. x
+=> <_>r . [[<x>r. [x]r.x].F]r . [<x>r. [x]r. x] . F
+
+
+Mixed:
+   [<x>r.[x]r.[x].F]r . <x>r. [x]r. x
+   [<x>r.[x]r.[x].F]r . <x>r. [x]r. [x]. F
+   [<x>r.[x]r.[x].F]r . [<x>r.[x]r.[x].F] . F
+
+
+---------- 
+
+MU-RECURSION
+
+   mx.N
+=> N{mx.N/x}
+
+In the machine:
+  ( mx.N , e , S ) => ( N , e{mx.N/x} , S )
+
   
+
+
+=>  ( (\x.N)(mx.N) , e , S)
+=>  ( \x.N , e , mx.N . S)
+=>  ( N , e{mx.N/x} , S )
+
+
+=>  ( \xy.y , e , mx.N . N . S )
+=>  ( y , e{N/y}{mx.N/x} , S )
+=>  ( N , e{mx.N/x} , S )
+
+
+( N , e , S , R )
+
+LETREC
+
+  ( letrec x = N in M , e , S ) => ( M , e{N/x} , S )
+
+----------
+
+Jim's work: ! is a resource accessed as many times as you like.
+
+----------
+
+Strategies:
+
+  CBN:    as is
+  CBV:    "push" = evaluate + push
+  CBNeed: "pop"  = occurs check + evaluate + pop
+
+----------
+
+Higher-order store
+
+  Writing to and reading from the same location
+
+
+Lambda-calculus with futures
+
+
+----------
+
+Selling points:
+
+  * Simplicity, mathematical & conceptual
+  * Confluence, strategy independence
+
+
+----------
+
+  A -> B  =  pop of type A; continue as B
+  
+  (A -> B) ^ A
+  ------------  
+        B
+
+    = push of type A; pop of type A; continue as B
+
+  Add channels:
+
+  A|i
+
+  (A|i -> B) ^ A|i
+  ----------------
+          B
+
+------
+
+Call-by-name
+
+Effect Lambda implements a call-by-name strategy:
+
+  x := 0 . i := (x := 1 . 0) . !x
+
+evaluates to 0, and if you want 1 you should write
+
+  x := 0 . x := 1 . i := 0 . !x
+
+
+Call-by-value
+
+In the machine, one can obtain a CBV effect (locally!) by swapping function and argument for an application, and then swapping back.
+
+Let  M ~> \v.V  ;  we want  \x.N M ~> \x.N \v.V
+
+     ( [!M].\x.N ,         S )
+     (      \x.N ,    !M . S )
+ ~>  (         M , ?\x.N . S )
+ ~>> (      \v.V , ?\x.N . S )
+ ~>  (      \x.N ,  \v.V . S )
+
+
+CALL-BY-VALUE TRANSFORMATION?
+
+If M is of the form H{x}, what about:
+
+  [M].N = [H.x].N  =>  H.[x].N ??
+
+Or recursively that?
+
+"Yes":
+
+   [[1].[2].+].<x>.x
+=> [1].[2].[+].<x>.x
+~> [1].[2].+
+
+NO:
+
+OO:   [<x>.[x].x].<x>.[x].x
+K:    <x>.<y>.x
+I:    <x>.x
+
+KIOO:   [[<x>.[x].x].<x>.[x].x].[<x>.x].<x>.<y>.x
+ =>     [[<x>.[x].x].<x>.[x].x].<y>.<x>.x
+ =>     <x>.x
+KI!OO:  [<x>.[x].x].<x>.[x].[x].[<x>.x].<x>.<y>.x
+ =>     [<x>.[x].x].[<x>.[x].x].[<x>.x].<x>.<y>.x
+ =>     [<x>.[x].x].[<x>.[x].x].<y>.<x>.x
+ =>     [<x>.[x].x].<x>.x
+ =>     <x>.[x].x
+ (should loop instead)
+
+
+------
+
+- Typing.
+- Parallellism.
+- Exceptions/continuations.
+
+------
+
+  S = channels x1 ... xn
+
+  State monad:  S -> (B ^ S)
+
+  We get a decomposition:
+
+    (A1|x1 ... An|xn) -> (B ^ A1|x1 ... An|xn)
+
+  The difference with   S -> (B ^ S)
+
+  And even              IO B
+
+  Array of type A: channels i in I
+
+  Single location:    A|i 
+  Single " in array:  A|I<n>
+  Whole array:        A^n|I
+
+------
+
+State Monad
+
+A "command" or stateful expression is a head context,
+
+  H  ::=  {}  |  [N]i.H  |  i<x>.H
+
+which can be encoded as a "linear head continuation",
+
+  H  ~  <c>.H{c}
+
+via the reduction
+
+  [N].<c>.H{c}  ~>  H{N}
+
+so that we may write  H.N  for  <c>.H{c} N  =  [N].<c>.H{c} .
+
+A function 
+
+  f : S -> (AxS)
+
+managed through the primitives
+
+  g >>= (\x -> h)
+
+  return N
+
+translates to a head context |f| by
+
+  | g >>= (\x -> h) |  =  |g|.<x>.|h|
+
+         | return N |  =  [N]
+
+(one could use a dedicated channel for it). Evaluating
+
+  fst (f s)
+
+is then encoded as
+
+  |s|.|f|.<r>.r
+
+where  |s|  encodes setting up the initial state, and the identity  <r>.r  reads the result of the stateful computation. (In general, a projection from the result state of a command H will be an identity along the projected channel.)
+
 
 
 
