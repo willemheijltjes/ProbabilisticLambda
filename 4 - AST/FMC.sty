@@ -1,0 +1,444 @@
+\ProvidesPackage{FMC}
+
+
+%========== Packages
+\RequirePackage{accents}
+\RequirePackage{tikz}
+	\usetikzlibrary{arrows.meta}
+	\usetikzlibrary{calc}
+\RequirePackage{xcolor}
+
+%========== Colours
+\newcommand\black{\color{black}}
+
+\colorlet{0}{black}
+\colorlet{1}{red!80!black}
+\colorlet{2}{blue!80!black}
+\colorlet{3}{orange!90!black}
+\colorlet{4}{green!50!black}
+\colorlet{5}{violet!80!black}
+\colorlet{6}{teal!90!white}
+\colorlet{7}{brown!90!black}
+\colorlet{8}{pink!70!blue}
+\colorlet{9}{lime!80!black}
+
+\colorlet{term}{1}
+\colorlet{type}{2}
+
+\newcommand\colorterm{\color{term}}
+\newcommand\colortype{\color{type}}
+
+\newcommand\colored{%
+  \let\color@term\colorterm%
+  \let\color@type\colortype%
+  \let\color@ctxt\colorctxt%
+  \let\color@simp\colorsimp%
+  \let\color@patn\colorpatn%
+  \let\color@ptpe\colorptpe%
+}
+\newcommand\uncolored{%
+  \let\color@term\relax%
+  \let\color@type\relax%
+  \let\color@ctxt\relax%
+  \let\color@simp\relax%
+  \let\color@patn\relax%
+  \let\color@ptpe\relax%
+  \black
+}
+\uncolored
+
+
+%========== General
+
+\newcommand\N{\mathbb N}
+
+\newcommand\coloneqq{\mathbin{{:}{:}{=}}}
+
+\newcommand\e\varepsilon
+
+\newcommand\floor[1]{\lfloor#1\rfloor}
+
+\newcommand\fraction[2]{\textstyle{\frac{#1}{#2}}}
+
+\newcommand\pt{\kern1pt{\cdot}\kern1pt}
+
+
+%========== Sets
+
+\newcommand\Var   {\textsc{var}}
+\newcommand\Choice{\textsc{choice}}
+\newcommand\Bvar  {\textsc{bvar}}
+\newcommand\Stack {\textsc{stack}}
+\newcommand\Cont  {\textsc{cont}}
+\newcommand\Trace {\B^*} %{\textsc{trace}}
+\newcommand\Prob  {\textsc{prob}}
+
+%========== Numerals
+
+\newcommand\cno{\underline 0}
+\newcommand\cni{\underline 1}
+\newcommand\cnii{\underline 2}
+\newcommand\cniii{\underline 3}
+\newcommand\cniv{\underline 4}
+\newcommand\cnn{\underline n}
+\newcommand\cnm{\underline m}
+
+%========== Connectives
+
+\newcommand\smallbin[1]{\mathchoice
+      {\mathbin{\raise.2ex \hbox{$\scriptstyle      #1$}}}%
+      {\mathbin{\raise.2ex \hbox{$\scriptstyle      #1$}}}%
+      {\mathbin{\raise.12ex\hbox{$\scriptscriptstyle#1$}}}%
+      {\mathbin{           \hbox{$\scriptscriptstyle#1$}}}}%
+
+\newcommand\choicearrow{\kern1pt{\smallbin\rightarrow}\kern1pt}
+
+\newcommand\0\bot
+\newcommand\1\top
+
+\newcommand\pfx{\kern1pt{\cdot}\kern1pt}
+\newcommand\less{\kern1pt{\setminus}\kern1pt}
+\newcommand\only{\kern1pt{|}\kern1pt}
+
+%========== Vector notation
+
+\newcommand\vv[1]{\overline{#1}}
+\newcommand\VV[1]{\dbloverline{#1}}
+
+\newcommand{\dbloverline}[1]{\overline{\dbl@overline{#1}}}
+\newcommand{\dbl@overline}[1]{\mathpalette\dbl@@overline{#1}}
+\newcommand{\dbl@@overline}[2]{%
+  \begingroup
+  \sbox\z@{$\m@th#1\overline{#2}$}%
+  \ht\z@=\dimexpr\ht\z@-2\dbl@adjust{#1}\relax
+  \box\z@
+  \ifx#1\scriptstyle\kern-\scriptspace\else
+  \ifx#1\scriptscriptstyle\kern-\scriptspace\fi\fi
+  \endgroup
+}
+\newcommand{\dbl@adjust}[1]{%
+  \fontdimen8
+  \ifx#1\displaystyle\textfont\else
+  \ifx#1\textstyle\textfont\else
+  \ifx#1\scriptstyle\scriptfont\else
+  \scriptscriptfont\fi\fi\fi 3
+}
+
+
+%========== Probabilities
+
+\newcommand\probox[1]{\begin{tikzpicture}[baseline=0]\node[anchor=base](a){$\scriptstyle #1\vphantom)$};\draw[line width=.6pt] (-5pt,-2.5pt) rectangle (5pt,7.5pt);\end{tikzpicture}}
+
+\newcommand\prj[2]{\pi^#1_#2}
+
+% Sum with betting odds
+\newcommand\prob[1][\relax]{%
+\ifx#1\relax\oplus\else\mathbin{\begin{array}[t]{@{}c@{}}\oplus\\[-5pt]\scriptstyle{#1}\end{array}}}
+
+
+
+%========== Distributions
+
+\newcommand\DD{\mathcal D}
+\newcommand\DM{{\colorterm\mathcal M}}
+\newcommand\DN{{\colorterm\mathcal N}}
+\newcommand\DNo{{\colorterm\mathcal N_0}}
+\newcommand\DNi{{\colorterm\mathcal N_1}}
+\newcommand\DP{{\colorterm\mathcal P}}
+\newcommand\DS{\mathcal S}
+\newcommand\DT{\mathcal T}
+\newcommand\DU{\mathcal U}
+\newcommand\DV{\mathcal V}
+\newcommand\DW{\mathcal W}
+
+\newcommand\DR[2]{\mathcal{R}(#1,\term{#2})}
+
+\newcommand\D[1]{\{\D@start#1\D@end\}}
+\newcommand\D@start{\let\D@loop\D@next\D@loop}
+\newcommand\D@next[1]{%
+  \ifx#1\D@end\let\D@loop\relax\else%
+  \ifx#1.\let\D@loop\D@dots\else%
+  \ifx#1_\let\D@loop\D@sub\else%
+  \ifx#1/\let\D@loop\D@frac\else%
+  #1%
+  \fi\fi\fi\fi%
+  \D@loop%
+}
+\newcommand\D@end{}
+\newcommand\D@discard[1]{\D@start}
+\newcommand\D@dots{\@ifnextchar.{\dots\D@discard}{\pt\D@start}}
+\newcommand\D@sub[1]{_{#1}\D@start}
+\newcommand\D@frac[2]{\fraction{#1}{#2}\D@start}
+
+\newcommand\Ds[2]{\D{#1}_{#2}}
+
+
+\newcommand\Dt[1]{\Dt@next#1,\D@end}
+\newcommand\Dt@next{\@ifnextchar\D@end{}{\Dt@item}}
+\def\Dt@item#1.#2,{\pterm{#1}{#2}}
+
+\newcommand\Dts[2]{[\Dt{#1}]_{#2}}
+
+
+%========== Sequents
+\newcommand\seq@discard[1]{\seq@start}
+\newcommand\seq@comma{\@ifnextchar,{{\black,\dots,}~\seq@discard}{{\black,}~\seq@start}}
+
+
+%========== Types
+\newcommand\vec@space{\kern0.4pt}
+\newcommand\type[1]{{\colored\typ{#1}}}
+\newcommand\typ[1]{%
+  \vphantom)%
+  \let\seq@start\type@start%
+  \seq@start#1\@end%
+}
+\newcommand\type@start{\color@type\let\type@loop\type@next\type@loop}
+\newcommand\type@next[1]{%
+  \ifx#1\@end\let\type@loop\type@end\else%
+  \ifx#1`\let\type@loop\type@escape\else%
+  \ifx#1_\let\type@loop\type@sub\else%
+  \ifx#1^\let\type@loop\type@sup\else%
+  %
+  \ifx#1|\let\type@loop\type@bar\else%
+  \ifx#1,\let\type@loop\seq@comma\else%
+  \ifx#1!\let\type@loop\type@bang\else%
+  %
+  \ifx#1.\let\type@loop\type@dot\else%
+  \ifx#1=\let\type@loop\type@equals\else%
+  \ifx#1*{\star}\else%
+  \ifx#1/\let\type@loop\type@frac\else%
+  %
+  \ifx#1+\let\type@loop\type@plus\else%
+  \ifx#1-\let\type@loop\type@minus\else%
+  \ifx#1I\kern-1pt_I\else%
+  \ifx#1J\kern-1pt_J\else%
+  %
+  \typevar{#1}%
+  %
+  \fi\fi\fi\fi%
+  \fi\fi\fi%
+  \fi\fi\fi\fi%
+  \fi\fi\fi\fi%
+  \type@loop%
+}
+%
+\newcommand\type@end{\uncolored}
+\newcommand\type@discard[1]{\type@start}
+\newcommand\type@escape[1]{#1\type@start}
+% ^ _
+\newcommand\type@sub[1]{_{#1}\type@start}
+\newcommand\type@sup[1]{^{#1}\type@start}
+% !
+\newcommand\type@bang{\@ifnextchar!\type@Vec\type@vec}
+\newcommand\type@vec[1]{\vv{\typevar{#1}}\type@start}
+\newcommand\type@Vec[2]{\VV{\typevar{#2}}\type@start}
+% |- => .. + - /
+\newcommand\type@bar{\@ifnextchar-{~{\black\vdash}~\seq@discard}{\type@only}}
+\newcommand\type@only[1]{\only_{#1}\type@start}
+\newcommand\type@equals{\@ifnextchar>{\kern2pt{\smallbin\Rightarrow}\kern2pt\type@discard}{=\type@start}}
+\newcommand\type@dot{\@ifnextchar.{\kern1pt{\dots}\kern1pt\type@discard}{\pfx\type@start}}
+\newcommand\type@plus{\@ifnextchar+{\kern2pt{\sqcup}\kern2pt\type@discard}{\kern2pt{\smallbin+}\kern2pt\type@start}}
+\newcommand\type@minus[1]{\less_{#1}\type@start}
+\newcommand\type@frac[2]{\fraction{#1}{#2}\type@start}
+
+
+%========== Type variables
+\newcommand\typevar[1]{
+  \ifx#1r\rho\else%
+  \ifx#1s\sigma\else%
+  \ifx#1t\tau\else%
+  \ifx#1u\upsilon\else%
+  \ifx#1w\omega\else%
+  #1%
+  \fi\fi\fi\fi\fi%
+}
+
+
+%========== Terms
+
+\newcounter{@parens}
+
+\newcommand\term[1]{{\colored\trm{#1}}}
+\newcommand\trm[1]{%
+  \setcounter{@parens}{0}%
+  \vphantom(%
+  \let\seq@start\term@start%
+  \seq@start#1\@end%
+}
+\newcommand\term@start{\color@term\let\term@loop=\term@next\term@loop}
+\newcommand\term@next[1]{%
+  \ifx#1\@end\let\term@loop\term@end\else%
+  \ifx#1`\let\term@loop\term@escape\else%
+  \ifx#1_\let\term@loop\term@sub\else%
+  \ifx#1^\let\term@loop\term@sup\else%
+  \ifx#1!\let\term@loop\term@vec\else%
+  %
+  \ifx#1"\let\term@loop\term@color\else%
+  \ifx#1:\let\term@loop\term@colon\else%
+  \ifx#1|\let\term@loop\term@bar\else%
+  \ifx#1-\let\term@loop\term@dash\else%
+  %
+  \ifx#1((\stepcounter{@parens}\else%
+  \ifx#1))\addtocounter{@parens}{-1}\else%
+  \ifx#1\{\{\stepcounter{@parens}\else%
+  \ifx#1\}\}\addtocounter{@parens}{-1}\else%
+  \ifx#1,\ifnum\value{@parens}=0\let\term@loop\seq@comma\else,\fi\else%
+  %
+  \ifx#1*{\star}\else%
+  \ifx#1l\lambda\else%
+  \ifx#1<\langle\else%
+  \ifx#1>\rangle\else%
+  \ifx#1.\let\term@loop\term@dot\else%
+  %
+  \ifx#1?\let\term@loop\term@box\else%
+  \ifx#1;\,{;}\,\else%
+  \ifx#1=\kern1pt{\smallbin=}\kern1pt\else%
+  \ifx#1G{{\black\Gamma}}\else%
+  \ifx#1D{{\black\Delta}}\else%
+  %
+  \ifx#1p\let\term@loop\term@project\else%
+  \ifx#1+\kern1pt{\smallbin\oplus}\kern1pt\else%
+  %\ifx#1/\let\term@loop\term@frac\else%
+  %
+  \ifx#1S{{\black S}}\else%
+  \ifx#1T{{\black T}}\else%
+  %
+  #1%
+  %
+  \fi\fi\fi\fi\fi%
+  \fi\fi\fi\fi%
+  \fi\fi\fi\fi\fi%
+  \fi\fi\fi\fi\fi%
+  \fi\fi\fi\fi\fi%
+  \fi\fi%\fi%
+  \fi\fi%
+  \term@loop%
+}
+\newcommand\term@end{\color{black}\uncolored}
+\newcommand\term@discard[1]{\term@start}
+\newcommand\term@escape[1]{#1\term@start}
+\newcommand\term@color[1]{\color{#1}\term@start}
+% ^ _
+\newcommand\term@sub[1]{_{#1}\term@start}
+\newcommand\term@sup[1]{^{#1}\term@start}
+% vectors
+\newcommand\term@vec[1]{\vv{#1}\term@start}
+% |-
+\newcommand\term@bar{\@ifnextchar-{~{\black\vdash}~\term@discard}{|\term@start}}
+% : :=
+\newcommand\term@colon{\@ifnextchar={\term@assign}{\term@type}}
+\newcommand\term@assign{\mathbin{{:}{=}}\term@discard}
+\newcommand\term@type{\black{{}:{}}\type@start}
+% ->
+\newcommand\term@dash{\@ifnextchar>{\choicearrow\term@discard}{-\term@start}}
+% ..
+\newcommand\term@dot{\@ifnextchar.{\dots\term@discard}{.\,\term@start}}
+% [a] pi /
+\newcommand\term@box[1]{\probox{#1}\kern1pt\term@start}
+\newcommand\term@project[2]{\prj{#1}{#2}\term@start}
+\newcommand\term@frac[2]{\fraction{#1}{#2}\term@start}
+
+%========== Programming in the FMC
+
+\newcommand\get{\mathsf{get}~}
+\newcommand\set{\mathsf{set}~}
+\newcommand\print{\mathsf{print}}
+\newcommand\rand{\mathsf{rand}}
+\newcommand\rd{\mathsf{read}}
+\newcommand\ifthen{\mathsf{if}}
+\newcommand\B{\mathbb B}
+\newcommand\Z{\mathbb Z}
+
+
+%========== LOCATIONS
+
+\newcommand\A{\mathcal A}
+\newcommand\rnd{\mathsf{rnd}} %{\scriptstyle rnd}}
+\newcommand\nd {\mathsf{nd}}  %{\scriptstyle nd}}
+\newcommand\inp{\mathsf{in}}  %{\scriptstyle in}}
+\newcommand\out{\mathsf{out}} %{\scriptstyle out}}
+
+%========== Big-step
+
+\newcommand\evalarrow{{\Downarrow}}
+\newcommand\eval[4][{}]{#2,\term{#3}\,\evalarrow_{#1}\,#4}
+
+\newcommand\evl[2]{#1,#2\,\evalarrow}
+
+\newcommand\partevalarrow{{\Downarrow^p}}
+\newcommand\evalp[3]{#1,\term{#2}\,\partevalarrow\,#3}
+
+%========== Reducibility
+
+\newcommand\RUN[1]{\textsc{run}(\type{#1})}
+\newcommand\SRUN[1]{\textsc{run}(\term{#1})}
+
+%========== Machine
+
+% States
+\newcommand\state[4]{(#1,#2,\term{#3},#4)}
+\newcommand\State[4]{(\,#1~,~#2~,~\term{#3}~,~#4\,)}
+
+% Steps
+\newcommand\dline{\hline\hline\rule[-5pt]{0pt}{15pt}}
+
+\newcommand\three@step[7][\relax]{%
+\begin{array}{@{(~}l@{~,~}r@{~,~}r@{~)}}%
+         #2 & \term{#3} & #4%
+\\\hline #5 & \term{#6} & #7%
+\end{array}%
+\ifx#1\relaxe\else\scriptstyle{~#1}\fi%
+}
+\newcommand\three@steps[7][\relax]{%
+\begin{array}{@{(~}l@{~,~}r@{~,~}r@{~)}}%
+         #2 & \term{#3} & #4%
+\\\dline #5 & \term{#6} & #7%
+\end{array}%
+\ifx#1\relaxe\else\raisebox{3pt}{$\scriptstyle{~#1}$}\fi%
+}
+
+\newcommand\four@step[8]{%
+\begin{array}{@{(~}l@{~,~}l@{~,~}r@{~,~}r@{~)}}%
+         #1 & #2 & \term{#3} & #4%
+\\\hline #5 & #6 & \term{#7} & #8%
+\end{array}%
+}
+\newcommand\four@steps[8]{%
+\begin{array}{@{(~}l@{~,~}l@{~,~}r@{~,~}r@{~)}}%
+         #1 & #2 & \term{#3} & #4%
+\\\dline #5 & #6 & \term{#7} & #8%
+\end{array}%
+}
+
+\newcommand\threestate{\let\@step\three@step\let\@steps\three@steps}
+\newcommand\fourstate{\let\@step\four@step\let\@steps\four@steps}
+
+\fourstate
+
+\newcommand\step[1]{%
+  \ifx#1-\let\@next\@step\else%
+  \ifx#1=\let\@next\@steps\else%
+  \fi\fi%
+  \@next%
+}
+
+\newcommand\runs[2]{\mathcal R(#1,\term{#2})}
+
+%========== REWRITING
+
+\tikzstyle{rwhead}=[>/.tip={Triangle[open,length=2.5pt,width=4.5pt]},|/.tip={Rectangle[length=.5pt,width=4.5pt]}]
+
+\tikzstyle{rw} =[line width=.5pt,rwhead,->]
+\tikzstyle{rws}=[line width=.5pt,rwhead,->.>]
+\tikzstyle{rwn}=[line width=.5pt,rwhead,->.>|]
+
+\newcommand\rw  {\mathrel{\tikz\draw[rw]  (0,0)--(10pt,0pt);}}
+\newcommand\rws {\mathrel{\tikz\draw[rws] (0,0)--(10pt,0pt);}}
+\newcommand\rwn {\mathrel{\tikz\draw[rwn] (0,0)--(10pt,0pt);}}
+
+\newcommand\rwl  [1][\relax]{\mathrel{_{#1}\tikz\draw[rw]  (10pt,0pt)--(0,0);}}
+\newcommand\rwls [1][\relax]{\mathrel{_{#1}\tikz\draw[rws] (10pt,0pt)--(0,0);}}
+\newcommand\rwln [1][\relax]{\mathrel{_{#1}\tikz\draw[rwn] (10pt,0pt)--(0,0);}}
+
+
