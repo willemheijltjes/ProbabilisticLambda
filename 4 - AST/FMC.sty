@@ -25,12 +25,12 @@
 \colorlet{term}{1}
 \colorlet{type}{2}
 
-\newcommand\colorterm{\color{term}}
-\newcommand\colortype{\color{type}}
+\newcommand\termcolor{\color{term}}
+\newcommand\typecolor{\color{type}}
 
 \newcommand\colored{%
-  \let\color@term\colorterm%
-  \let\color@type\colortype%
+  \let\color@term\termcolor%
+  \let\color@type\typecolor%
   \let\color@ctxt\colorctxt%
   \let\color@simp\colorsimp%
   \let\color@patn\colorpatn%
@@ -140,11 +140,11 @@
 %========== Distributions
 
 \newcommand\DD{\mathcal D}
-\newcommand\DM{{\colorterm\mathcal M}}
-\newcommand\DN{{\colorterm\mathcal N}}
-\newcommand\DNo{{\colorterm\mathcal N_0}}
-\newcommand\DNi{{\colorterm\mathcal N_1}}
-\newcommand\DP{{\colorterm\mathcal P}}
+\newcommand\DM{{\termcolor\mathcal M}}
+\newcommand\DN{{\termcolor\mathcal N}}
+\newcommand\DNo{{\termcolor\mathcal N_0}}
+\newcommand\DNi{{\termcolor\mathcal N_1}}
+\newcommand\DP{{\termcolor\mathcal P}}
 \newcommand\DS{\mathcal S}
 \newcommand\DT{\mathcal T}
 \newcommand\DU{\mathcal U}
