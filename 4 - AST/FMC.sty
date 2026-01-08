@@ -238,7 +238,7 @@
 \newcommand\type@only[1]{\only_{#1}\type@start}
 \newcommand\type@equals{\@ifnextchar>{\kern2pt{\smallbin\Rightarrow}\kern2pt\type@discard}{=\type@start}}
 \newcommand\type@dot{\@ifnextchar.{\kern1pt{\dots}\kern1pt\type@discard}{\pfx\type@start}}
-\newcommand\type@plus{\@ifnextchar+{\kern2pt{\sqcup}\kern2pt\type@discard}{\kern2pt{\smallbin+}\kern2pt\type@start}}
+\newcommand\type@plus{\@ifnextchar+{\kern2pt{\sqcup}\kern2pt\type@discard}{\kern2pt{\smallbin\oplus}\kern2pt\type@start}}
 \newcommand\type@minus[1]{\less_{#1}\type@start}
 \newcommand\type@frac[2]{\fraction{#1}{#2}\type@start}
 

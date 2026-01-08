@@ -25,7 +25,7 @@
 % - - - - - - - - - - - - - - -
 
 
-\newcommand\looppic[1]{
+\newcommand\looppicx[1]{
 \begin{tikzpicture}[thick,x=12pt,y=12pt,outer sep=0pt,inner sep=2pt]
 	\coordinate (m) at (0,0);
 	
@@ -49,12 +49,39 @@
     	\fi	
 	
 	\node[draw=red,fill=red!10,rounded corners,minimum size=16pt] (M) at (m) {$\term M$};
-	
 	\draw[->,>=stealth] (0,2)--(M);	
-	
 \end{tikzpicture}
 }
 
+\newcommand\looppic[1]{
+\vcenter{\hbox{%
+\begin{tikzpicture}[thick,x=18pt,y=15pt,outer sep=0pt,inner sep=2pt]
+	\coordinate (m) at (0,0);
+	
+	\node at (-0.3,-2) {$\dots$};
+	
+	\begin{scope}[->,>=stealth,anchor=north]
+		\draw (m)--node[pos=0.7,anchor=east]{$\termcolor\scriptstyle{i_1\,}$} (-1,-2) node {$\vphantom:\typecolor\scriptstyle{\ifx#11p_1\else\frac{p_1}{1-q}\fi}$};
+		\draw (m)--node[pos=0.7,anchor=east]{$\termcolor\scriptstyle{i_n\,}$} (.4,-2) node {$\vphantom:\typecolor\scriptstyle{\ifx#11p_n\else\frac{p_n}{1-q}\fi}$};
+	\ifx#11
+		\draw (m)--node[pos=0.7,anchor=west]{\,$\termcolor\scriptstyle{j}$}   ( 1,-2) node {$\vphantom:\typecolor\scriptstyle{q}$};
+	\fi
+	\end{scope}
+	
+	\node (x) at (0,-3) {};
+	
+	\coordinate (a) at ( .85,-1.7);% \node[gray,circle,draw,inner sep=0pt,minimum size=2pt] at (a) {};
+	\coordinate (b) at (1.25,-1.6);% \node[gray,circle,draw,inner sep=0pt,minimum size=2pt] at (b) {};
+	
+    	\ifx#10
+		%\draw (m) [rounded corners=20pt] -- (1.25,-2.5) [rounded corners=5pt] -- (1.25,1.5) -- (0,1.5) -- (0,1);
+		\draw[rounded corners=5pt] (m) -- (.5,-1) .. controls (a) and (b) .. (1.25,-.75) -- (1.25,1.5) -- (0,1.5) -- (0,1);
+    	\fi	
+	
+	\node[draw=red,fill=red!10,rounded corners,minimum size=16pt] (M) at (m) {$\term M$};
+	\draw[->,>=stealth] (0,2)--(M);	
+\end{tikzpicture}}}
+}
 
 %====================================================================================================
 \begin{document}
@@ -72,60 +99,93 @@
 
 \section{Introduction}
 
-We are interested in applying the tools of the $\lambda$-calculus, in particular confluent reduction and type systems, to probabilistic computation. In~\cite{DalLago-Guerreri-Heijltjes-2020} we restored confluence to a probabilistic $\lambda$-calculus, the probabilistic event $\lambda$-calculus (PEL), by decomposing probabilistic choice into a \emph{sampling} construct and a \emph{conditional}. Independently in~\cite{Antonelli-DalLago-Pistone-2022} and~\cite{Heijltjes-Majuri-2025}, from different inspirations we converged on essentially the same probabilistic type system for the PEL to give lower bounds on the probability of termination. In this paper we further extend the calculus, and develop a type system for \emph{almost sure termination}: termination with probability one.
+We are interested in applying the tools of the $\lambda$-calculus, in particular confluent reduction and type systems, to probabilistic computation. In~\cite{DalLago-Guerreri-Heijltjes-2020} we restored confluence to a probabilistic $\lambda$-calculus, the probabilistic event $\lambda$-calculus (PEL), by decomposing probabilistic choice into a \emph{sampling} construct and a \emph{conditional}. Independently in~\cite{Antonelli-DalLago-Pistone-2022} and~\cite{Heijltjes-Majuri-2025}, from different inspirations we converged on essentially the same probabilistic type system for the PEL to give lower bounds on the probability of termination. In this paper we further extend the calculus, and develop a type system for \emph{almost sure termination} (AST): termination with probability one.
 
-We start from the following observation. \emph{Iteration}, generally represented by while-loops, repeats a given function $f$ until a condition is fulfilled. In the typed case, illustrated  below, the function $f$ is required to return a sum $B+A$ where the choice between returning a value $A$ or $B$ represents the condition. Then $\mathsf{iter}\;f$ first evaluates $f$, and exits on $B$ and repeats on $A$.
+We start from the following observation. \emph{Iteration}, generally represented by while-loops, repeats a given function $f$ until a condition is fulfilled. In the typed case, illustrated  below, the function $f$ is required to return a sum $B+A$ where the choice between returning a value $A$ or $B$ represents the condition. Then $\mathsf{iter}\,f$ first evaluates $f$, and exits on $B$ and repeats on $A$.
 \[
 \begin{array}{@{}r@{}l@{}}
 	f &{}: A \to B+A
 \\ \hline
-	\mathsf{iter}\;f &{}: A\to B
+	\mathsf{iter}\,f &{}: A\to B
 \end{array}
 	%\infer{\mathsf{iter}~f : A\to B} { f : A \to B+A } 
 	% \qquad \mathsf{iter}~f~=~[\mathsf{id},\mathsf{iter}~f]\,\circ\,f
 	%It is defined as the least solution to the equation below right, where $[-,-]$ is the co-diagonal of the coproduct.
 \]
-We observe that if we replace $B+A$ by a probabilistic sum $B \oplus_p A$ with a fixed probability $p\in (0,1]$, i.e.\ the probability of choosing $B$ is non-zero, and $f$ is itself terminating, then $\mathsf{iter}\;f$ is \emph{almost surely terminating}. This opens a way to approach almost sure termination via type systems.
+We observe that if we replace $B+A$ by a probabilistic sum $B \oplus_p A$ with a fixed probability $p\in (0,1]$, i.e.\ the probability of choosing $B$ is non-zero, then $\mathsf{iter}\,f$ is \emph{almost surely terminating} (provided of course that $f$ is itself terminating). This opens a way to approach almost sure termination via type systems.
 
 These considerations demonstrate how probabilistic choice is tied up with other imperative features such as sequentiality and iteration. Derived from the PEL, the second author has developed new approach to unifying the $\lambda$-calculus with imperative features, the Functional Machine Calculus (FMC)~\cite{Heijltjes-2022}. Its most recent iteration~\cite{Heijltjes-2025-MFPS} features branching sequential computation and iteration, providing an ideal vehicle for our present study.
 
-In the FMC each branch of the computation is labelled with a \emph{choice} $i,j,k,\dots$, which takes the role of a constant, an exception, a case label, or an exit status. For a term $\term{M}$ with branches $i$ and $j$, depicted below left, the term $\term{M^j}$ iterates on the branch $j$ and exits on $i$, below right. (A term may have more branches, but we restrict $\term M$ to two for simplicity of exposition.) The probability of choosing each branch is included in the typing information, indicated below in blue: $\term M$ chooses $i$ with probability $p$ and $j$ with probability $q$. These must sum to at most one, as usual, but not exacly one: $\term M$ may also diverge with probability $1-p-q$. We may render the return type of $\term M$ as $\type{p_i+q_j}$, retaining the branch labels and their probabilities (the full exposition will include further typing information).
-\[
-\looppic1 \qquad \looppic0
-\]
-The probability $\frac p{1-q}$ of choosing branch $i$ in $\term{M^j}$ may be computed in two ways. The first gives the probability of choosing $i$ at each iteration of the loop as the following geometric series, given by the recurrence $x = p + qx$, which has the expected probability as its limit.
-\[
-p + pq + pq^2 + pq^3 + \cdots ~=~ \frac p{1-q}
-\]
-For the second we observe that the typing rule for $\mathsf{iter}$ simply removes the iterated branch $A$ from the sum $B+A$ and apply this to the probabilistic setting. For $\term M$ we have the probabilities $d$, $p$, and $q$ where $d=1-p-q$ is the probability of divergence. Then for $\term{M^j}$ we remove $q$ and renormalize $d$ and $p$ to sum to one. Since $d+p=1-q$ these are given directly by $\frac d{1-q}$ and $\frac p{1-q}$.
+In the FMC each branch of the computation is labelled with a \emph{choice} label $i,j,k,\dots$, which takes the role of a constant, an exception, a case label, or an exit status. For example, the boolean constants $\bot$ and $\top$ are choice labels. Iteration of a term $\term M$ is written $\term{M^i}$, which evaluates $\term M$ and repeats if $\term M$ chooses $i$, and terminates for any other choice. The calculus encodes a fair probabilistic choice, which we write as $\term{M+N}$.
 
 \begin{example}
-For a concrete example, if $p=\frac12$ and $q=\frac13$ then $\term M$ diverges, chooses $i$, or chooses $j$ with the ratio $\frac16:\frac12:\frac13$ or $1:3:2$. Removing $q$ leaves the ratio $1:3$ or the probabilities $\frac d{1-q}=\frac14$ and $\frac p{1-q}=\frac 34$ respectively.
+The term $\term{(\bot + (\top + \,i))^i}$ chooses $\bot$ with probability $\frac12$, $\top$ with probability $\frac14$, and iterates with probability $\frac14$, to give an overall probability of $\frac 23$ for $\bot$ and $\frac 13$ for $\top$. We illustrate it pictorially as follows.
+\[
+	\term{(\bot + (\top + \,i))^i}
+\quad=\quad
+\vcenter{\hbox{%
+\begin{tikzpicture}[thick,x=20pt,y=24pt,outer sep=0pt,inner sep=1pt]
+	\node (x) at (1,2) {$\termcolor\oplus$};
+	\node (y) at (2,1) {$\termcolor\oplus$};
+
+	\coordinate (a) at (2.75,0.25); %\node[gray,circle,draw,inner sep=0pt,minimum size=2pt] at (a) {};
+	\coordinate (b) at (3   ,0.3);  %\node[gray,circle,draw,inner sep=0pt,minimum size=2pt] at (b) {};
+	
+	\begin{scope}[->,>=stealth,anchor=north]
+	
+	\draw (1,2.7)--(x);
+	\draw (x)--(y);
+	\draw (x) --node[pos=0.6,anchor=south east]{$\termcolor\scriptstyle{\bot}$} (0,1);
+	\draw (y) --node[pos=0.6,anchor=south east]{$\termcolor\scriptstyle{\top}$} (1,0);
+	
+	\draw[rounded corners=5pt] (y) -- node[pos=0.6,anchor=north east]{$\,\termcolor\scriptstyle{i}$}  
+	  (2.5,0.5) .. controls (a) and (b) .. (3,0.7) -- (3,2.5) -- (1,2.5) -- (x);
+	\end{scope}
+\end{tikzpicture}}}
+\]
 \end{example}
 
-Simplified, the typing rule for iteration $\term{M^j}$ looks as follows, where $p_I$ is a family of probabilities in a set $I=\{i_1,i_2,\dots,i_n\}$ of choice labels, multiplied with the probability $\frac 1{1-q}$ pointwise in the rule below. The double arrow is the function type and $\varepsilon$ represents the lack of an input value.
+The type system, simplified for this introduction to omit return values, records the probability of terminating with each given choice. A term $\term M$ is typed as follows, indicating that it may choose $i_k$ with probability $p_k$ from choices $i_1$ through $i_n$.
+\[
+	\term{M : \e ~=>~ p_1 i_1 + \cdots + p_n i_n }
+\]
+Here, the double arrow $\type{=>}$ is the function type and $\type\varepsilon$ represents the lack of an input value. The return type is a probability (sub-)distribution over the choices $\{i_1,\dots,i_n\}$, written as a formal sum. The probabilities $p_1$ through $p_n$ may sum to less than one, with the remainder representing a probability of divergence.
+
+\begin{example}
+For the body of our example term, without the loop, we have the following type.
+\[
+	\term{\bot + (\top + \,i) : \e ~=>~ /12\bot + /14\top + /14i}
+\]
+\end{example}
+
+Iteration $\term{M^i}$ removes a choice $i$ from the possible return choices. In the probabilistic setting, the remaining probabilities must then be renormalized to a distribution. That is, if $i$ has probability $q$, the remaining choices (including divergence) have a total probability $1-q$, and must be multiplied by $\frac1{1-q}$ to return the total to one. Typing for iteration is then as follows.
 \[
 \begin{array}{@{}r@{}l@{}}
-	\term{M}   &{}: \type{\e => p_I + q_j}
+	\term{M}   &{}: \type{\e ~=>~ p_1i_1 + \dots + p_ni_n + qj}
 \\ \hline \\[-10pt]
-	\term{M^j} &{}: \type{\e => /1{1-q}p_I}
+	\term{M^j} &{}: \type{\e ~=>~ /{p_1}{1-q}i_1 + \dots + /{p_n}{1-q}i_n}
 \end{array}	
+\qquad
+\term{M}=\looppic1 \qquad \term{M^j}=\looppic0
 \]
 
 \begin{example}
-Our calculus encodes a fair probabilistic choice, which we write as $\term{M+N}$. The following term then computes an unfair coin toss with probability $\frac 23$ of tails and $\frac 13$ of heads, given by the booleans $\term\bot$ and $\term\top$ as choice labels.
+The return type for our example term is given by renormalizing the sub-distribution $\type{/12\bot + /14\top}$, remaining after removing the element $\type{/14i}$, by multiplying by $\frac 43$, giving the following.
 \[
-	\term{(\bot + (\top + i))^i}
-\]
-The types of the iterated body and the term itself are as follows.
-\[
-\term{\bot + (\top + i) : \e => (/12)_\bot + (/14)_\top + (/14)_i}
-\qquad
-\term{(\bot + (\top + i))^i : \e => (/23)_\bot + (/13)_\top}
+	\term{(\bot + (\top + \,i))^i : \e ~=>~ /23\bot + /13\top}
 \]
 \end{example}
 
-The typed calculus, the probabilistically typed FMC (FMC$^\oplus$), achieves the following. It guarantees termination with the probability given by the sum of all $p$ in $p_I$, which is almost sure termination if the sum is one, in the presence of higher-order probabilistic functions. In a first-order setting it guarantees \emph{positive} almost sure termination (expected evaluation time is finite), where still it may capture all Markov chains and directly compute their expected output. In the higher-order setting, which gives access to Church numerals, there are examples of \emph{non-positive} or \emph{null} AST.
+Types for iteration then correctly give the probabilities for each choice. Consider $\term{M^j}$ where $j$ has probability $q$ in $\term M$. For any other choice $i$ with probability $p$ in $\term M$ the chance of $\term{M^j}$ choosing $i$ is given by the following geometric series, generated by choosing $i$ immediately, then after one loop, after two loops, and so forth. The limit of this series is the probability given by the type system.
+\[
+	p + pq + pq^2 + pq^3 + \cdots ~=~ \frac p{1-q}
+\]
+
+The typed calculus, the probabilistically typed FMC (FMC$^\oplus$), achieves the following. A term is guaranteed to terminate with the probabilities of its return type, which is almost sure termination if the sum probability is one, also in the presence of higher-order probabilistic functions. In a first-order setting it guarantees \emph{positive} almost sure termination (expected evaluation time is finite), where still it may capture all Markov chains and directly compute their expected output. In the higher-order setting, which gives access to Church numerals, there are examples of \emph{non-positive} or \emph{null} AST.
+
+
+\end{document}
+
 
 
 
