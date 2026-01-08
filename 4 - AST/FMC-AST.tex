@@ -1,7 +1,5 @@
-\documentclass{article}
 
-\usepackage[T1]{fontenc}
-\usepackage{palatino}
+\documentclass[a4paper,UKenglish,cleveref, autoref, thm-restate]{lipics-v2021}
 
 \usepackage{amsmath,amssymb,amsthm}
 \usepackage{stmaryrd}
@@ -11,47 +9,40 @@
 
 \usepackage{FMC}
 
-% - - - - - - - - - - - - - - -
 
-\theoremstyle{plain}
-\newtheorem{theorem}             {Theorem}
-\newtheorem{lemma}      [theorem]{Lemma}
-\newtheorem{proposition}[theorem]{Proposition}
+\bibliographystyle{plainurl}
 
-\theoremstyle{definition}
-\newtheorem{definition} [theorem]{Definition}
-\newtheorem{example}    [theorem]{Example}
 
 % - - - - - - - - - - - - - - -
 
 
-\newcommand\looppicx[1]{
-\begin{tikzpicture}[thick,x=12pt,y=12pt,outer sep=0pt,inner sep=2pt]
-	\coordinate (m) at (0,0);
-	
-	\begin{scope}[->,>=stealth,anchor=north]
-		\ifx#11
-		\draw (m)--node[pos=0.6,anchor=east]{$\termcolor\scriptstyle{i\vphantom j\,}$} (-1,-2) node {$\vphantom:\typecolor\scriptstyle{p}$};
-		\draw (m)--node[pos=0.6,anchor=west]{\,$\termcolor\scriptstyle{j}$}            ( 1,-2) node {$\vphantom:\typecolor\scriptstyle{q}$};
-		\else
-		\draw (m)--node[pos=0.6,anchor=east]{$\termcolor\scriptstyle{i\vphantom j\,}$} (-1,-2) node {$\vphantom:\typecolor\scriptstyle{\frac p{1-q}}$};
-		\fi
-	\end{scope}
-	
-	\node (x) at (0,-3) {};
-	
-	\coordinate (a) at ( .85,-1.7);% \node[gray,circle,draw,inner sep=0pt,minimum size=2pt] at (a) {};
-	\coordinate (b) at (1.25,-1.6);% \node[gray,circle,draw,inner sep=0pt,minimum size=2pt] at (b) {};
-	
-    	\ifx#10
-		%\draw (m) [rounded corners=20pt] -- (1.25,-2.5) [rounded corners=5pt] -- (1.25,1.5) -- (0,1.5) -- (0,1);
-		\draw[rounded corners=5pt] (m) -- (.5,-1) .. controls (a) and (b) .. (1.25,-.75) -- (1.25,1.5) -- (0,1.5) -- (0,1);
-    	\fi	
-	
-	\node[draw=red,fill=red!10,rounded corners,minimum size=16pt] (M) at (m) {$\term M$};
-	\draw[->,>=stealth] (0,2)--(M);	
-\end{tikzpicture}
-}
+%\newcommand\looppicx[1]{
+%\begin{tikzpicture}[thick,x=12pt,y=12pt,outer sep=0pt,inner sep=2pt]
+%	\coordinate (m) at (0,0);
+%	
+%	\begin{scope}[->,>=stealth,anchor=north]
+%		\ifx#11
+%		\draw (m)--node[pos=0.6,anchor=east]{$\termcolor\scriptstyle{i\vphantom j\,}$} (-1,-2) node {$\vphantom:\typecolor\scriptstyle{p}$};
+%		\draw (m)--node[pos=0.6,anchor=west]{\,$\termcolor\scriptstyle{j}$}            ( 1,-2) node {$\vphantom:\typecolor\scriptstyle{q}$};
+%		\else
+%		\draw (m)--node[pos=0.6,anchor=east]{$\termcolor\scriptstyle{i\vphantom j\,}$} (-1,-2) node {$\vphantom:\typecolor\scriptstyle{\frac p{1-q}}$};
+%		\fi
+%	\end{scope}
+%	
+%	\node (x) at (0,-3) {};
+%	
+%	\coordinate (a) at ( .85,-1.7);% \node[gray,circle,draw,inner sep=0pt,minimum size=2pt] at (a) {};
+%	\coordinate (b) at (1.25,-1.6);% \node[gray,circle,draw,inner sep=0pt,minimum size=2pt] at (b) {};
+%	
+%    	\ifx#10
+%		%\draw (m) [rounded corners=20pt] -- (1.25,-2.5) [rounded corners=5pt] -- (1.25,1.5) -- (0,1.5) -- (0,1);
+%		\draw[rounded corners=5pt] (m) -- (.5,-1) .. controls (a) and (b) .. (1.25,-.75) -- (1.25,1.5) -- (0,1.5) -- (0,1);
+%    	\fi	
+%	
+%	\node[draw=red,fill=red!10,rounded corners,minimum size=16pt] (M) at (m) {$\term M$};
+%	\draw[->,>=stealth] (0,2)--(M);	
+%\end{tikzpicture}
+%}
 
 \newcommand\looppic[1]{
 \vcenter{\hbox{%
@@ -83,18 +74,50 @@
 \end{tikzpicture}}}
 }
 
-%====================================================================================================
-\begin{document}
+%==================================================================================================== FRONTMATTER
 
 \title{Simple Types for Almost Sure Termination}
-\author{Ugo Dal Lago and Willem Heijltjes}
+
+\author{Ugo {Dal Lago}}{University of Bologna, Italy \and INRIA Sophia Antipolis, France}{ugo.dallago@unibo.it}{https://orcid.org/0000-0001-9200-070X}{}
+
+\author{Willem B. Heijltjes}{University of Bath, United Kingdom \and \url{http://willem.heijltj.es}}{w.b.heijltjes@bath.ac.uk}{https://orcid.org/0009-0001-8941-1150}{}
+
+\authorrunning{U. Dal Lago and W.\,B. Heijltjes}
+
+\Copyright{Ugo Dal Lago and Willem B. Heijltjes}
+
+\ccsdesc[500]{Theory of computation~Lambda calculus}
+\ccsdesc[300]{Theory of computation~Probabilistic computation}
+
+\keywords{probabilistic lambda-calculus, type systems, almost sure termination}
+
+%\relatedversion{}
+
+%\acknowledgements{Georgina Majury?}
+
+\nolinenumbers
+
+\EventEditors{}
+\EventNoEds{0}
+\EventLongTitle{}
+\EventShortTitle{}
+\EventAcronym{}
+\EventYear{}
+\EventDate{}
+\EventLocation{}
+\EventLogo{}
+\SeriesVolume{}
+\ArticleNo{}
+
+%==================================================================================================== DOCUMENT
+\begin{document}
 
 \maketitle
 
 \begin{abstract}
+
 \end{abstract}
    
-
 %---------------------------------------------------------------------------------------------------- INTRODUCTION
 
 \section{Introduction}
@@ -181,8 +204,11 @@ Types for iteration then correctly give the probabilities for each choice. Consi
 	p + pq + pq^2 + pq^3 + \cdots ~=~ \frac p{1-q}
 \]
 
+
+
 The typed calculus, the probabilistically typed FMC (FMC$^\oplus$), achieves the following. A term is guaranteed to terminate with the probabilities of its return type, which is almost sure termination if the sum probability is one, also in the presence of higher-order probabilistic functions. In a first-order setting it guarantees \emph{positive} almost sure termination (expected evaluation time is finite), where still it may capture all Markov chains and directly compute their expected output. In the higher-order setting, which gives access to Church numerals, there are examples of \emph{non-positive} or \emph{null} AST.
 
+The FMC$^\oplus$ is a new type system for the FMC~\cite{Heijltjes-2025}, while the underlying calculus remains essentially the same. It is also a conservative extension of the \emph{sequential} probabilistic event $\lambda$-calulculus
 
 %\cite{Hurd-2002}
 
@@ -203,6 +229,8 @@ The typed calculus, the probabilistically typed FMC (FMC$^\oplus$), achieves the
 
 * Probabilistic iteration is straightforward and natural, taking  $f : A \to A+B$ to $\mathsf{iter}~f : A\to B$, which is AST if $A+B$ is a probabilistic sum which has a non-zero probability of choosing $B$. 
 
+
+* Zero-th order and first-order fragments.
 }
 
 %---------------------------------------------------------------------------------------------------- PROBABILISTIC FMC
@@ -743,9 +771,15 @@ Let $\type{!tI}=\type{\{!t_i.p_i\}_{i\in I}}$. By Lemma~\ref{lem:run} we have $\
 % - - - - - - - - - - - - - - -
 
 
+\newpage
+%----------------------------------------------------------------------------------------------------
+\section{Properties of the calculus}
+
+{\color{green!66!black}
+Give 0th- and 1st-order fragments, encode Markov chains, show PAST and NAST.
+}
 
 %----------------------------------------------------------------------------------------------------
-\newpage
 \subsection{Encoding Markov chains}
 
 A Markov chain
@@ -822,15 +856,15 @@ Its interpretation is as follows, writing $\term{M+N+P}$ for the term $\termcolo
 \\         &~=~ \term{((a+(a+b+k)^c+j)^b + (a+(a+c+j)^b+k)^c+i)^a}
 \end{aligned}
 \]
-This term is typed as follows.
+This term is typed as follows. As in the introduction, for brevity we omit return stacks from the types.
 \[
 \begin{aligned}
-	    \term{(a+b+k)^c}         &: \type{\e => \e./13a + \e./13b + \e./13k}
-\\[5pt]	\term{ a+(a+b+k)^c+j}~~~ &: \type{\e => \e./49a + \e./19b + \e./19k + \e./13j}
-\\[5pt] \term{(a+(a+b+k)^c+j)^b} &: \type{\e => \e./12a + \e./18k + \e./38j}
-\\[5pt] \term{(a+(a+c+j)^b+k)^c} &: \type{\e => \e./12a + \e./18j + \e./38k}
-\\[5pt] \term{ (a+(a+b+k)^c+j)^b + (a+(a+c+j)^b+k)^c+i}~~~ &: \type{\e => \e./13a + \e./16k + \e./16j + \e./13i}
-\\[5pt] \term{((a+(a+b+k)^c+j)^b + (a+(a+c+j)^b+k)^c+i)^a} &: \type{\e => \e./14k + \e./14j + \e./12i}
+	    \term{(a+b+k)^c}         &: \type{\e => /13a + /13b + /13k}
+\\[5pt]	\term{ a+(a+b+k)^c+j}~~~ &: \type{\e => /49a + /19b + /19k + /13j}
+\\[5pt] \term{(a+(a+b+k)^c+j)^b} &: \type{\e => /12a + /18k + /38j}
+\\[5pt] \term{(a+(a+c+j)^b+k)^c} &: \type{\e => /12a + /18j + /38k}
+\\[5pt] \term{ (a+(a+b+k)^c+j)^b + (a+(a+c+j)^b+k)^c+i}~~~ &: \type{\e => /13a + /16k + /16j + /13i}
+\\[5pt] \term{((a+(a+b+k)^c+j)^b + (a+(a+c+j)^b+k)^c+i)^a} &: \type{\e => /14k + /14j + /12i}
 \end{aligned}
 \]
 The interpretation may be illustrated as follows, where the solid edges represent the tree-shape of the probabilistic sums, while the dashed edges represent the loops.
@@ -875,17 +909,21 @@ As the illustration suggests, the formalism may express any probabilistic tree w
 The types work out the same way.
 \[
 \begin{aligned}
-	    \term{ b+c+i }~~~             &: \type{\e => \e./13b + \e./13c + \e./13i}
-\\[5pt] \term{ b+c+i ; b -> a+c+j}~~~ &: \type{\e => \e./19a + \e./49c + \e./13i + \e./19j}
-\\[5pt] \term{(a+b+k ; b -> a+c+j)^c} &: \type{\e => \e./12a + \e./18j + \e./38k}
-\\[5pt] \term{ b+c+i ; b -> a+c+j ; c -> (a+b+k ; b -> a+c+j)^c}     &: \type{\e => \e./13a + \e./13i + \e./16j + \e./16k}
-\\[5pt] \term{(b+c+i ; b -> a+c+j ; c -> (a+b+k ; b -> a+c+j)^c )^a} &: \type{\e => \e./12i + \e./14j + \e./14k}
+	    \term{ b+c+i }~~~             &: \type{\e => /13b + /13c + /13i}
+\\[5pt] \term{ b+c+i ; b -> a+c+j}~~~ &: \type{\e => /19a + /49c + /13i + /19j}
+\\[5pt] \term{(a+b+k ; b -> a+c+j)^c} &: \type{\e => /12a + /18j + /38k}
+\\[5pt] \term{ b+c+i ; b -> a+c+j ; c -> (a+b+k ; b -> a+c+j)^c}     &: \type{\e => /13a + /13i + /16j + /16k}
+\\[5pt] \term{(b+c+i ; b -> a+c+j ; c -> (a+b+k ; b -> a+c+j)^c )^a} &: \type{\e => /12i + /14j + /14k}
 \end{aligned}
 \]
 
 
 %----------------------------------------------------------------------------------------------------
-\newpage
+\subsection{The first-order fragment is PAST}
+
+
+
+%----------------------------------------------------------------------------------------------------
 \subsection{AST vs PAST}
 
 The following term $\term Z$ generates a geometric series of Church numerals.
