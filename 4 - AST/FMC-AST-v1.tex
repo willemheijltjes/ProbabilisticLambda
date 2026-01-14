@@ -270,8 +270,8 @@ Machine:
 \\ \\ \mathsf{reject}   & \step- t S i {(\term{j->M})\,K}  t S i K
 \\ \\ \mathsf{sequence} & \step- t S {M;i->N} K            t S M {(\term{i->N})\,K}
 \\ \\ \mathsf{iterate}  & \step- t S {M^i} K               t S M {(\term{i->M^i})\,K}
-\\ \\ \mathsf{sample}   & \step- {t\,\1} S {?a.M} K        t S {\{\1/a\}M} K
-                   \quad  \step- {t\,\0} S {?a.M} K        t S {\{\0/a\}M} K
+\\ \\ \mathsf{sample}   & \step- t S {?a.M} K        {t\,\1} S {\{\1/a\}M} K
+                   \quad  \step- t S {?a.M} K        {t\,\0} S {\{\0/a\}M} K
 \end{array}
 \]
 
@@ -280,79 +280,231 @@ A \emph{run} of the machine is a sequence of steps, written with a double line a
 	\step= sSMK tTNL
 \]
 
+% - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - Big-step semantics
+\subsection{Big-step semantics}
 
-\renewcommand\eval[6]{#1,#2,\term{#3}\,\evalarrow\,#4,#5,\term{#6}}
-\newcommand\Eval[3]{#1,\term{#2}\,\evalarrow\,#3}
+A \emph{frontier} $F$ is a set of traces such that no element in $F$ is a prefix of another. A frontier is \emph{total} if it contains a prefix of every stream in $\B^\N$.
 
-Big-step evaluation: $(i\neq j)$
+To collect the outcomes of evaluating a term, a \emph{return family} $\DS$ in a frontier $F$ assigns to each trace $t\in F$ a pair $(S,\term i)$ of a stack and choice. We write $\floor\DS$ for the frontier $F$ over which $\DS$ is defined.
 \[
-\begin{array}{ccc}
-     \infer{\eval sSi sSi}{}
-   & \infer{\eval rR{M;i->N} tTj }{\eval rRM sSi & \eval sSN tTj}
-   & \infer{\eval rR{M;i->N} sSj }{\eval rRM sSj}
-\\\\ \infer{\eval sS{[N].M} tTi}{\eval s{S\,\term N}M tTi}
-   & \infer{\eval rR{M^i} tTj }{\eval rRM sSi & \eval sS{M^i} tTj}
-   & \infer{\eval rR{M^i} sSj }{\eval rRM sSj} 
-\\\\ \infer{\eval s{S\,\term N}{<x>.M} tTi}{\eval sS{\{N/x\}M} tTi}
-   & \infer{\eval {s\,\bot}S{?a.M} tTi}{\eval sS{\{\bot/a\}M} tTi}
-   & \infer{\eval {s\,\top}S{?a.M} tTi}{\eval sS{\{\top/a\}M} tTi}
-\end{array}
+	\DS,\DT~:~F\to\Stack\times\Choice
 \]
+The set $\runs SM$ for a stack $S$ and term $\term M$ is the return family that collects the traces and outputs of all successful runs, as follows. Note that this is well-defined as a family over a frontier since each run has a unique trace.
+\[
+	\runs SM~=~\{~t\mapsto (T,\term i)~\mid~\step= \e SM\e tTi\e~\}
+\] 
 
-
-
-
-\newcommand\pr[1]{\mathsf{pr}(#1)}
-\newcommand\ret[2]{#1[#2]}
-
-
-\subsection*{Probabilistic evaluation}
-
-A \emph{frontier} $F$ is a set of traces such that no element in $F$ is a prefix of another. A frontier is \emph{total} if it contains a prefix of every stream in $\B^\N$. We extend a frontier $F$ with a prefix $s$ pointwise, $s\pfx F=\{st\mid t\in F\}$. The \emph{probability} $\pr F$ of a frontier $F$ is the sum probability of its traces.
+\emph{Union} of two return families $\DS\cup\DT$ is that of their underlying relations, and is a return family if they are defined over disjoint frontiers, $\floor\DS\cap\floor\DT=\varnothing$. Likewise, \emph{inclusion} between families $\DS\subseteq\DT$ is inclusion as relations, which means $\floor\DS\subseteq\floor\DT$ and $\DS(t)=\DT(t)$ for all $t\in\floor\DS$. We define the following notions below: the \emph{extension} $s\pfx\DS$ of a return family $\DS$ with a trace $s$, its \emph{restriction} $\DS\only i$ to a choice $i$, and its \emph{exclusion} $\DS\less i$ of $i$. 
 \[
 \begin{array}{l@{}l}
-	    \pr t &~=~ (\frac12)^{|t|} \quad\text{where $|t|$ is the length of $t$}
-\\[5pt]	\pr F &~=~ \sum_{t\in F}\pr t
+	    s\pfx\DS   &~=~\{ s\,t\mapsto(S,j) \mid t\mapsto(S,j)\in\DS\}
+\\[5pt]	\DS\only i &~=~\{ t\mapsto(S,j)\in\DS \mid j=i \} 
+\\[5pt]	\DS\less i &~=~\{ t\mapsto(S,j)\in\DS \mid j\neq i \}
 \end{array}
 \]
 
-To collect the outcomes of evaluating a term, a \emph{return family} $\DS_F$ in a frontier $F$ assigns to each trace $t\in F$ a pair $S.i$ of a stack and choice. 
+\begin{definition}
+The \emph{evaluation} relation $\evalarrow$ on terms $\eval SM\DT$ and continuations $\eval\DS{i->M}\DT$ is defined inductively by the following rules.
 \[
-	\DS_F,\DT_F~:~F\to\Stack\times\Choice
+\begin{array}{@{}c@{\qquad}c@{\qquad}c@{}}
+	\infer{\eval Si{\{\e\mapsto (S,i)\}}}{}
+&	\infer{\eval {S\,\term N}{<x>.M}\DT}{\eval S{\{N/x\}M}\DT}
+&	\infer{\eval R{M;i->N}\DT}{\eval RM\DS && \eval\DS{i->N}\DT}
+\\ \\
+	\infer{\eval SM\varnothing}{}
+&	\infer{\eval S{[N].M}\DT}{\eval {S\,\term N}M\DT}
+&	\infer{\eval S{?a.M}{(\0\pfx\DT_0)\cup(\1\pfx\DT_1)}}{\eval S{\{\0/a\}M}{\DT_0} && \eval S{\{\1/a\}M}{\DT_1}}
+\\ \\
+\multicolumn{2}{@{}c@{\qquad}}{
+	\infer{\eval S{M^i}{\sup_{n\in\N}(\DT_n\less i)}}{
+    	\eval SM{\DT_0}
+    	&& 
+    	\{\eval{\DT_n}{i->M}{\DT_{n+1}}\}_{n\in\N}
+    }
+}&
+	\infer{\eval\DS{i->M}{\DS\less i\cup\bigcup_{t\in\floor{\DS\only i}} t\pfx\DT_t}}{ \{\eval {S_t}M{\DT_t}\}_{t\,\mapsto\,(S_t,i)~\in~\DS\only i} } 
+\end{array}	
+\]
+\end{definition}
+
+Observe that the \emph{sample} and \emph{sequence} rules are well-defined as the unions are disjoint, and in the \emph{iterate} rule for $\term{M^i}$ the supremum is well-defined since each $\DT_{n+1}$ is given (in the continuation rule) as $\DT_n\less i\cup\DT'$ for some $\DT'$, so that we immediately have $\DT_n\less i\subseteq\DT_{n+1}\less i$.
+
+
+
+% - - - - - - - - - - - - - - -
+\begin{proposition}
+\label{prop:eval-run}
+If $\eval SM\DT$ then $\DT~\subseteq~\runs SM$.
+\end{proposition}
+
+\begin{proof}
+By induction on the derivation for $\eval SM\DT$.
+\begin{itemize}
+
+	% Choice
+	\item \emph{Choice:}
+\[
+	\infer{\eval Si{\D{\e\mapsto (S,i)}}}{}
+\]
+The only run for the state $(\e,S,\term i,\e)$ is the empty run, which gives the singleton $\runs SM=\{\e\mapsto (S,i)\}$ as required.
+
+	% Fail
+	\item \emph{Fail:}
+\[
+	\infer{\eval SM\varnothing}{}
+\]
+It is immediate that $\varnothing\subseteq\runs SM$.
+
+	% Pop
+	\item \emph{Pop:}
+\[
+	\infer{\eval {S\,\term N}{<x>.M}\DT}{\eval S{\{N/x\}M}\DT}
+\]
+Since a run for $\state \e{S\,\term N}{<x>.M}\e$ must necessarily start with a $\mathsf{pop}$ transition to $\state\e S{\{N/x\}M}\e$, we have:
+\[
+	\runs{S\,\term N}{<x>.M}~=~\runs S{\{N/x\}M}
+\]
+The case is then immediate by induction.
+
+	% Push
+	\item \emph{Push:}
+\[
+	\infer{\eval S{[N].M}\DT}{\eval {S\,\term N}M\DT}
+\]
+Since a run for $\state \e S{[N].M}\e$ must necessarily start with a $\mathsf{push}$ transition to $\state\e{S\,\term N}M\e$, we have:
+\[
+	\runs S{[N].M}~=~\runs{S\,\term{N}}M
+\]
+The case is then immediate by induction.
+
+	% Sequence
+	\item \emph{Sequence:}
+\[
+	\infer{\eval R{M;i->N}\DT}{\eval RM\DS && \eval\DS{i->N}\DT}
 \qquad
-	\DS~\coloneqq~\{ S_t.i_t \}_{t\in F}
+	\infer{\eval\DS{i->M}{\DS\less i\cup\bigcup_{t\in\floor{\DS\only i}} t\pfx\DT_t}}{ \{\eval {S_t}M{\DT_t}\}_{t\,\mapsto\,(S_t,i)~\in~\DS\only i} }
 \]
+Let $s\mapsto (T,j)\in\DT$ as above left, where $\DT=\DS\less i\cup\bigcup_{t\in\floor{\DS\only i}} t\pfx\DT_t$ as above right. It must be shown that $s\mapsto (T,j)\in\runs R{M;i->N}$. There are two cases.
 
-The \emph{union} of two return families $\DS+\DT$ is defined if they have disjoint frontiers, $\floor\DS\cap\floor\DT=\varnothing$, as the union of their underlying sets $\DS\cup\DT$. Likewise, \emph{inclusion} between families $\DS\subseteq\DT$ is inclusion as sets, which means $\floor\DS\subseteq\floor\DT$ and $\DS(t)=\DT(t)$ for all $t\in\floor\DS$. We define the following notions below: the \emph{extension} $s\pfx\DS$ of a return family $\DS$ with a trace $s$, its \emph{restriction} $\DS\only i$ to a choice $i$, and its \emph{exclusion} $\DS\less i$ of $i$. 
+\begin{itemize}
+	\item $s\mapsto(T,j)\in\DS\less i$. Then $j\neq i$ and by induction on $\eval RM\DS$ we have $s\mapsto(T,j)\in\runs RM$, which means there is a run as below left. This gives the run below right, which shows $s\mapsto(T,j)\in\runs R{M;i->N}$.
 \[
-\begin{array}{l@{}l}
-	    s\pfx\DS   &~=~\{ \,S_{st}.i_{st} \mid S_t.i_t \in \DS~,~S_{st}=S_t~,~i_{st}=i_t\,\}
-\\[5pt] S\,\DT     &~=~\{ \,S\,T_t.i_t \mid T_t.i_t \in \DT \}	    
-\\[5pt]	\DS\only i &~=~\{ \,S_t.i_t \in \DS \mid i_t=i \,\} 
-\\[5pt]	\DS\less i &~=~\{ \,S_t.i_t \in \DS \mid i_t\neq i \,\}
-\\[5pt] \pr\DS     &~=~\pr{\floor\DS}
-\\[5pt] \ret\DS i  &~=~\{ \,S_t \mid S_t.i_t \in \DS~,~i_t=i \,\}
-\end{array}
+	\step= \e RM\e tTj\e
+\qquad\qquad	    	
+    \begin{array}{@{(~}l@{~,~}l@{~,~}r@{~,~}r@{~)}}
+    	      \e & R & \term{M;i->N} & \e
+    \\ \hline \e & R & \term{M}      & (\term{i->N})
+    \\ \dline  s & T & \term{j}      & (\term{i->N})
+    \\ \hline  s & T & \term{j}      & \e
+    \end{array}
 \]
 
-Observe the following equations.
+	\item $s\mapsto(T,j)\in\bigcup_{t\in\floor{\DS\only i}} t\pfx\DT_t$. Then there is some $t\mapsto(S,i)\in\DS\only i$ such that $s = t\,t'$ and $t'\mapsto(T,j)\in\DT_t$. By induction, $t\mapsto(S,i)\in\runs RM$ and $t'\mapsto(T,j)\in\runs SN$. This gives the two runs below left, from which that below right is then constructed, showing that $s\mapsto(T,j)\in\runs R{M;i->N}$.
 \[
-\begin{array}{r@{}l}
-   \pr{\DS+\DT}      &~=~ \pr\DS + \pr\DT
-\\ \pr{s\pfx\DS}     &~=~ \pr s\times\pr\DS
-\\ \floor{s\pfx\DS}  &~=~ s\pfx\floor\DS
-\\ s\pfx(\DS\only i) &~=~ (s\pfx\DS)\only i
-\\ s\pfx(\DS\less i) &~=~ (s\pfx\DS)\less i
-\end{array}
+	\begin{array}{@{}c@{}}
+		\step= \e RM\e tSi\e
+	\\ \\
+		\step= \e SN\e{t'}Tj\e
+	\end{array}
+\qquad\qquad
+    \begin{array}{@{(~}l@{~,~}l@{~,~}r@{~,~}r@{~)}}
+    	      \e    & R & \term{M;i->N} & \e
+    \\ \hline \e    & R & \term{M}      & (\term{i->N})
+    \\ \dline t     & S & \term{i}      & (\term{i->N})
+    \\ \hline t     & S & \term{N}      & \e
+    \\ \dline t\,t' & T & \term{j}      & \e
+    \end{array}
 \]
+\end{itemize}
 
-
-The probabilistic evaluation $\Eval SM\DT$ of a term in the context of a stack is given by a return family $F$ generated by the evaluation of $\term M$ and $\term S$ with each $t\in F$.
+	% Sample
+	\item \emph{Sample:}
 \[
-\Eval SM{\{ T_t.i_t \}_{t\in F}} \iff \forall t\in F.~(\eval tSM \e {T_t}{i_t})
+	\infer{\eval S{?a.M}{(\0\pfx\DT_0)\cup(\1\pfx\DT_1)}}{\eval S{\{\0/a\}M}{\DT_0} && \eval S{\{\1/a\}M}{\DT_1}}
+\]
+Let $t\mapsto(T,i)\in\0\pfx\DT_0\cup\1\pfx\DT_1$. Then either $t=\0\,s$ and $s\mapsto(T,i)\in\DT_0$, for some $s$, or $t=\1\,s$ and $s\mapsto(T,i)\in\DT_1$. We consider the case $t=\0\,s$; the other is analogous. By induction we have the run below left, which then gives that below right, showing that $t\mapsto(T,i)\in\runs S{?a.M}$.
+\[
+	\step= \e S{\{\0/a\}M}\e sTi\e 
+\qquad\qquad
+    \begin{array}{@{(~}l@{~,~}l@{~,~}r@{~,~}r@{~)}}
+    	      \e    & S & \term{?a.M}      & \e
+    \\ \hline \0    & S & \term{\{\0/a\}M} & \e
+    \\ \dline \0\,s & T & \term{i}         & \e
+    \end{array}
 \]
 
-An evaluation $\Eval SM\DT$ gives a lower bound of $\pr\DT$ for the probability of termination of a term $\term M$ in the context of a stack $S$.
+	% Iterate
+	\item \emph{Iterate:}
+\[
+	\infer{\eval S{M^i}{\sup_{n\in\N}(\DT_n\less i)}}{
+    	\eval SM{\DT_0}
+    	&& 
+    	\{\eval{\DT_n}{i->M}{\DT_{n+1}}\}_{n\in\N}
+    }
+\qquad
+	\infer{\eval\DS{i->M}{\DS\less i\cup\bigcup_{t\in\floor{\DS\only i}} t\pfx\DT_t}}{ \{\eval {S_t}M{\DT_t}\}_{t\,\mapsto\,(S_t,i)~\in~\DS\only i} } 
+\]
+First, by induction on $n$ it will be shown that if $t\mapsto(T,j)\in\DT_n$ then there is a run:
+\[
+	\step= \e S{M^i}\e tTj{\term{i -> M^i}} 
+\]
+For $n=0$, by the inductive hypothesis for $\eval SM{\DT_0}$ and $t\mapsto(T,j)\in\DT_0$ we have the run below left, which then gives that below right.
+\[
+	\step= \e SM\e tTj\e 
+\qquad	
+    \begin{array}{@{(~}l@{~,~}l@{~,~}r@{~,~}r@{~)}}
+    	      \e & S & \term{M^i} & \e
+    \\ \hline \e & S & \term{M}   & (\term{i->M^i})
+    \\ \dline  t & T & \term{j}   & (\term{i->M^i})
+    \end{array}
+\]
+For the case $n+1$, by the inductive hypothesis for $\eval{\DT_n}{i->M}{\DT_{n+1}}$ and $t\mapsto(T,j)\in\DT_{n+1}$ we have two cases: $t\mapsto(T,j)$ is either in $\DT_n\less i$ or in $\bigcup_{t\in\floor{\DT_n\only i}} t\pfx\DT_t$. The former case is immediate by the inductive hypothesis. In the latter case, $t=r\,s$ and there are $R$ and $\DT_s$ such that
+\[
+	r\mapsto(R,i)\in\DT_n
+\qquad
+	\eval RM{\DT_s}
+\qquad
+	s\mapsto(T,j)\in\DT_s
+\]
+The first statement gives the first run below left, by the induction on $n$, and the induction on the latter two statements gives the second. Then the required run is given below right.
+\[
+	\begin{array}{@{}c@{}}
+		\step= \e S{M^i}\e rRi{(\term{i->M^i})}
+	\\ \\
+		\step= \e RM\e sTj\e
+	\end{array}
+\qquad\qquad
+    \begin{array}{@{(~}l@{~,~}l@{~,~}r@{~,~}r@{~)}}
+    	      \e    & S & \term{M^i} & \e
+    \\ \dline r     & R & \term{i}   & (\term{i->M^i})
+    \\ \hline r     & R & \term{M^i} & \e
+    \\ \hline r     & R & \term{M}   & (\term{i->M^i})
+    \\ \dline r\,s  & T & \term{j}   & (\term{i->M^i})
+    \end{array}
+\]
+
+For the overall case, let $t\mapsto(T,j)\in\sup_{n\in\N}(\DT_n\less i)$. Then there is some $m$ such that $t\mapsto(T,j)$ is in $\DT_m\less i$. By the above, and since $i\neq j$, we have the following run, which shows that $t\mapsto(T,j)\in\runs S{M^i}$.
+\[
+    \begin{array}{@{(~}l@{~,~}l@{~,~}r@{~,~}r@{~)}}
+    	      \e & S & \term{M^i} & \e
+    \\ \dline  t & T & \term{j}   & (\term{i->M^i})
+    \\ \hline  t & T & \term{j}   & \e
+    \end{array}
+\]
+
+\end{itemize}
+\end{proof}
+% - - - - - - - - - - - - - - -
+
+
+
+{\color{green!66!black} The following is not essential but could be nice. Seems a bit of work, though.}
+
+\begin{proposition}
+$\eval SM{\runs SM}$.
+\end{proposition}
+
+
 
 
 %---------------------------------------------------------------------------------------------------- TYPES
@@ -376,7 +528,7 @@ Types:
 Definitions:
 \[
 \begin{array}{l@{}ll}
-		\type{!t.pi}       &~=~ \type{\{!t_i.p_i\}_{\{i\}}}                       & \text{where~}\type{!t_i}=\type{!t},~p_i=p
+		\type{(!t.p)_i}    &~=~ \type{\{!t_i.p_i\}_{\{i\}}}                       & \text{where~}\type{!t_i}=\type{!t},~p_i=p
 \\[5pt] \type{!sI + !tJ}   &~=~ \type{!sI \cup !tJ}                               & \text{if~}(I\cap J=\varnothing)
 \\[5pt] \type{!s\,!tI}     &~=~ \type{\{!s\,!t_i . p_i \mid !t_i.p_i \in !tI\}}
 \\[5pt]	\type{q.!tI}       &~=~ \type{\{ !t_i . q\,p_i \mid  !t_i.p_i \in !tI\}}
@@ -387,6 +539,32 @@ Definitions:
 \end{array}
 \]
 
+%\[
+%\begin{array}{lr@{~\coloneqq~}l}
+%	\text{types}	   & \type{s,t} & \type{!s => !tI}
+%\\	\text{stack types} & \type{!t}  & \type{t_1..t_n}
+%\\  \text{sum types}   & \type{!tI} & \type{\{i \mapsto !t_i.p_i\}_{i\in I}}~\quad~\sum_{i\in I}p_i\leq 1
+%\end{array}
+%\]
+%
+%\noindent
+%Definitions:
+%\[
+%\begin{array}{lll}
+%		\type{i(!t.p)}     &~=~ \type{\{i \mapsto !t.p\}}
+%\\[5pt] \type{!sI ++ !tJ}  &~=~ \type{!sI \cup !tJ} \qquad (I\cap J=\varnothing)
+%\\[5pt] \type{!s\,!tI}     &~=~ \type{\{i\mapsto !s\,!t_i . p_i \mid i\mapsto !t_i.p_i \in !tI\}}
+%\\[5pt]	\type{q.!tI}       &~=~ \type{\{i\mapsto  !t_i . q\,p_i \mid i\mapsto !t_i.p_i \in !tI\}}
+%\\[5pt]	\type{!tI-J}       &~=~ \type{\{i\mapsto !t_i.p_i \in !tI \mid i\notin J\}}
+%\\[5pt] \type{!tI|J}       &~=~ \type{\{i\mapsto !t_i.p_i \in !tI \mid i\in J\}}
+%\\[5pt] \floor{\type{!tI}} &~=~ \{ i\mapsto \type{!t_i}\}_{i\in I}
+%\\[5pt] \type{!sI + !tJ}   &~=~ \type{\{i\mapsto !t_i . p_i+q_i \mid i\mapsto !t_i.p_i \in !sI|J~`,~i\mapsto !t_i.q_i\in!tJ|I\}}
+%\\                         &\qquad \type{~\cup~(!sI-J)~\cup~(!tJ-I)} 
+%%\\[5pt] \type{!sI + !tI}   &~=~ \type{\{i\mapsto !t_i.p_i+q_i \mid i\mapsto !t_i.p_i \in !sI,~i\mapsto !t_i.q_i\in !tI \}} & \floor{\type{!sI}}=\floor{\type{!tI}}
+%%\\[5pt] \type{!sI + !tJ}   &~=~ \type{(!sI|J v !tJ|I) u (!sI-J) u (!tJ-I)}
+%\end{array}
+%\]
+
 \noindent
 Typing rules:
 \[
@@ -395,12 +573,12 @@ Typing rules:
 \\ \\ \mathsf{expansion} & \infer{\term{G |- M: !s\,!r => !r\,!tI}}{\term{G |- M: !s => !tI}}
 \\ \\ \mathsf{push}      & \infer{\term{G |- [N].M : !s => !tI}}{\term{G |- N:r} && \term{G |- M : r\,!s => !tI}}
 \\ \\ \mathsf{pop}       & \infer{\term{G |- <x>.M : r\,!s => !tI}}{\term{G , x:r |- M: !s => !tI}}
-\\ \\ \mathsf{choice}    & \infer{\term{G |- i: !s => !s.1i}}{}
+\\ \\ \mathsf{choice}    & \infer{\term{G |- i: !s => (!s.1)_i}}{}
 \\ \\ \mathsf{sequence}  & \infer{\term{G |- M;i->N : !r => !sI ++ (p . !tJ)}}
                                  {\term{G |- M: !r => !sI + (!s.p)_i} && 
                                   \term{G |- N: !s => !tJ}}
 \\ \\ \mathsf{iterate}   & \infer{\term{G |- M^i: !s => /1{1-p} . !tI}}{\term{G |- M: !s => !tI + (!s.p)_i} && (p\neq 1)}
-\\ \\ \mathsf{sample}    & \infer{\term{G |- ?a.M : !r => (/12 . !sI) ++ (/12 . !tJ)}}{\term{G , a: \e => \e.1\bot |- M: !r => !sI} && \term{G , a: \e => \e.1\top |- M: !r => !tJ}}
+\\ \\ \mathsf{sample}    & \infer{\term{G |- ?a.M : !r => (/12 . !sI) ++ (/12 . !tJ)}}{\term{G , a: \e => (\e.1)_\bot |- M: !r => !sI} && \term{G , a: \e => (\e.1)_\top |- M: !r => !tJ}}
 \\ \\ \mathsf{zero}      & \infer{\term{G |- M : !s => 0 . !tI}}{}
 \end{array}
 \]
@@ -411,20 +589,49 @@ Typing rules:
 \newpage
 \subsection{Runnability}
 
+The \emph{probability} of a trace $t$ is $p(t)=(\fraction12)^{|t|}$ where $|t|$ is the \emph{length} of $t$.
+
+\[
+\begin{array}{l@{}l}
+%	     |\DS|       &~=~ \sum_{t\in\floor\DS}~p(t)
+%\\[5pt]
+         |\DS|_i     &~=~ \sum_{t\in\floor{\DS\only i}}~p(t)
+\\[5pt]  \floor\DS_i &~=~ \{ S \mid t\mapsto(S,i)\in\DS \}
+\end{array}
+\]
 
 \begin{definition}
 The set $\RUN{t}$ of \emph{runnable terms} for a type $\type t$ is defined as the set of closed terms
 \[
-	\RUN{!s => !tI} = \{ \term M ~\mid~ \forall S \in\RUN{!s}.~\exists\DT\in\RUN{!tI}.~\Eval SM\DT~\}
+	\RUN{!s => !tI} = \{ \term M ~\mid~ \forall S \in\RUN{!s}.~\exists\DT\in\RUN{!tI}.~\eval SM\DT~\}
 \]
 where the runnable sets for stack types $\type{!t}$ and sum types $\type{!tI}$ are as follows.
 \[
     \RUN{t_1..t_n} = \{ \e\,\term{M_1}\dots \term{M_n} \mid \term{M_i}\in\RUN{t_i} \}
 \]
 \[
-	\RUN{\{!t_i.p_i\}_{i\in I}} = \{ \DT \mid \forall i\in I.~\ret\DT i\subseteq\RUN{!t_i}~\wedge~\pr{\DT\only i}\geq p_i~\}
+	\RUN{\{!t_i.p_i\}_{i\in I}} = \{ \DT \mid \forall i\in I.~\floor\DT_i\subseteq\RUN{!t_i}~\wedge~|\DT|_i\geq p_i~\}
 \]
 \end{definition}
+
+
+
+% - - - - - - - - - - - - - - - 
+\begin{lemma}
+\label{lem:run-union}
+If $\DS\in\RUN{!sI}$ and $\DT\in\RUN{!tJ}$ then $\DS\cup\DT\in\RUN{!sI ++ !tJ}$ if $\DS\cup\DT$ and $\type{!sI++!tJ}$ are defined.
+\end{lemma}
+
+\begin{proof}
+Let $\type{!sI}=\type{\{!s_i.p_i\}_{i\in I}}$ and $\type{!tJ}=\type{\{!t_j.q_j\}_{j\in J}}$. Note that $\DS\cup\DT$ is defined if $\floor\DS\cap\floor\DT=\varnothing$, and $\type{!sI++!tJ}$ if $\type{!s_i}=\type{!t_i}$ for all $i\in I\cap J$. We need to show two properties.
+\begin{itemize}
+	 \item[1)] If $t\mapsto(S,i)\in\DS\cup\DT$ then $S\in\RUN{!s_i}$ if $i\in I$ and $S\in\RUN{!t_i}$ if $i\in J$. This is as follows: since $\DS\in\RUN{!sI}$, if $t\mapsto(S,i)\in\DS$ then $S\in\RUN{!s_i}$, and since $\DT\in\RUN{!tJ}$, if $t\mapsto(S,i)\in\DT$ then $T\in\RUN{!t_j}$.
+	 
+	 \item[2)] For $i\in I\cup J$, the probability $|\DS\cup\DT|_i$ is at least: $p_i+q_i$ if $i\in I\cap J$, $p_i$ if $i\in I\less J$, and $q_i$ if $i\in J\less I$. This is as follows: first, $|\DS\cup\DT|_i=|\DS|_i+|\DT|_i$, since both are the sum over those $p(t)$ such that $t\in\floor{\DS\only i}$ or $t\in\floor{\DT\only i}$. Then since $\DS\in\RUN{!sI}$ the probability $|\DS|_i\geq p_i$ for $i\in I$, and since $\DT\in\RUN{!tJ}$ the probability $|\DT|_i\geq q_i$ for $i\in J$.
+\end{itemize}
+\end{proof}
+% - - - - - - - - - - - - - - -
+
 
 
 For a context $\Gamma=\term{x_1:t_1,..,x_n:t_n}$ the set $\SRUN{G}$ is a set of substitution maps $\mu$ that assigns each $x_i$ a runnable term $\term M\in\RUN{t_i}$.
@@ -443,216 +650,123 @@ If $\term{G |- M:t}$ and $\mu\in\SRUN{G}$ then $\term{\mu M}\in\RUN{t}$.
 \begin{proof}
 
 By induction on the typing derivation.
-
 \begin{itemize}
 
 	% Variable
 	\item \emph{Variable:} 
 \[
-\infer{\term{G, x:t |- x:t}}{}
+	\infer{\term{G, x:t |- x:t}}{}
 \]
 By the definition of $\SRUN{G}$ we have $\term{\mu x}\in\RUN t$.
 
 	% Choice
 	\item \emph{Choice:}
 \[
-\infer{\term{G |- i: !s => !s.1i}}{}
+\infer{\term{G |- i: !s => (!s.1)_i}}{}
 \]
-Let $S\in\RUN{!s}$ and note that $\term{\mu i}=\term i$ for any $\mu$. We have the evaluation $\eval\e Si\e Si$ for the empty trace. Then for the frontier $\{\e\}$ we have $\Eval Si\DS$ with the return family $\{S_\e.i_\e\}$ (where $S_\e=S$ and $i_\e=i$). Since $S\in\RUN{!s}$ and $p(\e)=1$ it follows that $\DS\in\RUN{!s.1i}$.
+Given $S\in\RUN{!s}$ we have $\eval Si\DT$ where $\DT={\{\e\mapsto(S,i)\}}$. Then $\floor\DT_i=\{S\}\subseteq\RUN{!s}$ and $|\DT|_i=p(\e)=1$, which gives $\DT\in\RUN{(!s.1)_i}$, and hence $\term{\mu i}=\term i\in\RUN{!s=>(!s.1)_i}$.
 
 	% Zero
 	\item \emph{zero}
 \[
 \infer{\term{G |- M : !s => 0 . !tI}}{}
 \]
-For any $S$ and $\mu$ we have $\eval S{\mu M}\varnothing$. Since $\varnothing\subseteq\RUN{!t_i}$ and $\pr{\varnothing\only i}\geq 0$ for all $i$ we have $\varnothing\in\RUN{0.!tI}$.
-
+We have $\eval S{\mu M}\varnothing$ for any $S$ and $\mu$, and $\varnothing\in\RUN{0.!tI}$ since $\floor\varnothing_i=\varnothing\subseteq\RUN{!t_i}$ and $|\varnothing|_i\geq 0$ for all $i$.
 
 	% Expansion
 	\item \emph{Expansion:}
 \[
 \infer{\term{G |- M: !s\,!r => !r\,!tI}}{\term{G |- M: !s => !tI}}
 \]
-Let $R\in\RUN{!r}$, $S\in\RUN{!s}$, and $\mu\in\SRUN{G}$. The inductive hypothesis gives the evaluation $\Eval SM\DT$ for a return memory $\DT=\{T_t,i_t)\}_{t\in F}\in\RUN{!tI}$. For each $t\in F$ we have the evaluation below left. By induction on the evaluation relation $\evalarrow$ for every $t$ we get the evaluation below right.
-\[
-\eval tS{\mu M}\e{T_t}{i_t}
-\qquad\qquad
-\eval t{RS}{\mu M} \e{RT_t}{i_t}
-\]
-This gives $\Eval{RS}{\mu M}{R\,\DT}$. Since $R\in\RUN{!r}$ and $\ret\DT i\subseteq\RUN{!t_i}$ we have $\ret{R\,\DT}i \subseteq \RUN{!r\,!t_i}$, and also $\pr{R\,\DT\only i}=\pr{\DT\only i}\geq p_i$, so that $R\,\DT\in\RUN{!r\,!tI}$. 
+Let $R\in\RUN{!r}$, $S\in\RUN{!s}$, and $\mu\in\SRUN{G}$. By induction $\eval S{\mu M}\DT$ for some $\DT\in\RUN{!tI}$. Then by induction on the evaluation relation, $\eval{RS}{\mu M}{R\DT}$ where $R\DT=\{ t \mapsto (RT,i) \mid t\mapsto (T,i)\in\DT\}$. Since $R\in\RUN{!r}$ it follows by the definition of $\RUN{!tI}$ that $R\DT\in\RUN{!r\,!tI}$.
 
 	% Push
 	\item \emph{Push:} 
 \[
 \infer{\term{G |- [N].M : !s => !tI}}{\term{G |- N:r} && \term{G |- M : r\,!s => !tI}}
 \]
-Let $S\in\RUN{!s}$ and $\mu\in\SRUN{G}$. By induction we have $\term{\mu N}\in\RUN{r}$ and $\term{\mu M}\in\RUN{r\,!s=>!tI}$, and for the latter the evaluation $\Eval {S\,\term{\mu N}}{\mu M}\DT$. Let this be given by a frontier $F$ evaluation below left for every $t\in F$, from which we construct the derivation below right.
-\[
-	\eval t{S\,\term{\mu N}}{\mu M}\e{T_t}{i_t}
-\qquad\qquad
-  \vcenter{\hbox{$
-	\infer{ \eval tS{\mu([N].M)}\e{T_t}{i_t} }{ \eval t{S\,\term{\mu N}}{\mu M}\e{T_t}{i_t} }
-  $}}
-\]
-Then $\Eval S{\mu([N].M)}\DT$ and $\term{\mu([N].M)}\in\RUN{!s => !tI}$.
+Let $S\in\RUN{!s}$ and $\mu\in\SRUN{G}$. By induction $\term{\mu N}\in\RUN{r}$ and $\term{\mu M}\in\RUN{r\,!s=>!tI}$, where by definition we get $\eval{S\,\term{\mu N}}{\mu M}\DT$ for some $\DT\in\RUN{!tI}$. By the definition of evaluation we get $\eval{S}{[\mu N].\mu M}\DT$ so that we have $\term{[\mu N].\mu M}=\term{\mu([N].M)}\in\RUN{!s=>!tI}$. 
 
 	% Pop
 	\item \emph{Pop:}
 \[
 \infer{\term{G |- <x>.M : r\,!s => !tI}}{\term{G , x:r |- M: !s => !tI}}
 \]
-Let $S\in\RUN{!s}$, $\term N\in\RUN r$, and $\mu\in\SRUN{G}$. Let $\mu'=\mu\{\term N/x\}$, the substitution map that sends $x$ to $\term N$ and every other variable $y$ to $\mu y$, so that $\mu'\in\SRUN{G,x:r}$. By induction we have $\Eval S{\mu'M}\DT$ given by the evaluation below for every $t\in F$, from which we construct the evaluation below right.
-\[
-\eval tS{\mu'M} \e{T_t}{i_t}
-\qquad\qquad
-\vcenter{\hbox{$
-  \infer{ \eval t{S\,\term{N}}{\mu(<x>.M)}\e{T_t}{i_t}}
-   {\eval tS{\mu'M}\e{T_t}{i_t}}
- $}} 
-\]
-Then $\Eval{S\,\term N}{\mu(<x>.M)}\DT$ and $\term{\mu(<x>.M)}\in\RUN{r\,!s=>!tI}$.
-
+Let $S\in\RUN{!s}$, $\term N\in\RUN r$, and $\mu\in\SRUN{G}$. Let $\mu'=\mu\{\term N/x\}$, the substitution map that sends $x$ to $\term N$ and every other variable $y$ to $\mu y$, so that $\mu'\in\SRUN{G,x:r}$. By induction $\eval S{\mu'M}\DT$ for some $\DT\in\RUN{!tI}$, and since $\term{\mu'M}=\term{\mu(\{N/x\}M)}$ by the definition of evaluation $\eval{S\,\term N}{\mu(<x>.M)}\DT$. It follows that $\term{\mu(<x>.M)}\in\RUN{r\,!s=>!tI}$.
 
 	% Sample
 	\item \emph{Sample:}
 \[
-\infer{\term{G |- ?a.M : !r => (/12 . !sI) ++ (/12 . !tJ)}}{\term{G , a: \e => \e.1\bot |- M: !r => !sI} && \term{G , a: \e => \e.1\top |- M: !r => !tJ}}
+\infer{\term{G |- ?a.M : !r => (/12 . !sI) ++ (/12 . !tJ)}}{\term{G , a: \e => (\e.1)_\0 |- M: !r => !sI} && \term{G , a: \e => (\e.1)_\1 |- M: !r => !tJ}}
 \]
-Let $R\in\RUN{R}$ and $\mu\in\SRUN{G}$. Define $\mu_0=\mu\{\term\bot/a\}$ and $\mu_1=\mu\{\term\top/a\}$ so that $\mu_0\in\SRUN{G , a: \e => \e.1\bot}$ and $\mu_1\in\SRUN{G , a: \e => \e.1\top}$. By induction we have $\Eval S{\mu_0M}{\DT_0}$ and $\Eval S{\mu_1M}{\DT_1}$ given by the following evaluations for every $s\in\floor{\DT_0}$ and $t\in\floor{\DT_1}$.
+Let $R\in\RUN{R}$ and $\mu\in\SRUN{G}$. Let $\mu_0=\mu\{\term\0/a\}$ and $\mu_1=\mu\{\term\1/a\}$, so that $\mu_0\in\SRUN{G , a: \e => (\e.1)_\0}$ and $\mu_1\in\SRUN{G , a: \e => (\e.1)_\1}$. By induction $\eval R{\mu_0M}{\DT_0}$ and $\eval R{\mu_1M}{\DT_1}$ where $\DT_0\in\RUN{!sI}$ and $\DT_1\in\RUN{!tJ}$. We have the following evaluation.
 \[
-\eval sS{\mu_0M}\e{T_s}{i_s} \qquad\qquad  
-\eval tS{\mu_1M}\e{T_t}{i_t}
+\infer{\eval S{\mu(?a.M)}{(\0\pfx\DT_0)\cup(\1\pfx\DT_1)}}{\eval S{\mu\{\0/a\}M}{\DT_0} && \eval S{\mu\{\1/a\}M}{\DT_1}}
 \]
-For these we have the following derivations.
+Since $\0\pfx\DT_0$ extends every trace in $\DT_0$ by $\bot$, it multiplies every probability $|\DT_0|_i$ by $\fraction 12$, so that we have $\0\pfx\DT_0\in\RUN{/12.!sI}$. Likewise we have $\1\pfx\DT_1\in\RUN{/12.!tJ}$. Then by Lemma~\ref{lem:run-union}
+$(\0\pfx\DT_0)\cup(\1\pfx\DT_1)\in\RUN{(/12 . !sI) ++ (/12 . !tJ)}$ and hence $\term{\mu(?a.M)}\in\RUN{!r => (/12 . !sI) ++ (/12 . !tJ)}$.
+
+	% Continuation
+	\item \emph{Continuation:}
+As a lemma for the remaining two cases, it will be shown that if $\DS\in\RUN{!sI + (!s.p)_i)}$ and $\term{M}\in\RUN{!s => !tJ}$ then $\eval\DS{i->M}\DT$ for some $\DT\in\RUN{!sI ++ (p . !tJ)}$. By definition, for every $t\mapsto(S_t,i)\in\DS$ we have $S_t\in\RUN{!s}$, and by induction $\eval{S_t}M{\DT_t}$ for some $\DT_t\in\RUN{!tJ}$. Evaluation is then as follows.
 \[
-\infer{ \eval{s\,\bot}S{\mu(?a.M)}\e{T_s}{i_s} }{ \eval sS{\mu_0M}\e{T_s}{i_s} } \qquad
-\infer{ \eval{t\,\top}S{\mu(?a.M)}\e{T_t}{i_t} }{ \eval tS{\mu_1M}\e{T_t}{i_t} }
+\infer{\eval\DS{i->M}{\DS\less i\cup\bigcup_{t\in\floor{\DS\only i}} t\pfx\DT_t}}{ \{\eval {S_t}M{\DT_t}\}_{t\,\mapsto\,(S_t,i)~\in~\DS\only i} } 
 \]
-Then for $\DT=(\bot\pfx\DT_0)\cup(\top\pfx\DT_1)$ we have $\Eval S{\mu(?a.M)}\DT$. Since $\type{!s_i}=\type{!t_i}$ for each $i\in I\cap J$ by the definition of $\type{++}$ we have $\ret\DT i\subseteq\RUN{!s_i}$. Since we further have $\pr{\DT}=\frac12\pr{\DT_0}+\frac12\pr{\DT_1}\geq \frac12p_i+\frac12q_i$ where $p_i$ and $q_i$ are the probabilities of $i$ in respectively $\type{!sI}$ and $\type{!tJ}$, it follows that $\DT\in\RUN{(/12.!sI) ++ (/12 . !tJ)}$.
+Let $\DT=\bigcup_{t\in\floor{\DS\only i}}t\pfx\DT_t$. Since $\DT_t\in\RUN{!tJ}$ and prefixing each trace in $\DT_t$ with $t$ multiplies each probability $|\DT_t|_i$ by $p(t)$, we have $t\pfx\DT_t\in\RUN{p(t).!tJ}$. Then since $|\DS|_i=\sum\{p(t)\mid t\in\floor{\DS\only i}\}\geq p$ we have $\DT\in\RUN{p.!tJ}$. By Lemma~\ref{lem:run-union} then $\DS\less i\cup\DT\in\RUN{!sI ++ (p.!tJ)}$.
 
 	% Sequence
 	\item \emph{Sequence:} 
 \[
 \infer{\term{G |- M;i->N : !r => !sI ++ (p . !tJ)}}
-      {\term{G |- M: !r => !sI + !s.pi} && 
+      {\term{G |- M: !r => !sI + (!s.p)_i} && 
        \term{G |- N: !s => !tJ}}
 \]
-Let $R\in\RUN{!r}$ and $\mu\in\SRUN{G}$. By induction we have $\term{\mu M}\in\RUN{!r => !sI ++ (p.!tJ)}$ and hence $\Eval R{\mu M}\DS$. Let this be given by an evaluation for each $s\in\floor\DS$ of the form below left. For each $s$ where $i_s=i$ we have $S_s\in\RUN{!s}$, and by induction on $\term{N}$, $\Eval{S_s}{\mu N}{\DT_s}$. Let this be given by the evaluation below right for each $t\in\floor{\DT_s}$.
+Let $R\in\RUN{!r}$ and $\mu\in\SRUN{G}$. By induction we have $\eval R{\mu M}\DS$ where $\DS\in\RUN{!sI+(!s.p)_i}$. By the \emph{continuation} case above, $\eval\DS{i->\mu N}\DT$ for some $\DT\in\RUN{!sI ++ (p . !tJ)}$. The case then follows by the evaluation below, which gives that $\term{\mu(M;i->N)}\in\RUN{!r => !sI ++ (p . !tJ)}$
 \[
-	\eval sR{\mu M} \e{S_s}{i_s}
-\qquad
-	\eval {t}{S_s}{\mu N} \e{T_t}{j_t}
-\] 
-For each $s$, if $i_s\neq i$  we construct the derivation below left, and if $i_s=i$ then for each $t$ we construct that below right. 
-\[
-	\infer{ \eval sR{\mu(M;i->N)} \e{S_s}{i_s} }{ \eval sR{\mu M} \e{S_s}{i_s} }
-\qquad\qquad
-	\infer{ \eval{ts}R{\mu(M;i->N)} \e{T_t}{j_t}}{ \eval {ts}R{\mu M} t{S_s}i && \eval t{S_s}{\mu N} \e{T_t}{j_t} }
+	\infer {\eval R{\mu M;i->\mu N}\DT} {\eval R{\mu M}\DS && \eval\DS{i->\mu N}\DT}
 \]
-Then we have $\Eval R{\mu(M;i->N)}\DT$ where $\DT$ is given as follows.
-\[
-	\DT=(\DS\less i) \cup \bigcup_{s\in\floor{\DS\only i}} s\pfx\DT_s
-\]
-We need to show that $\DT\in\RUN{!sI ++ (p.!tJ)}$.
-
-\begin{itemize}
-\item
-First, for all $T.j$ in $\DT$ we need that $T\in\RUN{!s_j}$ if $j\in I$ and $T\in\RUN{!t_j}$ if $j\in J$, where $\type{!s_j}=\type{!t_j}$ if $j\in I\cap J$ by the definition of $\type{++}$. If $T.j$ is in $\DS\less i$ this follows since $\DS\less i\in\RUN{!sI}$ and hence $T\in\RUN{!s_j}$, and if $T.j$ is in $\DT_s$ for some $s$ it follows since $\DT_s\in\RUN{!tJ}$, and hence $T\in\RUN{!t_j}$.
-\item
-Second, for all $j\in I\cap J$ it must be shown that $\pr{\DT\only j}\geq p_j + pq_j$ where $p_j$ is the probability of $j$ in $\type{!sI}$ and $q_j$ that in $\type{!tJ}$. We compute as follows.
-\[
-\begin{aligned}
-\pr{\DT\only j} 
-    &~=~    \pr{((\DS\less i)~\cup~\bigcup_{s\in\floor{\DS\only i}} s\pfx\DT_s)\only j}
-\\  &~=~    \pr{(\DS\less i)\only j} + \sum_{s\in\floor{\DS\only i}} (\pr{s}\times\pr{\DT_s\only j})
-\\  &~\geq~ p_j + \sum_{s\in\floor{\DS\only i}} (\pr{s}\times q_j)
-\\  &~\geq~ p_j + pq_j
-\end{aligned}
-\]
-The third step (the first inequality) is as follows. Since $\DS\less i\in\RUN{!sI}$ we have $\pr{\DS\only j}\geq p_j$ for all $j\in I$. Next, since $\DT_s\in\RUN{!tJ}$ for all $s$ we have $\pr{\DT_s\only j}\geq q_j$ for all $j\in J$. The last step follows since $\DS\only i\in\RUN{!s.pi}$ and hence $\pr{\DS\only i}\geq p$.
-\end{itemize}
-
-It follows that $\DT\in\RUN{!sI ++ (p.!tJ)}$ and hence $\term{\mu(M;i->N)}\in\RUN{!r => !sI ++ (p . !tJ)}$.
-
 
 	% Iterate
 	\item \emph{Iterate:}
 \[
-\infer{\term{G |- M^i: !s => /1{1-p} . !tI}}{\term{G |- M: !s => !tI + !s.pi} && (p\neq 1)}
+\infer{\term{G |- M^i: !s => /1{1-p} . !tI}}{\term{G |- M: !s => !tI + (!s.p)_i} && (p\neq 1)}
 \]
-Let $S\in\RUN{!s}$ and $\mu\in\SRUN{G}$. We construct a series of return families $\DT_n$ for all $n\in\N^+$ by induction on $n$, and show the following.
+Let $S\in\RUN{!s}$ and $\mu\in\SRUN{G}$ so that by induction $\eval S{\mu M}{\DT_0}$ for some $\DT_0\in\RUN{!tI + (!s.p)_i}$. By induction on $n$, using the \emph{continuation} case above, there are $\DT_n$ for all $n\in\N$ where $\eval{\DT_n}{i->\mu M}{\DT_{n+1}}$, with the following evaluation.
 \[
-	\DT_n\in\RUN{(q_n.!tI)+!s.p^ni} \quad\text{where}\quad q_n=1+p+p^2+p^3+\dots+p^{n-1}
+\infer{\eval S{\mu M^i}{\sup_{n\in\N}(\DT_n\less i)}}{
+    	\eval S{\mu M}{\DT_0}
+    	&& 
+    	\{\eval{\DT_n}{i->\mu M}{\DT_{n+1}}\}_{n\in\N}
+    }
 \]
-
-\begin{itemize}
-\item
-The case $\DT_1$ is given by induction on $\term M$ by $\Eval S{\mu M}{\DT_1}$. 
-
-\item
-For the case $\DT_{n+1}$ let $\DT_n=\{S_t.i_t\}_{t\in F_n}$. For all $t\in F_n$ such that $i_t=i$, let $\Eval {S_t}{\mu M}{\DT_t}$ by induction on $\term M$, and define $\DT_{n+1}$ as follows.
+Let $p_n=\sum_{m\leq n}p^m$. By induction on $n$ we have 
 \[
-	\DT_{n+1}=(\DT_n\less i) \cup \bigcup_{t\in\floor{\DT_n\only i}} t\pfx\DT_t
-\]
-By induction we have $\DT_n\in\RUN{q_n.!tI + !s.p^ni}$. By similar reasoning to the previous \emph{sequencing} case we have the following.
+	\DT_n\in\RUN{(p_n\cdot !tI) + p^n\cdot (!s.p)_i)}
+\] 
+as follows. For $n=0$ we have $\DT_0\in\RUN{!tI + (!s.p)_i}$, and for $n+1$ we have
 \[
-	\DT_{n+1}\in\RUN{q_n.!tI + p^n.(!tI + !s.pi)}~=~\RUN{q_{n+1}.!tI + !s.p^{n+1}i}
+	\type{(p_n . !tI) + p^n . (p . (!tI + (!s.p)_i)))}
+	~=~
+	\type{(p_{n+1} . !tI)+p^{n+1}.(!s.p_i)} 
 \]
-\end{itemize}
-
-Observe that by definition, $\DT_n\less i~\subseteq~\DT_{n+1}\less i$. Then we define $\DT$ as the following supremum.
-\[
-	\DT~=~\sup_{n\in\N^+}\DT_n\less i
-\]
-It remains to show that $\Eval S{\mu M^i}\DT$ and $\DT\in\RUN{/1{1-p}.!tI}$.
-
-\begin{itemize}
-	\item
-If $T.j\in\DT$, then by definition $T.j\in\DT_n\less i$ for some $n$. Assume this is the least such $n$. Then by induction, going backwards from $n$, we give a sequence of stacks $S_m$ for all $m<n$ such that $S_0=S$ and $\eval {t_m}{S_m}{\mu M^i}\e Tj$.
-\begin{itemize}
-	\item
-For the case $m=n-1$, since $T.j\in\DT_n$, by definition it is either in $\DT_{n-1}\less i$, which is ruled out by assumption, or it is given by an evaluation $\Eval{S_t}{\mu M}{\DT_t}$ with $S_t.i\in\DT_{n-1}$. Letting $S_{n-1}=S_t$, we have the evaluation below left, which gives the derivation below right.
-\[
-\eval {s_{n-1}}{S_{n-1}}{\mu M}\e Tj \qquad \infer{ \eval {s_{n-1}}{S_{n-1}}{\mu M^i}\e Tj }{ \eval {s_{n-1}}{S_{n-1}}{\mu M}\e Tj }
-\]
-
-	\item
-For the cases $0<m<n$, if $S_m.i\in\DT_m$ again by the definition of $\DT_m$ there is the evaluation below left for $S_{m-1}.i\in\DT_{m-1}$. This gives the derivation below right, where $t_m = s_m\,s_{m+1}\dots s_{n-1}$.
-\[
-	\eval {s_{m-1}}{S_{m-1}}{\mu M}\e{S_m}i
-\qquad
-	\infer{ \eval {t_{m-1}}{S_{m-1}}{\mu M^i}\e Tj }
-	{ \eval {t_{m-1}}{S_{m-1}}{\mu M}{t_m}{S_m}i & \eval {t_m}{S_m}{\mu M^i}\e Tj }
-\]
-\end{itemize}
-It follows that for every $T_t.j_t\in\DT$ there is an evaluation $\eval tS{\mu M^i}\e{T_t}{j_t}$, and hence $\Eval S{\mu M^i}\DT$.
-
-	\item
-For all $n\in\N^+$ we have $\DT_n\in\RUN{q_n.!tI + !s.p^ni}$ and hence $\DT_n\less i\in\RUN{q_n.!tI}$. Since each $T$ in $\ret\DT j$ is in some $\ret{\DT_n}j$, we have $T\in\RUN{!t_j}$. Next, for $j\neq i$ we have $\pr{\DT_n\only j} \geq q_np_j$ where $q_n=1+p+p^2+\dots +p^{n-1}$ and $p_j$ is the probability for $j$ in $\type{!tI}$. This gives the following. 
-\[
-	\pr{\DT\only j} \geq (1+p+p^2+p^3\dots)\times p_j ~=~ \frac1{1-p}\,p_j 
-\]
-\end{itemize}
-
-It follows that $\DT\in\RUN{/1{1-p}.!tI}$ and hence $\term{\mu M^i}\in\RUN{!s => /1{1-p}.!tI}$.
+so that by the \emph{continuation} case $\DT_{n+1}\in\RUN{(p_{n+1} . !tI)+p^{n+1}.(!s.p_i)}$. Since $i\notin I$ we have $\DT_n\less i\in\RUN{p_n.!tI}$, and since $\{p_n\mid n\in\N\}$ is a geometric series with limit $\fraction 1{1-p}$ we have that $\sup_{n\in\N}(\DT_n\less i)\in\RUN{/1{1-p}.!tI}$ and $\term{\mu M^i}\in\RUN{/1{1-p}!tI}$.
 \end{itemize}
 \end{proof}
+% - - - - - - - - - - - - - - -
 
 
-
-Let $\pr{\type{!tI}}=\sum\{ p_i \mid \type{!t_i.p_i} \in \type{!tI} \}$. 
+Let $|\type{!tI}|=\sum\{ p_i \mid \type{!t_i.p_i} \in \type{!tI} \}$ and $|\DT|=\sum\{ p(t)\mid t\in\floor\DT\}$. 
 
 
 % - - - - - - - - - - - - - - -
 \begin{theorem}[Almost-sure termination]
-If $\term{|- M: \e => !tI}$ then $\term M$ almost-surely terminates with probability $\pr{\type{!tI}}$.
+If $\term{|- M: \e => !tI}$ then $\term M$ almost-surely terminates with probability $|\type{!tI}|$.
 \end{theorem}
 
 \begin{proof}
-Let $\type{!tI}=\type{\{!t_i.p_i\}_{i\in I}}$. By Lemma~\ref{lem:run} we have $\eval\e M\DT$ with $\DT\in\RUN{!tI}$, which means that $\pr{\DT\only i}\geq p_i$ for every $i\in I$, so that $\pr\DT \geq \pr{\type{!tI}}$.
+Let $\type{!tI}=\type{\{!t_i.p_i\}_{i\in I}}$. By Lemma~\ref{lem:run} we have $\eval\e M\DT$ with $\DT\in\RUN{!tI}$, which means that $|\DT|_i\geq p_i$ for every $i\in I$, so that $|\DT|\geq|\type{!tI}|$. By Proposition~\ref{prop:eval-run} $\DT\subseteq\runs\e M$, so that $|\runs\e M|\geq|\type{!tI}|$.
 \end{proof}
 % - - - - - - - - - - - - - - -
-
 
 
 \newpage
