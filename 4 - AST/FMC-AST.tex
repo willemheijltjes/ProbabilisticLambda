@@ -74,6 +74,14 @@
 \end{tikzpicture}}}
 }
 
+\newcommand\heads{\mathsf{h}}
+\newcommand\tails{\mathsf{t}}
+\newcommand\PFMC{FMC^\oplus}
+\renewcommand\eval[5]{#1,#2,\term{#3}\,\evalarrow\,#4,\term{#5}}
+\newcommand\Eval[3]{#1,\term{#2}\,\evalarrow\,#3}
+\newcommand\pr[1]{\mathsf{pr}(#1)}
+\newcommand\ret[2]{#1[#2]}
+
 %==================================================================================================== FRONTMATTER
 
 \title{Simple Types for Almost Sure Termination}
@@ -137,14 +145,14 @@ We start from the following observation. \emph{Iteration}, generally represented
 \]
 We observe that if we replace $B+A$ by a probabilistic sum $B \oplus_p A$ with a fixed probability $p\in (0,1]$, i.e.\ the probability of choosing $B$ is non-zero, then $\mathsf{iter}\,f$ is \emph{almost surely terminating} (provided of course that $f$ is itself terminating). This opens a way to approach almost sure termination via type systems.
 
-These considerations demonstrate how probabilistic choice is tied up with other imperative features such as sequentiality and iteration. Derived from the PEL, the second author has developed new approach to unifying the $\lambda$-calculus with imperative features, the Functional Machine Calculus (FMC)~\cite{Heijltjes-2023}. Its most recent iteration~\cite{Heijltjes-2025-MFPS} features branching sequential computation and iteration, providing an ideal vehicle for our present study.
+These considerations illustrate how probabilistic choice is connected to other imperative features such as sequentiality and iteration. Derived from the PEL, the second author has developed new approach to unifying the $\lambda$-calculus with imperative computation and effects, the \emph{Functional Machine Calculus} (FMC)~\cite{Heijltjes-2023}. Its most recent iteration~\cite{Heijltjes-2025-MFPS} features branching sequential computation and iteration, providing an ideal vehicle for our present study.
 
 In the FMC each branch of the computation is labelled with a \emph{choice} label $i,j,k,\dots$, which takes the role of a constant, an exception, a case label, or an exit status. For example, the boolean constants $\bot$ and $\top$ are choice labels. Iteration of a term $\term M$ is written $\term{M^i}$, which evaluates $\term M$ and repeats if $\term M$ chooses $i$, and terminates for any other choice. The calculus encodes a fair probabilistic choice, which we write as $\term{M+N}$.
 
 \begin{example}
-The term $\term{(\bot + (\top + \,i))^i}$ chooses $\bot$ with probability $\frac12$, $\top$ with probability $\frac14$, and iterates with probability $\frac14$, to give an overall probability of $\frac 23$ for $\bot$ and $\frac 13$ for $\top$. We illustrate it pictorially as follows.
+The term $\term{(\heads + (\tails + \,i))^i}$ chooses \emph{heads}, the choice label $\heads$, with probability $\frac12$, \emph{tails} $\tails$ with probability $\frac14$, and iterates with probability $\frac14$, to give an overall probability of $\frac 23$ for $\heads$ and $\frac 13$ for $\tails$. We illustrate it pictorially as follows.
 \[
-	\term{(\bot + (\top + \,i))^i}
+	\term{(\heads + (\tails + \,i))^i}
 \quad=\quad
 \vcenter{\hbox{%
 \begin{tikzpicture}[thick,x=20pt,y=24pt,outer sep=0pt,inner sep=1pt]
@@ -158,8 +166,8 @@ The term $\term{(\bot + (\top + \,i))^i}$ chooses $\bot$ with probability $\frac
 	
 	\draw (1,2.7)--(x);
 	\draw (x)--(y);
-	\draw (x) --node[pos=0.6,anchor=south east]{$\termcolor\scriptstyle{\bot}$} (0,1);
-	\draw (y) --node[pos=0.6,anchor=south east]{$\termcolor\scriptstyle{\top}$} (1,0);
+	\draw (x) --node[pos=0.6,anchor=south east]{$\termcolor\scriptstyle{\heads}$} (0,1);
+	\draw (y) --node[pos=0.6,anchor=south east]{$\termcolor\scriptstyle{\tails}$} (1,0);
 	
 	\draw[rounded corners=5pt] (y) -- node[pos=0.6,anchor=north east]{$\,\termcolor\scriptstyle{i}$}  
 	  (2.5,0.5) .. controls (a) and (b) .. (3,0.7) -- (3,2.5) -- (1,2.5) -- (x);
@@ -175,13 +183,13 @@ The type system, simplified for this introduction to omit return values, records
 Here, the double arrow $\type{=>}$ is the function type and $\type\varepsilon$ represents the lack of an input value. The return type is a probability (sub-)distribution over the choices $\{i_1,\dots,i_n\}$, written as a formal sum. The probabilities $p_1$ through $p_n$ may sum to less than one, with the remainder representing a probability of divergence.
 
 \begin{example}
-For the body of our example term, without the loop, we have the following type.
+The body of our example term, without the loop, has the following type.
 \[
-	\term{\bot + (\top + \,i) : \e ~=>~ /12\bot + /14\top + /14i}
+	\term{\heads + (\tails + \,i) : \e ~=>~ /12\heads + /14\tails + /14i}
 \]
 \end{example}
 
-Iteration $\term{M^i}$ removes a choice $i$ from the possible return choices. In the probabilistic setting, the remaining probabilities must then be renormalized to a distribution. That is, if $i$ has probability $q$, the remaining choices (including divergence) have a total probability $1-q$, and must be multiplied by $\frac1{1-q}$ to return the total to one. Typing for iteration is then as follows.
+Iteration $\term{M^i}$ removes the choice $i$ from the possible return choices. In the probabilistic setting, the remaining probabilities must then be renormalized to form a distribution. That is, if $i$ has probability $q$, the remaining choices (including divergence) have a total probability of $1-q$, and must be multiplied by $\frac1{1-q}$ to return the total to one. Typing for iteration is then as follows.
 \[
 \begin{array}{@{}r@{}l@{}}
 	\term{M}   &{}: \type{\e ~=>~ p_1i_1 + \dots + p_ni_n + qj}
@@ -193,9 +201,9 @@ Iteration $\term{M^i}$ removes a choice $i$ from the possible return choices. In
 \]
 
 \begin{example}
-The return type for our example term is given by renormalizing the sub-distribution $\type{/12\bot + /14\top}$, remaining after removing the element $\type{/14i}$, by multiplying by $\frac 43$, giving the following.
+The return type for our example term is given by renormalizing the sub-distribution $\type{/12\heads + /14\tails}$, remaining after removing the element $\type{/14i}$, by multiplying by $\frac 43$, giving the following.
 \[
-	\term{(\bot + (\top + \,i))^i : \e ~=>~ /23\bot + /13\top}
+	\term{(\heads + (\tails + \,i))^i : \e ~=>~ /23\heads + /13\tails}
 \]
 \end{example}
 
@@ -206,9 +214,9 @@ Types for iteration then correctly give the probabilities for each choice. Consi
 
 
 
-The typed calculus, the probabilistically typed FMC (FMC$^\oplus$), achieves the following. A term is guaranteed to terminate with the probabilities of its return type, which is almost sure termination if the sum probability is one, also in the presence of higher-order probabilistic functions. In a first-order setting it guarantees \emph{positive} almost sure termination (expected evaluation time is finite), where still it may capture all Markov chains and directly compute their expected output. In the higher-order setting, which gives access to Church numerals, there are examples of \emph{non-positive} or \emph{null} AST.
+The typed calculus achieves the following. A term is guaranteed to terminate with the probabilities of its return type, which is almost sure termination if the sum probability is one, also in the presence of higher-order probabilistic functions. In a first-order setting it guarantees \emph{positive} almost sure termination (expected evaluation time is finite), where still it may capture all Markov chains and directly compute their expected output. In the higher-order setting, which gives access to Church numerals, there are examples of \emph{non-positive} or \emph{null} AST.
 
-The FMC$^\oplus$ is a new type system for the FMC~\cite{Heijltjes-2025-MFPS}, while the underlying calculus remains essentially the same. It is also a conservative extension of the \emph{sequential} probabilistic event $\lambda$-calulculus
+The probabilistic type system is new for the FMC~\cite{Heijltjes-2025-MFPS}, while the underlying calculus remains essentially the same. It is also a conservative extension of the \emph{sequential} probabilistic event $\lambda$-calculus...
 
 %\cite{Hurd-2002}
 
@@ -219,92 +227,137 @@ The FMC$^\oplus$ is a new type system for the FMC~\cite{Heijltjes-2025-MFPS}, wh
 
 \bigskip
 
+%---------------------------------------------------------------------------------------------------- BACKGROUND
+
+\section{Background and related work}
+
 {\color{green!66!black}
 
 * Conservative extension of [Curry \&\ Howard meet Borel] and [Simple Types for Probabilistic Termination].
 
-* Uses \emph{iteration} rather than \emph{recursion} to obtain probabilistic typeability.
+* Uses \emph{iteration} rather than \emph{recursion} to obtain probabilistic typeability. Probabilistic recursion is difficult as it requires probabilistic function variables at type level, essentially using dependent types. Example: probabilistic Church numerals and Y-combinator.
 
-* Probabilistic recursion is difficult as it requires probabilistic function variables at type level, essentially using dependent types. Example: probabilistic Church numerals and Y-combinator.
+* We believe the observation on typed iterators and almost-sure termination is new.
 
-* Probabilistic iteration is straightforward and natural, taking  $f : A \to A+B$ to $\mathsf{iter}~f : A\to B$, which is AST if $A+B$ is a probabilistic sum which has a non-zero probability of choosing $B$. 
+* Much work on probabilistic termination in verification, but not through type systems, which we believe is new.
+
+* Limited expressive power for real algorithms at present, due to types being simple types. But a dependently typed generalisation would be akin to Hoare logic, and might facilitate probabilistic termination in theorem provers and give natural ways to include termination evidence in typed imperative programming languages.
 
 }
 
 %---------------------------------------------------------------------------------------------------- PROBABILISTIC FMC
 
-\section{The probabilistically-typed FMC}
+\section{The probabilistic FMC}
 
+The Functional Machine Calculus (FMC)~\cite{Heijltjes-2023,Heijltjes-2025-MFPS} combines the $\lambda$-calculus with imperative programming and effects in the following way. Its point of departure is the (simplified) Krivine Abstract Machine~\cite{Krivine-2007}, a call--by--name operational semantics for the $\lambda$-calculus that evaluates terms in the context of an argument stack, where \emph{application} $M\,N$ pushes $N$, and \emph{abstraction} $\lambda x.M$ pops the head of the stack and substitutes it for $x$. The calculus and the machine are then extended as follows.
 
-Terms:
+\begin{description}
+	\item[Effects] The machine is generalised from one to multiple argument stacks or streams, which are then used to model effects: higher-order store as stacks of depth one, input/output as pop-only and push-only streams, and probabilistic choice as a pop-only stream of boolean values. The idea of a probabilistic $\lambda$-calculus that pops from a separate input stream derives from the probabilistic event $\lambda$-calculus~\cite{DalLago-Guerrieri-Heijltjes-2020}, the precursor to the FMC.
+
+	\item[Sequencing] The calculus is extended with imperative \emph{skip} and \emph{sequence} $\term{M;N}$, implemented in standard fashion on the machine with a continuation stack where $\term{M;N}$ pushes $N$ and \emph{skip} pops and executes. This further enables the embedding of Plotkin's call--by--value $\lambda$-calculus, the monadic \emph{return} and \emph{let}-binding of Moggi's computational metalanguage~\cite{Moggi-1991}, and Levy's call--by--push--value~\cite{Levy-2003}.
+	
+	\item[Control] The calculus is generalised from sequential to branching computation by parameterizing \emph{skip} in a set of \emph{choice} labels $i,j,k,\dots$, each indicating a distinct branch of the computation, and \emph{sequence} to be conditional on a choice $\term{M;i->N}$, continuing with $\term N$ only if $\term M$ terminates with the branch $i$. This is used to model control flow constructions: conditionals, constants, case switches, and exception handling. Iteration is introduced by the construct $\term{M^i}$ which evaluates $\term M$ and iterates on the choice $i$, exiting otherwise, with the semantics $\term{M^i}=\term{M;i->M^i}$.
+\end{description}
+
+In this way the FMC embeds a minimal but complete imperative programming language, and extends to it two primary features of the $\lambda$-calculus: confluent reduction and simple types. In this paper we consider the \emph{probabilistic FMC}, a fragment of the calculus with \emph{control} and two argument stacks, the regular one for the $\lambda$-calculus and a probabilistic input stream. 
+
+\begin{definition}
+The \emph{terms} of the probablistic FMC are given by the following grammar.
 \[
 \term{M,N} ~\coloneqq~ \term{x} ~\mid~ \term{<x>.M} ~\mid~ \term{[N].M} ~\mid~ \term{i} ~\mid~ \term{M;i->N} ~\mid~ \term{M^i} ~\mid~ \term{?a.M}
 \]
+\end{definition}
 
-\noindent
-Abbreviations:
+The constructs are: a \emph{variable} $\term x$; a \emph{pop} $\term{<x>.M}$ that binds $\term x$ in $\term M$; a \emph{push} $\term{[N].M}$; a \emph{choice} $\term i$; a \emph{case} $\term{M;i->N}$; a \emph{loop} $\term{M^i}$; and a \emph{generator} $\term{?a.M}$ which binds the variable $\term a$ in $\term M$.
+
+The $\lambda$-calculus embeds by letting $\lambda x.M=\term{<x>.M}$ and $M\,N=\term{[N].M}$. Probabilistic choice embeds as follows, where the \emph{case} construct associates left, $\term{M; i->N ; j->P}=\term{(M; i->N) ; j-> P}$.
 \[
-	\term{M+N} ~=~\term{?a.a;\top->M;\bot->N}
+	\term{M+N} ~=~\term{?a.a ; \top->M ; \bot->N }
 \]
+In this construction, first $\term{?a}$ pops a boolean value $\term\top$ or $\term\bot$ from a probabilistic stream and substitutes it for $\term a$. The remainder then selects the relevant branch by the semantics of the \emph{case} construct, given by the equations $\term{i;i->M}=\term M$ and $\term{j;i->M}=\term j$ for $i\neq j$. We reserve the choice labels $\top$ and $\bot$ for the purpose of encoding probabilistic choice: here, if $\term M$ were allowed to choose $\term\bot$, that would incorrectly trigger $\term N$ after evaluating $\term M$.
 
-\noindent
-Sets of things:
+% - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - Abstract machine
+\subsection*{The operational semantics}
+
+The machine evaluates a term $\term M$ in a state $(t,S,\term M,K)$, in the context of three stacks: 
+\begin{itemize}
+	\item A \emph{trace} $t$, a stack of boolean values $\top$ and $\bot$, from which $\term{?a.M}$ pops. 
+	\item An \emph{argument stack} $S$ of terms, where $\term{[N].M}$ pushes $\term N$, and $\term{<x>.M}$ pops the head $\term N$ and continues as $\term{\{N/x\}M}$, the capture-avoiding substitution of $\term N$ for $\term x$ in $\term M$.
+	\item A \emph{continuation stack} $K$, a stack of cases $\term{i->M}$, where $\term{M;i->N}$ pushes $\term{i->N}$ and $\term{M^i}$ pushes $\term{i->M^i}$. A choice $\term j$ pops the head $\term{i->M}$ and continues as $\term M$ if $i=j$, and as $\term j$ otherwise.
+\end{itemize}
+
+\begin{definition}
+The \emph{probabilistic functional abstract machine} is given by the following data. \emph{Traces}, \emph{argument stacks}, and \emph{continuation stacks} are as follows.
 \[
-\begin{array}{lll}
-	\0,\1   &~\in~\B      & \text{boolean constants}
-\\	a,x,y,z &~\in~\Var    & \text{variables}
-\\  i,j,k   &~\in~\Choice & \text{choices, where also}~\B\subset\Choice
-\\	R,S,T   &~\in~\Stack  & \text{stacks of terms}
-\\  L,K     &~\in~\Cont   & \text{continuation stacks: stacks of cases}~\term{i->M}
-\\	r,s,t   &~\in~\Trace  & \text{traces: finite sequences of booleans}~\top,\bot
-\\  p,q     &~\in~[0,1]   & \text{probabilities}
-\end{array}
+    r,s,t ~\coloneqq~ \e ~\mid~ \bot\,t ~\mid~ \top\,t   \qquad\quad 
+    R,S,T ~\coloneqq~ \e ~\mid~ S\,\term M               \qquad\quad 
+    K,L   ~\coloneqq~ \e ~\mid~ (\term{i->M})\,K
 \]
-
-Machine:
-\[
-\begin{array}{lc}
-	  \mathsf{push}     & \step- t S {[N].M} K             t {S\,\term N} M K
-\\ \\ \mathsf{pop}      & \step- t {S\,\term N} {<x>.M} K  t S {\{N/x\}M} K
-\\ \\ \mathsf{select}   & \step- t S i {(\term{i->M})\,K}  t S M K
-\\ \\ \mathsf{reject}   & \step- t S i {(\term{j->M})\,K}  t S i K
-\\ \\ \mathsf{sequence} & \step- t S {M;i->N} K            t S M {(\term{i->N})\,K}
-\\ \\ \mathsf{iterate}  & \step- t S {M^i} K               t S M {(\term{i->M^i})\,K}
-\\ \\ \mathsf{sample}   & \step- {\1\,t} S {?a.M} K        t S {\{\1/a\}M} K
-                   \quad  \step- {\0\,t} S {?a.M} K        t S {\{\0/a\}M} K
-\end{array}
-\]
-
-A \emph{run} of the machine is a sequence of steps, written with a double line as below. A \emph{successful} run is one terminating in a \emph{final state} $\state tTi\e$ with a choice term $\term i$ and empty continuation stack.
+The \emph{states} of the machine are four-tuples $(t,S,\term M,K)$. Its \emph{steps} or \emph{transitions} are given in Figure~\ref{fig:machine}. A \emph{run} of the machine is a sequence of steps, written with a double line as below. A \emph{successful} run is one terminating in a \emph{final state} $\state\e Ti\e$ with a choice term $\term i$ and empty trace and continuation stack.
 \[ 
 	\step= sSMK tTNL
 \]
+\end{definition}
 
-
-\renewcommand\eval[5]{#1,#2,\term{#3}\,\evalarrow\,#4,\term{#5}}
-\newcommand\Eval[3]{#1,\term{#2}\,\evalarrow\,#3}
-
-Big-step evaluation: $(i\neq j)$
+% - - - - - - - - - - Machine figure
+\begin{figure}
 \[
-\begin{array}{ccc}
-     \infer{\eval \e Si Si}{}
-   & \infer{\eval {rs}R{M;i->N} Tj }{\eval rRM Si & \eval sSN Tj}
-   & \infer{\eval rR{M;i->N} Sj }{\eval rRM Sj}
-\\\\ \infer{\eval sS{[N].M} Ti}{\eval s{S\,\term N}M Ti}
-   & \infer{\eval {rs}R{M^i} Tj }{\eval rRM Si & \eval sS{M^i} Tj}
-   & \infer{\eval rR{M^i} Sj }{\eval rRM Sj} 
-\\\\ \infer{\eval t{S\,\term N}{<x>.M} Ti}{\eval tS{\{N/x\}M} Ti}
-   & \infer{\eval {\bot\,t}S{?a.M} Ti}{\eval tS{\{\bot/a\}M} Ti}
-   & \infer{\eval {\top\,t}S{?a.M} Ti}{\eval tS{\{\top/a\}M} Ti}
+\begin{array}{lccr}
+	  \mathsf{push}     & \step- t S {[N].M} K             t {S\,\term N} M K
+	                    & \step- t S i {(\term{i->M})\,K}  t S M K                    & \mathsf{select}
+\\ \\ \mathsf{pop}      & \step- t {S\,\term N} {<x>.M} K  t S {\{N/x\}M} K
+	                    & \step- t S i {(\term{j->M})\,K}  t S i K                    & \mathsf{reject}
+\\ \\ \mathsf{sequence} & \step- t S {M;i->N} K            t S M {(\term{i->N})\,K}
+	                    & \step- t S {M^i} K               t S M {(\term{i->M^i})\,K} & \mathsf{iterate}
+\\ \\ \mathsf{sample}   & \step- {\1\,t} S {?a.M} K        t S {\{\1/a\}M} K
+                        & \step- {\0\,t} S {?a.M} K        t S {\{\0/a\}M} K
 \end{array}
 \]
+\caption{The abstract machine}
+\label{fig:machine}
+\end{figure}
+% - - - - - - - - - - 
+
+In addition to the machine we use a big-step operational semantics, in the form of an inductively defined evaluation relation $(\evalarrow)$, which describes the successful runs of the machine directly.
+
+\newcommand\erule[1]{\!\!\scriptstyle{\mathsf{#1}}}
+\newcommand\Rax  {\erule{ax}}
+\newcommand\Rsel {\erule{sel}}
+\newcommand\Rrej {\erule{rej}}
+\newcommand\Rpush{\erule{push}}
+\newcommand\Rloop{\erule{loop}}
+\newcommand\Rexit{\erule{exit}}
+\newcommand\Rpop {\erule{pop}}
+\newcommand\Rbot {\erule{smpl}}
+\newcommand\Rtop {\erule{smpl}}
+
+\begin{definition}
+The \emph{evaluation} relation has statements $\eval tSM Ti$ and is defined inductively by the following rules.
+\[
+\begin{array}{ccc}
+     \infer[\Rax]  {\eval \e Si Si}{}
+   & \infer[\Rsel] {\eval {rs}R{M;i->N} Tj }{\eval rRM Si & \eval sSN Tj}
+   & \infer[\Rrej] {\eval rR{M;i->N} Sj }{\eval rRM Sj}
+\\\\ \infer[\Rpush]{\eval sS{[N].M} Ti}{\eval s{S\,\term N}M Ti}
+   & \infer[\Rloop]{\eval {rs}R{M^i} Tj }{\eval rRM Si & \eval sS{M^i} Tj}
+   & \infer[\Rexit]{\eval rR{M^i} Sj }{\eval rRM Sj} 
+\\\\ \infer[\Rpop] {\eval t{S\,\term N}{<x>.M} Ti}{\eval tS{\{N/x\}M} Ti}
+   & \infer[\Rbot] {\eval {\bot\,t}S{?a.M} Ti}{\eval tS{\{\bot/a\}M} Ti}
+   & \infer[\Rtop] {\eval {\top\,t}S{?a.M} Ti}{\eval tS{\{\top/a\}M} Ti}
+\end{array}
+\]
+\end{definition}
 
 
+\begin{proposition}[{\cite[Proposition 5.4]{Heijltjes-2025-MFPS}}]
+Evaluation characterizes successful machine termination:
+\[
+\eval tSMTi \quad \iff \quad \step= tSM\e \e Ti\e
+\]
+\end{proposition}
 
 
-\newcommand\pr[1]{\mathsf{pr}(#1)}
-\newcommand\ret[2]{#1[#2]}
-
+% - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - Probabilistic evaluation
 
 \subsection*{Probabilistic evaluation}
 
@@ -409,7 +462,7 @@ Typing rules:
 
 % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - Runnability
 \newpage
-\subsection{Runnability}
+\subsection*{Runnability}
 
 
 \begin{definition}
