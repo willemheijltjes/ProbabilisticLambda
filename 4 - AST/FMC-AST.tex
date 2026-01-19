@@ -74,14 +74,8 @@
 \end{tikzpicture}}}
 }
 
-\newcommand\heads{\mathsf{h}}
-\newcommand\tails{\mathsf{t}}
-\newcommand\PFMC{FMC^\oplus}
-\renewcommand\eval[5]{#1,#2,\term{#3}\,\evalarrow\,#4,\term{#5}}
-\newcommand\Eval[3]{#1,\term{#2}\,\evalarrow\,#3}
-\newcommand\pr[1]{\mathsf{pr}(#1)}
-\newcommand\stk[1]{\mathsf{stk}(#1)}
-\newcommand\ret[2]{\stk{#1\only #2}}
+
+
 
 %==================================================================================================== FRONTMATTER
 
@@ -126,23 +120,22 @@
 \begin{abstract}
 
 \end{abstract}
-   
+ 
+ 
+ 
 %---------------------------------------------------------------------------------------------------- INTRODUCTION
 
 \section{Introduction}
 
 We are interested in applying the tools of the $\lambda$-calculus, in particular confluent reduction and type systems, to probabilistic computation. In~\cite{DalLago-Guerrieri-Heijltjes-2020} we restored confluence to a probabilistic $\lambda$-calculus, the probabilistic event $\lambda$-calculus (PEL), by decomposing probabilistic choice into a \emph{sampling} construct and a \emph{conditional}. Independently in~\cite{Antonelli-DalLago-Pistone-2022} and~\cite{Heijltjes-Majury-2025}, from different inspirations we converged on essentially the same probabilistic type system for the PEL to give lower bounds on the probability of termination. In this paper we further extend the calculus, and develop a type system for \emph{almost sure termination} (AST): termination with probability one.
 
-We start from the following observation. \emph{Iteration}, generally represented by while-loops, repeats a given function $f$ until a condition is fulfilled. In the typed case, illustrated  below, the function $f$ is required to return a sum $B+A$ where the choice between returning a value $A$ or $B$ represents the condition. Then $\mathsf{iter}\,f$ first evaluates $f$, and exits on $B$ and repeats on $A$.
+We start from the following observation. \emph{Iteration}, generally represented by while-loops, repeats a given function $f$ until a condition is fulfilled. In the typed case, illustrated  below, the function $f$ is required to return a sum $B+A$ where the choice between returning a value $A$ or $B$ represents the condition. Then $\mathsf{iter}\,f$ evaluates $f$, exits on $B$, and repeats on $A$.
 \[
 \begin{array}{@{}r@{}l@{}}
 	f &{}: A \to B+A
 \\ \hline
 	\mathsf{iter}\,f &{}: A\to B
 \end{array}
-	%\infer{\mathsf{iter}~f : A\to B} { f : A \to B+A } 
-	% \qquad \mathsf{iter}~f~=~[\mathsf{id},\mathsf{iter}~f]\,\circ\,f
-	%It is defined as the least solution to the equation below right, where $[-,-]$ is the co-diagonal of the coproduct.
 \]
 We observe that if we replace $B+A$ by a probabilistic sum $B \oplus_p A$ with a fixed probability $p\in (0,1]$, i.e.\ the probability of choosing $B$ is non-zero, then $\mathsf{iter}\,f$ is \emph{almost surely terminating} (provided of course that $f$ is itself terminating). This opens a way to approach almost sure termination via type systems.
 
@@ -179,32 +172,32 @@ The term $\term{(\heads + (\tails + \,i))^i}$ chooses \emph{heads}, the choice l
 
 The type system, simplified for this introduction to omit return values, records the probability of terminating with each given choice. A term $\term M$ is typed as follows, indicating that it may choose $i_k$ with probability $p_k$ from choices $i_1$ through $i_n$.
 \[
-	\term{M : \e ~=>~ p_1 i_1 + \cdots + p_n i_n }
+	\term{M : \e ~=>~ p_1 i_1 * \cdots * p_n i_n }
 \]
 Here, the double arrow $\type{=>}$ is the function type and $\type\varepsilon$ represents the lack of an input value. The return type is a probability (sub-)distribution over the choices $\{i_1,\dots,i_n\}$, written as a formal sum. The probabilities $p_1$ through $p_n$ may sum to less than one, with the remainder representing a probability of divergence.
 
 \begin{example}
 The body of our example term, without the loop, has the following type.
 \[
-	\term{\heads + (\tails + \,i) : \e ~=>~ /12\heads + /14\tails + /14i}
+	\term{\heads + (\tails + \,i) : \e ~=>~ /12\heads * /14\tails * /14i}
 \]
 \end{example}
 
 Iteration $\term{M^i}$ removes the choice $i$ from the possible return choices. In the probabilistic setting, the remaining probabilities must then be renormalized to form a distribution. That is, if $i$ has probability $q$, the remaining choices (including divergence) have a total probability of $1-q$, and must be multiplied by $\frac1{1-q}$ to return the total to one. Typing for iteration is then as follows.
 \[
 \begin{array}{@{}r@{}l@{}}
-	\term{M}   &{}: \type{\e ~=>~ p_1i_1 + \dots + p_ni_n + qj}
+	\term{M}   &{}: \type{\e ~=>~ p_1i_1 * \dots * p_ni_n + qj}
 \\ \hline \\[-10pt]
-	\term{M^j} &{}: \type{\e ~=>~ /{p_1}{1-q}i_1 + \dots + /{p_n}{1-q}i_n}
+	\term{M^j} &{}: \type{\e ~=>~ /{p_1}{1-q}i_1 * \dots * /{p_n}{1-q}i_n}
 \end{array}	
 \qquad
 \term{M}=\looppic1 \qquad \term{M^j}=\looppic0
 \]
 
 \begin{example}
-The return type for our example term is given by renormalizing the sub-distribution $\type{/12\heads + /14\tails}$, remaining after removing the element $\type{/14i}$, by multiplying by $\frac 43$, giving the following.
+The return type for our example term is given by renormalizing the sub-distribution $\type{/12\heads * /14\tails}$, remaining after removing the element $\type{/14i}$, by multiplying by $\frac 43$, giving the following.
 \[
-	\term{(\heads + (\tails + \,i))^i : \e ~=>~ /23\heads + /13\tails}
+	\term{(\heads + (\tails + \,i))^i : \e ~=>~ /23\heads * /13\tails}
 \]
 \end{example}
 
@@ -310,8 +303,8 @@ The \emph{states} of the machine are four-tuples $(t,S,\term M,K)$. Its \emph{st
 	                    & \step- t S i {(\term{j->M})\,K}  t S i K                    & \mathsf{reject}
 \\ \\ \mathsf{sequence} & \step- t S {M;i->N} K            t S M {(\term{i->N})\,K}
 	                    & \step- t S {M^i} K               t S M {(\term{i->M^i})\,K} & \mathsf{iterate}
-\\ \\ \mathsf{sample}   & \step- {\1\,t} S {?a.M} K        t S {\{\1/a\}M} K
-                        & \step- {\0\,t} S {?a.M} K        t S {\{\0/a\}M} K
+\\ \\ \mathsf{sample}   & \step- {\top\,t} S {?a.M} K      t S {\{\top/a\}M} K
+                        & \step- {\bot\,t} S {?a.M} K      t S {\{\bot/a\}M} K
 \end{array}
 \]
 \caption{The abstract machine}
@@ -319,18 +312,8 @@ The \emph{states} of the machine are four-tuples $(t,S,\term M,K)$. Its \emph{st
 \end{figure}
 % - - - - - - - - - - 
 
-In addition to the machine we use a big-step operational semantics, in the form of an inductively defined evaluation relation $(\evalarrow)$, which describes the successful runs of the machine directly.
 
-\newcommand\erule[1]{\!\!\scriptstyle{\mathsf{#1}}}
-\newcommand\Rax  {\erule{ax}}
-\newcommand\Rsel {\erule{sel}}
-\newcommand\Rrej {\erule{rej}}
-\newcommand\Rpush{\erule{push}}
-\newcommand\Rloop{\erule{loop}}
-\newcommand\Rexit{\erule{exit}}
-\newcommand\Rpop {\erule{pop}}
-\newcommand\Rbot {\erule{smpl}}
-\newcommand\Rtop {\erule{smpl}}
+In addition to the machine we use a big-step operational semantics, in the form of an inductively defined evaluation relation $(\evalarrow)$, which describes the successful runs of the machine directly.
 
 \begin{definition}
 The \emph{evaluation} relation has statements $\eval tSM Ti$ and is defined inductively by the following rules.
@@ -374,146 +357,174 @@ A \emph{frontier} $F$ is a (possibly infinite) set of traces such that no elemen
 
 \begin{example}
 \label{ex:frontier}
-The set of traces $\{ \bot^n\top\mid n\in \N \} = \{ \top,\bot\top,\bot\bot\top,\dots\}$ is a frontier with probability $1$.
+The set of traces $\{ (\bot^n)\top\mid n\in \N \} = \{ \top,\bot\top,\bot\bot\top,\dots\}$ is a frontier with probability $1$.
 \end{example}
 
 
-A \emph{return family} $\DS$ gives the result of successfully evaluating a term for every trace in a given frontier $F$, collecting for each $t\in F$ the return stack $S_t$ and choice $i_t$ as a pair $(S_t,i_t)_t$ indexed with $t$. The frontier $F$ over which $\DS$ is defined is written $\floor\DS=F$.
+A \emph{return family} $\DS$ gives the result of successfully evaluating a term for every trace in a given frontier $F$, collecting for each $t\in F$ a return stack $S_t$ and choice $i_t$ as the pair $(S_t,i_t)_t$ indexed with $t$. The frontier $F$ over which $\DS$ is defined is written $\floor\DS=F$, and the \emph{probability} of a return family is that of its frontier, $\pr\DS = \pr{\floor\DS}$.
 \[
-	\DR,\DS,\DT~\coloneqq~\{ (S_t,i_t)_t \}_{t\in F}
-\qquad
-	\DR,\DS,\DT~:~F\to\Stack\times\Choice
+	\DS,\DT~\coloneqq~\{ (S_t,i_t)_t \}_{t\in F}
 \]
 
 \begin{definition}
-The \emph{probabilistic evaluation} $\Eval SM\DT$ of a term $\term M$ in the context of a stack $S$ is given by a return family $\DT$ generated by the evaluation of $\term M$ and $\term S$ with each $t\in F$.
+A \emph{probabilistic evaluation} $\Eval SM\DT$ of a term $\term M$ in the context of a stack $S$ to a return family $\DT$ is given by the evaluation of $\term M$ and $\term S$ with each $t\in F$, as follows.
 \[
 	\Eval SM{\{ (T_t,i_t)_t \}_{t\in F}} \iff \forall t\in F.~(\eval tSM {T_t}{i_t})
 \]
 \end{definition}
 
 \begin{example}
-For the term $\term M=\term{(\heads + (\tails + \,i))^i}$ of the introduction we have $\Eval \e M \DT$ for the following return family over the frontier $F$ of Example~\ref{ex:frontier}.
+For the term $\term M=\term{(\heads + (\tails + \,i))^i}$ of the introduction we have $\Eval \e M \DT$ for the following return family $\DT$ over the frontier of Example~\ref{ex:frontier}.
 \[
-	\DT~=~\{ (\e,\heads)_t \mid t \in F~,~|t|~\text{is odd}~\} \cup \{ (\e,\tails)_t \mid t \in F~,~|t|~\text{is even}~\}
+	\DT~=~\{ (\e,\heads)_t \mid t = (\bot^{2n})\top,~n\in\N~\} \cup \{ (\e,\tails)_t \mid t = (\bot^{2n+1})\top,~n\in\N~\}
 \] 
 \end{example}
 
-Observe that evaluation is closed under inclusion: if $\Eval RM\DT$ and $\DS\subseteq\DT$ then $\Eval RM\DS$. An evaluation $\Eval SM\DT$ gives a lower bound of $\pr{\floor\DT}$ for the probability of termination of a term $\term M$ in the context of a stack $S$.
+Observe that evaluation is closed under inclusion: if $\Eval RM\DT$ and $\DS\subseteq\DT$ then $\Eval RM\DS$. An evaluation $\Eval SM\DT$ gives a lower bound of $\pr{\DT}$ for the probability of termination of a term $\term M$ in the context of a stack $S$.
 
 \begin{definition}
-The \emph{probability of termination} of a term $\term M$ in the context of a stack $S$ is the largest probability $\pr{\floor\DT}$ for any $\DT$ such that $\Eval SM\DT$.
+The \emph{probability of termination} of a term $\term M$ in the context of a stack $S$ is the largest probability $\pr{\DT}$ for any $\DT$ such that $\Eval SM\DT$.
 \end{definition}
 
-
-
-
-The \emph{union} of two return families $\DS+\DT$ is defined if they have disjoint frontiers, $\floor\DS\cap\floor\DT=\varnothing$, as the union of their underlying sets $\DS\cup\DT$. Likewise, \emph{inclusion} between families $\DS\subseteq\DT$ is inclusion as sets, which means $\floor\DS\subseteq\floor\DT$ and $\DS(t)=\DT(t)$ for all $t\in\floor\DS$. We define the following notions below: the \emph{extension} $s\pfx\DS$ of a return family $\DS$ with a trace $s$, its \emph{restriction} $\DS\only i$ to a choice $i$, and its \emph{exclusion} $\DS\less i$ of $i$. 
-
-We extend a frontier $F$ with a prefix $s$ pointwise, $s\pfx F=\{st\mid t\in F\}$. 
-
+To work with return families we use the following notation. The \emph{sum} of two return families $\DS+\DT$ is defined if they have disjoint frontiers, $\floor\DS\cap\floor\DT=\varnothing$, as the union of their underlying sets $\DS\cup\DT$. Likewise, \emph{inclusion} between families $\DS\subseteq\DT$ is inclusion as sets. We define the following notions below: $s\pfx F$ and $s\pfx\DS$ add $s$ as a prefix to every trace $t$ in $F$, respectively in $\DS$, and $S\,\DT$ prefixes every stack in $\DT$ with $S$; $\DS\only i$ restricts a family to the choice $i$ and $\DS\less i$ excludes the choice $i$; and $\stk\DS$ collects the stacks in $\DS$ as a set. 
 \[
-\begin{array}{l@{}l}
-	    s\pfx\DS   &~=~\{ \,(S_t.i_t)_{st} \mid (S_t,i_t)_t \in \DS\,\}
-\\[5pt] S\,\DT     &~=~\{ \,S\,T_t.i_t \mid T_t.i_t \in \DT \}	    
-\\[5pt]	\DS\only i &~=~\{ \,S_t.i_t \in \DS \mid i_t=i \,\} 
-\\[5pt]	\DS\less i &~=~\{ \,S_t.i_t \in \DS \mid i_t\neq i \,\}
-\\[5pt] \stk\DS    &~=~\{ \,S_t \mid S_t.i_t \in \DS\,\}
-\\[5pt] \pr\DS     &~=~\pr{\floor\DS}
+\begin{array}{r@{}l@{\qquad\qquad}r@{}l}
+		s\pfx F    &{}~=~\{ \, st \mid t\in F \,\}                & \DS\only i &{}~=~\{ \,(S,j)_t \in \DS \mid j=i \,\} 
+\\[5pt] s\pfx\DS   &{}~=~\{ \,(S,i)_{st} \mid (S,i)_t \in \DS\,\} & \DS\less i &{}~=~\{ \,(S,j)_t \in \DS \mid j\neq i \,\}
+\\[5pt] S\,\DT     &{}~=~\{ \,(S\,T,i)_t \mid (T,i)_t \in \DT\,\} & \stk\DS    &{}~=~\{ \,S \mid (S,i)_t \in \DS\,\}
 \end{array}
 \]
-
-Observe the following equations.
+We will freely use the following equations.
 \[
-\begin{array}{r@{}l}
-   \pr{\DS+\DT}      &~=~ \pr\DS + \pr\DT
-\\ \pr{s\pfx\DS}     &~=~ \pr s\times\pr\DS
-\\ \floor{s\pfx\DS}  &~=~ s\pfx\floor\DS
-\\ s\pfx(\DS\only i) &~=~ (s\pfx\DS)\only i
-\\ s\pfx(\DS\less i) &~=~ (s\pfx\DS)\less i
-\end{array}
+	\floor{s\pfx\DS} = s\pfx\floor\DS    \qquad\quad
+	\pr{s\pfx\DS}    = \pr s\times\pr\DS \qquad\quad
+	\pr{\DS+\DT}     = \pr\DS + \pr\DT
 \]
-
 
 
 %---------------------------------------------------------------------------------------------------- TYPES
 
 \section{Types}
 
-
-Types will use \emph{indexed probability (sub-)distributions}, which are families over finite sets of choices $I,J$.
-
-\noindent
-Types:
+Types for the FMC describe the input/output behaviour of the machine. In the deterministic case, a type $\type t$ is of the form below left, where the type vector $\type{!s}=\type{s_1 .. s_k}$ types the input stack on the machine, and the type vectors $\type{!t_m}$ type the return stack for each choice $i_m$. The type indicates that given an input stack $S:\type{!s}$ the machine will return some choice $i_m$ and stack $T:\type{!t_m}$. For the probabilistic case we replace the formal sum of the return type with a probability distribution, adding a probability $p_m$ for each summand as below right. For probabilities we use rationals in $[0,1]$.
 \[
-\begin{array}{lr@{~\coloneqq~}l}
-	\text{types}	   & \type{s,t} & \type{!s => !tI}
-\\	\text{stack types} & \type{!t}  & \type{t_1..t_n}
-\\  \text{sum types}   & \type{!tI} & \type{\{!t_i.p_i\}_{i\in I}}~\quad~\sum_{i\in I}p_i\leq 1
+	\type{!s ~=>~!t_1.i_1 + .. + !t_n.i_n} \qquad\qquad
+	\type{!s ~=>~!t_1.p_1i_1 * .. * !t_n.p_ni_n}
+\]
+We will formalize the return type as \emph{distribution type}, a family in a finite set $I$ of choice labels, with a type vector $\type{!t_i}$ and a probability $p_i$ for each $i\in I$ such that the sum probability over all $p_i$ is at most one. It is thus a combination of a deterministic sum type, the family of type vectors $\type{!t_i}$, and a probability (sub-)distribution over $I$, the family of probabilities $p_i$.
+
+\begin{definition}
+\emph{Types}, \emph{stack types}, and \emph{distribution types} are given as follows.
+\[
+\begin{array}{l@{\qquad}r@{~\coloneqq~}l}
+	\text{types}	            & \type{s,t} & \type{!t => d}
+\\	\text{stack types}          & \type{!t}  & \type{t_1..t_n}
+\\  \text{distribution types}   & \type{g,d} & \type{\{(!t_i,p_i)_i\}_{i\in I}}\quad\text{where}\quad\sum_{i\in I}p_i\leq 1
 \end{array}
 \]
+\end{definition}
 
-\noindent
-Definitions:
+We introduce the following notation to work with distribution types. The \emph{basis} of a distribution type $\type d$, the set of choices $I$ over which it is defined, is $\floor{\type d}=I$. To recover the informal notation at the start of the section, we define the \emph{singleton} distribution type $\type{!t.pi}=\type{\{(!t,p)_i\}}$ and the \emph{sum} $\type{g*d}=\type{g\cup d}$ of distribution types over disjoint bases $\floor{\type g}\cap\floor{\type d}$. The \emph{probability} $\pr{\type d}$ of a distribution type is the sum over its probabilities $p_i$. Below, $\type{!s\,d}$ prefixes the type vector $\type{!s}$ to each $\type{!t}$ in $\type d$, and $\type{q.d}$ multiplies each probability $p_i$ in $\type d$ by the probability $q$. Below right, $\type{d|I}$ restricts $\type d$ to the choices in $I$, and $\type{d-I}$ removes them.
 \[
-\begin{array}{l@{}ll}
-		\type{!t.pi}       &~=~ \type{\{!t_i.p_i\}_{\{i\}}}                       & \text{where~}\type{!t_i}=\type{!t},~p_i=p
-\\[5pt] \type{!sI + !tJ}   &~=~ \type{!sI \cup !tJ}                               & \text{if~}(I\cap J=\varnothing)
-\\[5pt] \type{!s\,!tI}     &~=~ \type{\{!s\,!t_i . p_i \mid !t_i.p_i \in !tI\}}
-\\[5pt]	\type{q.!tI}       &~=~ \type{\{ !t_i . q\,p_i \mid  !t_i.p_i \in !tI\}}
-\\[5pt]	\type{!tI-J}       &~=~ \type{\{ !t_i.p_i \in !tI \mid i\notin `J\}}
-\\[5pt] \type{!tI|J}       &~=~ \type{\{ !t_i.p_i \in !tI \mid i\in `J\}}
-\\[5pt] \type{!sI ++ !tJ}  & \multicolumn{2}{@{}l@{}}{~=~ \type{\{!t_i . p_i`+q_i \mid !t_i.p_i \in !sI|J~`,~!t_i.q_i\in!tJ|I\}}}
-\\[5pt]                    &\quad\type{\cup~(!sI-J)~\cup~(!tJ-I)}                 & \text{if~} \forall i\in(I\cap J).~\type{s_i}=\type{t_i}
+\begin{array}{r@{}l@{\qquad\qquad}r@{}l}
+	    \type{q.d}   &{}~=~ \type{\{    (!t,qp)_i \mid (!t,p)_i\in d\, \}}  & \type{d|I} &{}~=~ \type{\{ (!t.p)_i \in d \mid i\in I\,\}}
+\\[5pt]	\type{!s\,d} &{}~=~ \type{\{ (!s\,!t,p)_i \mid (!t,p)_i\in d\, \}}  & \type{d-I} &{}~=~ \type{\{ (!t.p)_i \in d \mid i\notin I\,\}}
 \end{array}
 \]
-
-\noindent
-Typing rules:
+Finally, the \emph{merger} $\type{g++d}$ of two distribution types is defined if for every $i\in\floor{\type g}\cap\floor{\type d}$ they have the same type vector $\type{!t_i}$, and is as follows.
 \[
-\begin{array}{lc}
-      \mathsf{variable}  & \infer{\term{G, x:t |- x:t}}{}
-\\ \\ \mathsf{expansion} & \infer{\term{G |- M: !s\,!r => !r\,!tI}}{\term{G |- M: !s => !tI}}
-\\ \\ \mathsf{push}      & \infer{\term{G |- [N].M : !s => !tI}}{\term{G |- N:r} && \term{G |- M : r\,!s => !tI}}
-\\ \\ \mathsf{pop}       & \infer{\term{G |- <x>.M : r\,!s => !tI}}{\term{G , x:r |- M: !s => !tI}}
-\\ \\ \mathsf{choice}    & \infer{\term{G |- i: !s => !s.1i}}{}
-\\ \\ \mathsf{sequence}  & \infer{\term{G |- M;i->N : !r => !sI ++ (p . !tJ)}}
-                                 {\term{G |- M: !r => !sI + !s.pi} && 
-                                  \term{G |- N: !s => !tJ}}
-\\ \\ \mathsf{iterate}   & \infer{\term{G |- M^i: !s => /1{1-p} . !tI}}{\term{G |- M: !s => !tI + !s.pi} && (p\neq 1)}
-\\ \\ \mathsf{sample}    & \infer{\term{G |- ?a.M : !r => (/12 . !sI) ++ (/12 . !tJ)}}{\term{G , a: \e => \e.1\bot |- M: !r => !sI} && \term{G , a: \e => \e.1\top |- M: !r => !tJ}}
-\\ \\ \mathsf{zero}      & \infer{\term{G |- M : !s => 0 . !tI}}{}
-\end{array}
+	\type{g++d} ~=~ \type{ \{ (!t,p+q)_i \mid i\in {\floor\gamma}\cup{\floor\delta}~`,~(!t,p)_i \in g~`,~(!t,q)_i\in d\}~+~g-{\floor\delta}~+~d-{\floor\gamma} }
 \]
 
+\begin{definition}
+The \emph{typed probabilistic FMC} is given by the typing rules in Figure~\ref{fig:types}, where a context $\term{G}=\term{x_1:t_1,,x_n:t_n}$ is a finite function from variables to types written as a sequence, and typing judgment $\term{G |- M:t}$ assigns a term $\term M$ the type $\type t$ in the context $\term G$.
+\end{definition}
+
+% - - - - - - - - - - Types figure
+\begin{figure}
+\[
+\begin{array}{l@{\qquad}c@{\qquad}c@{\qquad}r}
+      \mathsf{variable}  & \vc{\infer{\term{G, x:t |- x:t}}{}}
+                         & \vc{\infer{\term{G |- M : !s => 0 . d}}{}}                                 & \mathsf{zero}
+\\ \\ \mathsf{pop}       & \vc{\infer{\term{G |- <x>.M : r\,!s => d}}{\term{G , x:r |- M: !s => d}}}
+                         & \vc{\infer{\term{G |- [N].M : !s => d}}
+                                     {\term{G |- N:r} && \term{G |- M : r\,!s => d}}}                 & \mathsf{push}
+\\ \\ \mathsf{choice}    & \vc{\infer{\term{G |- i: !s => !s.1i}}{}}
+                         & \vc{\infer{\term{G |- M;i->N : !r => g ++ (p . d)}}
+                                     {\term{G |- M: !r => g * !s.pi} && 
+                                      \term{G |- N: !s => d}}}                                        & \mathsf{sequence}
+\\ \\ \mathsf{expand}    & \vc{\infer{\term{G |- M: !s\,!r => !r\,d}}{\term{G |- M: !s => d}}}
+                         & \vc{\infer{\term{G |- M^i: !s => /1{1-p} . d}}
+                                     {\term{G |- M: !s => d * !s.pi} && (p\neq 1)} }                  & \mathsf{iterate}    
+\\ \\ \mathsf{sample}    & \multicolumn{2}{c}{
+                           \vc{\infer{\term{G |- ?a.M : !r => (/12 . g) ++ (/12 . d)}}
+                                     {\term{G , a: \e => \e.1\top |- M: !r => g} && 
+                                      \term{G , a: \e => \e.1\bot |- M: !r => d}}}
+                          }
+\end{array}
+\]
+\caption{The typed probabilistic FMC}
+\label{fig:types}
+\end{figure}
+% - - - - - - - - - -
+
+\begin{example}
+The probabilistic sum $\term{M+N}=\term{?a.a ; \top->M ; \bot->N }$ is typed as follows.
+\[
+\infer{ \term{|- ?a.a ; \top -> M ; \bot -> N : !t ~=>~ /12.g ~++~ /12.d} }{
+ \infer{ \term{|- ?a.a ; \top -> M : !t ~=>~ !t./12\top ~*~ /12.d } }{
+  \infer{ \term{|- ?a.a : !t ~=>~ !t./12\top ~*~ !t./12\bot} }{
+   \infer{ \term{|- ?a.a : \e ~=>~ \e./12\top ~*~ \e./12\bot} }{
+    \infer{ \term{ a: \e => \e.1\top |- a: \e => \e.1\top} }{}
+    &&
+    \infer{ \term{ a: \e => \e.1\bot |- a: \e => \e.1\bot} }{}
+  }} &
+  \term{|- M : !t => g}
+ } &
+ \term{|- N : !t => d}
+}
+\]
+Using this as an admissible typing rule, our running example is typed as follows.
+\[
+\infer{ \term{|- (\heads + (\tails + \,i))^i : \e ~=>~ \e./23\heads ~*~ \e./13\tails} }{
+ \infer{ \term{|- \heads + (\tails + \,i) : \e ~=>~ \e./12\heads ~*~ \e./14\tails ~*~ \e./14i} }{
+  \infer{ \term{|- \heads : \e ~=>~\e.1\heads}}{}
+  &&
+  \infer{ \term{|- \tails + \,i : \e ~=>~ \e./12\tails ~*~ \e./12i } }{
+   \infer{ \term{|- \tails : \e ~=>~\e.1\tails}}{}
+   &&
+   \infer{ \term{|- i : \e ~=>~\e.1i}}{}
+}}}
+\]
+\end{example}
 
 
-% - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - Runnability
-\newpage
-\subsection*{Runnability}
 
+% - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - Almost sure termination
+\subsection*{Almost sure termination}
+
+The intended meaning of the type system is that if $\term{|- M: \e => d}$ (i.e.\ $\term M$ requires no inputs to run on the machine) then the probability of termination for $\term M$ is at least $\pr{\type d}$. We will establish this using a reducibility argument in the style of Tait~\cite{Tait-1967}, called \emph{runnability} since it uses the machine rather than reduction. 
+The runnability predicate directly interprets the meaning of types: a runnable term of type $\term{M:!s => d}$, given a stack $S$ of runnable terms for the types in $\type{!s}$, will probabilistically evaluate to a runnable return family $\DT$ for the type $\type{d}$, with the key property that $\pr{\DT}\geq\pr{\type d}$.
 
 \begin{definition}
 The set $\RUN{t}$ of \emph{runnable terms} for a type $\type t$ is defined as the set of closed terms
 \[
-	\RUN{!s => !tI} = \{ \term M ~\mid~ \forall S \in\RUN{!s}.~\exists\DT\in\RUN{!tI}.~\Eval SM\DT~\}
+	\RUN{!s => d} = \{ \term M ~\mid~ \forall S \in\RUN{!s}.~\exists\DT\in\RUN{d}.~\Eval SM\DT~\}
 \]
-where the runnable sets for stack types $\type{!t}$ and sum types $\type{!tI}$ are as follows.
+where the runnable sets for stack types $\type{!t}$ and distribution types $\type{d}$ are as follows.
 \[
     \RUN{t_1..t_n} = \{ \e\,\term{M_1}\dots \term{M_n} \mid \term{M_i}\in\RUN{t_i} \}
 \]
 \[
-	\RUN{\{!t_i.p_i\}_{i\in I}} = \{ \DT \mid \forall i\in I.~\ret\DT i\subseteq\RUN{!t_i}~\wedge~\pr{\DT\only i}\geq p_i~\}
+	\RUN{\{(!t_i,p_i)_i\}_{i\in I}} = \{ \DT \mid \forall i\in I.~\stk{\DT\only i}\subseteq\RUN{!t_i}~\wedge~\pr{\DT\only i}\geq p_i~\}
 \]
 \end{definition}
 
-
-For a context $\Gamma=\term{x_1:t_1,..,x_n:t_n}$ the set $\SRUN{G}$ is a set of substitution maps $\mu$ that assigns each $x_i$ a runnable term $\term M\in\RUN{t_i}$.
+To work with open terms, a \emph{substitution map} $\mu$ is a finite function from variables to terms, applied to a term as $\term{\mu M}$ which replaces every free variable $x$ in the domain of $\mu$ with the term $\term{\mu(x)}$. for a context $\Gamma=\term{x_1:t_1,..,x_n:t_n}$ the set $\SRUN{G}$ is a set of substitution maps $\mu$ that assigns each $x_i$ a runnable term $\term M\in\RUN{t_i}$, as follows.
 \[
-	\SRUN{G}~=~\{ \mu \mid \forall\term{x:t}\in\Gamma.~\term{\mu x}\in\RUN{t}\}
+	\SRUN{G}~=~\{ \mu \mid \forall\term{x:t}\in\Gamma.~\term{\mu(x)}\in\RUN{t}\}
 \]
-
-
+We are now ready to prove the \emph{runnability lemma}, that typed terms are runnable.
 
 % - - - - - - - - - - - - - - -
 \begin{lemma}
@@ -539,131 +550,130 @@ By the definition of $\SRUN{G}$ we have $\term{\mu x}\in\RUN t$.
 \[
 \infer{\term{G |- i: !s => !s.1i}}{}
 \]
-Let $S\in\RUN{!s}$ and note that $\term{\mu i}=\term i$ for any $\mu$. We have the evaluation $\eval\e Si Si$ for the empty trace. Then for the frontier $\{\e\}$ we have $\Eval Si\DS$ with the return family $\{S_\e.i_\e\}$ (where $S_\e=S$ and $i_\e=i$). Since $S\in\RUN{!s}$ and $p(\e)=1$ it follows that $\DS\in\RUN{!s.1i}$.
+Let $S\in\RUN{!s}$ and note that $\term{\mu i}=\term i$ for any $\mu$. We have the evaluation $\eval\e Si Si$ for the empty trace. Then for the frontier $\{\e\}$ we have $\Eval Si{\{(S,i)_\e\}}$, with the singleton return family of $S$ and $i$ for the empty trace. Since $S\in\RUN{!s}$ and $p(\e)=1$ it follows that $\{(S,i)_\e\}\in\RUN{!s.1i}$.
 
 	% Zero
-	\item \emph{zero}
+	\item \emph{Zero}
 \[
-\infer{\term{G |- M : !s => 0 . !tI}}{}
+\infer{\term{G |- M : !s => 0 . d}}{}
 \]
-For any $S$ and $\mu$ we have $\Eval S{\mu M}\varnothing$. Since $\varnothing\subseteq\RUN{!t_i}$ and $\pr{\varnothing\only i}\geq 0$ for all $i$ we have $\varnothing\in\RUN{0.!tI}$.
+For any $S$ and $\mu$ we have $\Eval S{\mu M}\varnothing$. Since $\varnothing\subseteq\RUN{!t}$ for any $\type{!t}$ and $\pr{\varnothing\only i}\geq 0$ for any $i$ we have $\varnothing\in\RUN{0.d}$.
 
-
-	% Expansion
-	\item \emph{Expansion:}
+	% Expand
+	\item \emph{Expand:}
 \[
-\infer{\term{G |- M: !s\,!r => !r\,!tI}}{\term{G |- M: !s => !tI}}
+\infer{\term{G |- M: !s\,!r => !r\,d}}{\term{G |- M: !s => d}}
 \]
-Let $R\in\RUN{!r}$, $S\in\RUN{!s}$, and $\mu\in\SRUN{G}$. The inductive hypothesis gives the evaluation $\Eval SM\DT$ for a return memory $\DT=\{T_t,i_t)\}_{t\in F}\in\RUN{!tI}$. For each $t\in F$ we have the evaluation below left. By induction on the evaluation relation $\evalarrow$ for every $t$ we get the evaluation below right.
+Let $R\in\RUN{!r}$, $S\in\RUN{!s}$, and $\mu\in\SRUN{G}$. The inductive hypothesis gives the evaluation $\Eval SM\DT$. For each $(T,i)_t\in\DT$ we have the evaluation below left. By induction on the evaluation relation $\evalarrow$ we get the evaluation below right.
 \[
-\eval tS{\mu M} {T_t}{i_t}
+\eval tS{\mu M}Ti
 \qquad\qquad
-\eval t{RS}{\mu M} {RT_t}{i_t}
+\eval t{RS}{\mu M}{RT}i
 \]
-This gives $\Eval{RS}{\mu M}{R\,\DT}$. Since $R\in\RUN{!r}$ and $\ret\DT i\subseteq\RUN{!t_i}$ we have $\ret{R\,\DT}i \subseteq \RUN{!r\,!t_i}$, and also $\pr{R\,\DT\only i}=\pr{\DT\only i}\geq p_i$, so that $R\,\DT\in\RUN{!r\,!tI}$. 
+This gives $\Eval{RS}{\mu M}{R\,\DT}$. Since $R\in\RUN{!r}$ and $\stk{\DT\only i}\subseteq\RUN{!t_i}$, where $\type{!t_i}$ is the type for $i$ in $\type d$, we have $\stk{R\,\DT\only i} \subseteq \RUN{!r\,!t_i}$. Since also $\pr{R\,\DT\only i}=\pr{\DT\only i}\geq p_i$ we have $R\,\DT\in\RUN{!r\,d}$. 
 
 	% Push
 	\item \emph{Push:} 
 \[
-\infer{\term{G |- [N].M : !s => !tI}}{\term{G |- N:r} && \term{G |- M : r\,!s => !tI}}
+\infer{\term{G |- [N].M : !s => d}}{\term{G |- N:r} && \term{G |- M : r\,!s => d}}
 \]
-Let $S\in\RUN{!s}$ and $\mu\in\SRUN{G}$. By induction we have $\term{\mu N}\in\RUN{r}$ and $\term{\mu M}\in\RUN{r\,!s=>!tI}$, and for the latter the evaluation $\Eval {S\,\term{\mu N}}{\mu M}\DT$. Let this be given by a frontier $F$ evaluation below left for every $t\in F$, from which we construct the derivation below right.
+Let $S\in\RUN{!s}$ and $\mu\in\SRUN{G}$. By induction we have $\term{\mu N}\in\RUN{r}$ and $\term{\mu M}\in\RUN{r\,!s=>d}$, and for the latter the evaluation $\Eval {S\,\term{\mu N}}{\mu M}\DT$. Then for every $(T,i)_t\in \DT$ we have the evaluation below left, from which we construct the derivation below right.
 \[
-	\eval t{S\,\term{\mu N}}{\mu M} {T_t}{i_t}
+	\eval t{S\,\term{\mu N}}{\mu M}Ti
 \qquad\qquad
-  \vcenter{\hbox{$
-	\infer{ \eval tS{\mu([N].M)} {T_t}{i_t} }{ \eval t{S\,\term{\mu N}}{\mu M} {T_t}{i_t} }
-  $}}
+	\vc{\infer[\Rpush]{ \eval tS{\mu([N].M)} Ti }{ \eval t{S\,\term{\mu N}}{\mu M} Ti } }
 \]
-Then $\Eval S{\mu([N].M)}\DT$ and $\term{\mu([N].M)}\in\RUN{!s => !tI}$.
+Then $\Eval S{\mu([N].M)}\DT$ and $\term{\mu([N].M)}\in\RUN{!s => d}$.
 
 	% Pop
 	\item \emph{Pop:}
 \[
-\infer{\term{G |- <x>.M : r\,!s => !tI}}{\term{G , x:r |- M: !s => !tI}}
+\infer{\term{G |- <x>.M : r\,!s => d}}{\term{G , x:r |- M: !s => d}}
 \]
-Let $S\in\RUN{!s}$, $\term N\in\RUN r$, and $\mu\in\SRUN{G}$. Let $\mu'=\mu\{\term N/x\}$, the substitution map that sends $x$ to $\term N$ and every other variable $y$ to $\mu y$, so that $\mu'\in\SRUN{G,x:r}$. By induction we have $\Eval S{\mu'M}\DT$ given by the evaluation below for every $t\in F$, from which we construct the evaluation below right.
+Let $S\in\RUN{!s}$, $\term N\in\RUN r$, and $\mu\in\SRUN{G}$. Let $\mu'=\mu\{\term N/x\}$, the substitution map that sends $x$ to $\term N$ and every other variable $y$ to $\mu y$, so that $\mu'\in\SRUN{G,x:r}$. By induction we have $\Eval S{\mu'M}\DT$, given by the evaluation below for every $(T,i)_t\in\DT$, from which we construct the evaluation below right.
 \[
-\eval tS{\mu'M} {T_t}{i_t}
+	\eval tS{\mu'M} Ti
 \qquad\qquad
-\vcenter{\hbox{$
-  \infer{ \eval t{S\,\term{N}}{\mu(<x>.M)} {T_t}{i_t}}
-   {\eval tS{\mu'M} {T_t}{i_t}}
- $}} 
+	\vc{ \infer[\Rpop]{ \eval t{S\,\term{N}}{\mu(<x>.M)}Ti } {\eval tS{\mu'M}Ti} } 
 \]
-Then $\Eval{S\,\term N}{\mu(<x>.M)}\DT$ and $\term{\mu(<x>.M)}\in\RUN{r\,!s=>!tI}$.
+Then $\Eval{S\,\term N}{\mu(<x>.M)}\DT$ and $\term{\mu(<x>.M)}\in\RUN{r\,!s=>d}$.
 
 
 	% Sample
 	\item \emph{Sample:}
 \[
-\infer{\term{G |- ?a.M : !r => (/12 . !sI) ++ (/12 . !tJ)}}{\term{G , a: \e => \e.1\bot |- M: !r => !sI} && \term{G , a: \e => \e.1\top |- M: !r => !tJ}}
+\infer{\term{G |- ?a.M : !r => (/12 . g) ++ (/12 . d)}}{\term{G , a: \e => \e.1\top |- M: !r => g} && \term{G , a: \e => \e.1\bot |- M: !r => d}}
 \]
-Let $R\in\RUN{R}$ and $\mu\in\SRUN{G}$. Define $\mu_0=\mu\{\term\bot/a\}$ and $\mu_1=\mu\{\term\top/a\}$ so that $\mu_0\in\SRUN{G , a: \e => \e.1\bot}$ and $\mu_1\in\SRUN{G , a: \e => \e.1\top}$. By induction we have $\Eval S{\mu_0M}{\DT_0}$ and $\Eval S{\mu_1M}{\DT_1}$ given by the following evaluations for every $s\in\floor{\DT_0}$ and $t\in\floor{\DT_1}$.
+Let $R\in\RUN{R}$ and $\mu\in\SRUN{G}$. Define $\mu_\top=\mu\{\term\top/a\}$ and $\mu_\bot=\mu\{\term\bot/a\}$ so that $\mu_\top\in\SRUN{G , a: \e => \e.1\top}$ and $\mu_\bot\in\SRUN{G , a: \e => \e.1\bot}$. By induction we have return families $\DS$ and $\DT$ where $\Eval R{\mu_\top M}\DS$ and $\Eval R{\mu_\bot M}\DT$, given by the following evaluations for every $(S,i)_s\in\DS$ and $(T,j)_t\in\DT$.
 \[
-\eval sS{\mu_0M} {T_s}{i_s} \qquad\qquad  
-\eval tS{\mu_1M} {T_t}{i_t}
+\eval sR{\mu_\top M}Si \qquad\qquad  
+\eval tR{\mu_\bot M}Tj
 \]
 For these we have the following derivations.
 \[
-\infer{ \eval{\bot\,s}S{\mu(?a.M)}  {T_s}{i_s} }{ \eval sS{\mu_0M}  {T_s}{i_s} } \qquad
-\infer{ \eval{\top\,t}S{\mu(?a.M)}  {T_t}{i_t} }{ \eval tS{\mu_1M}  {T_t}{i_t} }
+\infer[\Rtop]{ \eval{\top\,s}R{\mu(?a.M)}Si }{ \eval sR{\mu_\top M}Si } \qquad
+\infer[\Rbot]{ \eval{\bot\,t}R{\mu(?a.M)}Tj }{ \eval tR{\mu_\bot M}Tj }
 \]
-Then for $\DT=(\bot\pfx\DT_0)\cup(\top\pfx\DT_1)$ we have $\Eval S{\mu(?a.M)}\DT$. Since $\type{!s_i}=\type{!t_i}$ for each $i\in I\cap J$ by the definition of $\type{++}$ we have $\ret\DT i\subseteq\RUN{!s_i}$. Since we further have $\pr{\DT}=\frac12\pr{\DT_0}+\frac12\pr{\DT_1}\geq \frac12p_i+\frac12q_i$ where $p_i$ and $q_i$ are the probabilities of $i$ in respectively $\type{!sI}$ and $\type{!tJ}$, it follows that $\DT\in\RUN{(/12.!sI) ++ (/12 . !tJ)}$.
+Then for $\DU=(\top\pfx\DS)\cup(\bot\pfx\DT)$ we have $\Eval S{\mu(?a.M)}\DU$. It remains to show that $\DU\in\RUN{/12.g ++ /12.d}$. For any indexed pair in $\type{/12.g ++ /12.d}$, by the definition of $(\type{++})$ we have three cases.
+\begin{itemize}
+	\item $\type{(!t,/12p+/12q))_i}$ where $i\in\floor{\type g}\cap\floor{\type d}$, $\type{(!t.p)_i}\in\type g$ and $\type{(!t.q)_i}\in\type d$. Then since $\stk{\DS\only i}\subseteq\RUN{!t}$ and $\stk{\DT\only i}\subseteq\RUN{!t}$ we have $\stk{\DU\only i}\subseteq\RUN{!t}$, and since $\pr{\DS\only i}\geq p$ and $\pr{\DT\only i}\geq q$ we have $\pr{\DU\only i}=\pr{\top\pfx\DS\only i}+\pr{\bot\pfx\DT\only i}\geq \frac 12p+\frac 12q$.
+	\item $\type{(!t,/12p)_i}$ in $\type{/12.g-{\floor\delta}}$. Since $\stk{\DS\only i}\subseteq\RUN{!t}$ we have $\stk{\DU\only i}\subseteq\RUN{!t}$, and since $\pr{\DS\only i}\geq p$ we have $\pr{\DU\only i}=\pr{\top\pfx\DS\only i}\geq\frac 12p$.
+	\item The case for $\type{/12.d-{\floor\gamma}}$ is analogous to the previous.
+\end{itemize}
 
 	% Sequence
 	\item \emph{Sequence:} 
 \[
-\infer{\term{G |- M;i->N : !r => !sI ++ (p . !tJ)}}
-      {\term{G |- M: !r => !sI + !s.pi} && 
-       \term{G |- N: !s => !tJ}}
+\infer{\term{G |- M;i->N : !r => g ++ p.d}}
+      {\term{G |- M: !r => g * !s.pi} && 
+       \term{G |- N: !s => d}}
 \]
-Let $R\in\RUN{!r}$ and $\mu\in\SRUN{G}$. By induction we have $\term{\mu M}\in\RUN{!r => !sI ++ (p.!tJ)}$ and hence $\Eval R{\mu M}\DS$. Let this be given by an evaluation for each $s\in\floor\DS$ of the form below left. For each $s$ where $i_s=i$ we have $S_s\in\RUN{!s}$, and by induction on $\term{N}$, $\Eval{S_s}{\mu N}{\DT_s}$. Let this be given by the evaluation below right for each $t\in\floor{\DT_s}$.
+Let $R\in\RUN{!r}$ and $\mu\in\SRUN{G}$. By induction we have $\term{\mu M}\in\RUN{!r => g * !s.pi}$ and $\Eval R{\mu M}\DS$. Let this be given by an evaluation for each $(S,j)_s\in\DS$ of the form below left. For each $(S,j)_s$ where $j=i$ we have $S\in\RUN{!s}$, and by induction on $\term{N}$ a return family $\DT_s$ such that $\Eval S{\mu N}{\DT_s}$. Let this be given by the evaluation below right for each $(T,k)_t\in\DT_s$.
 \[
-	\eval sR{\mu M} {S_s}{i_s}
+	\eval sR{\mu M}Sj
 \qquad
-	\eval t{S_s}{\mu N} {T_t}{j_t}
+	\eval tS{\mu N}Tk
 \] 
-For each $s$, if $i_s\neq i$  we construct the derivation below left, and if $i_s=i$ then for each $t$ we construct that below right. 
+For each $(S,j)_s$, if $j\neq i$  we construct the derivation below left, and if $j=i$ then for each $(T,k)_t\in\DT_s$ we construct that below right. 
 \[
-	\infer{ \eval sR{\mu(M;i->N)} {S_s}{i_s} }{ \eval sR{\mu M} {S_s}{i_s} }
+	\infer[\Rrej]{ \eval sR{\mu(M;i->N)}Sj }{ \eval sR{\mu M}Sj }
 \qquad\qquad
-	\infer{ \eval{st}R{\mu(M;i->N)} {T_t}{j_t}}{ \eval sR{\mu M} {S_s}i && \eval t{S_s}{\mu N} {T_t}{j_t} }
+	\infer[\Rsel]{ \eval{st}R{\mu(M;i->N)}Tk }{ \eval sR{\mu M}Sj && \eval tS{\mu N}Tk }
 \]
 Then we have $\Eval R{\mu(M;i->N)}\DT$ where $\DT$ is given as follows.
 \[
-	\DT=(\DS\less i) \cup \bigcup_{s\in\floor{\DS\only i}} s\pfx\DT_s
+	\DT~=~(\DS\less i) \cup \bigcup_{s\in\floor{\DS\only i}} s\pfx\DT_s
 \]
-We need to show that $\DT\in\RUN{!sI ++ (p.!tJ)}$.
+It remains to show that $\DT\in\RUN{g ++ p.d}$.
 
 \begin{itemize}
-\item
-First, for all $T.j$ in $\DT$ we need that $T\in\RUN{!s_j}$ if $j\in I$ and $T\in\RUN{!t_j}$ if $j\in J$, where $\type{!s_j}=\type{!t_j}$ if $j\in I\cap J$ by the definition of $\type{++}$. If $T.j$ is in $\DS\less i$ this follows since $\DS\less i\in\RUN{!sI}$ and hence $T\in\RUN{!s_j}$, and if $T.j$ is in $\DT_s$ for some $s$ it follows since $\DT_s\in\RUN{!tJ}$, and hence $T\in\RUN{!t_j}$.
-\item
-Second, for all $j\in I\cap J$ it must be shown that $\pr{\DT\only j}\geq p_j + pq_j$ where $p_j$ is the probability of $j$ in $\type{!sI}$ and $q_j$ that in $\type{!tJ}$. We compute as follows.
+	\item
+First, for the return types, for all $j\in\floor{\type g}\cup\floor{\type d}$ we need that $\stk{\DT\only j}\subseteq\RUN{!t}$ where $\type{!t}$ is the type for $j$ in $\type g$ and $\type d$ (the definition of $(\type{++})$ requires that they agree). By definition any indexed pair in $\DT$ is either $(S,j)_s\in\DS\less i$ or $(T,k)_t\in\DT_s$. The former case follows since $\DS\in\RUN{g}$ and so $\stk{\DS\only j}\subseteq\RUN{!t}$ and $S\in\subseteq\RUN{!t}$. The latter case follows since $\DT_s\in\RUN{d}$, so that $\stk{\DS\only j}\subseteq\RUN{!t}$ and $T\in\RUN{!t}$.
+	\item
+Second, for the probabilities, for all $j\in\floor{\type g}\cup\floor{\type d}$ it must be shown that $\pr{\DT\only j}\geq p_j + pq_j$ where $p_j$ is the probability of $j$ in $\type g$ and $q_j$ that in $\type d$. We compute as follows.
 \[
 \begin{aligned}
 \pr{\DT\only j} 
-    &~=~    \pr{((\DS\less i)~\cup~\bigcup_{s\in\floor{\DS\only i}} s\pfx\DT_s)\only j}
+    &~=~    \pr{((\DS\less i)~\cup~\bigcup_{s\,\in\,\floor{\DS\only i}} s\pfx\DT_s)\only j}
 \\  &~=~    \pr{(\DS\less i)\only j} + \sum_{s\in\floor{\DS\only i}} (\pr{s}\times\pr{\DT_s\only j})
 \\  &~\geq~ p_j + \sum_{s\in\floor{\DS\only i}} (\pr{s}\times q_j)
 \\  &~\geq~ p_j + pq_j
 \end{aligned}
 \]
-The third step (the first inequality) is as follows. Since $\DS\less i\in\RUN{!sI}$ we have $\pr{\DS\only j}\geq p_j$ for all $j\in I$. Next, since $\DT_s\in\RUN{!tJ}$ for all $s$ we have $\pr{\DT_s\only j}\geq q_j$ for all $j\in J$. The last step follows since $\DS\only i\in\RUN{!s.pi}$ and hence $\pr{\DS\only i}\geq p$.
+For the third step (the first inequality), since $\DS\less i\in\RUN{g}$ we have $\pr{\DS\only j}\geq p_j$ for all $j\in\floor{\type g}$. For the last step, since $\DT_s\in\RUN{d}$ for all $s$ we have $\pr{\DT_s\only j}\geq q_j$ for all $j\in\floor{\type d}$. Then since $\DS\only i\in\RUN{!s.pi}$ we have $\pr{\DS\only i}\geq p$.
 \end{itemize}
 
-It follows that $\DT\in\RUN{!sI ++ (p.!tJ)}$ and hence $\term{\mu(M;i->N)}\in\RUN{!r => !sI ++ (p . !tJ)}$.
+It follows that $\DT\in\RUN{g ++ p.d}$ and hence $\term{\mu(M;i->N)}\in\RUN{!r => g ++ p.d}$.
 
 
 	% Iterate
 	\item \emph{Iterate:}
 \[
-\infer{\term{G |- M^i: !s => /1{1-p} . !tI}}{\term{G |- M: !s => !tI + !s.pi} && (p\neq 1)}
+\infer{\term{G |- M^i: !s => /1{1-p} . d}}{\term{G |- M: !s => d + !s.pi} && (p\neq 1)}
 \]
 Let $S\in\RUN{!s}$ and $\mu\in\SRUN{G}$. We construct a series of return families $\DT_n$ for all $n\in\N^+$ by induction on $n$, and show the following.
 \[
-	\DT_n\in\RUN{(q_n.!tI)+!s.p^ni} \quad\text{where}\quad q_n=1+p+p^2+p^3+\dots+p^{n-1}
+	\DT_n\in\RUN{(q_n.d) + !s.p^ni} \quad\text{where}\quad q_n=1+p+p^2+p^3+\dots+p^{n-1}
 \]
 
 \begin{itemize}
@@ -671,66 +681,69 @@ Let $S\in\RUN{!s}$ and $\mu\in\SRUN{G}$. We construct a series of return familie
 The case $\DT_1$ is given by induction on $\term M$ by $\Eval S{\mu M}{\DT_1}$. 
 
 \item
-For the case $\DT_{n+1}$ let $\DT_n=\{S_t.i_t\}_{t\in F_n}$. For all $t\in F_n$ such that $i_t=i$, let $\Eval {S_t}{\mu M}{\DT_t}$ by induction on $\term M$, and define $\DT_{n+1}$ as follows.
+For the case $\DT_{n+1}$, for each $(R,i)_r\in\DT_n$, by induction on $\term M$ let $\Eval R{\mu M}{\DT_r}$ and define $\DT_{n+1}$ as follows.
 \[
-	\DT_{n+1}=(\DT_n\less i) \cup \bigcup_{t\in\floor{\DT_n\only i}} t\pfx\DT_t
+	\DT_{n+1}~=~(\DT_n\less i) \cup \bigcup_{r\in\floor{\DT_n\only i}} r\pfx\DT_r
 \]
-By induction we have $\DT_n\in\RUN{q_n.!tI + !s.p^ni}$. By similar reasoning to the previous \emph{sequencing} case we have the following.
+By induction we have $\DT_n\in\RUN{q_n.d + !s.p^ni}$. By similar reasoning to the previous \emph{sequencing} case we have the following.
 \[
-	\DT_{n+1}\in\RUN{q_n.!tI + p^n.(!tI + !s.pi)}~=~\RUN{q_{n+1}.!tI + !s.p^{n+1}i}
+	\DT_{n+1}\in\RUN{q_n.d + p^n.(d + !s.pi)}~=~\RUN{q_{n+1}.d + !s.p^{n+1}i}
 \]
 \end{itemize}
 
-Observe that by definition, $\DT_n\less i~\subseteq~\DT_{n+1}\less i$. Then we define $\DT$ as the following supremum.
+Observe that by definition $\DT_n\less i~\subseteq~\DT_{n+1}\less i$. Then we define $\DT$ as the following supremum.
 \[
 	\DT~=~\sup_{n\in\N^+}\DT_n\less i
 \]
-It remains to show that $\Eval S{\mu M^i}\DT$ and $\DT\in\RUN{/1{1-p}.!tI}$.
+It remains to show that $\Eval S{\mu(M^i)}\DT$ and $\DT\in\RUN{/1{1-p}.d}$.
 
 \begin{itemize}
 	\item
-If $T.j\in\DT$, then by definition $T.j\in\DT_n\less i$ for some $n$. Assume this is the least such $n$. Then by induction, going backwards from $n$, we give a sequence of stacks $S_m$ for all $m<n$ such that $S_0=S$ and $\eval {t_m}{S_m}{\mu M^i} Tj$.
+If $(T,j)_t\in\DT$, then by definition $(T,j)_t\in\DT_n\less i$ for some $n$. Assume this is the least such $n$. Then by induction, going backwards from $n$, we give a sequence of stacks $S_m$ and traces $s_m$ and $t_m$ for all $m<n$ such that $S_0=S$, $s_0=\e$, $s_m\,t_m=t$, and $\eval {t_m}{S_m}{\mu(M^i)} Tj$, and $(S_m,i)_{s_m}\in\DT_m$ for $m\neq 0$.
+
 \begin{itemize}
 	\item
-For the case $m=n-1$, since $T.j\in\DT_n$, by definition it is either in $\DT_{n-1}\less i$, which is ruled out by assumption, or it is given by an evaluation $\Eval{S_t}{\mu M}{\DT_t}$ with $S_t.i\in\DT_{n-1}$. Letting $S_{n-1}=S_t$, we have the evaluation below left, which gives the derivation below right.
+For the case $m=n-1$, since $(T,j)_t\in\DT_n$, by definition it is either in $\DT_{n-1}\less i$, which is ruled out by assumption, or it is given by an evaluation $\Eval R{\mu M}{\DT_r}$ with $R=S$ if $n=1$, and otherwise $(R,i)_s\in\DT_{n-1}$ and $t=sr$, with the evaluation below left. Let $S_{n-1}=R$, $s_{n-1}=s$, and $t_{n-1}=r$. Since $i\neq j$, this gives the derivation below right.
 \[
-\eval {s_{n-1}}{S_{n-1}}{\mu M} Tj \qquad \infer{ \eval {s_{n-1}}{S_{n-1}}{\mu M^i} Tj }{ \eval {s_{n-1}}{S_{n-1}}{\mu M} Tj }
+\eval rR{\mu M} Tj \qquad \infer[\Rexit]{ \eval {t_{n-1}}{S_{n-1}}{\mu(M^i)} Tj }{ \eval {t_{n-1}}{S_{n-1}}{\mu M} Tj }
 \]
 
 	\item
-For the cases $0<m<n$, if $S_m.i\in\DT_m$ again by the definition of $\DT_m$ there is the evaluation below left for $S_{m-1}.i\in\DT_{m-1}$. This gives the derivation below right, where $t_m = s_m\,s_{m+1}\dots s_{n-1}$.
+For the cases $0<m<n$, by induction let $(S_m,i)_{s_m}\in\DT_m$ with $t=s_mt_m$ and the evaluation below left. By the definition of $\DT_m$, $(S_m,i)_{s_m}$ is given by an evaluation $\Eval R{\mu M}{\DT_r}$ with $R=S$ if $m=1$ and otherwise $(R,i)_s\in\DT_{m-1}$ with $s_m=sr$, giving the evaluation below right.
 \[
-	\eval {s_{m-1}}{S_{m-1}}{\mu M} {S_m}i
-\qquad
-	\infer{ \eval {t_{m-1}}{S_{m-1}}{\mu M^i} Tj }
-	{ \eval {s_{m-1}}{S_{m-1}}{\mu M} {S_m}i & \eval {t_m}{S_m}{\mu M^i} Tj }
+	\eval{t_m}{S_m}{\mu(M^i)}Tj
+\qquad\qquad
+	\eval rR{\mu M}{S_m}i
+\] 
+To show the statement for $m-1$, let $S_{m-1}=R$, $s_{m-1}=s$, and $t_m=r\,t_{m-1}$, and construct the derivation below.
+\[
+	\infer[\Rloop]{ \eval {t_{m-1}}{S_{m-1}}{\mu(M^i)} Tj }
+	{ \eval {s_{m-1}}{S_{m-1}}{\mu M} {S_m}i && \eval {t_m}{S_m}{\mu(M^i)} Tj }
 \]
 \end{itemize}
-It follows that for every $T_t.j_t\in\DT$ there is an evaluation $\eval tS{\mu M^i} {T_t}{j_t}$, and hence $\Eval S{\mu M^i}\DT$.
+It follows that for every $(T,j)_t\in\DT$ there is an evaluation $\eval tS{\mu(M^i)}{T_t}{j_t}$, and hence $\Eval S{\mu(M^i)}\DT$.
 
 	\item
-For all $n\in\N^+$ we have $\DT_n\in\RUN{q_n.!tI + !s.p^ni}$ and hence $\DT_n\less i\in\RUN{q_n.!tI}$. Since each $T$ in $\ret\DT j$ is in some $\ret{\DT_n}j$, we have $T\in\RUN{!t_j}$. Next, for $j\neq i$ we have $\pr{\DT_n\only j} \geq q_np_j$ where $q_n=1+p+p^2+\dots +p^{n-1}$ and $p_j$ is the probability for $j$ in $\type{!tI}$. This gives the following. 
+For all $n\in\N^+$ we have $\DT_n\in\RUN{q_n.d + !s.p^ni}$ and hence $\DT_n\less i\in\RUN{q_n.d}$. Since each $T$ in $\stk{\DT\only j}$ is in some $\stk{\DT\only j}$ we have $T\in\RUN{!t}$ where $\type{!t}$ is the stack for $j$ in $\type d$. Next, for $j\neq i$ we have $\pr{\DT_n\only j} \geq q_np_j$ where $q_n=1+p+p^2+\dots +p^{n-1}$ and $p_j$ is the probability for $j$ in $\type{d}$. This gives the following. 
 \[
 	\pr{\DT\only j} \geq (1+p+p^2+p^3\dots)\times p_j ~=~ \frac1{1-p}\,p_j 
 \]
 \end{itemize}
 
-It follows that $\DT\in\RUN{/1{1-p}.!tI}$ and hence $\term{\mu M^i}\in\RUN{!s => /1{1-p}.!tI}$.
+It follows that $\DT\in\RUN{/1{1-p}.d}$ and hence $\term{\mu(M^i)}\in\RUN{!s => /1{1-p}.d}$.
 \end{itemize}
 \end{proof}
 
 
-
-Let $\pr{\type{!tI}}=\sum\{ p_i \mid \type{!t_i.p_i} \in \type{!tI} \}$. 
-
+The runnability lemma directly gives the main theorem of typed almost sure termination.
 
 % - - - - - - - - - - - - - - -
-\begin{theorem}[Almost-sure termination]
-If $\term{|- M: \e => !tI}$ then $\term M$ almost-surely terminates with probability $\pr{\type{!tI}}$.
+\begin{theorem}
+If $\term{|- M: \e => d}$ then $\term M$ terminates with probability at least $\pr{\type{d}}$.
 \end{theorem}
 
 \begin{proof}
-Let $\type{!tI}=\type{\{!t_i.p_i\}_{i\in I}}$. By Lemma~\ref{lem:run} we have $\Eval\e M\DT$ with $\DT\in\RUN{!tI}$, which means that $\pr{\DT\only i}\geq p_i$ for every $i\in I$, so that $\pr\DT \geq \pr{\type{!tI}}$.
+Let $\type{d}=\type{\{(!t_i,p_i)_i\}_{i\in I}}$. By Lemma~\ref{lem:run} we have $\Eval\e M\DT$ with $\DT\in\RUN{d}$, which means that $\pr{\DT\only i}\geq p_i$ for every $i\in I$, so that $\pr\DT \geq \pr{\type d}$.
 \end{proof}
 % - - - - - - - - - - - - - - -
 
@@ -743,6 +756,19 @@ Let $\type{!tI}=\type{\{!t_i.p_i\}_{i\in I}}$. By Lemma~\ref{lem:run} we have $\
 {\color{green!66!black}
 Give 0th- and 1st-order fragments, encode Markov chains, show PAST and NAST.
 }
+
+\noindent
+``0th-order'':
+\[
+	\term{M,N}~\coloneqq~\term x~\mid~\term i~\mid~\term{M;i->N}~\mid~\term{M^i}~\mid~\term{?a.M}
+\]
+
+1st-order:
+\[
+	\term{V,W}~\coloneqq~\term x~\mid~\term i
+\qquad
+	\term{M,N}~\coloneqq~\term{V}~\mid~\term{[V].M}~\mid~\term{<x>.M}~\mid~\term{M;i->N}~\mid~\term{M^i}~\mid~\term{?a.M}
+\]
 
 %----------------------------------------------------------------------------------------------------
 \subsection{Encoding Markov chains}
@@ -805,12 +831,12 @@ Consider the following Markov chain $C$, where each arrow has probability $\frac
 \end{tikzpicture}}}
 \qquad
 \begin{array}{l@{}l@{}l}
-	S &~=~& \{a,b,c,i,j,k\}
-\\[3pt]	s &~=~& a
-\\[3pt]	F &~=~& \{i,j,k\}
-\\[3pt]	\delta &~=~&  a \mapsto \D{~b./13~,~c./13~,~i./13~}
-\\[3pt]            && b \mapsto \D{~a./13~,~c./13~,~j./13~}
-\\[3pt]            && c \mapsto \D{~a./13~,~b./13~,~k./13~}
+	    S      &{}~=~{}& \{a,b,c,i,j,k\}
+\\[3pt]	s      &{}~=~{}& a
+\\[3pt]	F      &{}~=~{}& \{i,j,k\}
+\\[3pt]	\delta &{}~=~{}& a \mapsto \D{~b./13~,~c./13~,~i./13~}
+\\[3pt]               && b \mapsto \D{~a./13~,~c./13~,~j./13~}
+\\[3pt]               && c \mapsto \D{~a./13~,~b./13~,~k./13~}
 \end{array}
 \]
 Its interpretation is as follows, writing $\term{M+N+P}$ for the term $\termcolor\lfloor\D{M./13,N./13,P./13}\rfloor$.
@@ -824,27 +850,62 @@ Its interpretation is as follows, writing $\term{M+N+P}$ for the term $\termcolo
 This term is typed as follows. As in the introduction, for brevity we omit return stacks from the types.
 \[
 \begin{aligned}
-	    \term{(a+b+k)^c}         &: \type{\e => /13a + /13b + /13k}
-\\[5pt]	\term{ a+(a+b+k)^c+j}~~~ &: \type{\e => /49a + /19b + /19k + /13j}
-\\[5pt] \term{(a+(a+b+k)^c+j)^b} &: \type{\e => /12a + /18k + /38j}
-\\[5pt] \term{(a+(a+c+j)^b+k)^c} &: \type{\e => /12a + /18j + /38k}
-\\[5pt] \term{ (a+(a+b+k)^c+j)^b + (a+(a+c+j)^b+k)^c+i}~~~ &: \type{\e => /13a + /16k + /16j + /13i}
-\\[5pt] \term{((a+(a+b+k)^c+j)^b + (a+(a+c+j)^b+k)^c+i)^a} &: \type{\e => /14k + /14j + /12i}
+	    \term{(a+b+k)^c}         &: \type{\e => /13a * /13b * /13k}
+\\[5pt]	\term{ a+(a+b+k)^c+j}~~~ &: \type{\e => /49a * /19b * /19k + /13j}
+\\[5pt] \term{(a+(a+b+k)^c+j)^b} &: \type{\e => /12a * /18k * /38j}
+\\[5pt] \term{(a+(a+c+j)^b+k)^c} &: \type{\e => /12a * /18j * /38k}
+\\[5pt] \term{ (a+(a+b+k)^c+j)^b + (a+(a+c+j)^b+k)^c+i}~~~ &: \type{\e => /13a * /16k * /16j * /13i}
+\\[5pt] \term{((a+(a+b+k)^c+j)^b + (a+(a+c+j)^b+k)^c+i)^a} &: \type{\e => /14k * /14j * /12i}
 \end{aligned}
 \]
 The interpretation may be illustrated as follows, where the solid edges represent the tree-shape of the probabilistic sums, while the dashed edges represent the loops.
+%\[
+%\begin{tikzpicture}[x=24pt,y=-24pt,inner sep=2pt,outer sep=0pt,thick]
+%	\node[circle,draw] (a) at (1,0) {$a$};
+%	\node[circle,draw] (b) at (0,1) {$b$};
+%	\node[circle,draw] (c) at (2,1) {$c$};
+%	\node[circle,draw] (d) at (0,2.4) {$c$};
+%	\node[circle,draw] (e) at (2,2.4) {$b$};
+%	\node (i) at (1,-1)   {$i$};
+%	\node (j) at (-1,1)   {$j$};
+%	\node (k) at ( 3,1)   {$k$};
+%	\node (l) at (-1,2.4) {$k$};
+%	\node (m) at ( 3,2.4) {$j$};
+%	\begin{scope}[->,>=stealth]
+%	\draw (0,-1)--(a);
+%	\draw (a) to[bend right] (b);
+%	\draw (a) to[bend left]  (c);
+%	\draw (a) -- (i);
+%	\draw (b) -- (d);
+%	\draw (c) -- (e);
+%	\draw (b) -- (j);
+%	\draw (c) -- (k);
+%	\draw (d) -- (l);
+%	\draw (e) -- (m);
+%	\begin{scope}[dash pattern=on 3pt off 2pt]
+%	\draw (b.120) to[bend left]  (a.150);
+%	\draw (c.60)  to[bend right] (a.30);
+%	\draw (d.120) to[bend left]  (b.240);
+%	\draw (e.60)  to[bend right] (c.300);
+%	\draw (d.60)  to[bend left=10]  (a.240);
+%	\draw (e.120) to[bend right=10] (a.300);
+%	\end{scope}
+%	\end{scope}
+%\end{tikzpicture}
+%\]
 \[
-\begin{tikzpicture}[x=24pt,y=-24pt,inner sep=2pt,outer sep=0pt,thick]
-	\node[circle,draw] (a) at (1,0) {$a$};
-	\node[circle,draw] (b) at (0,1) {$b$};
-	\node[circle,draw] (c) at (2,1) {$c$};
-	\node[circle,draw] (d) at (0,2.4) {$c$};
-	\node[circle,draw] (e) at (2,2.4) {$b$};
-	\node (i) at (1,-1)   {$i$};
-	\node (j) at (-1,1)   {$j$};
-	\node (k) at ( 3,1)   {$k$};
-	\node (l) at (-1,2.4) {$k$};
-	\node (m) at ( 3,2.4) {$j$};
+\vc{
+\begin{tikzpicture}[x=27pt,y=-27pt,inner sep=0.5pt,outer sep=0pt,thick]
+	\node[circle,draw] (a) at (1,0) {$\term M$};
+	\node[circle,draw] (b) at (0,1) {$\term N$};
+	\node[circle,draw] (c) at (2,1) {$\term P$};
+	\node[circle,draw] (d) at (0,2.4) {$\term Q$};
+	\node[circle,draw] (e) at (2,2.4) {$\term R$};
+	\node (i) at (1,-1)   {$\vphantom(i$};
+	\node (j) at (-1,1)   {$~j~$};
+	\node (k) at ( 3,1)   {$~k~$};
+	\node (l) at (-1,2.4) {$~k~$};
+	\node (m) at ( 3,2.4) {$~j~$};
 	\begin{scope}[->,>=stealth]
 	\draw (0,-1)--(a);
 	\draw (a) to[bend right] (b);
@@ -857,15 +918,24 @@ The interpretation may be illustrated as follows, where the solid edges represen
 	\draw (d) -- (l);
 	\draw (e) -- (m);
 	\begin{scope}[dash pattern=on 3pt off 2pt]
-	\draw (b.120) to[bend left]  (a.150);
-	\draw (c.60)  to[bend right] (a.30);
-	\draw (d.120) to[bend left]  (b.240);
-	\draw (e.60)  to[bend right] (c.300);
-	\draw (d.60)  to[bend left=10]  (a.240);
-	\draw (e.120) to[bend right=10] (a.300);
+	\draw (b.120) to[bend left]     node[pos=0.5,anchor=south east]{$\scriptstyle a~$} (a.150);
+	\draw (c.60)  to[bend right]    node[pos=0.5,anchor=south west]{$~\scriptstyle a$} (a.30);
+	\draw (d.120) to[bend left]     node[pos=0.5,anchor=south east]{$\scriptstyle b~$} (b.240);
+	\draw (e.60)  to[bend right]    node[pos=0.5,anchor=south west]{$~\scriptstyle c$} (c.300);
+	\draw (d.60)  to[bend left=10]  node[pos=0.5,anchor=west]      {$~\scriptstyle a$} (a.240);
+	\draw (e.120) to[bend right=10] node[pos=0.5,anchor=east]      {$\scriptstyle a~$} (a.300);
 	\end{scope}
 	\end{scope}
 \end{tikzpicture}
+}
+\qquad
+\begin{array}{l@{}l}
+        \term M &{}~=~\term{(N + P + i)^a}
+\\[3pt] \term N &{}~=~\term{(a + Q + j)^b}
+\\[3pt] \term P &{}~=~\term{(a + R + k)^c}
+\\[3pt] \term Q &{}~=~\term{(a+b+k)^c}~=~\term{a+b+k}
+\\[3pt] \term R &{}~=~\term{(a+c+j)^b}~=~\term{a+c+j}
+\end{array}
 \]
 As the illustration suggests, the formalism may express any probabilistic tree with back-pointers. It may also express directed acyclic graphs, which yields a smaller interpretation of the Markov chain above, though still exponential, in the following term.
 \[
@@ -959,13 +1029,47 @@ The Church numeral types $\type{((s=>t)\,s => t)~(s=>t)~s=>t}$ of $\term{\cnii}$
 The existence of this typed term gives the following.
 
 \begin{proposition}
-The probabilistically typed FMC expresses terms that are not positively almost-sure terminating.
+The typed probabilistic FMC expresses terms that are not positively almost-sure terminating.
 \end{proposition}
 
 
 %----------------------------------------------------------------------------------------------------
 
 \bibliography{FMC-AST}
+
+
+\appendix
+
+\begin{example}
+Below we give a successful run of the machine for our running example term, with the definition of $\term{M+N}$ unfolded to its primitives, and the trace $\bot\,\bot\,\top$.
+\[
+	\term{M}~=~\term{(\heads + (\tails +\,i))^i}~=~\term{(?a.a ; \top->\heads ; \bot->(?b.b ; \top->\tails ; \bot -> i))^i}
+\]
+\[
+\begin{array}{@{(\,}r@{\,,\,}l@{\,,\,}l@{\,,\,}r@{\,)}}
+             \bot\,\bot\,\top & \e &         \term{(?a.a ; \top->\heads ; \bot->(?b.b ; \top->\tails ; \bot -> i))^i} & \e
+\\\hline     \bot\,\bot\,\top & \e & \phantom(\term{?a.a ; \top->\heads ; \bot->(?b.b ; \top->\tails ; \bot -> i)} & \term{(i -> M)}
+\\\hline     \bot\,\bot\,\top & \e & \phantom(\term{?a.a ; \top->\heads} & \term{(\bot->(?b.b ; \top->\tails ; \bot -> i))~(i -> M)}
+\\\hline     \bot\,\bot\,\top & \e & \phantom(\term{?a.a} & \term{(\top->\heads)~(\bot->(?b.b ; \top->\tails ; \bot -> i))~(i -> M)}
+\\\hline           \bot\,\top & \e & \phantom(\term{\bot} & \term{(\top->\heads)~(\bot->(?b.b ; \top->\tails ; \bot -> i))~(i -> M)}
+\\\hline           \bot\,\top & \e & \phantom(\term{\bot} &                \term{(\bot->(?b.b ; \top->\tails ; \bot -> i))~(i -> M)}
+\\\hline           \bot\,\top & \e & \phantom(\term{?b.b ; \top->\tails ; \bot -> i} &                               \term{(i -> M)}
+\\\hline           \bot\,\top & \e & \phantom(\term{?b.b ; \top->\tails} &                               \term{(\bot -> i)~(i -> M)}
+\\\hline           \bot\,\top & \e & \phantom(\term{?b.b} &                               \term{(\top->\tails)~(\bot -> i)~(i -> M)}
+\\\hline                 \top & \e & \phantom(\term{\bot} &                               \term{(\top->\tails)~(\bot -> i)~(i -> M)}
+\\\hline                 \top & \e & \phantom(\term{\bot} &                                              \term{(\bot -> i)~(i -> M)}
+\\\hline                 \top & \e & \phantom(\term{i}    &                                                          \term{(i -> M)}
+\\\hline                 \top & \e & \term{(?a.a ; \top->\heads ; \bot->(?b.b ; \top->\tails ; \bot -> i))^i} & \e
+\\\hline                 \top & \e & \phantom(\term{?a.a ; \top->\heads ; \bot->(?b.b ; \top->\tails ; \bot -> i)} & \term{(i -> M)}
+\\\hline                 \top & \e & \phantom(\term{?a.a ; \top->\heads} & \term{(\bot->(?b.b ; \top->\tails ; \bot -> i))~(i -> M)}
+\\\hline                 \top & \e & \phantom(\term{?a.a} & \term{(\top->\heads)~(\bot->(?b.b ; \top->\tails ; \bot -> i))~(i -> M)}
+\\\hline                   \e & \e & \phantom(\term{\top} & \term{(\top->\heads)~(\bot->(?b.b ; \top->\tails ; \bot -> i))~(i -> M)}
+\\\hline                   \e & \e & \phantom(\term{\heads} &              \term{(\bot->(?b.b ; \top->\tails ; \bot -> i))~(i -> M)}
+\\\hline                   \e & \e & \phantom(\term{\heads} &                                                        \term{(i -> M)}
+\\\hline                   \e & \e & \phantom(\term{\heads} & \e
+\end{array}
+\]
+\end{example}
 
 \end{document}
 
