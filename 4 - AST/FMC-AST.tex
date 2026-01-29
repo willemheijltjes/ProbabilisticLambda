@@ -214,6 +214,13 @@ The typed calculus achieves the following. A term is guaranteed to terminate wit
 
 The probabilistic type system is new for the FMC~\cite{Heijltjes-2025-MFPS}, while the underlying calculus remains essentially the same. It is also a conservative extension of the \emph{sequential} probabilistic event $\lambda$-calculus...
 
+{\color{green}
+TO DO:
+\\~* discuss full calculus (with stacks)
+\\~* argue this is simple types (Remark~\ref{rem:simple types embed})
+\\~* conservativity over previous work (Remark~\ref{rem:probabilistic types embed})
+}
+
 %\cite{Hurd-2002}
 
 %while (x>0) { x := x-1 [1/2] x := x+1 }
@@ -263,6 +270,7 @@ The Functional Machine Calculus (FMC)~\cite{Heijltjes-2023,Heijltjes-2025-MFPS} 
 	\item[Control] The calculus is generalised from sequential to branching computation by parameterizing \emph{skip} in a set of \emph{choice} labels $i,j,k,\dots$, each indicating a distinct branch of the computation, and \emph{sequence} to be conditional on a choice $\term{M;i->N}$, continuing with $\term N$ only if $\term M$ terminates with the branch $i$. This is used to model control flow constructions: conditionals, constants, case switches, and exception handling. Iteration is introduced by the construct $\term{M^i}$ which evaluates $\term M$ and iterates on the choice $i$, exiting otherwise, with the semantics $\term{M^i}=\term{M;i->M^i}$.
 \end{description}
 
+\noindent
 In this way the FMC embeds a minimal but complete imperative programming language, and extends to it two primary features of the $\lambda$-calculus: confluent reduction and simple types. In this paper we consider the \emph{probabilistic FMC}, a fragment of the calculus with \emph{control} and two argument stacks, the regular one for the $\lambda$-calculus and a probabilistic input stream. 
 
 \begin{definition}
@@ -507,7 +515,25 @@ Using this as an admissible typing rule, our running example is typed as follows
 \]
 \end{example}
 
+\begin{remark}
+\label{rem:simple types embed}
+The type system is a conservative extension of simple types for the $\lambda$-calculus. These embed as follows, using a single default choice $\star$ (see also~\cite{Heijltjes-2023,Heijltjes-Majury-2025,Heijltjes-2025-MFPS}). For these types, the typing rules for $\mathsf{variable}$, $\mathsf{pop}$, and $\mathsf{push}$ are those of the simply typed lambda-calculus.
+\[
+	\typ{t_1 \to \dots \to t_n \to o} \quad=\quad \type{t_1 \dots t_n => \e.1\star}
+\]
+\end{remark}
 
+\begin{remark}
+\label{rem:probabilistic types embed}
+The type system is also a conservative extension of those of our previous work on probabilistic termination~\cite{Antonelli-DalLago-Pistone-2022,Heijltjes-Majury-2025}. Using the notation of~\cite{Heijltjes-Majury-2025}, simple probabilistic types are simple types over the rationals between $0$ and $1$ as the set of base types, and embed as follows, where $p\in\mathbb{Q}\cap[0,1]$ and $\star$ is again the single available choice label.
+\[
+	\typ{t_1 \to \dots \to t_n \to p} \quad=\quad \type{t_1 \dots t_n => \e.p\star}
+\]
+\emph{Sequential probabilistic types}~\cite{Heijltjes-Majury-2025} are the restriction of the present system to the choice $\star$.
+\[
+	\typ{!s} \overset{p}{\Rightarrow} \typ{!t} \quad=\quad \type{!s => !t.p\star}
+\]
+\end{remark}
 
 % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - Almost sure termination
 \subsection*{Almost sure termination}
