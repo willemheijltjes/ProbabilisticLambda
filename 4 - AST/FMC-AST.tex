@@ -76,6 +76,7 @@
 \end{tikzpicture}}}
 }
 
+\newcommand\markov[1]{\llparenthesis\kern1pt\term{#1}\kern1pt\rrparenthesis}
 
 
 
@@ -94,7 +95,7 @@
 \ccsdesc[500]{Theory of computation~Lambda calculus}
 \ccsdesc[300]{Theory of computation~Probabilistic computation}
 
-\keywords{probabilistic lambda-calculus, type systems, almost sure termination}
+\keywords{probabilistic lambda-calculus, type systems, almost-sure termination}
 
 %\relatedversion{}
 
@@ -122,16 +123,17 @@
 \maketitle
 
 \begin{abstract}
-We investigate almost-sure termination in higher-order probabilistic computation through the lens of the functional machine calculus. Our key observation is that Conway iteration  can easily be equipped with a non-zero chance of exiting, thus guaranteeing almost-surely terminating in a simple way. We exploit this insight by shifting attention from recursion to typed iteration, allowing probabilistic behavior to be tracked compositionally at the type level. For the purpose, we introduce a novel probabilistic type system that assigns explicit probability distributions to termination outcomes, and we show that these types soundly guarantee almost-sure termination, even in the presence of higher-order functions. We study the expressive power of the introduced system through an embedding of Markov chains, and prove that positive almost sure termination, while guaranteed at first-order, does not hold at higher-order, in general.
+We investigate almost-sure termination in higher-order probabilistic computation through the lens of the functional machine calculus. Our key observation is that Conway iteration  can easily be equipped with a non-zero chance of exiting, thus guaranteeing almost-surely terminating in a simple way. We exploit this insight by shifting attention from recursion to typed iteration, allowing probabilistic behavior to be tracked compositionally at the type level. For the purpose, we introduce a novel probabilistic type system that assigns explicit probability distributions to termination outcomes, and we show that these types soundly guarantee almost-sure termination, even in the presence of higher-order functions. We study the expressive power of the introduced system through an embedding of Markov chains, and prove that positive almost-sure termination, while guaranteed at first-order, does not hold at higher-order, in general.
 \end{abstract}
- 
- 
- 
+
+
+
+
 %---------------------------------------------------------------------------------------------------- INTRODUCTION
 
 \section{Introduction}
 
-We are interested in applying the tools of the $\lambda$-calculus, in particular confluent reduction and type systems, to probabilistic computation. In~\cite{DalLago-Guerrieri-Heijltjes-2020} we restored confluence to a probabilistic $\lambda$-calculus, the probabilistic event $\lambda$-calculus (PEL), by decomposing probabilistic choice into a \emph{sampling} construct and a \emph{conditional}. Independently in~\cite{Antonelli-DalLago-Pistone-2022} and~\cite{Heijltjes-Majury-2025}, from different inspirations we converged on essentially the same probabilistic type system for the PEL to give lower bounds on the probability of termination. In this paper we further extend the calculus, and develop a type system for \emph{almost sure termination} (AST): termination with probability one. In doing so, our objective differs from that of many existing works in this area, which aim to capture as many AST programs as possible~\cite{}, or even to study the feasibility of capturing all such programs~\cite{}. Instead, we seek to understand the extent to which the almost-sure termination can be obtained and explained in a simple and natural manner, possibly using well-established methods.
+We are interested in applying the tools of the $\lambda$-calculus, in particular confluent reduction and type systems, to probabilistic computation. In~\cite{DalLago-Guerrieri-Heijltjes-2020} we restored confluence to a probabilistic $\lambda$-calculus, the probabilistic event $\lambda$-calculus (PEL), by decomposing probabilistic choice into a \emph{sampling} construct and a \emph{conditional}. Independently in~\cite{Antonelli-DalLago-Pistone-2022} and~\cite{Heijltjes-Majury-2025}, from different inspirations we converged on essentially the same probabilistic type system for the PEL to give lower bounds on the probability of termination. In this paper we further extend the calculus, and develop a type system for \emph{almost-sure termination} (AST): termination with probability one. In doing so, our objective differs from that of many existing works in this area, which aim to capture as many AST programs as possible~\cite{}, or even to study the feasibility of capturing all such programs~\cite{}. Instead, we seek to understand the extent to which the almost-sure termination can be obtained and explained in a simple and natural manner, possibly using well-established methods.
 
 We start from the following observation. \emph{Iteration}, generally represented by while-loops, repeats a given function $f$ until a condition is fulfilled. In the typed case, illustrated  below, the function $f$ is required to return a sum $B+A$ where the choice between returning a value $A$ or $B$ represents the condition. Then $\mathsf{iter}\,f$ evaluates $f$, exits on $B$, and repeats on $A$.
 \[
@@ -141,7 +143,7 @@ We start from the following observation. \emph{Iteration}, generally represented
 	\mathsf{iter}\,f &{}: A\to B
 \end{array}
 \]
-We observe that if we replace $B+A$ by a probabilistic sum $B \oplus_p A$ with a fixed probability $p\in (0,1]$, i.e.\ the probability of choosing $B$ is non-zero and does not depend on the input, then $\mathsf{iter}\,f$ is \emph{almost surely terminating} (provided of course that $f$ is itself terminating). This opens a way to approach almost sure termination via type systems. A crucial question arises: how can we handle a type constructor such as $B\oplus_p A$ within a $\lambda$-calculus with probabilistic choice in a compositional and elegant manner?
+We observe that if we replace $B+A$ by a probabilistic sum $B \oplus_p A$ with a fixed probability $p\in (0,1]$, i.e.\ the probability of choosing $B$ is non-zero and does not depend on the input, then $\mathsf{iter}\,f$ is \emph{almost-surely terminating} (provided of course that $f$ is itself terminating). This opens a way to approach almost-sure termination via type systems. A crucial question arises: how can we handle a type constructor such as $B\oplus_p A$ within a $\lambda$-calculus with probabilistic choice in a compositional and elegant manner?
 
 These considerations illustrate how probabilistic choice is connected to other imperative features such as sequentiality and iteration. Derived from the PEL, the second author has developed new approach to unifying the $\lambda$-calculus with imperative computation and effects, the \emph{Functional Machine Calculus} (FMC)~\cite{Heijltjes-2023}. Its most recent iteration~\cite{Heijltjes-2025-MFPS} features branching sequential computation and iteration, providing an ideal vehicle for our present study. 	In the FMC each branch of the computation is labelled with a \emph{choice} label $i,j,k,\dots$, which takes the role of a constant, an exception, a case label, or an exit status. For example, the boolean constants $\bot$ and $\top$ are choice labels. Iteration of a term $\term M$ is written $\term{M^i}$, which evaluates $\term M$ and repeats if $\term M$ chooses $i$, and terminates for any other choice. The calculus encodes a fair probabilistic choice, which we write as $\term{M+N}$.
 
@@ -150,7 +152,7 @@ The term $\term{(\heads + (\tails + \,i))^i}$ chooses \emph{heads}, the choice l
 \[
 	\term{(\heads + (\tails + \,i))^i}
 \quad=\quad
-\vcenter{\hbox{%
+\vc{%
 \begin{tikzpicture}[thick,x=20pt,y=24pt,outer sep=0pt,inner sep=1pt]
 	\node (x) at (1,2) {$\termcolor\oplus$};
 	\node (y) at (2,1) {$\termcolor\oplus$};
@@ -168,7 +170,7 @@ The term $\term{(\heads + (\tails + \,i))^i}$ chooses \emph{heads}, the choice l
 	\draw[rounded corners=5pt] (y) -- node[pos=0.6,anchor=north east]{$\,\termcolor\scriptstyle{i}$}  
 	  (2.5,0.5) .. controls (a) and (b) .. (3,0.7) -- (3,2.5) -- (1,2.5) -- (x);
 	\end{scope}
-\end{tikzpicture}}}
+\end{tikzpicture}}
 \]
 \end{example}
 
@@ -210,12 +212,13 @@ Types for iteration then correctly give the probabilities for each choice. Consi
 
 
 
-The typed calculus achieves the following. A term is guaranteed to terminate with the probabilities of its return type, which is almost sure termination if the sum probability is one, also in the presence of higher-order probabilistic functions. In a first-order setting it guarantees \emph{positive} almost sure termination (expected evaluation time is finite), where still it may capture all Markov chains and directly compute their expected output. In the higher-order setting, which gives access to Church numerals, there are examples of \emph{non-positive} or \emph{null} AST.
+The typed calculus achieves the following. A term is guaranteed to terminate with the probabilities of its return type, which is almost-sure termination if the sum probability is one, also in the presence of higher-order probabilistic functions. In a first-order setting it guarantees \emph{positive} almost-sure termination (expected evaluation time is finite), where still it may capture all Markov chains and directly compute their expected output. In the higher-order setting, which gives access to Church numerals, there are examples of \emph{non-positive} or \emph{null} AST.
 
 The probabilistic type system is new for the FMC~\cite{Heijltjes-2025-MFPS}, while the underlying calculus remains essentially the same. It is also a conservative extension of the \emph{sequential} probabilistic event $\lambda$-calculus...
 
 {\color{green}
 TO DO:
+\\~* decomposition of $N\oplus M$ into $\trm{?a.M}$ and $\trm{MaN}$
 \\~* discuss full calculus (with stacks)
 \\~* argue this is simple types (Remark~\ref{rem:simple types embed})
 \\~* conservativity over previous work (Remark~\ref{rem:probabilistic types embed})
@@ -770,7 +773,7 @@ It follows that $\DT\in\RUN{/1{1-p}.d}$ and hence $\term{\mu(M^i)}\in\RUN{!s => 
 \end{proof}
 
 
-The runnability lemma directly gives the main theorem of typed almost sure termination.
+The runnability lemma directly gives the main theorem of typed almost-sure termination.
 
 % - - - - - - - - - - - - - - -
 \begin{theorem}
@@ -792,7 +795,7 @@ We have shown that the calculus introduced in this paper enjoys all the expected
 
 In the following, the ground terms are those in the following form.
 \[
-	\term{M,N}~\coloneqq~\term x~\mid~\term i~\mid~\term{M;i->N}~\mid~\term{M^i}~\mid~\term{?a.M}
+	\term{M,N}~\coloneqq~\term i~\mid~\term{M;i->N}~\mid~\term{M^i}~\mid~\term{?a.a}
 \]
 Similarly, first-order terms are those having the following form. 
 \[
@@ -1073,6 +1076,8 @@ The typed probabilistic FMC expresses terms that are not positively almost-sure 
 
 \appendix
 
+\subsection*{Running the machine}
+
 \begin{example}
 Below we give a successful run of the machine for our running example term, with the definition of $\term{M+N}$ unfolded to its primitives, and the trace $\bot\,\bot\,\top$.
 \[
@@ -1101,6 +1106,73 @@ Below we give a successful run of the machine for our running example term, with
 \\\hline                   \e & \e & \phantom(\term{\heads} &                                                        \term{(i -> M)}
 \\\hline                   \e & \e & \phantom(\term{\heads} & \e
 \end{array}
+\]
+\end{example}
+
+
+\subsection*{Ground terms as Markov chains}
+
+The translation $\markov M$ from ground terms to Markov chains will take $\term M$ to a chain
+\[
+	\markov{M}~=~(S_M,~s_M,~F_M,~\delta_M)
+\]
+where internal states $S_M\less F_M$ represent subformulas and final states represent choices not captured by a later case. We consider chains modulo renaming of internal states, and when combining the translations of two terms we assume their internal states to be disjoint. To connect two chains, we use the notation $s\{t/i\}$ to rename a state, and the notation $\delta\{s/i\}$ which replaces all transitions to a (final) state $i$ with transitions to $s$.
+\[
+	\delta\{s/i\}(r)~=~\{~t\{s/i\}\pt p \mid t\pt p\in \delta(r)~\}
+\qquad\qquad
+	\begin{array}{r@{}l} i\{t/i\} &{}=t \\ s\{t/i\} &{}=s \quad (s\neq i) \end{array}
+\]
+The translation $\markov-$ is then as follows.
+\[
+\begin{aligned}
+	\markov{i}      &= (\{s,i\},~s,~\{i\},~s\mapsto\D{i.1})
+\\	\markov{M;i->N} &= (S_M\less\{i\}\cup S_N,~s_M,~F_M\less\{i\}\cup F_N,~\delta_M\{s_N/i\}\cup\delta_N)
+\\  \markov{M^i}    &= (S_M\less\{i\},~s_M,~F_M\less\{i\},~\delta_M\{s_M/i\})
+\\  \markov{?a.a}   &= (\{s,\top,\bot\},~s,~\{\top,\bot\},~s\mapsto\D{\top./12,\bot./12})
+\end{aligned}
+\]
+
+\begin{example}
+For the example term from the introduction, abbreviated as $\term{M^i}$ where $\term M$ is as below, the translation is as follows.
+\[
+	\term{M}~=~\term{?a.a ; \top->\heads ; \bot->(?b.b ; \top->\tails ; \bot -> i)}
+\]
+\[
+\begin{array}{r@{}l}
+	     \markov{?a.a}                            &{}= (\{r,\top,\bot\},~r,~\{\top,\bot\},~r\mapsto\D{\top./12,\bot./12})
+\\[5pt]  \markov{?a.a ; \top->\heads}             &{}= (\{r,u,\heads,\bot\},~r,~\{\heads,\bot\},~r\mapsto\D{\bot./12,u./12}~u\mapsto\D{\heads.1})
+\\[5pt]  \markov{?b.b ; \top->\tails ; \bot -> i} &{}= (\{s,v,w,\tails,i\},~s,~\{\tails,i\}, s\mapsto\D{v./12,w./12}~v\mapsto\D{\tails.1}~w\mapsto\D{i.1})
+\\[5pt]  \markov{M}                               &{}= (\{r,s,u,v,w,\heads,\tails,i\},~r,~\{\heads,\tails,i\},
+\\[5pt]  \multicolumn{2}{r}{ r\mapsto\D{u./12,s./12}~s\mapsto\D{v./12,w./12}~u\mapsto\D{\heads.1}~v\mapsto\D{\tails.1}~w\mapsto\D{i.1}~) }
+\\[5pt]  \markov{M^i}                             &{}= (\{r,s,u,v,w,\heads,\tails\},~r,
+\\[5pt]  \multicolumn{2}{r}{ r\mapsto\D{u./12,s./12}~s\mapsto\D{v./12,w./12}~u\mapsto\D{\heads.1}~v\mapsto\D{\tails.1}~w\mapsto\D{r.1}~) }
+\end{array}
+\]
+\[
+\markov{M^i}~=~\vc{
+\begin{tikzpicture}[thick,x=20pt,y=24pt,outer sep=0pt,inner sep=2pt]
+	\node (r) at (1,2) {$r$};
+	\node (s) at (2,1) {$s$};
+	\node (u) at (0,1) {$u$};
+	\node (v) at (1,0) {$v$};
+	\node (w) at (3,0) {$w$};
+	\node (h) at (0,0) {$\termcolor\heads$};
+	\node (t) at (1,-1) {$\termcolor\tails$};
+
+	\begin{scope}[->,>=stealth]
+	
+	\draw (1,2.7)--(r);
+	\draw (r) --node[pos=0.6,anchor=south east]{$\scriptstyle{\frac12}$} (u);
+	\draw (r) --node[pos=0.6,anchor=south west]{$\scriptstyle{\frac12}$} (s);
+	\draw (s) --node[pos=0.6,anchor=south east]{$\scriptstyle{\frac12}$} (v);
+	\draw (s) --node[pos=0.6,anchor=south west]{$\scriptstyle{\frac12}$} (w);
+	\draw (u)--(h);
+	\draw (v)--(t);
+	
+	\draw[rounded corners] (w)--(3.7,0.7)--(1.7,2.7)--(r);
+	
+	\end{scope}
+\end{tikzpicture}}
 \]
 \end{example}
 
