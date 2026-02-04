@@ -141,7 +141,7 @@
 %========== Distributions
 
 \newcommand\DD{\mathcal D}
-\newcommand\DM{\termcolor{\mathcal M}}
+\newcommand\DM{{\termcolor\mathcal M}}
 
 \newcommand\D[1]{\{\D@start#1\D@end\}}
 \newcommand\D@start{\let\D@loop\D@next\D@loop}
@@ -283,9 +283,9 @@
   \ifx#1G{{\black\Gamma}}\else%
   \ifx#1D{{\black\Delta}}\else%
   %
-  \ifx#1p\let\term@loop\term@project\else%
+  %\ifx#1p\let\term@loop\term@project\else%
   \ifx#1+\kern1pt{\smallbin\oplus}\kern1pt\else%
-  %\ifx#1/\let\term@loop\term@frac\else%
+  \ifx#1/\let\term@loop\term@frac\else%
   %
   \ifx#1S{{\black S}}\else%
   \ifx#1T{{\black T}}\else%
@@ -320,9 +320,8 @@
 \newcommand\term@dash{\@ifnextchar>{\choicearrow\term@discard}{-\term@start}}
 % ..
 \newcommand\term@dot{\@ifnextchar.{\dots\term@discard}{.\,\term@start}}
-% [a] pi /
+% [a] /
 \newcommand\term@box[1]{\probox{#1}\kern1pt\term@start}
-\newcommand\term@project[2]{\prj{#1}{#2}\term@start}
 \newcommand\term@frac[2]{\fraction{#1}{#2}\term@start}
 
 %========== Programming in the FMC
