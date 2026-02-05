@@ -18,34 +18,6 @@
 % - - - - - - - - - - - - - - -
 
 
-%\newcommand\looppicx[1]{
-%\begin{tikzpicture}[thick,x=12pt,y=12pt,outer sep=0pt,inner sep=2pt]
-%	\coordinate (m) at (0,0);
-%	
-%	\begin{scope}[->,>=stealth,anchor=north]
-%		\ifx#11
-%		\draw (m)--node[pos=0.6,anchor=east]{$\termcolor\scriptstyle{i\vphantom j\,}$} (-1,-2) node {$\vphantom:\typecolor\scriptstyle{p}$};
-%		\draw (m)--node[pos=0.6,anchor=west]{\,$\termcolor\scriptstyle{j}$}            ( 1,-2) node {$\vphantom:\typecolor\scriptstyle{q}$};
-%		\else
-%		\draw (m)--node[pos=0.6,anchor=east]{$\termcolor\scriptstyle{i\vphantom j\,}$} (-1,-2) node {$\vphantom:\typecolor\scriptstyle{\frac p{1-q}}$};
-%		\fi
-%	\end{scope}
-%	
-%	\node (x) at (0,-3) {};
-%	
-%	\coordinate (a) at ( .85,-1.7);% \node[gray,circle,draw,inner sep=0pt,minimum size=2pt] at (a) {};
-%	\coordinate (b) at (1.25,-1.6);% \node[gray,circle,draw,inner sep=0pt,minimum size=2pt] at (b) {};
-%	
-%    	\ifx#10
-%		%\draw (m) [rounded corners=20pt] -- (1.25,-2.5) [rounded corners=5pt] -- (1.25,1.5) -- (0,1.5) -- (0,1);
-%		\draw[rounded corners=5pt] (m) -- (.5,-1) .. controls (a) and (b) .. (1.25,-.75) -- (1.25,1.5) -- (0,1.5) -- (0,1);
-%    	\fi	
-%	
-%	\node[draw=red,fill=red!10,rounded corners,minimum size=16pt] (M) at (m) {$\term M$};
-%	\draw[->,>=stealth] (0,2)--(M);	
-%\end{tikzpicture}
-%}
-
 \newcommand\looppic[1]{
 \vcenter{\hbox{%
 \begin{tikzpicture}[thick,x=18pt,y=15pt,outer sep=0pt,inner sep=2pt]
@@ -67,7 +39,6 @@
 	\coordinate (b) at (1.25,-1.6);% \node[gray,circle,draw,inner sep=0pt,minimum size=2pt] at (b) {};
 	
     	\ifx#10
-		%\draw (m) [rounded corners=20pt] -- (1.25,-2.5) [rounded corners=5pt] -- (1.25,1.5) -- (0,1.5) -- (0,1);
 		\draw[rounded corners=5pt] (m) -- (.5,-1) .. controls (a) and (b) .. (1.25,-.75) --node[pos=0.3,anchor=west]{\,$\termcolor\scriptstyle{j}$} (1.25,1.5) -- (0,1.5) -- (0,1);
     	\fi	
 	
@@ -130,8 +101,6 @@
 \begin{abstract}
 We investigate almost-sure termination in higher-order probabilistic computation through the lens of the functional machine calculus. Our key observation is that iteration  can easily be equipped with a non-zero chance of exiting, thus guaranteeing almost-surely terminating in a simple way. We exploit this insight by shifting attention from recursion to typed iteration, allowing probabilistic behavior to be tracked compositionally at the type level. For the purpose, we introduce a novel probabilistic type system that assigns explicit probability distributions to termination outcomes, and we show that these types soundly guarantee almost-sure termination, even in the presence of higher-order functions. We study the expressive power of the introduced system through an embedding of Markov chains, and prove that \emph{positive} almost-sure termination does not hold at higher-order, in general.
 \end{abstract}
-
-
 
 
 %---------------------------------------------------------------------------------------------------- INTRODUCTION
@@ -219,38 +188,10 @@ In this paper, we explore this idea in the context of the FMC, introducing the \
 
 An overview of the features of the calculus, in order of appearance in the paper, is as follows. We introduce the untyped \PFMC\ as a fragment of the FMC in Section~\ref{sec:PFMC} via its operational semantics, a simple stack machine that naturally extends the Krivine machine~\cite{Krivine-2007}. The calculus inherits confluent reduction from the FMC~\cite{Heijltjes-2025-MFPS}; while a notable feature, we omit it here as it plays no crucial r\^ole. The typed calculus \PFMCT, introduced in Section~\ref{sec:types}, conservatively extends simple types for the $\lambda$-calculus (Remark~\ref{rem:simple types embed}) and our previous probabilistic types for the PEL~\cite{Antonelli-DalLago-Pistone-2022,Heijltjes-Majury-2025} (Remark~\ref{rem:probabilistic types embed}). The main result, Theorem~\ref{thm:termination}, is that the probability given by the type of a term is a lower bound on the probability of termination, which implies almost-sure termination if that probability is one.
 
-In the remainder of the paper we then consider the expressive power of ...
-
-The typed calculus achieves the following. A term is guaranteed to terminate with the probabilities of its return type, which is almost-sure termination if the sum probability is one, also in the presence of higher-order probabilistic functions. In a first-order setting it guarantees \emph{positive} almost-sure termination (expected evaluation time is finite), where still it may capture all Markov chains and directly compute their expected output. In the higher-order setting, which gives access to Church numerals, there are examples of \emph{non-positive} or \emph{null} AST.
-
-{\color{green}
-TO DO:
-\\~* decomposition of $N\oplus M$ into $\trm{?a.M}$ and $\trm{MaN}$
-\\~* discuss full calculus (with stacks)
-\\~* argue this is simple types (Remark~\ref{rem:simple types embed})
-\\~* conservativity over previous work (Remark~\ref{rem:probabilistic types embed})
-}
-
-\commentout{\color{green!66!black}
-
-* Conservative extension of [Curry \&\ Howard meet Borel] and [Simple Types for Probabilistic Termination].
-
-* Uses \emph{iteration} rather than \emph{recursion} to obtain probabilistic typeability. Probabilistic recursion is difficult as it requires probabilistic function variables at type level, essentially using dependent types. Example: probabilistic Church numerals and Y-combinator.
-
-* We believe the observation on typed iterators and almost-sure termination is new.
-
-* Much work on probabilistic termination in verification, but not through type systems, which we believe is new.
-
-* Limited expressive power for real algorithms at present, due to types being simple types. But a dependently typed generalisation would be akin to Hoare logic, and might facilitate probabilistic termination in theorem provers and give natural ways to include termination evidence in typed imperative programming languages.
-
-}
-
-%\cite{Hurd-2002}
-
-%while (x>0) { x := x-1 [1/2] x := x+1 }
-
-%  -1 (+) +1 : (=> p1.1 + p2.2 + p3.3 + ...) => (1/2 p1).0 + (1/2 p2).1 + (1/2 p1+p3).2 + (1/2 p2+p3).3 + ...
-
+In the remainder of the paper we then consider two aspects of the expressive power of the calculus. Section~\ref{sec:ground terms} considers \emph{ground terms}, the fragment of the calculus that combines branching and iteration with probabilistic choice, omitting the $\lambda$-calculus; essentially the fragment we have been using in this introduction. We observe that ground terms are equivalent to finite Markov chains (Proposition~\ref{prop:ground is markov}), and that typing, which is decidable, computes the return distribution of an encoded Markov chain (Proposition~\ref{prop:markov return}). This fragment is \emph{positive} AST (PAST): the expected runtime for a probabilistic term on the machine is finite. The full \PFMCT, being higher-order, is more expressive, and in Section~\ref{sec:NAST} we give an example term that is \emph{null} AST (NAST): while the probability of termination is one, expected runtime is infinite. The mechanism is standard: by probabilistically generating a series of terms $\term{M_n}$ with exponentially decreasing probability but exponentially increasing runtime, i.e.\ $\term{M_{n+1}}$ takes double the time of $\term{M_n}$, as below.
+\[
+	\fraction12\term{M_1}~,~\fraction14\term{M_2}~,~\fraction18\term{M_3},~\dots
+\]
 
 %---------------------------------------------------------------------------------------------------- RELATED WORK
 
@@ -627,6 +568,8 @@ Let $\type{d}=\type{\{(!t_i,p_i)_i\}_{i\in I}}$. By Lemma~\ref{lem:run} we have 
 
 %----------------------------------------------------------------------------------------------------
 \section{Ground terms and finite Markov chains}
+\label{sec:ground terms}
+
 
 We have shown that the calculus introduced in this paper enjoys all the expected properties, in particular guaranteeing almost-sure termination. Several natural questions concerning the expressive power of the calculus remain open. Notably, it is of interest to investigate the behavior of the calculus under restrictions to low-order types, or when stronger termination properties than AST, such as \emph{positive} almost-sure termination (PAST), can be proved. In this section, we consider the fragment of \emph{ground terms}: those that involve only probabilistic branching and iteration, but not input and output. They are the terms of the following form.
 \[
@@ -744,27 +687,6 @@ Then the interpretation of a Markov chain $C=(S,s,F,\delta)$ as a term is as fol
 	\\	\termcolor{(p_1\sem{C(t_1)}\term{+..+}p_n\sem{C(t_n)})^s} & \text{where}~\delta(s)=\D{p_1t_1,..,p_nt_n}	
 	\end{array}\right.
 \]
-
-
-
-%For a distribution of terms
-%\[
-%	\DM~=~\D{p_1{\term{M_1}},..,p_n{\term{M_n}}}
-%\]
-%let the term $\term{\lfloor\DM\rfloor}$ be the internalization of that distribution:
-%\[
-%	\lfloor\D{1{\term{M}}}\rfloor~=~\term{M} 
-%\qquad\qquad
-%	\lfloor\D{p{\term{M}}}+\DM\rfloor~=~\term{?a_p.a ; \top-> M; \bot -> \lfloor{\fraction1{1-p}}\cdot\DM\rfloor} 
-%\]
-%Then the interpretation of a Markov chain $C$ as a term is as follows.
-%\[
-%	\sem C~=~
-%	\left\{\begin{array}{ll}
-%		\term{s} & \text{if}~s~\in~F
-%	\\	{\termcolor\lfloor\D{{p_1\sem{C(t_1)}},..,p_n{\sem{C(t_n)}}}\rfloor^s} & \text{where}~\delta(s)=\D{p_1t_1,..,p_nt_n}	
-%	\end{array}\right.
-%\]
 
 \begin{example}
 Consider the following Markov chain $C$, where each arrow has probability $\frac13$.
@@ -884,6 +806,7 @@ The types work out the same way.
 The translations $\markov-$ and $\sem-$ above demonstrate the following.
 
 \begin{proposition}
+\label{prop:ground is markov}
 Ground terms of the \PFMC\ are equivalent to finite Markov chains.
 \end{proposition}
 
@@ -891,6 +814,7 @@ Ground terms of the \PFMC\ are equivalent to finite Markov chains.
 Markov chains are PAST if they are AST, i.e.\ if any path may eventually reach a final state. For typed ground terms, which are AST, we then have the following.
 
 \begin{proposition}
+\label{prop:PAST}
 Typed ground terms of the \PFMCT\ are PAST.
 \end{proposition}
 
@@ -898,6 +822,7 @@ Typed ground terms of the \PFMCT\ are PAST.
 Combining type inference for ground terms (Proposition~\ref{prop:ground type inference}) and the translation $\sem-$, we have the following result.
 
 \begin{proposition}
+\label{prop:markov return}
 Encoding and typing a finite Markov chain computes its return distribution: if ${\termcolor\sem{C}}:\type{p_1`s_1*..*p_n`s_n}$ then $C$ terminates in the state $s_i$ with probability $p_i$.
 \end{proposition}
 
@@ -908,6 +833,7 @@ By construction.
 
 %----------------------------------------------------------------------------------------------------
 \section{Moving past PAST}
+\label{sec:NAST}
 
 Further exploring the expressive power of the calculus, in this section we demonstrate that typed terms in general are AST, but not PAST: that is, we will give an example of a term with infinite expected running time, despite terminating with probability one. Our example relies crucially on higher-order functions.
 
@@ -932,6 +858,7 @@ The term is typed: for any $\type{!t}$, if $\term M$ is typed $\term{M:!t => !t.
 The term $\term{<g>.g : (!t => !t.1\star)\,!t => !t.1\star}$ takes $\term{M^n : !t => !t.1\star}$ off the stack and evaluates it with an appropriate remaining stack of type $\type{!t}$. The existence of a typed term that is not PAST then demonstrates the following.
 
 \begin{proposition}
+\label{prop:NAST}
 The typed probabilistic FMC is not positive almost-surely terminating.
 \end{proposition}
 
@@ -945,8 +872,7 @@ The central idea, with which we started the introduction, is to take the familia
 
 The full \PFMC\ is then an orthogonal and conservative combination of the control extension with the $\lambda$-calculus and the probabilistic generator. Each fragment operates on an independent stack of the extended Krivine machine, simply by pushing and popping. The type system is a conservative extension of simple types for the $\lambda$-calculus, where each fragment contributes a natural component: the control fragment, a formal sum of return values indexed by \emph{choice} labels; the generator, a probability (sub-)distribution over these choice labels. The combination of probabilistic almost-sure termination and higher-order functions then gives the calculus expressive power beyond positive AST.
 
-In future work, we intend to further analyse the expressive power of the calculus and fragments of it. At present, being an extension of simple types, it is clear that expressive power is limited. Addressing this, we expect that the type system will generalize to dependent types and intersection types along standard lines. This is not idle speculation: the principle was already demonstrated for intersection types for higher-order store in the FMC~\cite{Heijltjes-2025-FSCD}.
-
+In future work, we intend to further analyse the expressive power of the calculus and fragments of it. At present, being an extension of simple types, it is clear that the expressive power for real algorithms of the typed calculus is limited. Addressing this, we expect that the type system will generalize to dependent types and intersection types along standard lines. This is not idle speculation: the principle was already demonstrated for intersection types for higher-order store in the FMC~\cite{Heijltjes-2025-FSCD}. A dependently typed generalisation would be akin to Hoare logic, and might facilitate reasoning about probabilistic termination in theorem provers and give natural ways to include termination evidence in typed imperative programming languages.
 
 %----------------------------------------------------------------------------------------------------
 
