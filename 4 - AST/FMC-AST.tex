@@ -280,36 +280,50 @@ The Functional Machine Calculus (FMC)~\cite{Heijltjes-2023,Heijltjes-2025-MFPS} 
 \end{description}
 
 \noindent
-In this way the FMC embeds a minimal but complete imperative programming language, and extends to it two primary features of the $\lambda$-calculus: confluent reduction and simple types. In this paper we consider the \emph{probabilistic FMC}, a fragment of the calculus with \emph{control} and two argument stacks, the regular one for the $\lambda$-calculus and a probabilistic input stream. 
+In this way the FMC embeds a minimal but complete imperative programming language, and extends to it two primary features of the $\lambda$-calculus: confluent reduction and simple types. In this paper we consider the \emph{probabilistic FMC} (\PFMC), a fragment of the calculus with \emph{control} and two argument stacks, the regular one for the $\lambda$-calculus and a probabilistic input stream. 
 
 \begin{definition}
-The \emph{terms} of the probablistic FMC are given by the following grammar.
+The \emph{terms} of the \PFMC\ are given by the following grammar.
 \[
 \term{M,N} ~\coloneqq~ \term{x} ~\mid~ \term{<x>.M} ~\mid~ \term{[N].M} ~\mid~ \term{i} ~\mid~ \term{M;i->N} ~\mid~ \term{M^i} ~\mid~ \term{?a.M}
 \]
 The constructs are: a \emph{variable} $\term x$; a \emph{pop} $\term{<x>.M}$ that binds $\term x$ in $\term M$; a \emph{push} $\term{[N].M}$; a \emph{choice} $\term i$; a \emph{case} $\term{M;i->N}$; a \emph{loop} $\term{M^i}$; and a \emph{generator} $\term{?a.M}$ which binds the variable $\term a$ in $\term M$.
 \end{definition}
 
-The $\lambda$-calculus embeds by letting $\lambda x.M=\term{<x>.M}$ and $M\,N=\term{[N].M}$. The generator $\term{?a.M}$ is rendered as $\term{`{\mathsf{rnd}}<a>.M}$ in other presentations of the FMC, as a parameterised pop construct accessing a stream $\mathsf{rnd}$ that represents a random generator. Probabilistic choice embeds as follows, where the \emph{case} construct associates left, $\term{M; i->N ; j->P}=\term{(M; i->N) ; j-> P}$.
+The $\lambda$-calculus embeds by letting $\lambda x.M=\term{<x>.M}$ and $M\,N=\term{[N].M}$. The generator $\term{?a.M}$ is rendered as $\term{`{\mathsf{rnd}}<a>.M}$ in other presentations of the FMC, as a parameterised pop construct accessing a stream $\mathsf{rnd}$ that represents a random generator. The calculus is thus an orthogonal combination of the (parameterized) $\lambda$-calculus, in the fragment of \emph{variable}, \emph{pop}, \emph{push}, and \emph{generator}, and the \emph{control} extension of the FMC, consisting of \emph{choice}, \emph{case}, and \emph{loop}.
+
+Probabilistic choice $\term{M+N}$ is encoded as follows, where the \emph{case} construct associates left, $\term{M; i->N ; j->P}=\term{(M; i->N) ; j-> P}$.
 \[
 	\term{M+N} ~=~\term{?a.a ; \top->M ; \bot->N }
 \]
 In this construction, first $\term{?a}$ pops a boolean value $\term\top$ or $\term\bot$ from a probabilistic stream and substitutes it for $\term a$. The remainder then selects the relevant branch by the semantics of the \emph{case} construct, given by the equations $\term{i;i->M}=\term M$ and $\term{j;i->M}=\term j$ for $i\neq j$. We reserve the choice labels $\top$ and $\bot$ for the purpose of encoding probabilistic choice: here, if $\term M$ were allowed to choose $\term\bot$, that would incorrectly trigger $\term N$ after evaluating $\term M$.
 
-The generator $\term{?a.M}$ represents a \emph{fair} coin toss, with equal probability for $\term\top$ and $\term\bot$. We may write $\term{?a_p.M}$ for an unfair coin with probability $p$ for $\term\top$ and $1-p$ for $\term\bot$. This construct may either be considered a primitive, generalising $\term{?a.M}$, or constructed from fair coin tosses with iteration, as with the example term for $\frac13$ probability in the introduction.
+\begin{example}
+Our running example term unfolds into the full calculus as follows.
+\[
+	\term{(\heads+(\tails+\,i))^i}~=~\term{(?a.a ; \top->\heads ; \bot->(?b.b ; \top->\tails ; \bot -> i))^i}
+\]
+\end{example}
+
+The generator $\term{?a.M}$ represents a \emph{fair} coin toss, with equal probability for $\term\top$ and $\term\bot$. We may write $\term{?a_p.M}$ for an unfair coin with probability $p$ for $\term\top$ and $1-p$ for $\term\bot$. This construct may either be considered a primitive, generalising $\term{?a.M}$, or constructed from fair coin tosses with iteration, in the way our running example term generates $\frac13$ probability.
 
 % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - Abstract machine
 \subsection*{The Operational Semantics}
 
-The Probabilistic FMC can be given meaning via an abstract machine whose states consist of the term under evaluation, two stacks (namely, the continuation stack and the evaluation stack) and a trace. The trace records the outcomes of future probabilistic choice instructions, thereby rendering the machine effectively deterministic. More formally, the machine evaluates a term $\term M$ in a state $(t,S,\term M,K)$, in the context of three stacks: 
-\begin{itemize}
-	\item A \emph{trace} $t$, a stack of boolean values $\top$ and $\bot$, from which $\term{?a.M}$ pops. 
-	\item An \emph{argument stack} $S$ of terms, where $\term{[N].M}$ pushes $\term N$, and $\term{<x>.M}$ pops the head $\term N$ and continues as $\term{\{N/x\}M}$, the capture-avoiding substitution of $\term N$ for $\term x$ in $\term M$.
-	\item A \emph{continuation stack} $K$, a stack of cases $\term{i->M}$, where $\term{M;i->N}$ pushes $\term{i->N}$ and $\term{M^i}$ pushes $\term{i->M^i}$. A choice $\term j$ pops the head $\term{i->M}$ and continues as $\term M$ if $i=j$, and as $\term j$ otherwise.
-\end{itemize}
+We will give the small-step and big-step operational semantics of the \PFMC, the former as an abstract machine and the latter as an inductive evaluation relation. The FMC further features a confluent reduction relation~\cite{Heijltjes-2025-MFPS}, which we omit here.
+
+The abstract machine is given by the Krivine machine with the extensions described at the start of this section. In addition to the standard argument stack, it will have a \emph{trace}, a stack of boolean values that represents the probabilistic generator, and a \emph{continuation stack} that implements the branching and iteration of the \emph{case} and \emph{loop} constructs. A term $\term M$ is evaluated in the context of these three stacks until the machine halts with a choice term $\term i$ and an empty continuation stack, returning the argument stack as output and the choice $\term i$ as the exit status, indicating the chosen branch of the computation. The machine itself is deterministic; the probabilistic aspect of computation is modelled by taking the trace to be probabilistically generated.
+
+%The Probabilistic FMC can be given meaning via an abstract machine whose states consist of the term under evaluation, two stacks (namely, the continuation stack and the evaluation stack) and a trace. The trace records the outcomes of future probabilistic choice instructions, thereby rendering the machine effectively deterministic. 
+%More formally, the machine evaluates a term $\term M$ in a state $(t,S,\term M,K)$, in the context of three stacks:
+%\begin{itemize}
+%	\item A \emph{trace} $t$, a stack of boolean values $\top$ and $\bot$, from which $\term{?a.M}$ pops. 
+%	\item An \emph{argument stack} $S$ of terms, where $\term{[N].M}$ pushes $\term N$, and $\term{<x>.M}$ pops the head $\term N$ and continues as $\term{\{N/x\}M}$, the capture-avoiding substitution of $\term N$ for $\term x$ in $\term M$.
+%	\item A \emph{continuation stack} $K$, a stack of cases $\term{i->M}$, where $\term{M;i->N}$ pushes $\term{i->N}$ and $\term{M^i}$ pushes $\term{i->M^i}$. A choice $\term j$ pops the head $\term{i->M}$ and continues as $\term M$ if $i=j$, and as $\term j$ otherwise.
+%\end{itemize}
 
 \begin{definition}
-The \emph{functional abstract machine} is given by the following data. \emph{Traces}, \emph{argument stacks}, and \emph{continuation stacks} are as follows.
+The \emph{functional abstract machine} is given by the following data. \emph{Traces} $r,s,t$, \emph{argument stacks} $R,S,T$, and \emph{continuation stacks} $k,L$ are as follows.
 \[
     r,s,t ~\coloneqq~ \e ~\mid~ \bot\,t ~\mid~ \top\,t   \qquad\quad 
     R,S,T ~\coloneqq~ \e ~\mid~ S\,\term M               \qquad\quad 
@@ -320,6 +334,13 @@ The \emph{states} of the machine are four-tuples $(t,S,\term M,K)$. Its \emph{st
 	\step= sSMK tTNL
 \]
 \end{definition}
+
+\noindent
+Example~\ref{example:run} in the appendix demonstrates a successful run of the machine for our running example term.
+
+%The transitions of the machine implement the semantics as follows. The generator $\term{?a.M}$ pops $\top$ or $\bot$ from the trace $t$, 
+
+%The continuation stack takes the form of a stack of cases $\term{i->M}$, where a term $\term{M;i->N}$ pushes $\term{i->N}$, a term $\term j$ pops $\term{i->M}$ and uses $\term M$ only if $i=j$, discarding it otherwise, and $\term{M^i}$ pushes $\term{i->M^i}$.
 
 % - - - - - - - - - - Machine figure
 \begin{figure}
@@ -341,7 +362,7 @@ The \emph{states} of the machine are four-tuples $(t,S,\term M,K)$. Its \emph{st
 % - - - - - - - - - - 
 
 
-In addition to the machine we use a big-step operational semantics, in the form of an inductively defined evaluation relation $(\evalarrow)$, which describes the successful runs of the machine directly.
+The big-step operational semantics, in the form of an inductively defined evaluation relation $(\evalarrow)$, describes the successful runs of the machine directly. Where the machine implements branching with the contination stack, the big-step semantics gives a more abstract view as conditional sequential composition.
 
 \begin{definition}
 The \emph{evaluation} relation has statements $\eval tSM Ti$ and is defined inductively by the following rules.
@@ -359,7 +380,10 @@ The \emph{evaluation} relation has statements $\eval tSM Ti$ and is defined indu
 \end{array}
 \]
 \end{definition}
+
+\noindent
 The machine and the big-step evaluation relation can be put in correspondence as follows.
+
 \begin{proposition}[{\cite[Proposition 5.4]{Heijltjes-2025-MFPS}}]
 Evaluation characterizes successful machine termination:
 \[
@@ -582,9 +606,403 @@ If $\term{G |- M:t}$ and $\mu\in\SRUN{G}$ then $\term{\mu M}\in\RUN{t}$.
 \end{lemma}
 
 \begin{proof}
+See the Appendix.
+\end{proof}
+% - - - - - - - - - - - - - - -
 
+The runnability lemma directly gives the main theorem of typed almost-sure termination.
+
+% - - - - - - - - - - - - - - -
+\begin{theorem}
+If $\term{|- M: \e => d}$ then $\term M$ terminates with probability at least $\pr{\type{d}}$.
+\end{theorem}
+
+\begin{proof}
+Let $\type{d}=\type{\{(!t_i,p_i)_i\}_{i\in I}}$. By Lemma~\ref{lem:run} we have $\Eval\e M\DT$ with $\DT\in\RUN{d}$, which means that $\pr{\DT\only i}\geq p_i$ for every $i\in I$, so that $\pr\DT \geq \pr{\type d}$.
+\end{proof}
+% - - - - - - - - - - - - - - -
+
+%----------------------------------------------------------------------------------------------------
+\section{Ground terms and finite Markov chains}
+
+We have shown that the calculus introduced in this paper enjoys all the expected properties, in particular guaranteeing almost-sure termination. Several natural questions concerning the expressive power of the calculus remain open. Notably, it is of interest to investigate the behavior of the calculus under restrictions to low-order types, or when stronger termination properties than AST, such as \emph{positive} almost-sure termination (PAST), can be proved. In this section, we consider the fragment of \emph{ground terms}: those that involve only probabilistic branching and iteration, but not input and output. They are the terms of the following form.
+\[
+	\text{\emph{Gound terms:}}\qquad \term{M,N}~\coloneqq~\term i~\mid~\term{M;i->N}~\mid~\term{M^i}~\mid~\term{?a.a}
+\]
+We will show the following properties: one, typing of ground terms is decidable; two, ground terms readily encode as finite Markov chains; and three, finite Markov chains may be encoded as ground terms. These then have the following consequences. The last two properties imply that ground terms are equivalent to finite Markov chains. Since finite Markov chains are PAST (if they are AST), also ground terms are PAST. Finally, combining the first and last property, for the encoding of a Markov chain as a ground term, type inference calculates the probability of terminating with each final state.
+
+As in the introduction, we may restrict types for ground terms to sub-distributions over choice labels, and abbreviate them by omitting input and return types.
+\[
+	\term{M : p_1i_1 * .. * p_ni_n}\quad\text{\emph{abbreviates}}\quad\term{M : \e => \e.p_1i_i * .. * \e.p_ni_n}
+\]
+Since ground terms are closed, the typing rules may further omit contexts. Thus restricted, they are as follows.
+\[
+       \infer{\term{i: 1i}}{}
+\qquad \infer{\term{M;i->N : g ++ (p . d)}}{\term{M: g * pi} & \term{N: d}}
+\qquad \infer{\term{M^i : /1{1-p} . d}}{\term{M: d * pi} & (p\neq 1)}
+\qquad \infer{\term{?a.a : /12\top * /12\bot}}{}
+\qquad \infer{\term{M : 0.d}}{}
+\]
+
+\begin{proposition}
+\label{prop:ground type inference}
+Typing for ground terms is decidable.
+\end{proposition}
+
+\begin{proof}
+Immediate by induction on the term.
+\end{proof}
+
+We will use the following definition of Markov chains as probabilistic automata. We write $\DD X$ for the set of probability distributions over a set $X$, and write a distribution over $X=\{x_1,x_2,\dots\}$ as $\{p_1x_1,p_2x_2,\dots\}$.
+
+\begin{definition}
+A \emph{Markov chain}
+\(C~=~(S,~s\in S,~F\subseteq S,~\delta:S\less F\to\DD{S})\)
+is given by a set of \emph{states} $S$, a \emph{starting state} $s$, a set of \emph{final states} $F$, and a stochastic transition function $\delta$ from non-final states to states.
+\end{definition}
+
+The translation $\markov M$ from ground terms to Markov chains will take $\term M$ to a chain
+\[
+	\markov{M}~=~(S_M,~s_M,~F_M,~\delta_M)
+\]
+where internal states $S_M\less F_M$ represent subformulas and final states represent choices not captured by a later case construct. We consider chains modulo renaming of internal states, and when combining the translations of two terms we assume their internal states to be disjoint, but final states may overlap. To connect two chains, we use the notation $s\{t/i\}$ to rename a state, and the notation $\delta\{s/i\}$ which replaces all transitions to a (final) state $i$ with transitions to $s$.
+\[
+	\delta\{s/i\}(r)~=~\{~p(t\{s/i\}) \mid pt \in \delta(r)~\}
+\qquad\qquad
+	\begin{array}{r@{}l} i\{t/i\} &{}=t \\ s\{t/i\} &{}=s \quad (s\neq i) \end{array}
+\]
+The translation $\markov-$ is then as follows.
+\[
+\begin{aligned}
+	\markov{i}      &= (\{s,i\},~s,~\{i\},~s\mapsto\D{i.1})
+\\	\markov{M;i->N} &= (S_M\less\{i\}\cup S_N,~s_M,~F_M\less\{i\}\cup F_N,~\delta_M\{s_N/i\}\cup\delta_N)
+\\  \markov{M^i}    &= (S_M\less\{i\},~s_M,~F_M\less\{i\},~\delta_M\{s_M/i\})
+\\  \markov{?a.a}   &= (\{s,\top,\bot\},~s,~\{\top,\bot\},~s\mapsto\D{/12\top,/12\bot})
+\end{aligned}
+\]
+
+\begin{example}
+For the example term from the introduction, abbreviated as $\term{M^i}$ where $\term M$ is as below, the translation is as follows.
+\[
+	\term{M}~=~\term{?a.a ; \top->\heads ; \bot->(?b.b ; \top->\tails ; \bot -> i)}
+\qquad\qquad
+	\markov{M^i}~=~\vc{
+\begin{tikzpicture}[thick,x=20pt,y=24pt,outer sep=0pt,inner sep=2pt]
+	\node (r) at (1,2) {$r$};
+	\node (s) at (2,1) {$s$};
+	\node (u) at (0,1) {$u$};
+	\node (v) at (1,0) {$v$};
+	\node (w) at (3,0) {$w$};
+	\node (h) at (0,0) {$\termcolor\heads$};
+	\node (t) at (1,-1) {$\termcolor\tails$};
+
+	\begin{scope}[->,>=stealth]
+	
+	\draw (1,2.7)--(r);
+	\draw (r) --node[pos=0.6,anchor=south east]{$\scriptstyle{\frac12}$} (u);
+	\draw (r) --node[pos=0.6,anchor=south west]{$\scriptstyle{\frac12}$} (s);
+	\draw (s) --node[pos=0.6,anchor=south east]{$\scriptstyle{\frac12}$} (v);
+	\draw (s) --node[pos=0.6,anchor=south west]{$\scriptstyle{\frac12}$} (w);
+	\draw (u)--(h);
+	\draw (v)--(t);
+	
+	\draw[rounded corners] (w)--(3.7,0.7)--(1.7,2.7)--(r);
+	
+	\end{scope}
+\end{tikzpicture}}
+\]
+\[
+\begin{array}{r@{}l}
+	     \markov{?a.a}                            &{}= (\{r,\top,\bot\},~r,~\{\top,\bot\},~r\mapsto\D{/12\top,/12\bot})
+\\[5pt]  \markov{?a.a ; \top->\heads}             &{}= (\{r,u,\heads,\bot\},~r,~\{\heads,\bot\},~r\mapsto\D{/12\bot,/12u}~u\mapsto\D{1\heads})
+\\[5pt]  \markov{?b.b ; \top->\tails ; \bot -> i} &{}= (\{s,v,w,\tails,i\},~s,~\{\tails,i\}, s\mapsto\D{/12v,/12w}~v\mapsto\D{1\tails}~w\mapsto\D{1i}) \rule{30pt}{0pt}
+\\[5pt]  \markov{M}                               &{}= (\{r,s,u,v,w,\heads,\tails,i\},~r,~\{\heads,\tails,i\},
+\\[5pt]  \multicolumn{2}{r}{ r\mapsto\D{/12u,/12s}~s\mapsto\D{/12v,/12w}~u\mapsto\D{1\heads}~v\mapsto\D{1\tails}~w\mapsto\D{1i}~) }
+\\[5pt]  \markov{M^i}                             &{}= (\{r,s,u,v,w,\heads,\tails\},~r,
+\\[5pt]  \multicolumn{2}{r}{ r\mapsto\D{/12u,/12s}~s\mapsto\D{/12v,/12w}~u\mapsto\D{1\heads}~v\mapsto\D{1\tails}~w\mapsto\D{1r}~) }
+\end{array}
+\]
+\end{example}
+
+
+In the other direction, we give an interpretation $\sem C$ of a finite Markov chain as a ground term. The translation operates as follows, using states as choice labels. Given $C$ with starting state $s$ and transition $s\mapsto\{p_1t_1,\dots,p_nt_n\}\in\delta$, we remove this transition and consider the sub-chains $C(t_i)$ for $i\leq n$ with new starting state $t_i$, in which $s$ becomes a final state. These are translated inductively to $\term{M_i}$. Then $\sem C$ is given by a term $\term{M^s}$, iterating on $s$, where $\term M$ is a probabilistic sum that chooses $\term{M_i}$ with probability $p_i$. We formalize this below.
+
+For $C=(S,s,F,\delta)$ and $t\in S\less\{s\}$ let $C(t)=(S,t,F\cup\{s\},\delta\less\{s\})$ where $\delta\less X$ is the transition function $\delta$ restricted to the domain $\mathrm{dom}(\delta)\less X$. Write $\term{p_1M_1+..+p_nM_n}$ for the term that chooses $\term{M_i}$ with probability $p_i$, given inductively below; recall that $\term{?a_p}$ represents an unfair coin toss, given either as primitive or encoded with $\term{?a}$ and iteration.
+\[
+	\term{1M}~=~\term{M} 
+\qquad
+    \term{pM+q_1N_1+..+q_nN_n}~=~\term{?a_p.a ; \top -> M; \bot -> (//{q_1}{1-p}N_1 + .. + //{q_n}{1-p}N_n) } 
+\]
+Then the interpretation of a Markov chain $C=(S,s,F,\delta)$ as a term is as follows.
+\[
+	\sem C~=~
+	\left\{\begin{array}{ll}
+		\term{s} & \text{if}~s~\in~F
+	\\	\termcolor{(p_1\sem{C(t_1)}\term{+..+}p_n\sem{C(t_n)})^s} & \text{where}~\delta(s)=\D{p_1t_1,..,p_nt_n}	
+	\end{array}\right.
+\]
+
+
+
+%For a distribution of terms
+%\[
+%	\DM~=~\D{p_1{\term{M_1}},..,p_n{\term{M_n}}}
+%\]
+%let the term $\term{\lfloor\DM\rfloor}$ be the internalization of that distribution:
+%\[
+%	\lfloor\D{1{\term{M}}}\rfloor~=~\term{M} 
+%\qquad\qquad
+%	\lfloor\D{p{\term{M}}}+\DM\rfloor~=~\term{?a_p.a ; \top-> M; \bot -> \lfloor{\fraction1{1-p}}\cdot\DM\rfloor} 
+%\]
+%Then the interpretation of a Markov chain $C$ as a term is as follows.
+%\[
+%	\sem C~=~
+%	\left\{\begin{array}{ll}
+%		\term{s} & \text{if}~s~\in~F
+%	\\	{\termcolor\lfloor\D{{p_1\sem{C(t_1)}},..,p_n{\sem{C(t_n)}}}\rfloor^s} & \text{where}~\delta(s)=\D{p_1t_1,..,p_nt_n}	
+%	\end{array}\right.
+%\]
+
+\begin{example}
+Consider the following Markov chain $C$, where each arrow has probability $\frac13$.
+\[
+\vcenter{\hbox{
+\begin{tikzpicture}[inner sep=2pt,outer sep=0pt,thick]
+	\node[circle,draw] (a) at ( 90:1) {$a$} ;
+	\node[circle,draw] (b) at (210:1) {$b$} ;
+	\node[circle,draw] (c) at (330:1) {$c$} ;
+	\node (i) at ( 90:2) {$i$} ;
+	\node (j) at (210:2) {$j$} ;
+	\node (k) at (330:2) {$k$} ;
+	\begin{scope}[->,>=stealth]
+	\draw (a.240) to[bend right] (b.60) ;
+	\draw (b.0)   to[bend right] (c.180) ;
+	\draw (c.120) to[bend right] (a.300) ;
+	\draw (a.330) to[bend left]  (c.90) ;
+	\draw (b.90)  to[bend left]  (a.210) ;
+	\draw (c.210) to[bend left]  (b.330) ;
+	\draw (a)--(i);
+	\draw (b)--(j);
+	\draw (c)--(k);
+	\draw (120:2)--(a);
+	\end{scope}
+\end{tikzpicture}}}
+\qquad
+\begin{array}{l@{}l@{}l}
+	    S      &{}~=~{}& \{a,b,c,i,j,k\}
+\\[3pt]	s      &{}~=~{}& a
+\\[3pt]	F      &{}~=~{}& \{i,j,k\}
+\\[3pt]	\delta &{}~=~{}& a \mapsto \D{~/13b~,~/13c~,~/13i~}
+\\[3pt]               && b \mapsto \D{~/13a~,~/13c~,~/13j~}
+\\[3pt]               && c \mapsto \D{~/13a~,~/13b~,~/13k~}
+\end{array}
+\]
+Its interpretation is as follows, writing $\term{M+N+P}$ for the term $\term{//13M+//13N+//13P}$.
+\[
+\begin{aligned}
+	\sem C &~=~ \term{({\sem{C(b)}}+{\sem{C(c)}}+i)^a}
+\\	       &~=~ \term{((a+{\sem{C(b)(c)}}+j)^b + (a+{\sem{C(c)(b)}}+k)^c+i)^a}
+\\         &~=~ \term{((a+(a+b+k)^c+j)^b + (a+(a+c+j)^b+k)^c+i)^a}
+\end{aligned}
+\]
+This term is typed as follows.
+\[
+\begin{aligned}
+	    \term{(a+b+k)^c}         &: \type{/13a * /13b * /13k}
+\\[5pt]	\term{ a+(a+b+k)^c+j}~~~ &: \type{/49a * /19b * /19k + /13j}
+\\[5pt] \term{(a+(a+b+k)^c+j)^b} &: \type{/12a * /18k * /38j}
+\\[5pt] \term{(a+(a+c+j)^b+k)^c} &: \type{/12a * /18j * /38k}
+\\[5pt] \term{ (a+(a+b+k)^c+j)^b + (a+(a+c+j)^b+k)^c+i}~~~ &: \type{/13a * /16k * /16j * /13i}
+\\[5pt] \term{((a+(a+b+k)^c+j)^b + (a+(a+c+j)^b+k)^c+i)^a} &: \type{/14k * /14j * /12i}
+\end{aligned}
+\]
+The interpretation may be illustrated as follows, where the solid edges represent the tree-shape of the probabilistic sums, while the dashed edges represent the loops.
+\[
+\vc{
+\begin{tikzpicture}[x=27pt,y=-27pt,inner sep=0.5pt,outer sep=0pt,thick]
+	\node[circle,draw] (a) at (1,0) {$\term M$};
+	\node[circle,draw] (b) at (0,1) {$\term N$};
+	\node[circle,draw] (c) at (2,1) {$\term P$};
+	\node[circle,draw] (d) at (0,2.4) {$\term Q$};
+	\node[circle,draw] (e) at (2,2.4) {$\term R$};
+	\node (i) at (1,-1)   {$\vphantom(i$};
+	\node (j) at (-1,1)   {$~j~$};
+	\node (k) at ( 3,1)   {$~k~$};
+	\node (l) at (-1,2.4) {$~k~$};
+	\node (m) at ( 3,2.4) {$~j~$};
+	\begin{scope}[->,>=stealth]
+	\draw (0,-1)--(a);
+	\draw (a) to[bend right] (b);
+	\draw (a) to[bend left]  (c);
+	\draw (a) -- (i);
+	\draw (b) -- (d);
+	\draw (c) -- (e);
+	\draw (b) -- (j);
+	\draw (c) -- (k);
+	\draw (d) -- (l);
+	\draw (e) -- (m);
+	\begin{scope}[dash pattern=on 3pt off 2pt]
+	\draw (b.120) to[bend left]     node[pos=0.5,anchor=south east]{$\scriptstyle a~$} (a.150);
+	\draw (c.60)  to[bend right]    node[pos=0.5,anchor=south west]{$~\scriptstyle a$} (a.30);
+	\draw (d.120) to[bend left]     node[pos=0.5,anchor=south east]{$\scriptstyle b~$} (b.240);
+	\draw (e.60)  to[bend right]    node[pos=0.5,anchor=south west]{$~\scriptstyle c$} (c.300);
+	\draw (d.60)  to[bend left=10]  node[pos=0.5,anchor=west]      {$~\scriptstyle a$} (a.240);
+	\draw (e.120) to[bend right=10] node[pos=0.5,anchor=east]      {$\scriptstyle a~$} (a.300);
+	\end{scope}
+	\end{scope}
+\end{tikzpicture}
+}
+\qquad
+\begin{array}{l@{}l}
+        \term M &{}~=~\term{(N + P + i)^a}
+\\[3pt] \term N &{}~=~\term{(a + Q + j)^b}
+\\[3pt] \term P &{}~=~\term{(a + R + k)^c}
+\\[3pt] \term Q &{}~=~\term{(a+b+k)^c}~=~\term{a+b+k}
+\\[3pt] \term R &{}~=~\term{(a+c+j)^b}~=~\term{a+c+j}
+\end{array}
+\]
+As the illustration suggests, the formalism may express any probabilistic tree with back-pointers. It may also express directed acyclic graphs, which yields a smaller interpretation of the Markov chain above, though still exponential, in the following term.
+\[
+	\term{ (b+c+i ; b -> a+c+j ; c -> (a+b+k ; b -> a+c+j)^c )^a }
+\]
+The types work out the same way.
+\[
+\begin{aligned}
+	    \term{ b+c+i }~~~             &: \type{/13b * /13c * /13i}
+\\[5pt] \term{ b+c+i ; b -> a+c+j}~~~ &: \type{/19a * /49c * /13i * /19j}
+\\[5pt] \term{(a+b+k ; b -> a+c+j)^c} &: \type{/12a * /18j * /38k}
+\\[5pt] \term{ b+c+i ; b -> a+c+j ; c -> (a+b+k ; b -> a+c+j)^c}     &: \type{/13a * /13i * /16j * /16k}
+\\[5pt] \term{(b+c+i ; b -> a+c+j ; c -> (a+b+k ; b -> a+c+j)^c )^a} &: \type{/12i * /14j * /14k}
+\end{aligned}
+\]
+\end{example}
+
+\noindent
+The translations $\markov-$ and $\sem-$ above demonstrate the following.
+
+\begin{proposition}
+Ground terms of the \PFMC\ are equivalent to finite Markov chains.
+\end{proposition}
+
+\noindent
+Markov chains are PAST if they are AST, i.e.\ if any path may eventually reach a final state. For typed ground terms, which are AST, we then have the following.
+
+\begin{proposition}
+Typed ground terms of the \PFMCT\ are PAST.
+\end{proposition}
+
+\noindent
+Combining type inference for ground terms (Proposition~\ref{prop:ground type inference}) and the translation $\sem-$, we have the following result.
+
+\begin{proposition}
+Encoding and typing a finite Markov chain computes its return distribution: if ${\termcolor\sem{C}}:\type{p_1`s_1*..*p_n`s_n}$ then $C$ terminates in the state $s_i$ with probability $p_i$.
+\end{proposition}
+
+\begin{proof}
+By construction.
+\end{proof}
+
+
+%----------------------------------------------------------------------------------------------------
+\section{Moving past PAST}
+
+Further exploring the expressive power of the calculus, in this section we demonstrate that typed terms in general are AST, but not PAST: that is, we will give an example of a term with infinite expected running time, despite terminating with probability one. Our example relies crucially on higher-order functions.
+
+We will use the default choice $\star$ as imperative \emph{skip}, and its case as sequential composition, $\term{M;N}=\term{M;\star ->N}$. Consider the following term, for a given $\term M$.
+\[
+	\term{[M].(\,(<f>.[f;f].i)\, + \,\star)^i }
+\]
+With probability $\fraction12$ it composes the term on the stack with itself and iterates, or it terminates. Evaluating this term on the machine gives the following return family, for the sequence of terms $\term{M_n}$ given by $\term{M_0}=\term M$ and $\term{M_{n+1}}=\term{M_n;M_n}$.
+\[
+	\{(\term{M_n},\star)_{\top^n\bot}\mid n\in\N\}~=~\{\,(\term M,\star)_{\bot}~,~(\term{M;M},\star)_{\top\bot}~,~(\term{(M;M);(M;M)},\star)_{\top\top\bot}~,~\dots~\}
+\]
+We may then evaluate the term $\term{M_n}$ left on the stack by post-composing with $\term{<g>.g}$, which pops and runs it, possibly using further base values further down on the stack. If $\term M$ terminates successfully with $\star$ in $m$ steps, $\term{M_n}$ takes $m\times 2^n$ steps. For example, assuming a natural numbers type $\type{\N}$ with primitives zero $\term{0:\N}$ and addition $\term{`+:\N\,\N => \N.1\star}$, we let $\term M$ be the successor function $\term{[1].`+: \N => \N.1\star}$. The term below left then gives the return family below right, taking $m\times 2^n$ machine steps (for some small constant $m$) to compute the number $\term{2^n:\N}$ from zero and successor. Since the probability of returning $\term{2^n}$ is $\fraction 1{2^{n+1}}$, the expected evaluation time on the machine is infinite: the term is not PAST.
+\[
+	\term{[0].[[1].`+].(\,(<f>.[f;f].i)\, + \,\star)^i ; <g>.g ~:~\e => \N . 1\star }
+\qquad\qquad
+	\{ (\term{2^n},\star)_{\top^n\bot}\mid n\in\N \}
+\]
+The term is typed: for any $\type{!t}$, if $\term M$ is typed $\term{M:!t => !t.1\star}$ then we have $\term{M^n : !t => !t.1\star}$, such as in the case above where $\type{!t}=\type\N$. For the loop we then have the following.
+\[	
+	\vc{\infer{\term{|- ((<f>.[f;f].i)\,+\,\star)^i: s => s.1\star}}{\term{|- (<f>.[f;f].i)\,+\,\star: s => s./12i ~*~ s./12\star }}} \qquad \text{where} \quad \type{s}~=~\type{!t => !t.1\star}
+\]
+The term $\term{<g>.g : (!t => !t.1\star)\,!t => !t.1\star}$ takes $\term{M^n : !t => !t.1\star}$ off the stack and evaluates it with an appropriate remaining stack of type $\type{!t}$. The existence of a typed term that is not PAST then demonstrates the following.
+
+\begin{proposition}
+The typed probabilistic FMC is not positive almost-surely terminating.
+\end{proposition}
+
+%----------------------------------------------------------------------------------------------------
+
+\section{Conclusion}
+
+We have demonstrated a probabilistic interpretation of the branching and iteration in the FMC to give a type system for almost-sure termination, the \PFMCT. We believe this to be a natural account of almost-sure termination for the following reasons.
+
+The central idea, with which we started the introduction, is to take the familiar typed Conway iterator and make it probabilistic. Immediately, this gives an account of typed almost-sure termination. We explored the consequences of this idea within the \emph{control} extension of the FMC, consisting of the \emph{choice}, \emph{case}, and \emph{loop} constructs. In itself, this forms a minimal basis for imperative control flow, modelling conditionals, constants, case switches, exception handling, and iteration, all on simple abstract machine with a single continuation stack, both typed and untyped---unlike the Conway iterator, which must be typed. Combined with our probabilistic generator, the control constructs form the \emph{ground terms} of the \PFMC, which we showed to be equivalent to finite Markov chains, where typing computes the return distribution of the chain.
+
+The full \PFMC\ is then an orthogonal and conservative combination of the control extension with the $\lambda$-calculus and the probabilistic generator. Each fragment operates on an independent stack of the extended Krivine machine, simply by pushing and popping. The type system is a conservative extension of simple types for the $\lambda$-calculus, where each fragment contributes a natural component: the control fragment, a formal sum of return values indexed by \emph{choice} labels; the generator, a probability (sub-)distribution over these choice labels. The combination of probabilistic almost-sure termination and higher-order functions then gives the calculus expressive power beyond positive AST.
+
+In future work, we intend to further analyse the expressive power of the calculus and fragments of it. At present, being an extension of simple types, it is clear that expressive power is limited. Addressing this, we expect that the type system will generalize to dependent types and intersection types along standard lines. This is not idle speculation: the principle was already demonstrated for intersection types for higher-order store in the FMC~\cite{Heijltjes-2025-FSCD}.
+
+
+%----------------------------------------------------------------------------------------------------
+
+\bibliography{FMC-AST}
+
+\newpage
+
+\appendix
+
+\section{Appendix}
+
+\subsection*{Running the machine}
+
+\begin{example}
+\label{example:run}
+Below we give a successful run of the machine for our running example term, with the definition of $\term{M+N}$ unfolded to its primitives, and the trace $\bot\,\bot\,\top$.
+\[
+	\term{M}~=~\term{(\heads + (\tails +\,i))^i}~=~\term{(?a.a ; \top->\heads ; \bot->(?b.b ; \top->\tails ; \bot -> i))^i}
+\]
+\[
+\begin{array}{@{(\,}r@{\,,\,}l@{\,,\,}l@{\,,\,}r@{\,)}}
+             \bot\,\bot\,\top & \e &         \term{(?a.a ; \top->\heads ; \bot->(?b.b ; \top->\tails ; \bot -> i))^i} & \e
+\\\hline     \bot\,\bot\,\top & \e & \phantom(\term{?a.a ; \top->\heads ; \bot->(?b.b ; \top->\tails ; \bot -> i)} & \term{(i -> M)}
+\\\hline     \bot\,\bot\,\top & \e & \phantom(\term{?a.a ; \top->\heads} & \term{(\bot->(?b.b ; \top->\tails ; \bot -> i))~(i -> M)}
+\\\hline     \bot\,\bot\,\top & \e & \phantom(\term{?a.a} & \term{(\top->\heads)~(\bot->(?b.b ; \top->\tails ; \bot -> i))~(i -> M)}
+\\\hline           \bot\,\top & \e & \phantom(\term{\bot} & \term{(\top->\heads)~(\bot->(?b.b ; \top->\tails ; \bot -> i))~(i -> M)}
+\\\hline           \bot\,\top & \e & \phantom(\term{\bot} &                \term{(\bot->(?b.b ; \top->\tails ; \bot -> i))~(i -> M)}
+\\\hline           \bot\,\top & \e & \phantom(\term{?b.b ; \top->\tails ; \bot -> i} &                               \term{(i -> M)}
+\\\hline           \bot\,\top & \e & \phantom(\term{?b.b ; \top->\tails} &                               \term{(\bot -> i)~(i -> M)}
+\\\hline           \bot\,\top & \e & \phantom(\term{?b.b} &                               \term{(\top->\tails)~(\bot -> i)~(i -> M)}
+\\\hline                 \top & \e & \phantom(\term{\bot} &                               \term{(\top->\tails)~(\bot -> i)~(i -> M)}
+\\\hline                 \top & \e & \phantom(\term{\bot} &                                              \term{(\bot -> i)~(i -> M)}
+\\\hline                 \top & \e & \phantom(\term{i}    &                                                          \term{(i -> M)}
+\\\hline                 \top & \e & \term{(?a.a ; \top->\heads ; \bot->(?b.b ; \top->\tails ; \bot -> i))^i} & \e
+\\\hline                 \top & \e & \phantom(\term{?a.a ; \top->\heads ; \bot->(?b.b ; \top->\tails ; \bot -> i)} & \term{(i -> M)}
+\\\hline                 \top & \e & \phantom(\term{?a.a ; \top->\heads} & \term{(\bot->(?b.b ; \top->\tails ; \bot -> i))~(i -> M)}
+\\\hline                 \top & \e & \phantom(\term{?a.a} & \term{(\top->\heads)~(\bot->(?b.b ; \top->\tails ; \bot -> i))~(i -> M)}
+\\\hline                   \e & \e & \phantom(\term{\top} & \term{(\top->\heads)~(\bot->(?b.b ; \top->\tails ; \bot -> i))~(i -> M)}
+\\\hline                   \e & \e & \phantom(\term{\heads} &              \term{(\bot->(?b.b ; \top->\tails ; \bot -> i))~(i -> M)}
+\\\hline                   \e & \e & \phantom(\term{\heads} &                                                        \term{(i -> M)}
+\\\hline                   \e & \e & \phantom(\term{\heads} & \e
+\end{array}
+\]
+\end{example}
+
+
+\subsection*{Proving the Runnability Lemma}
+
+Here we prove Lemma~\ref{lem:run}, the runnability lemma. Recall the statement of the Lemma:
+
+\medskip
+
+\noindent
+\textbf{Runnability lemma:}\quad\textit{
+If $\term{G |- M:t}$ and $\mu\in\SRUN{G}$ then $\term{\mu M}\in\RUN{t}$.
+}
+
+\begin{proof}
 By induction on the typing derivation.
-
 \begin{itemize}
 
 	% Variable
@@ -782,377 +1200,6 @@ For all $n\in\N^+$ we have $\DT_n\in\RUN{q_n.d + !s.p^ni}$ and hence $\DT_n\less
 It follows that $\DT\in\RUN{/1{1-p}.d}$ and hence $\term{\mu(M^i)}\in\RUN{!s => /1{1-p}.d}$.
 \end{itemize}
 \end{proof}
-
-
-The runnability lemma directly gives the main theorem of typed almost-sure termination.
-
-% - - - - - - - - - - - - - - -
-\begin{theorem}
-If $\term{|- M: \e => d}$ then $\term M$ terminates with probability at least $\pr{\type{d}}$.
-\end{theorem}
-
-\begin{proof}
-Let $\type{d}=\type{\{(!t_i,p_i)_i\}_{i\in I}}$. By Lemma~\ref{lem:run} we have $\Eval\e M\DT$ with $\DT\in\RUN{d}$, which means that $\pr{\DT\only i}\geq p_i$ for every $i\in I$, so that $\pr\DT \geq \pr{\type d}$.
-\end{proof}
-% - - - - - - - - - - - - - - -
-
-%----------------------------------------------------------------------------------------------------
-\section{Ground terms and finite Markov chains}
-
-We have shown that the calculus introduced in this paper enjoys all the expected properties, in particular guaranteeing almost-sure termination. Several natural questions concerning the expressive power of the calculus remain open. Notably, it is of interest to investigate the behavior of the calculus under restrictions to low-order types, or when stronger termination properties than AST, such as \emph{positive} almost-sure termination (PAST), can be proved. In this section, we consider the fragment of \emph{ground terms}: those that involve only probabilistic branching and iteration, but not input and output. They are the terms of the following form.
-\[
-	\text{\emph{Gound terms:}}\qquad \term{M,N}~\coloneqq~\term i~\mid~\term{M;i->N}~\mid~\term{M^i}~\mid~\term{?a.a}
-\]
-We will show the following properties: one, typing of ground terms is decidable; two, ground terms readily encode as finite Markov chains; and three, finite Markov chains may be encoded as ground terms. These then have the following consequences. The last two properties imply that ground terms are equivalent to finite Markov chains. Since finite Markov chains are PAST (if they are AST), also ground terms are PAST. Finally, combining the first and last property, for the encoding of a Markov chain as a ground term, type inference calculates the probability of terminating with each final state.
-
-As in the introduction, we may restrict types for ground terms to sub-distributions over choice labels, and abbreviate them by omitting input and return types.
-\[
-	\term{M : p_1i_1 * .. * p_ni_n}\quad\text{\emph{abbreviates}}\quad\term{M : \e => \e.p_1i_i * .. * \e.p_ni_n}
-\]
-Since ground terms are closed, the typing rules may further omit contexts. Thus restricted, they are as follows.
-\[
-       \infer{\term{i: 1i}}{}
-\qquad \infer{\term{M;i->N : g ++ (p . d)}}{\term{M: g * pi} & \term{N: d}}
-\qquad \infer{\term{M^i : /1{1-p} . d}}{\term{M: d * pi} & (p\neq 1)}
-\qquad \infer{\term{?a.a : /12\top * /12\bot}}{}
-\qquad \infer{\term{M : 0.d}}{}
-\]
-
-\begin{proposition}
-\label{prop:ground type inference}
-Typing for ground terms is decidable.
-\end{proposition}
-
-\begin{proof}
-Immediate by induction on the term.
-\end{proof}
-
-We will use the following definition of Markov chains as probabilistic automata. We write $\DD X$ for the set of probability distributions over a set $X$, and write a distribution over $X=\{x_1,\dots,x_n\}$ as $\{p_1x_1,\dots,p_nx_n\}$.
-
-\begin{definition}
-A \emph{Markov chain}
-\(C~=~(S,~s\in S,~F\subseteq S,~\delta:S\less F\to\DD{S})\)
-is given by a set of \emph{states} $S$, a \emph{starting state} $s$, a set of \emph{final states} $F$, and a stochastic transition function $\delta$ from non-final states to states.
-\end{definition}
-
-The translation $\markov M$ from ground terms to Markov chains will take $\term M$ to a chain
-\[
-	\markov{M}~=~(S_M,~s_M,~F_M,~\delta_M)
-\]
-where internal states $S_M\less F_M$ represent subformulas and final states represent choices not captured by a later case construct. We consider chains modulo renaming of internal states, and when combining the translations of two terms we assume their internal states to be disjoint, but final states may overlap. To connect two chains, we use the notation $s\{t/i\}$ to rename a state, and the notation $\delta\{s/i\}$ which replaces all transitions to a (final) state $i$ with transitions to $s$.
-\[
-	\delta\{s/i\}(r)~=~\{~p(t\{s/i\}) \mid pt \in \delta(r)~\}
-\qquad\qquad
-	\begin{array}{r@{}l} i\{t/i\} &{}=t \\ s\{t/i\} &{}=s \quad (s\neq i) \end{array}
-\]
-The translation $\markov-$ is then as follows.
-\[
-\begin{aligned}
-	\markov{i}      &= (\{s,i\},~s,~\{i\},~s\mapsto\D{i.1})
-\\	\markov{M;i->N} &= (S_M\less\{i\}\cup S_N,~s_M,~F_M\less\{i\}\cup F_N,~\delta_M\{s_N/i\}\cup\delta_N)
-\\  \markov{M^i}    &= (S_M\less\{i\},~s_M,~F_M\less\{i\},~\delta_M\{s_M/i\})
-\\  \markov{?a.a}   &= (\{s,\top,\bot\},~s,~\{\top,\bot\},~s\mapsto\D{/12\top,/12\bot})
-\end{aligned}
-\]
-
-\begin{example}
-For the example term from the introduction, abbreviated as $\term{M^i}$ where $\term M$ is as below, the translation is as follows.
-\[
-	\term{M}~=~\term{?a.a ; \top->\heads ; \bot->(?b.b ; \top->\tails ; \bot -> i)}
-\qquad\qquad
-	\markov{M^i}~=~\vc{
-\begin{tikzpicture}[thick,x=20pt,y=24pt,outer sep=0pt,inner sep=2pt]
-	\node (r) at (1,2) {$r$};
-	\node (s) at (2,1) {$s$};
-	\node (u) at (0,1) {$u$};
-	\node (v) at (1,0) {$v$};
-	\node (w) at (3,0) {$w$};
-	\node (h) at (0,0) {$\termcolor\heads$};
-	\node (t) at (1,-1) {$\termcolor\tails$};
-
-	\begin{scope}[->,>=stealth]
-	
-	\draw (1,2.7)--(r);
-	\draw (r) --node[pos=0.6,anchor=south east]{$\scriptstyle{\frac12}$} (u);
-	\draw (r) --node[pos=0.6,anchor=south west]{$\scriptstyle{\frac12}$} (s);
-	\draw (s) --node[pos=0.6,anchor=south east]{$\scriptstyle{\frac12}$} (v);
-	\draw (s) --node[pos=0.6,anchor=south west]{$\scriptstyle{\frac12}$} (w);
-	\draw (u)--(h);
-	\draw (v)--(t);
-	
-	\draw[rounded corners] (w)--(3.7,0.7)--(1.7,2.7)--(r);
-	
-	\end{scope}
-\end{tikzpicture}}
-\]
-\[
-\begin{array}{r@{}l}
-	     \markov{?a.a}                            &{}= (\{r,\top,\bot\},~r,~\{\top,\bot\},~r\mapsto\D{/12\top,/12\bot})
-\\[5pt]  \markov{?a.a ; \top->\heads}             &{}= (\{r,u,\heads,\bot\},~r,~\{\heads,\bot\},~r\mapsto\D{/12\bot,/12u}~u\mapsto\D{1\heads})
-\\[5pt]  \markov{?b.b ; \top->\tails ; \bot -> i} &{}= (\{s,v,w,\tails,i\},~s,~\{\tails,i\}, s\mapsto\D{/12v,/12w}~v\mapsto\D{1\tails}~w\mapsto\D{1i}) \rule{30pt}{0pt}
-\\[5pt]  \markov{M}                               &{}= (\{r,s,u,v,w,\heads,\tails,i\},~r,~\{\heads,\tails,i\},
-\\[5pt]  \multicolumn{2}{r}{ r\mapsto\D{/12u,/12s}~s\mapsto\D{/12v,/12w}~u\mapsto\D{1\heads}~v\mapsto\D{1\tails}~w\mapsto\D{1i}~) }
-\\[5pt]  \markov{M^i}                             &{}= (\{r,s,u,v,w,\heads,\tails\},~r,
-\\[5pt]  \multicolumn{2}{r}{ r\mapsto\D{/12u,/12s}~s\mapsto\D{/12v,/12w}~u\mapsto\D{1\heads}~v\mapsto\D{1\tails}~w\mapsto\D{1r}~) }
-\end{array}
-\]
-\end{example}
-
-
-In the other direction, we give an interpretation $\sem C$ of a finite Markov chain as a ground term. The translation operates as follows, using states as choice labels. Given $C$ with starting state $s$ and transition $s\mapsto\{p_1t_1,\dots,p_nt_n\}\in\delta$, we remove this transition and consider the sub-chains $C(t_i)$ for $i\leq n$ with new starting state $t_i$, in which $s$ becomes a final state. These are translated inductively to $\term{M_i}$. Then $\sem C$ is given by a term $\term{M^s}$, iterating on $s$, where $\term M$ is a probabilistic sum that chooses $\term{M_i}$ with probability $p_i$. We formalize this below.
-
-For $C=(S,s,F,\delta)$ and $t\in S\less\{s\}$ let $C(t)=(S,t,F\cup\{s\},\delta\less\{s\})$ where $\delta\less X$ is the transition function $\delta$ restricted to the domain $\mathrm{dom}(\delta)\less X$. Write $\term{p_1M_1+..+p_nM_n}$ for the term that chooses $\term{M_i}$ with probability $p_i$, given inductively below; recall that $\term{?a_p}$ represents an unfair coin toss, given either as primitive or encoded with $\term{?a}$ and iteration.
-\[
-	\term{1M}~=~\term{M} 
-\qquad
-    \term{pM+q_1N_1+..+q_nN_n}~=~\term{?a_p.a ; \top -> M; \bot -> ({\fraction{q_1}{1-p}}N_1 + .. + {\fraction{q_n}{1-p}N_n}) } 
-\]
-Then the interpretation of a Markov chain $C=(S,s,F,\delta)$ as a term is as follows.
-\[
-	\sem C~=~
-	\left\{\begin{array}{ll}
-		\term{s} & \text{if}~s~\in~F
-	\\	\termcolor{(p_1\sem{C(t_1)}\term{+..+}p_n\sem{C(t_n)})^s} & \text{where}~\delta(s)=\D{p_1t_1,..,p_nt_n}	
-	\end{array}\right.
-\]
-
-
-
-%For a distribution of terms
-%\[
-%	\DM~=~\D{p_1{\term{M_1}},..,p_n{\term{M_n}}}
-%\]
-%let the term $\term{\lfloor\DM\rfloor}$ be the internalization of that distribution:
-%\[
-%	\lfloor\D{1{\term{M}}}\rfloor~=~\term{M} 
-%\qquad\qquad
-%	\lfloor\D{p{\term{M}}}+\DM\rfloor~=~\term{?a_p.a ; \top-> M; \bot -> \lfloor{\fraction1{1-p}}\cdot\DM\rfloor} 
-%\]
-%Then the interpretation of a Markov chain $C$ as a term is as follows.
-%\[
-%	\sem C~=~
-%	\left\{\begin{array}{ll}
-%		\term{s} & \text{if}~s~\in~F
-%	\\	{\termcolor\lfloor\D{{p_1\sem{C(t_1)}},..,p_n{\sem{C(t_n)}}}\rfloor^s} & \text{where}~\delta(s)=\D{p_1t_1,..,p_nt_n}	
-%	\end{array}\right.
-%\]
-
-\begin{example}
-Consider the following Markov chain $C$, where each arrow has probability $\frac13$.
-\[
-\vcenter{\hbox{
-\begin{tikzpicture}[inner sep=2pt,outer sep=0pt,thick]
-	\node[circle,draw] (a) at ( 90:1) {$a$} ;
-	\node[circle,draw] (b) at (210:1) {$b$} ;
-	\node[circle,draw] (c) at (330:1) {$c$} ;
-	\node (i) at ( 90:2) {$i$} ;
-	\node (j) at (210:2) {$j$} ;
-	\node (k) at (330:2) {$k$} ;
-	\begin{scope}[->,>=stealth]
-	\draw (a.240) to[bend right] (b.60) ;
-	\draw (b.0)   to[bend right] (c.180) ;
-	\draw (c.120) to[bend right] (a.300) ;
-	\draw (a.330) to[bend left]  (c.90) ;
-	\draw (b.90)  to[bend left]  (a.210) ;
-	\draw (c.210) to[bend left]  (b.330) ;
-	\draw (a)--(i);
-	\draw (b)--(j);
-	\draw (c)--(k);
-	\draw (120:2)--(a);
-	\end{scope}
-\end{tikzpicture}}}
-\qquad
-\begin{array}{l@{}l@{}l}
-	    S      &{}~=~{}& \{a,b,c,i,j,k\}
-\\[3pt]	s      &{}~=~{}& a
-\\[3pt]	F      &{}~=~{}& \{i,j,k\}
-\\[3pt]	\delta &{}~=~{}& a \mapsto \D{~/13b~,~/13c~,~/13i~}
-\\[3pt]               && b \mapsto \D{~/13a~,~/13c~,~/13j~}
-\\[3pt]               && c \mapsto \D{~/13a~,~/13b~,~/13k~}
-\end{array}
-\]
-Its interpretation is as follows, writing $\term{M+N+P}$ for the term $\term{/13M+/13N+/13P}$.
-\[
-\begin{aligned}
-	\sem C &~=~ \term{({\sem{C(b)}}+{\sem{C(c)}}+i)^a}
-\\	       &~=~ \term{((a+{\sem{C(b)(c)}}+j)^b + (a+{\sem{C(c)(b)}}+k)^c+i)^a}
-\\         &~=~ \term{((a+(a+b+k)^c+j)^b + (a+(a+c+j)^b+k)^c+i)^a}
-\end{aligned}
-\]
-This term is typed as follows.
-\[
-\begin{aligned}
-	    \term{(a+b+k)^c}         &: \type{/13a * /13b * /13k}
-\\[5pt]	\term{ a+(a+b+k)^c+j}~~~ &: \type{/49a * /19b * /19k + /13j}
-\\[5pt] \term{(a+(a+b+k)^c+j)^b} &: \type{/12a * /18k * /38j}
-\\[5pt] \term{(a+(a+c+j)^b+k)^c} &: \type{/12a * /18j * /38k}
-\\[5pt] \term{ (a+(a+b+k)^c+j)^b + (a+(a+c+j)^b+k)^c+i}~~~ &: \type{/13a * /16k * /16j * /13i}
-\\[5pt] \term{((a+(a+b+k)^c+j)^b + (a+(a+c+j)^b+k)^c+i)^a} &: \type{/14k * /14j * /12i}
-\end{aligned}
-\]
-The interpretation may be illustrated as follows, where the solid edges represent the tree-shape of the probabilistic sums, while the dashed edges represent the loops.
-\[
-\vc{
-\begin{tikzpicture}[x=27pt,y=-27pt,inner sep=0.5pt,outer sep=0pt,thick]
-	\node[circle,draw] (a) at (1,0) {$\term M$};
-	\node[circle,draw] (b) at (0,1) {$\term N$};
-	\node[circle,draw] (c) at (2,1) {$\term P$};
-	\node[circle,draw] (d) at (0,2.4) {$\term Q$};
-	\node[circle,draw] (e) at (2,2.4) {$\term R$};
-	\node (i) at (1,-1)   {$\vphantom(i$};
-	\node (j) at (-1,1)   {$~j~$};
-	\node (k) at ( 3,1)   {$~k~$};
-	\node (l) at (-1,2.4) {$~k~$};
-	\node (m) at ( 3,2.4) {$~j~$};
-	\begin{scope}[->,>=stealth]
-	\draw (0,-1)--(a);
-	\draw (a) to[bend right] (b);
-	\draw (a) to[bend left]  (c);
-	\draw (a) -- (i);
-	\draw (b) -- (d);
-	\draw (c) -- (e);
-	\draw (b) -- (j);
-	\draw (c) -- (k);
-	\draw (d) -- (l);
-	\draw (e) -- (m);
-	\begin{scope}[dash pattern=on 3pt off 2pt]
-	\draw (b.120) to[bend left]     node[pos=0.5,anchor=south east]{$\scriptstyle a~$} (a.150);
-	\draw (c.60)  to[bend right]    node[pos=0.5,anchor=south west]{$~\scriptstyle a$} (a.30);
-	\draw (d.120) to[bend left]     node[pos=0.5,anchor=south east]{$\scriptstyle b~$} (b.240);
-	\draw (e.60)  to[bend right]    node[pos=0.5,anchor=south west]{$~\scriptstyle c$} (c.300);
-	\draw (d.60)  to[bend left=10]  node[pos=0.5,anchor=west]      {$~\scriptstyle a$} (a.240);
-	\draw (e.120) to[bend right=10] node[pos=0.5,anchor=east]      {$\scriptstyle a~$} (a.300);
-	\end{scope}
-	\end{scope}
-\end{tikzpicture}
-}
-\qquad
-\begin{array}{l@{}l}
-        \term M &{}~=~\term{(N + P + i)^a}
-\\[3pt] \term N &{}~=~\term{(a + Q + j)^b}
-\\[3pt] \term P &{}~=~\term{(a + R + k)^c}
-\\[3pt] \term Q &{}~=~\term{(a+b+k)^c}~=~\term{a+b+k}
-\\[3pt] \term R &{}~=~\term{(a+c+j)^b}~=~\term{a+c+j}
-\end{array}
-\]
-As the illustration suggests, the formalism may express any probabilistic tree with back-pointers. It may also express directed acyclic graphs, which yields a smaller interpretation of the Markov chain above, though still exponential, in the following term.
-\[
-	\term{ (b+c+i ; b -> a+c+j ; c -> (a+b+k ; b -> a+c+j)^c )^a }
-\]
-The types work out the same way.
-\[
-\begin{aligned}
-	    \term{ b+c+i }~~~             &: \type{/13b * /13c * /13i}
-\\[5pt] \term{ b+c+i ; b -> a+c+j}~~~ &: \type{/19a * /49c * /13i * /19j}
-\\[5pt] \term{(a+b+k ; b -> a+c+j)^c} &: \type{/12a * /18j * /38k}
-\\[5pt] \term{ b+c+i ; b -> a+c+j ; c -> (a+b+k ; b -> a+c+j)^c}     &: \type{/13a * /13i * /16j * /16k}
-\\[5pt] \term{(b+c+i ; b -> a+c+j ; c -> (a+b+k ; b -> a+c+j)^c )^a} &: \type{/12i * /14j * /14k}
-\end{aligned}
-\]
-\end{example}
-
-The translations $\markov-$ and $\sem-$ above demonstrate the following.
-
-\begin{proposition}
-Ground terms of the \PFMC\ are equivalent to finite Markov chains.
-\end{proposition}
-
-Markov chains are PAST if they are AST, i.e.\ if any path may eventually reach a final state. For typed ground terms, which are AST, we then have the following.
-
-\begin{proposition}
-Typed ground terms of the \PFMCT\ are PAST.
-\end{proposition}
-
-Combining type inference for ground terms (Proposition~\ref{prop:ground type inference}) and the translation $\sem-$, we have the following result.
-
-\begin{proposition}
-Encoding and typing a finite Markov chain computes its return distribution: if $\termcolor{\sem{C}}:\type{p_1`s_1*..*p_n`s_n}$ then $C$ terminates in the state $s_i$ with probability $p_i$.
-\end{proposition}
-
-\begin{proof}
-By construction.
-\end{proof}
-
-
-%----------------------------------------------------------------------------------------------------
-\section{Moving past PAST}
-
-Further exploring the expressive power of the calculus, in this section we demonstrate that typed terms in general are AST, but not PAST: that is, we will give an example of a term with infinite expected running time, despite terminating with probability one. Our example relies crucially on higher-order functions.
-
-We will use the default choice $\star$ as imperative \emph{skip}, and its case as sequential composition, $\term{M;N}=\term{M;\star ->N}$. Consider the following term, for a given $\term M$.
-\[
-	\term{[M].(\,(<f>.[f;f].i)\, + \,\star)^i }
-\]
-With probability $\fraction12$ it composes the term on the stack with itself and iterates, or it terminates. Evaluating this term on the machine gives the following return family, for the sequence of terms $\term{M_n}$ given by $\term{M_0}=\term M$ and $\term{M_{n+1}}=\term{M_n;M_n}$.
-\[
-	\{(\term{M_n},\star)_{\top^n\bot}\mid n\in\N\}~=~\{\,(\term M,\star)_{\bot}~,~(\term{M;M},\star)_{\top\bot}~,~(\term{(M;M);(M;M)},\star)_{\top\top\bot}~,~\dots~\}
-\]
-We may then evaluate the term $\term{M_n}$ left on the stack by post-composing with $\term{<g>.g}$, which pops and runs it, possibly using further base values further down on the stack. If $\term M$ terminates successfully with $\star$ in $m$ steps, $\term{M_n}$ takes $m\times 2^n$ steps. For example, assuming a natural numbers type $\type{\N}$ with primitives zero $\term{0:\N}$ and addition $\term{`+:\N\,\N => \N.1\star}$, we let $\term M$ be the successor function $\term{[1].`+: \N => \N.1\star}$. The term below left then gives the return family below right, taking $m\times 2^n$ machine steps (for some small constant $m$) to compute the number $\term{2^n:\N}$ from zero and successor. Since the probability of returning $\term{2^n}$ is $\fraction 1{2^{n+1}}$, the expected evaluation time on the machine is infinite: the term is not PAST.
-\[
-	\term{[0].[[1].`+].(\,(<f>.[f;f].i)\, + \,\star)^i ; <g>.g ~:~\e => \N . 1\star }
-\qquad\qquad
-	\{ (\term{2^n},\star)_{\top^n\bot}\mid n\in\N \}
-\]
-The term is typed: for any $\type{!t}$, if $\term M$ is typed $\term{M:!t => !t.1\star}$ then we have $\term{M^n : !t => !t.1\star}$, such as in the case above where $\type{!t}=\type\N$. For the loop we then have the following.
-\[	
-	\vc{\infer{\term{|- ((<f>.[f;f].i)\,+\,\star)^i: s => s.1\star}}{\term{|- (<f>.[f;f].i)\,+\,\star: s => s./12i ~*~ s./12\star }}} \qquad \text{where} \quad \type{s}~=~\type{!t => !t.1\star}
-\]
-The term $\term{<g>.g : (!t => !t.1\star)\,!t => !t.1\star}$ takes $\term{M^n : !t => !t.1\star}$ off the stack and evaluates it with an appropriate remaining stack of type $\type{!t}$. The existence of a typed term that is not PAST then demonstrates the following.
-
-\begin{proposition}
-The typed probabilistic FMC is not positive almost-surely terminating.
-\end{proposition}
-
-%----------------------------------------------------------------------------------------------------
-
-\section{Conclusion}
-
-
-%----------------------------------------------------------------------------------------------------
-
-\bibliography{FMC-AST}
-
-\newpage
-
-\appendix
-
-\section{Appendix}
-
-\subsection*{Running the machine}
-
-\begin{example}
-Below we give a successful run of the machine for our running example term, with the definition of $\term{M+N}$ unfolded to its primitives, and the trace $\bot\,\bot\,\top$.
-\[
-	\term{M}~=~\term{(\heads + (\tails +\,i))^i}~=~\term{(?a.a ; \top->\heads ; \bot->(?b.b ; \top->\tails ; \bot -> i))^i}
-\]
-\[
-\begin{array}{@{(\,}r@{\,,\,}l@{\,,\,}l@{\,,\,}r@{\,)}}
-             \bot\,\bot\,\top & \e &         \term{(?a.a ; \top->\heads ; \bot->(?b.b ; \top->\tails ; \bot -> i))^i} & \e
-\\\hline     \bot\,\bot\,\top & \e & \phantom(\term{?a.a ; \top->\heads ; \bot->(?b.b ; \top->\tails ; \bot -> i)} & \term{(i -> M)}
-\\\hline     \bot\,\bot\,\top & \e & \phantom(\term{?a.a ; \top->\heads} & \term{(\bot->(?b.b ; \top->\tails ; \bot -> i))~(i -> M)}
-\\\hline     \bot\,\bot\,\top & \e & \phantom(\term{?a.a} & \term{(\top->\heads)~(\bot->(?b.b ; \top->\tails ; \bot -> i))~(i -> M)}
-\\\hline           \bot\,\top & \e & \phantom(\term{\bot} & \term{(\top->\heads)~(\bot->(?b.b ; \top->\tails ; \bot -> i))~(i -> M)}
-\\\hline           \bot\,\top & \e & \phantom(\term{\bot} &                \term{(\bot->(?b.b ; \top->\tails ; \bot -> i))~(i -> M)}
-\\\hline           \bot\,\top & \e & \phantom(\term{?b.b ; \top->\tails ; \bot -> i} &                               \term{(i -> M)}
-\\\hline           \bot\,\top & \e & \phantom(\term{?b.b ; \top->\tails} &                               \term{(\bot -> i)~(i -> M)}
-\\\hline           \bot\,\top & \e & \phantom(\term{?b.b} &                               \term{(\top->\tails)~(\bot -> i)~(i -> M)}
-\\\hline                 \top & \e & \phantom(\term{\bot} &                               \term{(\top->\tails)~(\bot -> i)~(i -> M)}
-\\\hline                 \top & \e & \phantom(\term{\bot} &                                              \term{(\bot -> i)~(i -> M)}
-\\\hline                 \top & \e & \phantom(\term{i}    &                                                          \term{(i -> M)}
-\\\hline                 \top & \e & \term{(?a.a ; \top->\heads ; \bot->(?b.b ; \top->\tails ; \bot -> i))^i} & \e
-\\\hline                 \top & \e & \phantom(\term{?a.a ; \top->\heads ; \bot->(?b.b ; \top->\tails ; \bot -> i)} & \term{(i -> M)}
-\\\hline                 \top & \e & \phantom(\term{?a.a ; \top->\heads} & \term{(\bot->(?b.b ; \top->\tails ; \bot -> i))~(i -> M)}
-\\\hline                 \top & \e & \phantom(\term{?a.a} & \term{(\top->\heads)~(\bot->(?b.b ; \top->\tails ; \bot -> i))~(i -> M)}
-\\\hline                   \e & \e & \phantom(\term{\top} & \term{(\top->\heads)~(\bot->(?b.b ; \top->\tails ; \bot -> i))~(i -> M)}
-\\\hline                   \e & \e & \phantom(\term{\heads} &              \term{(\bot->(?b.b ; \top->\tails ; \bot -> i))~(i -> M)}
-\\\hline                   \e & \e & \phantom(\term{\heads} &                                                        \term{(i -> M)}
-\\\hline                   \e & \e & \phantom(\term{\heads} & \e
-\end{array}
-\]
-\end{example}
-
-
-
 
 \end{document}
 

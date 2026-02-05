@@ -285,7 +285,7 @@
   %
   %\ifx#1p\let\term@loop\term@project\else%
   \ifx#1+\kern1pt{\smallbin\oplus}\kern1pt\else%
-  \ifx#1/\let\term@loop\term@frac\else%
+  \ifx#1/\let\term@loop\term@slash\else%
   %
   \ifx#1S{{\black S}}\else%
   \ifx#1T{{\black T}}\else%
@@ -322,7 +322,9 @@
 \newcommand\term@dot{\@ifnextchar.{\dots\term@discard}{.\,\term@start}}
 % [a] /
 \newcommand\term@box[1]{\probox{#1}\kern1pt\term@start}
-\newcommand\term@frac[2]{\fraction{#1}{#2}\term@start}
+\newcommand\term@slash{\@ifnextchar/{\term@frac}{/\term@start}}
+\newcommand\term@frac[3]{\fraction{#2}{#3}\term@start}
+
 
 %========== Programming in the FMC
 
