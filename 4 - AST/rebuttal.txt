@@ -3,13 +3,14 @@ Let us address in particular the following observation:
 #99B
 "this fragment corresponds to finite Markov chains. This seems pretty unsurprising to me"
 
-This is precisely the point we wished to illustrate: this fragment, which is exactly the extension to the lambda-calculus considered in this paper, is a natural model of computation in its own right. First, the fact that this corresponds naturally and obviously to Markov chains is a *discovery*, since that was not what it was designed to do (it was for *exception handling*). Second, this fragment combines seamlessly with the lambda-calculus to give almost-sure termination with higher-order functions. Thus, the key message is that this fragment is natural and well-behaved, which the observation that it obviously corresponds to Markov chains underlines. We should not lose sight of the fact that it is *new*, in particular the type assignment.
+The FMC "choice" extension is new, introduced in [14] to give simple types for imperative programming with exception handling and iteration. That the probabilistic variant coincides with finite Markov chains is a new discovery. A typed calculus for Markov chains that integrates seamlessly with the lambda-calculus is a new capability. If this is unsurprising, or if our presentation has made it so, that strongly suggests that it is a simple and natural model of probabilistic computation. And it is *new*.
+
 
 ---------
 
 We would like to thank all reviewers for their careful reading and many comments. 
 
-The contribution of our paper is to give a system of simple types for almost-sure termination with higher-order functions capable of capturing nontrivial termination patters. This is an entirely new capability: previous approaches use intersection types or semantics. The three reviews agree that the development is simple and natural, and praise the exposition and simplicity of the development. Review #99B repeatedly expresses that various aspects are "unsurprising". This is, or should be, the highest praise: we have established an entirely new capability, simple types for almost-sure termination, in a way that feels instantly natural and obvious.
+The contribution of our paper is to give a system of simple types for almost-sure termination with higher-order functions capable of capturing nontrivial termination patterns. This is an entirely new capability: previous approaches use intersection types or semantics. The three reviews agree that the development is simple and natural, and praise the exposition and simplicity of the development. Review #99B repeatedly expresses that various aspects are "unsurprising". This is, or should be, the highest praise: we have established an entirely new capability, simple types for almost-sure termination, in a way that feels instantly natural and obvious.
 
 Imagine our surprise that all three reviews express concerns about the limitations of the contribution: "the main contribution and idea of this paper seems to be a rather small extension of previous works" (#99A),
 "the choice of the paper to consider a very restricted language makes the results a bit too simplistic in my opinion and clearly unsurprising even for a non expert" (#99B), and "The paper combines concepts from FMC, PEL, and type-based AST analysis, making its novelty incremental." (#99C).
