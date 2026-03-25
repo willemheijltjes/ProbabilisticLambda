@@ -1,24 +1,3 @@
-
-
-The contribution of the paper is to give a system of simple types for almost-sure termination with higher-order functions. This is an entirely new capability: previous approaches use intersection types or semantics.
-
-The development is moreover simple and natural. The three reviews agree on this and praise the exposition and simplicity of the development. Review B repeatedly expresses that various aspects are "unsurprising". This is, or should be, the highest praise: we have established an entirely new capability, simple types for almost-sure termination, in a way that feels instantly natural and obvious.
-
-Imagine our surprise that all three reviews express concerns about the limitations of the contribution:
-
-#99A
-"- the main contribution and idea of this paper seems to be a rather small extension of previous works"
-
-#99B
-"the choice of the paper to consider a very restricted language makes the results a bit too simplistic in my opinion and clearly unsurprising even for a non expert"
-
-#99C
-"The paper combines concepts from FMC, PEL, and type-based AST analysis, making its novelty incremental."
-
-Let us reiterate that what matters in research is the new capability. The effort to acquire it and the complexity of the solution are *costs*. While we often use these as proxies to estimate the difficulty of a problem, we have to keep in mind that effort and complexity are not the primary contribution.
-
-The naturality and simplicity of our solution is a testament to the design of the Functional Machine Calculus. This is where the effort was spent; the present paper is a demonstration of the power of the approach of the FMC: we are able to express almost-sure termination through types by simple and entirely natural means.
-
 Let us address in particular the following observation:
 
 #99B
@@ -36,13 +15,22 @@ As stated with the proposition, this is proved in [14] (though the proof is mini
 
 ----------
 
-We would like to thank all reviewers for their careful reading and helpful comments. Below, we give answers to the main questions raised.
+We would like to thank all reviewers for their careful reading and many comments\. 
+
+The contribution of our paper is to give a system of simple types for almost-sure termination with higher-order functions. This is an entirely new capability: previous approaches use intersection types or semantics. The three reviews agree that the development is simple and natural, and praise the exposition and simplicity of the development. Review #99B repeatedly expresses that various aspects are "unsurprising". This is, or should be, the highest praise: we have established an entirely new capability, simple types for almost-sure termination, in a way that feels instantly natural and obvious.
+
+Imagine our surprise that all three reviews express concerns about the limitations of the contribution: "- the main contribution and idea of this paper seems to be a rather small extension of previous works" (#99A),
+"the choice of the paper to consider a very restricted language makes the results a bit too simplistic in my opinion and clearly unsurprising even for a non expert" (#99B), and "The paper combines concepts from FMC, PEL, and type-based AST analysis, making its novelty incremental." (#99C).
+
+We strongly believe that what matters in research is the new capability. The effort to acquire it and the complexity of the solution are *costs*. While we often use these as proxies to estimate the difficulty of a problem, we have to keep in mind that effort and complexity are not the primary contribution. The naturality and simplicity of our solution is a testament to the design of the Functional Machine Calculus. This is where the effort was spent. The present paper is a demonstration of the power of the approach of the FMC: we are able to express almost-sure termination through types by simple and entirely natural means.
+
+After addressing these criticisms, the remainder of the rebuttal will focus on more specific comments raised by the three reviewers.
 
 Review #99A.
-We thank the reviewer for the helpful suggestions. Concerning the request for an example illustrating the limitations of the calculus, a natural candidate is the well-known coupon collector process, a classical example in probabilistic termination. This process can be encoded in our calculus as a sequential composition of $n$ loops (where $n$ is the number of coupons$, each loops having a decreasing exit probability. However, it cannot currently be expressed using two nested loop within our system, due to the restriction of a fixed exit probability. We agree that including such an example would improve the discussion, and we will incorporate it in a revised version. We also appreciate the remark regarding the order of the antecedent vector in the typing rules. We acknowledge that this point may be confusing, and we will revise the presentation 
+Concerning the request for an example illustrating the limitations of the calculus, a natural candidate is the well-known coupon collector process, a classical example in probabilistic termination. This process can be encoded in our calculus as a sequential composition of $n$ loops (where $n$ is the number of coupons), each loops having a decreasing exit probability. However, it cannot be expressed using two nested loop within our system, due to the restriction of a fixed exit probability. We agree that including such an example would improve the discussion, and we will incorporate it in a revised version. We also appreciate the remark regarding the order of the antecedent vector in the typing rules. We acknowledge that this point may be confusing, and we will revise the presentation. 
 
 Review #99B.
-We sincerely thank the reviewer for the detailed feedback and for acknowledging the relevance of the topic. We fully agree that the paper would benefit from a broader and more balanced discussion of related work. In particular, we acknowledge that references to the works of Bournez and collaborators, as well as Saheb-Djahromi, should be included in relation to AST and PAST, and we will add them in a revised version. We also agree that Ehrhard’s work is closely related in spirit, especially regarding the use of an external source of randomness in the underlying operational model. While there are clear structural similarities between the underlying machines, the perspectives differ: our work is primarily focused on a type-theoretic approach to termination, whereas Ehrhard’s work is fundamentally rooted in denotational semantics. We will expand the discussion to better clarify these connections. Finally, we appreciate the suggestion to better motivate the use of the FMC over other abstract machines, and we will include additional discussion to make this design choice clearer. (Maybe we can say that we can capture all reduction strategies?)
+We fully agree that the paper would benefit from a broader and more balanced discussion of related work. In particular, we acknowledge that references to the works of Bournez and collaborators, as well as Saheb-Djahromi, should be included, and we will add them in a revised version. We also agree that Ehrhard’s work is closely related in spirit, especially regarding the use of an external source of randomness in the underlying abstract machine. While there are clear structural similarities between the two machines, the perspectives differ: our work is primarily focused on a type-theoretic approach to termination, whereas Ehrhard’s work is fundamentally rooted in denotational semantics. We will expand the discussion to better clarify these connections. Finally, we appreciate the suggestion to better motivate the use of the FMC over other abstract machines, and we will include additional discussion to make this design choice clearer. (Maybe we can say that we can capture all reduction strategies?)
 
 Review #99C.
 We thank the reviewer for the insightful comments. We agree that establishing decidability results for type checking (or type inference) in the full calculus would be highly desirable. At present we are actively investigating it, and we hope to report progress on this problem in future work.
