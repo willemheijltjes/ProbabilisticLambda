@@ -1,3 +1,41 @@
+
+
+The contribution of the paper is to give a system of simple types for almost-sure termination with higher-order functions. This is an entirely new capability: previous approaches use intersection types or semantics.
+
+The development is moreover simple and natural. The three reviews agree on this and praise the exposition and simplicity of the development. Review B repeatedly expresses that various aspects are "unsurprising". This is, or should be, the highest praise: we have established an entirely new capability, simple types for almost-sure termination, in a way that feels instantly natural and obvious.
+
+Imagine our surprise that all three reviews express concerns about the limitations of the contribution:
+
+#99A
+"- the main contribution and idea of this paper seems to be a rather small extension of previous works"
+
+#99B
+"the choice of the paper to consider a very restricted language makes the results a bit too simplistic in my opinion and clearly unsurprising even for a non expert"
+
+#99C
+"The paper combines concepts from FMC, PEL, and type-based AST analysis, making its novelty incremental."
+
+Let us reiterate that what matters in research is the new capability. The effort to acquire it and the complexity of the solution are *costs*. While we often use these as proxies to estimate the difficulty of a problem, we have to keep in mind that effort and complexity are not the primary contribution.
+
+The naturality and simplicity of our solution is a testament to the design of the Functional Machine Calculus. This is where the effort was spent; the present paper is a demonstration of the power of the approach of the FMC: we are able to express almost-sure termination through types by simple and entirely natural means.
+
+Let us address in particular the following observation:
+
+#99B
+"this fragment corresponds to finite Markov chains. This seems pretty unsurprising to me"
+
+This is precisely the point we wished to illustrate: this fragment, which is exactly the extension to the lambda-calculus considered in this paper, is a natural model of computation in its own right. First, the fact that this corresponds naturally and obviously to Markov chains is a *discovery*, since that was not what it was designed to do (it was for *exception handling*). Second, this fragment combines seamlessly with the lambda-calculus to give almost-sure termination with higher-order functions. Thus, the key message is that this fragment is natural and well-behaved, which the observation that it obviously corresponds to Markov chains underlines. We should not lose sight of the fact that it is *new*, in particular the type assignment.
+
+
+----------
+
+#99B
+"they state that the two correspond to each other (without proof)"
+
+As stated with the proposition, this is proved in [14] (though the proof is minimal).
+
+----------
+
 We would like to thank all reviewers for their careful reading and helpful comments. Below, we give answers to the main questions raised.
 
 Review #99A.
