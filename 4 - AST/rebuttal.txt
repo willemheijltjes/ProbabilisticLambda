@@ -8,6 +8,33 @@ The FMC "choice" extension is new, introduced in [14] to give simple types for i
 
 ---------
 
+We are afraid the referees might be underestimating the problem of typing higher-order probabilistic programs. Of course, recursion has been tried. We work with iteration because it offers a way in where other approaches have failed.
+
+Let us quickly illustrate where a standard approach fails. We try to find a probabilistic type for Church numeral 2.
+
+ \f.\x.f(fx)
+
+Our previous types are simple types over fractions:
+
+  s,t  ::=  p  |  s -> t
+
+We want to have  f : 1 -> 1/2  and apply it twice so that  f.f : 1 -> 1/4 (their composition, \x.f(f(x))). But we can't: to apply f twice we need different types, f : 1 -> 1/2 and f : 1/2 -> 1/4. 
+
+We need probabilistic type variables, f : p -> 1/2 p , which can generalise to f : 1/2p -> 1/4p and compose so that f.f : p -> 1/4 p. Then, what is the general type language, and what is the most general type of 2'? 
+
+The type system involves sums and products of probabilities, so we have at least polynomials. We need  f : p -> P(p) , a polynomial P over p. Then we have
+
+  \f.\x.f(fx) : (p -> P(p)) -> q -> P(P(q))
+
+where P is a variable over polynomials. But now we have replicated the term structure at the type level! We have arrived at a form of intersection types simply by assuming polymorphism.
+
+For this reason we are proceeding cautiously, remaining with simple types. While we appreciate that this might appear incremental, we believe we have taken a very significant step, and that the next step is far from obvious.
+
+
+
+
+---------
+
 We would like to thank all reviewers for their careful reading and many comments. 
 
 The contribution of our paper is to give a system of simple types for almost-sure termination with higher-order functions capable of capturing nontrivial termination patterns. This is an entirely new capability: previous approaches use intersection types or semantics. The three reviews agree that the development is simple and natural, and praise the exposition and simplicity of the development. Review #99B repeatedly expresses that various aspects are "unsurprising". This is, or should be, the highest praise: we have established an entirely new capability, simple types for almost-sure termination, in a way that feels instantly natural and obvious.

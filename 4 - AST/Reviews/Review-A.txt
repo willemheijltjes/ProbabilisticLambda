@@ -1,0 +1,31 @@
+Overall merit:       3. Weak accept
+Reviewer expertise:  2. Some familiarity
+
+Paper summary
+The authors extend the functional machine calculus, a calculus derived from on a probabilistic λ-calculus but with added imperative constructs, with a type system that guarantees almost sure termination of all well-typed terms. In contrast to prior works, an iteration primitive is added. To guarantee almost-sure termination, the type system requires that each step of an iteration terminates with at least some fixed probability. The authors then study a version of this calculus restricted to “ground terms”, i.e., terms limited to choice, iteration, and probabilistic branching. They find that these terms correspond to finite Markov Chains and conclude that type checking for such terms is thus decidable.  Moreover, while this is not the case for the unrestricted version of the calculus, AST (termination with probability one) and PAST (finite expected runtime) coincide on ground terms.
+
+Comments for authors
+Overall the paper is well-written, the calculus and the presented concepts are illustrated with examples which makes it easy to follow. The concept of iteration fits well with the functional machine calculus and the proposed type system. This extension to existing work, consisting of iteration and the choice labels, while natural, is rather small.
+
+I would like to see a discussion on the limits of type checking and the discussion on the calculus' limits to be accompanied by a small example that cannot be typed given the current rules (due to fixed exit probability).  Then, one could detail how the proposed extensions might solve this limitation.
+
+## Pros
+- natural extension of previous work on types for almost-sure termination with the FMC
+- the paper is well-written and clear
+
+## Cons
+- missing illustration/discussion on the limits
+- the main contribution and idea of this paper seems to be a rather small extension of previous works
+
+## Detailed Comments
+The antecedent vector seems to be reversed in the typing rules (as in [15]). Currently, this is not mentioned which was very confusing. Initially, I therefore had difficulty understanding the outlined type system until I found the corresponding remark in [15]. I suggest to not reverse the order of the arguments, or at least to add a remark.
+
+- l. 235 looks out of context and its meaning should be explained
+- l. 240: contination → continuation
+- l. 315: I think the type of box{a}. a; ⊤→M should read bar{τ} ⇒ bar{τ}⋅½⊥ ⊕ ½γ
+- l. 399/402: I had some trouble with the notation s{t/i}. You should make clear, that s{t/i} renames state s to t if s equals i. Here, it is not clear at first sight whether s is a state or some dedicated symbol.
+- l. 404: In the translation of i the last element s↦{i⋅1} should read s↦{1i} as the rhs is a distribution
+- l. 414: Markov chains → Finite Markov chains
+- l. 619: R ∈ Run(R) → R ∈ Run(bar{ρ})
+- l. 629: (bar{τ}⋅p)ᵢ → (bar{τ},p)ᵢ or bar{τ}⋅pi (same for (bar{τ}⋅q)ᵢ)
+- l. 652: S ∈⊆ Run(bar{τ}) → S ∈ Run(bar{τ})

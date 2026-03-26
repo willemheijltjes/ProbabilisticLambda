@@ -1,0 +1,55 @@
+Overall merit:       2. Weak reject
+Reviewer expertise:  2. Some familiarity
+
+Paper summary
+The submission deals with termination properties of probabilistic programs, namely almost-sure termination and positive almost-sure termination, two classic notions of termination in this field.
+
+The present work aims at designing a small language in which the AST property holds by construction thanks (1) to the choice on constraining recusive behaviour by working with iteration instead of recursion and (2) to a type system that reflects the probability distribution. In doing so, the authors explain that they aim at explaining AST in a natural way.
+
+The framework they use is a variant of the lambda-calculus with an iteration mechanism that is executed in an abstract machine as well as given a big-step semantics. It therefore allows naturally to consider for HO probabilistic programs even though a good part of the paper deals only with ground terms which make no use of HO features.
+
+The contributions (and organisation of the paper) are the following:
+- In Section 2, the authors develop a comparison with the state of the art already started in the introduction. I must say that I was quite surprised in this related work section (as well as in the introduction and the rest of the paper) to see the small number of citation of works not involving the authors: Over the 21 citations of the reference list, only 9 are not self-citations! (4 of which having no connection whatsoever with probabilistic programming)... I will come back to this point later.
+
+- In Section 3, the author introduce the Probabilistic FMC, first introducing some background on the second order FMC framework and then explaining how they extend it to probabilities. The operational semantics is given in terms of an abstract machine (for which the FMC is designed) and of a big-step operational semantics and they state that the two correspond to each other (without proof).  The calculus is very simple and the machine / operation semantics is correspondingly quite simple as well. Then, the author explain how evaluation is made probabilistic (as it is treated externally in some way), which is essentially the way used by Ehrhard by putting a probability distribution over traces. 
+
+- In Section 4, they introduce the type system, which describes in the authors' words, "hte input/output behaviour of the machine", describing how a typed input stack will be turned into a distribution of typed output stacks. The typing rules are as one can expect (including the iterate rule which was somehow anticipated). The author then establish that typed terms are AST with lemma 20 and thm 21 (the proof of the key property, lemma 20, is given in appendix).
+
+- In the following Section 5, the author focus on terms (that are refered to as ground terms)with no higher-order feature: only probabilistic branching and iteration and establish that this fragment corresponds to finite Markov chains. This seems pretty unsurprising to me even though I am not an expert of the area. They deduce from this that those terms are PAST (not only are they almost surely terminating, but with finite expected time of termination).  Considering the fragment covered by ground terms, I would say that this result is quite expected as well and I guess proving this result directly would simply amount to reproving that finite Markov chains are PAST given that the two are so closely related. 
+
+- Finally, in Section 6, they come back to the full calculus and provide an example of a term that is not PAST. It consists in using the higher-order features of the calculus to iterate composition a some term in such a way that the expectation of the termination time diverges. Again, this is not entirely surprising.
+
+PRO: 
+The paper is definitely in scope of FSCD as HO probabilitic languages are an important and timely topic. Understanding more precisely their termination behaviour is a difficult and important problem 
+
+Moreover, the paper is nicely written, with lots of examples which make the reading easy and enjoyable. 
+
+Even if not all results are proved in details, the main result is and the other are usually at least informally justified. 
+
+CONS: 
+On the other hand, the choice of the paper to consider a very restricted language makes the results a bit too simplistic in my opinion and clearly unsurprising even for a non expert (both from the point of view of the results themselves, which are expected, and from the point of view of the proof techniques, which are also often pretty straightforward).
+
+A definite drawback is the clear lack of discussion and comparison with related works:  over 21 citations, 12 are self-citations and among the 9 citations to works in which the authors are not involved, only 5 deals with probabilistic programs. 
+
+Moreover, in my opinion, important references are missing. I will only give two examples of references that I think the authors should have cited: 
+- concerning the termination properties under study, there is no reference to AST itself (apart from the authors' works themselves). The authors could -- and should in my opnion --  have refered to Bournez and colleagues works and AST and PAST as well as Saheb-Djahromi's work.
+- in my opinion, an important lacking reference are the works by Ehrhard, in particular his FSCD 19 paper "Differentials and distances in probabilistic coherence spaces" where he considers the pKAM that uses and external stack (or random tape as he calls it) for managing the probabilities exactly as the authors do here. In a similar way, it might have been relevant to refer to "Full Abstraction for Probabilistic PCF" when you study the connection between ground terms and finite Markov chains.
+
+In relation with the comment on the pKAM, I think it would make sense to discuss what is the benefit of using the FMC over more standard abstract machines for this work: this would deserve some comments that I would be happy to read in the authors rebuttal.
+
+Overall, I am not fully convinced by the present work and, even though the topic is a very good fit for FSCD, I am not sure that the results are strong enough for FSCD and that the paper would merit some reworking in order to develop a more adequate discussion of the related works. Globally, I think the paper would deserve some more work and that it has the potential of being greatly improved and given more ambition.
+
+Comments for authors
+* On related works and references to the literature:
+
+Over the 21 citations of the reference list, only 9 are not self-citations (4 of which having no connection whatsoever with probabilistic programming)... Important references are missing!
+AST and PAST: refer to Bournez and coauthors about 20 years ago.
++ Saheb ...
+
+* What is the benefit of the FMC (of which they only use a small portion of the possibilities)over using a more standard KAM that would make their work more easily comparable with other works and probably easier to spread and communicate. Here I don't see much the benefit of the FMC for the development: couldn't you develop the same results for the probabilistic KAM? For instance, that would allow comparison with Ehrhard's probabilistic KAM that you do not cite.
+
+* Definition 7: 
+- in rule rej, you need to add a condition stating the i is different from j.
+- I don't see why you use two inferences for smpl. Is there a reason for that?
+
+* Appendix p21, l665: I think that it would make sense here to note that qn is (1-p^n)/(1-p), that helps the rest of the development (actually it could already be used in the body of the paper)
