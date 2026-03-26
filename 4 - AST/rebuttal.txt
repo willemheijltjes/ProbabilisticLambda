@@ -19,7 +19,7 @@ The type system involves sums and products of probabilities, so we have at least
 
 where P is a variable over polynomials. But now we have replicated the term structure at the type level! We have arrived at a form of intersection types simply by assuming polymorphism.
 
-For this reason we are proceeding cautiously, remaining with simple types. While we appreciate that this might appear "simplistic" and "incremental", we believe we have taken a very significant step, and that the next step is far from obvious.
+For this reason we are proceeding cautiously, remaining with simple types. While we appreciate that this might appear incremental, we believe we have taken a very significant step, and that the next step is far from obvious.
 
 
 ---------
