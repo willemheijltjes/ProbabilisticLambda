@@ -19,7 +19,12 @@ The type system involves sums and products of probabilities, so we have at least
 
 where P is a variable over polynomials. But now we have replicated the term structure at the type level! We have arrived at a form of intersection types simply by assuming polymorphism.
 
-For this reason we are proceeding cautiously, remaining with simple types. While we appreciate that this might appear incremental, we believe we have taken a very significant step, and that the next step is far from obvious.
+For this reason we are proceeding cautiously, remaining with simple types. While we appreciate that this might appear "simplistic" and "incremental", we believe we have taken a very significant step, and that the next step is far from obvious.
+
+
+---------
+
+We are thankful for the references to Ehrhard's work and the pKAM. It indeed uses the very same mechanism of a "random tape". But otherwise the pKAM would not be suitable for our purposes: it does not feature iteration, and its conditional is standard, with two branches of the same type. Note that our machine is an extension of the KAM with exactly the desired feature: branching and looping computation.
 
 
 
