@@ -1,7 +1,12 @@
+We would like to thank all reviewers for their careful reading and many comments. 
 
-We are afraid the referees might be underestimating the problem of typing higher-order probabilistic programs. Of course, recursion has been tried. We work with iteration because it offers a way in where other approaches have failed.
+The contribution of our paper is to give a system of simple types for almost-sure termination with higher-order functions capable of capturing nontrivial termination patterns. This is an entirely new capability: previous approaches use intersection types, refinement types, or semantics. The three reviews agree that the development is simple and natural, and praise the exposition and simplicity of the development. Review #99B repeatedly expresses that various aspects are "unsurprising". This is, or should be, the highest praise: we have established an entirely new capability, simple types for almost-sure termination, in a way that feels instantly natural and obvious.
 
-Let us quickly illustrate where a standard approach fails. We try to find a probabilistic type for Church numeral 2.
+Imagine our surprise that all three reviews express concerns about the limitations of the contribution: "the main contribution and idea of this paper seems to be a rather small extension of previous works" (#99A), "the choice of the paper to consider a very restricted language makes the results a bit too simplistic in my opinion and clearly unsurprising even for a non expert" (#99B), and "The paper combines concepts from FMC, PEL, and type-based AST analysis, making its novelty incremental." (#99C).
+
+We strongly believe that what matters in research is the new capability. The effort to acquire it and the complexity of the solution are *costs*. While we often use these as proxies to estimate the difficulty of a problem, we have to keep in mind that effort and complexity are not the primary contribution. The naturality and simplicity of our solution is a testament to the design of the Functional Machine Calculus. This is where the effort was spent. The present paper is a demonstration of the power of the FMC: we are able to express almost-sure termination through types by simple and entirely natural means. 
+
+Of course, recursion has been tried. We work with iteration because it offers a way in where other approaches have failed. Let us quickly illustrate where a standard approach fails. We try to find a probabilistic type for Church numeral 2.
 
  \f.\x.f(fx)
 
@@ -9,44 +14,19 @@ Our previous types are simple types over fractions:
 
   s,t  ::=  p  |  s -> t
 
-We want to have  f : 1 -> 1/2  and apply it twice so that  f.f : 1 -> 1/4 (their composition, \x.f(f(x))). But we can't: to apply f twice we need different types, f : 1 -> 1/2 and f : 1/2 -> 1/4. 
-
-We need probabilistic type variables, f : p -> 1/2 p , which can generalise to f : 1/2p -> 1/4p and compose so that f.f : p -> 1/4 p. Then, what is the general type language, and what is the most general type of 2'? 
-
-The type system involves sums and products of probabilities, so we have at least polynomials. We need  f : p -> P(p) , a polynomial P over p. Then we have
+We want to have  f : 1 -> 1/2  and apply it twice so that  f.f : 1 -> 1/4 (their composition, \x.f(f(x))). But we can't: to apply f twice we need different types, f : 1 -> 1/2 and f : 1/2 -> 1/4. We need probabilistic type variables, f : p -> 1/2 p , which can generalise to f : 1/2p -> 1/4p and compose so that f.f : p -> 1/4 p. Then, what is the general type language, and what is the most general type of 2'? The type system involves sums and products of probabilities, so we have at least polynomials. We need  f : p -> P(p) , a polynomial P over p. Then we have
 
   \f.\x.f(fx) : (p -> P(p)) -> q -> P(P(q))
 
-where P is a variable over polynomials. But now we have replicated the term structure at the type level! We have arrived at a form of intersection types simply by assuming polymorphism.
+where P is a variable over polynomials. But now we have replicated the term structure at the type level! We have arrived at a form of intersection types simply by assuming polymorphism! For this reason we are proceeding cautiously, remaining with simple types. While we appreciate that this might appear incremental, we believe we have taken a very significant step, and that the next step is far from obvious.
 
-For this reason we are proceeding cautiously, remaining with simple types. While we appreciate that this might appear incremental, we believe we have taken a very significant step, and that the next step is far from obvious.
-
-
----------
-
-We are thankful for the references to Ehrhard's work and the pKAM. It indeed uses the very same mechanism of a "random tape". But otherwise the pKAM would not be suitable for our purposes: it does not feature iteration, and its conditional is standard, with two branches of the same type. Note that our machine is an extension of the KAM with exactly the desired feature: branching and looping computation.
-
-
-
-
----------
-
-We would like to thank all reviewers for their careful reading and many comments. 
-
-The contribution of our paper is to give a system of simple types for almost-sure termination with higher-order functions capable of capturing nontrivial termination patterns. This is an entirely new capability: previous approaches use intersection types or semantics. The three reviews agree that the development is simple and natural, and praise the exposition and simplicity of the development. Review #99B repeatedly expresses that various aspects are "unsurprising". This is, or should be, the highest praise: we have established an entirely new capability, simple types for almost-sure termination, in a way that feels instantly natural and obvious.
-
-Imagine our surprise that all three reviews express concerns about the limitations of the contribution: "the main contribution and idea of this paper seems to be a rather small extension of previous works" (#99A),
-"the choice of the paper to consider a very restricted language makes the results a bit too simplistic in my opinion and clearly unsurprising even for a non expert" (#99B), and "The paper combines concepts from FMC, PEL, and type-based AST analysis, making its novelty incremental." (#99C).
-
-We strongly believe that what matters in research is the new capability. The effort to acquire it and the complexity of the solution are *costs*. While we often use these as proxies to estimate the difficulty of a problem, we have to keep in mind that effort and complexity are not the primary contribution. The naturality and simplicity of our solution is a testament to the design of the Functional Machine Calculus. This is where the effort was spent. The present paper is a demonstration of the power of the FMC: we are able to express almost-sure termination through types by simple and entirely natural means.
-
-After addressing these criticisms, the remainder of the rebuttal will focus on more specific comments raised by the three reviewers.
+After addressing the main criticism, the remainder of the rebuttal will focus on more specific comments raised by the three reviewers.
 
 Review #99A.
 Concerning the request for an example illustrating the limitations of the calculus, a natural candidate is the well-known coupon collector process, a classical example in probabilistic termination. This process can be encoded in our calculus as a sequential composition of $n$ loops (where $n$ is the number of coupons), each loops having a decreasing exit probability. However, it cannot be expressed using two nested loop within our system, due to the restriction of a fixed exit probability. We agree that including such an example would improve the discussion, and we will incorporate it in a revised version. We also appreciate the remark regarding the order of the antecedent vector in the typing rules. We acknowledge that this point may be confusing, and we will revise the presentation accordingly. 
 
 Review #99B.
-We fully agree that the paper would benefit from a broader and more balanced discussion of related work. In particular, we acknowledge that references to the works of Bournez and collaborators, as well as Saheb-Djahromi, should be included, and we will add them in a revised version. We also agree that Ehrhard’s work is closely related in spirit, especially regarding the use of an external source of randomness in the underlying abstract machine. While there are clear structural similarities between the two machines, the perspectives differ: our work is primarily focused on a type-theoretic approach to termination, whereas Ehrhard’s work is fundamentally rooted in denotational semantics. We will expand the discussion to better clarify these connections. Finally, we appreciate the suggestion to better motivate the use of the FMC over other abstract machines; using the KAM would have the clear disadvantage of not being directly applicable to call-by-value computation. The correspondence between the abstract machine and the big-step semantics is proved in [14], though the proof is quite simple. The FMC "choice" extension is new, introduced in [14] to give simple types for imperative programming with exception handling and iteration. That the probabilistic variant coincides with finite Markov chains is a new discovery. A typed calculus for Markov chains that integrates seamlessly with the lambda-calculus is a new capability. If this is unsurprising, or if our presentation has made it so, that strongly suggests that it is a simple and natural model of probabilistic computation. 
+We fully agree that the paper would benefit from a broader and more balanced discussion of related work. In particular, we acknowledge that references to the works of Bournez and collaborators, as well as Saheb-Djahromi, should be included, and we will add them in a revised version. We are thankful for the references to Ehrhard's work and the pKAM. It indeed uses the very same mechanism of a "random tape". But otherwise the pKAM would not be suitable for our purposes: it does not feature iteration, and its conditional is standard, with two branches of the same type. Note that our machine is an extension of the KAM with exactly the desired feature: branching and looping computation. The correspondence between the abstract machine and the big-step semantics is proved in [14], though the proof is quite simple. The FMC "choice" extension is new, introduced in [14] to give simple types for imperative programming with exception handling and iteration. That the probabilistic variant coincides with finite Markov chains is a new discovery. A typed calculus for Markov chains that integrates seamlessly with the lambda-calculus is a new capability. If this is unsurprising, or if our presentation has made it so, that strongly suggests that it is a simple and natural model of probabilistic computation. 
 
 Review #99C.
 We thank the reviewer for the insightful comments. We agree that establishing decidability results for type checking (or type inference) in the full calculus would be highly desirable. At present we are actively investigating it, and we hope to report progress on this problem in future work.
