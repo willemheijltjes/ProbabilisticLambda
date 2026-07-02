@@ -1,0 +1,33 @@
+Overall merit:      3. Weak accept
+Reviewer expertise: 4. Expert
+
+Paper summary
+The paper studies almost-sure termination (AST) in higher-order probabilistic computation by introducing a typed probabilistic functional machine calculus (PFMC). The paper limits the probabilistic pattern to iteration (i.e., tail recursion) with a constant exit probability, focusing on reasoning about effects and higher-order functions. The paper extends a call-by-name Krivine machine-based small-step semantics with a trace for probabilistic outcomes, formulates a big-step semantics, and proves that the two are equivalent. The paper presents a quantitative simple type system for PFMC, where types serve as lower bounds for the probability distribution of termination behavior. Using a Tait-style logical relations argument, the paper proves that terms typed with non-sub-distributions are AST. The paper shows that the first-order non-lambda fragment of PFMC corresponds exactly to finite Markov chains; thus, well-typed terms enjoy positive AST. The paper ends with a higher-order example to demonstrate that, in general, although well-typed terms are AST, they may have infinite expected termination time.
+
+Comments for authors
+## Strengths
+
+- The paper explores an interesting intersection of FMC, probabilistic termination, and quantitative typing.
+- The lower-bound type system and the Tait-style soundness proof are a strong and insightful contribution.
+- The paper is well-written, logically clear, and structured.
+
+## Weaknesses
+
+- The proposed PFMC feels very preliminary in its expressiveness.
+- The paper combines concepts from FMC, PEL, and type-based AST analysis, making its novelty incremental.
+- The paper's theoretical analysis can be improved; for example, it should include a discussion on the type-checking decidability of the full calculus.
+
+## Detailed Comments
+
+*Importance.*
+The proposed PFMC has several limitations: no recursion, iteration with a constant exit probability, and finite sets of choice labels. Although the paper highlights the "higher-order" aspect, it is unclear how precisely the proposed type system can lower-bound the termination probability of higher-order programs (only Section 6 provides a single example). On the other hand, I think PFMC and its type system are quite neat, so they might illuminate the internal structure of the AST problem for higher-order programs, which holds reasonable theoretical importance.
+
+*Novelty.*
+The paper's integration of concepts from FMC, PEL, and type-based AST analysis appears quite natural, and I see no technical challenges in the development. The paper's proof technique, however, is quite interesting and somewhat novel. Applying logical relations to probabilistic programs is a valuable technique that can benefit future research.
+
+*Evidence.*
+The paper's formulation and proof are solid and clear. The encoding of Markov Chains and the derivation of the NAST example are convincing. It would be better if the paper discussed additional meta-theoretic properties, such as the decidability of type checking for the full calculus and the completeness of the type system, especially in the higher-order setting.
+
+*Clarity.*
+I find the paper very enjoyable to read.
+The running example is helpful; the intuition behind the iteration rule is clear; and the paper is well-organized.
