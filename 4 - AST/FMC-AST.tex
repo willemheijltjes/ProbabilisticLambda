@@ -1089,7 +1089,9 @@ The typed probabilistic FMC is not positive almost-surely terminating.
 
 \section{Conclusion}
 
-We have demonstrated a probabilistic interpretation of the branching and iteration in the FMC to give a type system for almost-sure termination, the \PFMCT. We believe this to be a natural account of almost-sure termination for the following reasons.
+We have demonstrated a type system for almost-sure termination in a probabilistic $\lambda$-calculus with iteration, the \PFMCT. 
+%We have demonstrated a probabilistic interpretation of the branching and iteration in the FMC to give a type system for almost-sure termination, the \PFMCT. 
+As a direct probabilistic generalization of the FMC and typed iteration, we believe this to be a natural account of AST. %almost-sure termination for the following reasons.
 
 %The central idea, with which we started the introduction, is to take the familiar typed iterator $\mathsf{iter}\,f$ and make it probabilistic. Immediately, this gives an account of typed almost-sure termination. We explored the consequences of this idea within the \emph{control} extension of the FMC, consisting of the \emph{choice}, \emph{case}, and \emph{loop} constructs. In itself, this forms a minimal basis for imperative control flow, modelling conditionals, constants, case switches, exception handling, and iteration, all on simple abstract machine with a single continuation stack, both typed and untyped---unlike the iterator $\mathsf{iter}\,f$, which must be typed. Combined with our probabilistic generator, the control constructs form the \emph{ground terms} of the \PFMC, which we showed to be equivalent to finite Markov chains, where typing computes the return distribution of the chain.
 
