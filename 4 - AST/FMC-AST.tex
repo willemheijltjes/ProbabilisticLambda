@@ -1109,7 +1109,7 @@ A dependently typed generalisation would be akin to Hoare logic, and might facil
 \section{On function composition and recursion}
 \label{A:recursion}
 
-As the introduction set out, typed almost-sure termination arises naturally by replacing the sum in the standard typed iterator with a probabilistic sum. The probabilistic FMC integrates iteration into the $\lambda$-calculus, giving AST in a higher-order setting. The $\lambda$-calculus is however more commonly associated with \emph{recursion} than iteration. A pertinent question is then whether typed AST is also possible for recursion. Here, we consider the obstacles to typing probabilistic termination in a probabilistic $\lambda$-calculus without branching and iteration. We will use our type system for the probabilistic event $\lambda$-calculus, given by arrow types over probabilities $p\in\mathbb Q\cap[0,1]$.
+As the introduction set out, typed almost-sure termination arises naturally by replacing the sum in the standard typed iterator with a probabilistic sum. The probabilistic FMC integrates iteration into the $\lambda$-calculus, giving AST in a higher-order setting. The $\lambda$-calculus is however more commonly associated with \emph{recursion} than iteration. A pertinent question is then whether typed AST is also possible for recursion. Here, we consider the obstacles to typing probabilistic termination in a probabilistic $\lambda$-calculus without branching and iteration. We will use the type system for the probabilistic event $\lambda$-calculus, given by arrow types over probabilities $p\in\mathbb Q\cap[0,1]$.
 \[
 	\type{s,t}~\coloneqq~\type p~\mid~\type{s\to t}
 \]
