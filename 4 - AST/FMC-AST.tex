@@ -133,7 +133,7 @@ These considerations illustrate how probabilistic choice is connected to other i
 This brings us to a new approach to unifying the $\lambda$-calculus with imperative computation and effects, the \emph{Functional Machine Calculus} (FMC)~\cite{Heijltjes-2023}. Its most recent instance~\cite{Heijltjes-2025-MFPS} features branching sequential computation and iteration, providing an ideal vehicle for our present study. In the FMC each branch of the computation is labelled with a \emph{choice} label $i,j,k,\dots$, which takes the r\^ole of a constant, an exception, a case label, or an exit status. For example, the boolean constants $\bot$ and $\top$ are choice labels. Iteration of a term $\term M$ is written $\term{M^i}$, which evaluates $\term M$ and repeats if $\term M$ chooses $i$, terminating for any other choice. The calculus encodes a fair probabilistic choice, which we write as $\term{M+N}$.
 
 \begin{example}[Bernoulli Factory]
-The term $\term{(\heads + (\tails + \,i))^i}$ chooses \emph{heads}, the choice label $\heads$, with probability $\frac12$, \emph{tails} $\tails$ with probability $\frac14$, and iterates with probability $\frac14$, to give an overall probability of $\frac 23$ for $\heads$ and $\frac 13$ for $\tails$. We illustrate it pictorially as follows; it will remain a running example. %throughout the paper.
+The term $\term{(\heads + (\tails + \,i))^i}$ chooses \emph{heads}, the choice $\heads$, with probability $\frac12$, \emph{tails} $\tails$ with probability $\frac14$, and iterates with probability $\frac14$, to give an overall probability of $\frac 23$ for $\heads$ and $\frac 13$ for $\tails$. We illustrate it as follows; it will remain a running example. %throughout the paper.
 \[
 	\term{(\heads + (\tails + \,i))^i}
 \quad=\quad
