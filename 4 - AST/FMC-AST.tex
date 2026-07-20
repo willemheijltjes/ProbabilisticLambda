@@ -324,7 +324,7 @@ As in the previous, in the probabilistic setting types become (sub-)distribution
 \end{tikzpicture}}
 \end{array}
 \]
-\caption{Typing rules for ground terms, with illustrating diagrams. The double arrows represent multiple branches. In the second rule, the types for $\term M$ and $\term N$ divide into overlappings parts $\type{p_J}$ and $\type{`r\!_J}$, and non-overlapping parts $\type{p_I}$ and $\type{`r\!_K}$, where $I$, $J$, and $K$ are pairwise disjoint sets of choices.}
+\caption{Typing rules for ground terms, with illustrating diagrams. The double arrows represent multiple branches. In the second rule, the types for $\term M$ and $\term N$ divide into overlapping parts $\type{p_J}$ and $\type{`r\!_J}$, and non-overlapping parts $\type{p_I}$ and $\type{`r\!_K}$, where $I$, $J$, and $K$ are pairwise disjoint sets of choices.}
 \label{fig:ground types}
 \end{figure}
 
@@ -433,7 +433,7 @@ After exploring related work in the next section, we will define the calculus (S
 Our type system is a conservative extension of %our previous 
 the systems in \cite{Antonelli-DalLago-Pistone-2022} and \cite{Heijltjes-Majury-2025} (see Remark~\ref{rem:probabilistic types embed}). While those systems already feature higher-order functions, they do not account for either iteration or recursion.
 
-The literature on semantics and termination properties of probabilistic computation is extensive and includes a wide range of techniques. We mention semantic domains~\cite{Dahlqvist-Kozen-2020,Kozen-1981,Vakar-Kammar-Staton-2019}, bisimulations and trace semantics~\cite{vanGlabbeek-Smolka-Steffen-1995,Silva-Sokolova-2011,Stark-Smolka-2000}, probabilistic automata~\cite{Esparza-Kucera-Mayr-2004,Etessami-Yannakakis-2009}, probabilistic coherence spaces~\cite{Crubille-Ehrhard-Pagani-Tasson-2017,Danos-Ehrhard-2011,Ehrhard-Tasson-2019}, verification logics~\cite{FerrerFioriti-Hermanns-2015,McIver-Morgan-Kaminski-Katoen-2018}, and separation logic~\cite{Barthe-Hsu-Liao-2020,Jereb-Simpson-2025}.
+The literature on semantics and termination properties of probabilistic computation is extensive and includes a wide range of techniques. We mention semantic domains~\cite{Dahlqvist-Kozen-2020,Kozen-1981,Vakar-Kammar-Staton-2019}, bisimulations and trace semantics~\cite{vanGlabbeek-Smolka-Steffen-1995,Silva-Sokolova-2011,Stark-Smolka-2000}, probabilistic automata~\cite{Esparza-Kucera-Mayr-2004,Etessami-Yannakakis-2009}, probabilistic coherence spaces~\cite{Crubille-Ehrhard-Pagani-Tasson-2017,Danos-Ehrhard-2011,Ehrhard-Tasson-2019}, program  logics~\cite{FerrerFioriti-Hermanns-2015,McIver-Morgan-Kaminski-Katoen-2018}, and separation logic~\cite{Barthe-Hsu-Liao-2020,Jereb-Simpson-2025}.
 
 Type systems for probabilistic calculi are numerous and diverse as well. We distinguish two kinds. Firstly, there are deterministic or monadic types, which do not feature explicit probabilities at the type level (see Remark~\ref{rem:monads}). These tend to play a supporting role, with probabilistic properties such as AST then guarandeed by construction. Examples are~\cite{TorrezRuiz-Piedeleu-Silva-Zanasi-2024},~\cite{Staton-2017} which features coproduct-typed (but not probabilistic) iteration, and~\cite{Breuvart-DalLago-Herrou-2021} which extends G\"odel's $\mathbb{T}$ with probabilistic generators and iterators that are inherently AST.
 
@@ -498,7 +498,7 @@ The constructs are: a \emph{variable} $\term x$; a \emph{pop} $\term{<x>.M}$ tha
 % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - Abstract machine
 %\subsection*{The Operational Semantics}
 
-The small-step semantics is given by the Krivine machine~\cite{Krivine-2007}, which evaluates the $\lambda$-calculus via a single argument stack, with the following extensions. The generator $\term{?a.M}$ will pop from a stack of boolean values, called a \emph{trace}, which we will model as being probabilistically generated. Branching computation is implemented via a \emph{contination stack} of conditional continuations $\term{i->N}$, where $\term{M;i->N}$ pushes the continuation $\term{i->N}$, and a choice term $\term i$ discards non-matching continuations $\term{j->M}$ where $i\neq j$ until it pops a matching $\term{i->N}$. The machine termites successfully when it reaches a choice $\term i$ and the continuation stack is empty, at which point it returns the argument stack.
+The small-step semantics is given by the Krivine machine~\cite{Krivine-2007}, which evaluates the $\lambda$-calculus via a single argument stack, with the following extensions. The generator $\term{?a.M}$ will pop from a stack of boolean values, called a \emph{trace}, which we will model as being probabilistically generated. Branching computation is implemented via a \emph{contination stack} of conditional continuations $\term{i->N}$, where $\term{M;i->N}$ pushes the continuation $\term{i->N}$, and a choice term $\term i$ discards non-matching continuations $\term{j->M}$ where $i\neq j$ until it pops a matching $\term{i->N}$. The machine terminates successfully when it reaches a choice $\term i$ and the continuation stack is empty, at which point it returns the argument stack.
 
 % The machine itself is deterministic; the probabilistic aspect of computation is modelled by taking the trace to be probabilistically generated.
 
