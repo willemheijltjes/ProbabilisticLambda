@@ -1,0 +1,43 @@
+Overall merit
+2. 
+Weak reject
+
+Reviewer expertise
+4. 
+Expert
+
+Paper summary
+The paper studies terminations of programs in probabilistic Functional Machine Calculus (FMC), including almost-sure termination (AST) and positive almost-sure termination (PAST). They first prove that for a well-typed closed term, its type provides a lower bound of its termination probability. Therefore, if it is already 1, then it automatically implies AST. They also show that ground terms are equivalent to finite Markov chains, therefore they are PAST iff they are AST. Lastly, they construct a well-typed closed term in probabilistic FMC that is AST but not PAST.
+
+Comments for authors
+Strength: 
+
+- The paper is well-written, and it is easy to follow the material. While the introduction might be too long, it is helpful to grasp the intuition of the approach.  
+
+Weakness:
+
+- The novelty of the approach is not very compelling. The last two main results (Prop 34, Prop 36) are more-or-less well-known (in different but similar forms). The lower bound provided in Theorem 28 is also very unclear how far it is from the exact probability, and it is not easy to evaluate the effectiveness of the provided lower bound. 
+
+- I do not see the motivation of studying AST and PAST in this type-theoretic manner, at least in the current form. Ensuring AST or PAST for probabilistic higher-order programs have been studied actively, and the claimed advantages in this paper, which are mostly focusing on its theoretical clarity, are not very convincing. 
+
+Overall Impression: 
+
+AST and PAST are apparently fundamental and important concepts to guarantee safety of probabilistic programs, which have been actively studied for decades, and I agree that it would be nice if we have a conceptually simple and clean type-theoretic framework for these concepts. However, the presented framework is not satisfactory for this purpose, at least in the current presentation. Theorem 28 only provides a lower bound of the terminating probability, so it provides a sufficient condition to conclude AST, but it’s unclear whether it is a necessary condition. Prop34 is a well-known fact (or folklore), which essentially says that the total expected reward on a finite Markov chain is finite if it is AST. Prop36 is also a well-known phenomenon, or at least not surprising at all. Overall, I do not argue for its acceptance at least in the current form.　For instance, further studies of lower bounds provided in Theorem 28 might be helpful to clarify what this type system can reason for probabilistic programs in the program level.  
+
+Comments: 
+
+Line 75~79: The index $i$ should be $j$?
+
+Line 225~231: To show AST and PAST for probabilistic higher-order programs, CPS transformations are approaches that have been pursued in the literatures, e.g., in 
+
+- Martin Avanzini, Gilles Barthe, Ugo Dal Lago: On continuation-passing transformations and expected cost analysis. Proc. ACM Program. Lang. 5(ICFP): 1-30 (2021),
+
+- Satoshi Kura, Hiroshi Unno: Automated Verification of Higher-Order Probabilistic Programs via a Dependent Refinement Type System. Proc. ACM Program. Lang. 8(ICFP): 973-1002 (2024).
+
+Since the last approach provides an automated procedure to show PAST by calling CHC solvers, it would be nice if your framework can provide case-studies that can show AST for probabilistic higher-order programs by Theorem 28 in a semi-automated way, for the programs that are not possible by their solvers (at least empirically). 
+
+Another closely related work is the following work by Gregersen et al: 
+
+- Simon Oddershede Gregersen, Alejandro Aguirre, Philipp G. Haselwarter, Joseph Tassarotti, Lars Birkedal: Almost-Sure Termination by Guarded Refinement. Proc. ACM Program. Lang. 8(ICFP): 203-233 (2024)
+
+They also provide a sound procedure to guarantee AST even for programs that are not PAST. It would be nice if there are case studies that can show a practical benefit of your approach compared to them.

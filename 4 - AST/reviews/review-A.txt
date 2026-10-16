@@ -1,0 +1,43 @@
+Overall merit
+4. 
+Accept
+
+Reviewer expertise
+4. 
+Expert
+
+Paper summary
+The paper studies a lambda calculus with effects and iteration, called Functional Machine Calculus (FMC). Branching and iteration are connected to sum types. In particular, iteration of a term M continues as long as M evaluates to a fixed component of a sum.
+
+The main contribution is a type system that derives a lower bound on the probability of termination. The key idea is to annotate sum types with (sub-) probability distributions. If it is required that probabilities on sums are non-zero then this yields almost-sure termination. The proof uses a Tait-style logical relation and a Krivine abstract machine. Finally, it is shown that FMC without functions corresponds to finite Markov chains.
+
+Comments for authors
+I enjoyed reading this paper and learned from it. There are some details in the presentation that could be improved but the paper would nevertheless be a great addition to this year's CSL.
+
+I'm excited about the paper because it is based on a simple yet original idea: In a language like FMC in which iteration and branching are tied to types, one can add (simple) probabilistic branching and track the branch probabilities in the sum types that control iteration and branching. These probabilities then directly enable determining the probability of termination.
+
+The development of this idea is convincingly executed and the paper is well organized. The studied language has first-class functions, atomic choice terms that play the role of labels in labeled sums, and the control terms for iteration and branching. One could potentially criticize that the expressivity of the studied language is somewhat limited but the proof of the main termination theorem is already non-trivial. Furthermore, I agree with the authors that many language features can be easily supported in the same framework. The connection to finite Markov chains is a nice addition.
+
+I liked the use of the Krivine abstract machine and was also wondering if there's a connection to call by push value. Such a connection could be particularly interesting when considering dependent types. Maybe the authors could comment on that in the next version of the paper? Additionally, I was wondering if there is a connection to type systems that track algebraic effects and their handlers.
+
+My main criticism is the presentation of Section 4, which is arguably the central part of the paper. The type rules are not explained at all and I would strongly suggest adding such an explanation to the paper. Moreover, I would like to see Remark 25 about almost-sure termination expanded into a subsection containing some of the informally described type rules, more explanation, and an actual theorem. Isn't this what the title and abstract promises?
+
+Minor remarks/suggestions:
+
+- line 68/69: I was confused by this remark as I thought at this point
+  that the type system ensures almost-sure termination.
+
+- line 114: I wasn't sure why you didn't add the sum as a primitive.
+
+- line 124: Why is the last rule (weakening) needed?
+
+- Remark 7: I found this discussion difficult to follow and was
+  wondering if it's helpful at all at this spot.
+
+- line 338: "disjoint bases ..." I thought this was an awkward
+  phrasing.
+
+- line 343: should "+" be "(+)"?
+
+- line 392: It would be nice to include a part of the proof in the
+  main part of the paper.

@@ -1,0 +1,9 @@
+Dear authors,
+
+We have decided to conditionally accept your submission. To prepare the revised version of your paper, please implement the following items: 
+
+1: Clarify how your work relates to the existing work mentioned in Review #64B. Providing some concrete programs that illustrate the differences would be helpful if it is possible.
+
+2: Is there a closed program M that is AST and satisfies \sup_{\delta} pr(\delta) < 1, where the supremum is taken over all \delta such that \vdash M\colon \epsilon => \delta? Make this point clearer.  
+
+3: Address the question raised by Review #64C. Revising Remark 25 may work for this.

@@ -1,0 +1,38 @@
+Overall merit
+4. 
+Accept
+
+Reviewer expertise
+2. 
+Some familiarity
+
+Paper summary
+The paper extends the Functional Machine Calculus (FMC) with types for rational lower bounds on return probabilities and the types of returned stacks. This is done by replacing sum types with probability distributions. This then ensures that iteration has a nonzero chance of termination. This is done by a logical relations argument. The paper also connects closed terms to finite Markov chains and has a higher-order almost surely termiating computation with nevertheless infinite expected running time.
+
+Comments for authors
+For example, suppose each loop iteration:
+- returns h with probability .5
+- returns t with probability .25
+- repeats with probability .25
+The chance of repeating forever is zero. The type system computes the return probabilities as 2/3 for h and 1/3 for t, by summing a geometric series. The main contribution is making this kind of reasoning compositional, including in the higher order case.
+
+This is done in several contributions:
+1. Quantitative termination soundness, proving that a closed program terminates with at least the probability in its type. Thus, if that is 1, it gives almost sure termination.
+2. The connection with finite Markov chains (sec 6). Without higher-order, it is related to finite-state systems.
+3. Almost-sure termination can handle infinite expected runtime (sec 7). The example randomly doubles a computation before running it. It terminates with probability 1, but exponentially expensive executions make its expected runtime infinite.
+
+Question: you say "For almost-sure termination, where the probabilities for a distribution type sum to one, types may be further simplified by omitting probabilities altogether."
+
+What about:
+```
+coin := a computation that produces heads or tails fairly
+
+repeat:
+    if running coin produces heads:
+        stop
+    coin := square(coin) // doubles the number of coins that must succeed ```
+
+Thus, each time the probabilty p of the coin gets squared: p -> p^2 -> p^4 -> etc. Take p0 = 1/2.
+Now if we multiply (1 - 1/2)(1 - 1/4)(1 - 1/16)(1 - 1/256)etc. we get a positive looping probability. The exit probability shrinks too fast.
+
+Now if we allow erasing the quantity from the types, then a single type can type the entire loop, and the conditions outlined are satisfied. With annotations on the types that can't happen, and everything is fine. But what if we erase them and type that loop succesfully?
