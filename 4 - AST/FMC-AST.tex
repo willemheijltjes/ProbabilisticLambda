@@ -447,6 +447,10 @@ Secondly, there are several type systems that enforce AST or PAST in probabilist
 
 Our approach sets itself apart in two ways. Firstly, from the FMC we inherit the combination of higher-order functions with \emph{iteration}, rather than \emph{recursion} (we comment on typing recursion in our system in Appendix~\ref{A:recursion}). Secondly, as a direct probabilistic generalisation of coproducts, our probabilistic types are a notion of \emph{simple types}. We are thus taking a ``bottom-up'' approach, consciously trading expressiveness for simplicity and extensibility: our simple types are highly restricted in the algorithms they may express, but they arise naturally from typed iteration, and we expect they will extend to more powerful type systems such as polymorphic types, intersection types, and dependent types along standard lines.
 
+
+It would be interesting to consider continuation-passing translations from our calculus into one with recursion. Generally, these require higher types; for instance, the simply-typed FMC, when translated this way into $\lambda$-calculus, requires System F types. With such a translation for the probabilistic FMC, it would then become possible to compare the expressive power of our system against the mentioned approaches above. This is however out of scope for the present publication.
+
+
 % In the present work, we deliberately choose \emph{iteration} rather than \emph{recursion} in order to keep the framework as simple as possible. Indeed, handling probabilistic recursion poses substantial technical challenges, as it typically requires probabilistic function variables at the type level, effectively leading to the use of dependent types.
 
 %Several other works \cite{Avanzini-DalLago-Ghyselen-2019,DalLago-Grellois-2019,DalLago-Padovani-2024,Das-Wang-Hoffmann-2023} introduce type systems that guarantee almost-sure termination (AST) or positive almost-sure termination (PAST) for probabilistic $\lambda$-calculi equipped with recursion. However, these approaches generally prioritise expressive power, often at the expense of conceptual and technical simplicity. A notable exception is the work of the first author with Breuvart and Herrou on AST for extensions of G\"odel's $\mathbb{T}$~\cite{Breuvart-DalLago-Herrou-2021}. In that setting, however, one endows the underlying calculus either with recursion or with sampling from infinite distributions, rather than with iteration. In contrast, iteration is a fundamentally new ingredient of our approach and plays a central r\^ole in preserving simplicity while still capturing nontrivial probabilistic behaviour.
@@ -1028,7 +1032,7 @@ The typed probabilistic FMC is not positive almost-surely terminating.
 \end{proposition}
 
 %----------------------------------------------------------------------------------------------------
-\section{Limitations and the way forward}
+\section{Limitations and prospects}
 \label{sec:limits}
 
 The term $\term{?a_p.a : \e => \e.p\top * \e.(1-p)\bot}$ represents an unfair coin toss with probability $p$ for $\top$. Let us abbreviate its type by $\type{\top *_p \bot}$. 
