@@ -690,7 +690,7 @@ The \emph{zero} rule allows to type any term $\term M$ with a type $\type{\e =>0
 The \emph{pop} and \emph{push} rules add, respectively remove, the first stack input. With the embedding of the type arrow $\type{\to}$ of the simply-typed $\lambda$-calculus by $\type{r \to (!s => d)}=\type{r\,!s => d}$, these are the standard rules for abstraction and application.
 
 	\item
-The \emph{choice} rule reflects that $\term i$ immediately returns. 
+The \emph{choice} rule expresses that $\term i$ immediately returns for the empty stack. Using the \emph{expand} rule it may be typed $\type{!s => !s.1i}$, reflecting that it returns any input stack unchanged.
 
 	\item
 The \emph{sequence} rule reflects that $\term{M;i->N}$ first evaluates $\term{M}$, with input $\type{!r}$ and output either $\type{!s}$ on branch $i$ with probability $p$, or a different branch in $\type g$. In the former case, then $\term N$ is evaluated, with input $\type{!s}$ and output $\type{d}$. The overall term inputs $\type{!r}$ and outputs $\type{g ++ p.d}$, where the merge $\type{++}$ requires that whenever $\type g$ and $\type d$ have a common branch $j$, the associated stack types are the same. For the special case where $p=0$, i.e.\ $\term M$ chooses $i$ with probability zero, $\type{p.d}$ is the empty sub-distribution, and the rule becomes as follows.
@@ -1184,14 +1184,14 @@ By the definition of $\SRUN{G}$ we have $\term{\mu x}\in\RUN t$.
 \[
 \infer{\term{G |- i: \e => \e.1i}}{}
 \]
-Let $S\in\RUN{!s}$ and note that $\term{\mu i}=\term i$ for any $\mu$. We have the evaluation $\eval\e Si Si$ for the empty trace. Then for the frontier $\{\e\}$ we have $\Eval Si{\{(S,i)_\e\}}$, with the singleton return family of $S$ and $i$ for the empty trace. Since $S\in\RUN{!s}$ and $p(\e)=1$ it follows that $\{(S,i)_\e\}\in\RUN{!s.1i}$.
+Note that $\RUN{\e}=\{\e\}$ and $\term{\mu i}=\term i$ for any $\mu$. We have the evaluation $\eval\e\e i\e i$ for the empty trace and the empty stack. Then for the frontier $\{\e\}$ we have $\Eval \e i{\{(\e,i)_\e\}}$, with the singleton return family of $\e$ and $i$ for the empty trace. Since $p(\e)=1$ it follows that $\{(\e,i)_\e\}\in\RUN{\e.1i}$.
 
 	% Zero
 	\item \emph{Zero}
 \[
 \infer{\term{G |- M : \e => 0}}{}
 \]
-For any $S$ and $\mu$ we have $\Eval S{\mu M}\varnothing$. Since $\varnothing\subseteq\RUN{!t}$ for any $\type{!t}$ and $\pr{\varnothing\only i}\geq 0$ for any $i$ we have $\varnothing\in\RUN{0.d}$.
+For any $\mu$ we have $\Eval \e{\mu M}\varnothing$. Vacuously, $\varnothing\in\RUN{0}$, since membership is defined by the quantification $\forall i\in\floor{\type 0}$ while the latter is empty.
 
 	% Expand
 	\item \emph{Expand:}
