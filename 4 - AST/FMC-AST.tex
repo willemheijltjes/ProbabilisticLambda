@@ -435,8 +435,7 @@ After exploring related work in the next section, we will define the calculus (S
 \section{Related Work}
 \label{sec:related work}
 
-Our type system is a conservative extension of %our previous 
-the systems in \cite{Antonelli-DalLago-Pistone-2022} and \cite{Heijltjes-Majury-2025} (see Remark~\ref{rem:probabilistic types embed}). While those systems already feature higher-order functions, they do not account for either iteration or recursion.
+Our type system is a conservative extension of our previous systems in \cite{Antonelli-DalLago-Pistone-2022} and \cite{Heijltjes-Majury-2025} (see Remark~\ref{rem:probabilistic types embed}). While those systems already feature higher-order functions, they do not account for either iteration or recursion.
 
 The literature on semantics and termination properties of probabilistic computation is extensive and includes a wide range of techniques. We mention semantic domains~\cite{Dahlqvist-Kozen-2020,Kozen-1981,Vakar-Kammar-Staton-2019}, bisimulations and trace semantics~\cite{vanGlabbeek-Smolka-Steffen-1995,Silva-Sokolova-2011,Stark-Smolka-2000}, probabilistic automata~\cite{Esparza-Kucera-Mayr-2004,Etessami-Yannakakis-2009}, probabilistic coherence spaces~\cite{Crubille-Ehrhard-Pagani-Tasson-2017,Danos-Ehrhard-2011,Ehrhard-Tasson-2019}, program  logics~\cite{FerrerFioriti-Hermanns-2015,McIver-Morgan-Kaminski-Katoen-2018}, and separation logic~\cite{Barthe-Hsu-Liao-2020,Jereb-Simpson-2025}.
 
@@ -1032,7 +1031,7 @@ The typed probabilistic FMC is not positive almost-surely terminating.
 \section{Limitations and the way forward}
 \label{sec:limits}
 
-The term $\term{?a_p.a : \e => \e.p\top * \e.(1-p)\bot$ represents an unfair coin toss with probability $p$ for $\top$. Let us abbreviate its type by $\type{\top *_p \bot}$. 
+The term $\term{?a_p.a : \e => \e.p\top * \e.(1-p)\bot}$ represents an unfair coin toss with probability $p$ for $\top$. Let us abbreviate its type by $\type{\top *_p \bot}$. 
 
 \[
 	\term{<x>.[x;\bot->x].x : (\e => ) => (p^2).p}
@@ -1179,14 +1178,14 @@ By the definition of $\SRUN{G}$ we have $\term{\mu x}\in\RUN t$.
 	% Choice
 	\item \emph{Choice:}
 \[
-\infer{\term{G |- i: !s => !s.1i}}{}
+\infer{\term{G |- i: \e => \e.1i}}{}
 \]
 Let $S\in\RUN{!s}$ and note that $\term{\mu i}=\term i$ for any $\mu$. We have the evaluation $\eval\e Si Si$ for the empty trace. Then for the frontier $\{\e\}$ we have $\Eval Si{\{(S,i)_\e\}}$, with the singleton return family of $S$ and $i$ for the empty trace. Since $S\in\RUN{!s}$ and $p(\e)=1$ it follows that $\{(S,i)_\e\}\in\RUN{!s.1i}$.
 
 	% Zero
 	\item \emph{Zero}
 \[
-\infer{\term{G |- M : !s => 0 . d}}{}
+\infer{\term{G |- M : \e => 0}}{}
 \]
 For any $S$ and $\mu$ we have $\Eval S{\mu M}\varnothing$. Since $\varnothing\subseteq\RUN{!t}$ for any $\type{!t}$ and $\pr{\varnothing\only i}\geq 0$ for any $i$ we have $\varnothing\in\RUN{0.d}$.
 
