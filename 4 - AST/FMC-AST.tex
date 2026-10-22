@@ -1034,7 +1034,16 @@ The typed probabilistic FMC is not positive almost-surely terminating.
 \section{Limitations and prospects}
 \label{sec:limits}
 
-The term $\term{?a_p.a : \e => \e.p\top * \e.(1-p)\bot}$ represents an unfair coin toss with probability $p$ for $\top$. Let us abbreviate its type by $\type{\top *_p \bot}$. 
+The key to our type system is that it enforces a fixed probability of exiting or continuing for each iteration of a loop. Naturally, this limits expressiveness, as it prevents the typing of iteration with growing or shrinking probabilities, which might nevertheless be AST. Here, we explore how to express such algorithms in the untyped calculus, examine why they cannot be typed, and consider the prospects of lifting this restriction.
+
+Suppose we have a term $\term{M:p\top * (1`-p)\bot}$ representing an unfair coin toss (using the abbreviated notation for types). We can multiply $p$ by a fixed probability by $\term{[a]_q.a\,;\,\top -> M : pq\top * (1`-pq)\bot}$, or square it by $\term{M;\top ->M : p^1\top * (1`-p^2}\bot}$. To apply such a transformation between loop iterations, we need to store $\term M$ on the stack and update it with each iteration. For example, the following term squares the probability of choosing $\top$ at each iteration.
+\[
+	\term{[M]\,.\,( <x>.[x;\top -> x].x )^\bot}
+\]
+The first iteration evaluates $\term{M:$, and stores $\term{M;\top -> M}$ on the stack; the second iteration evaluates $\term{M;\top -> M}$
+
+
+The term  represents an unfair coin toss with probability $p$ for $\top$. Let us abbreviate its type by $\type{\top *_p \bot}$. 
 
 \[
 	\term{<x>.[x;\bot->x].x : (\e => ) => (p^2).p}
