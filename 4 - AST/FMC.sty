@@ -199,7 +199,7 @@
   %
   \ifx#1.\let\type@loop\type@dot\else%
   \ifx#1=\let\type@loop\type@equals\else%
-  \ifx#1*\kern2pt{\smallbin\oplus}\kern2pt\else%
+  \ifx#1*\let\type@loop\type@times\else%
   \ifx#1/\let\type@loop\type@frac\else%
   %
   \ifx#1+\let\type@loop\type@plus\else%
@@ -225,7 +225,7 @@
 \newcommand\type@bang{\@ifnextchar!\type@Vec\type@vec}
 \newcommand\type@vec[1]{\vv{\typevar{#1}}\type@start}
 \newcommand\type@Vec[2]{\VV{\typevar{#2}}\type@start}
-% |- => .. + - /
+% |- => .. + - / *
 \newcommand\type@bar{\@ifnextchar-{~{\black\vdash}~\seq@discard}{\only\type@start}} %\type@only}}
 %\newcommand\type@only[1]{\only_{#1}\type@start}
 \newcommand\type@equals{\@ifnextchar>{\kern2pt{\smallbin\Rightarrow}\kern2pt\type@discard}{=\type@start}}
@@ -233,6 +233,8 @@
 \newcommand\type@plus{\@ifnextchar+{\kern2pt{\sqcup}\kern2pt\type@discard}{\kern2pt{\smallbin+}\kern2pt\type@start}}
 \newcommand\type@minus[1]{\less_{#1}\type@start}
 \newcommand\type@frac[2]{\fraction{#1}{#2}\type@start}
+\newcommand\type@times{\@ifnextchar_{\type@times@sub}{{\kern2pt{\smallbin\oplus}\kern2pt}\type@start}}
+\newcommand\type@times@sub[2]{{\kern2pt{\smallbin\oplus}_{#2}\kern2pt}\type@start}
 
 
 %========== Type variables

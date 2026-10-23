@@ -99,6 +99,13 @@
 %==================================================================================================== DOCUMENT
 \begin{document}
 
+\[
+\type{\top *_p \bot}
+\]
+
+\end{document}
+
+
 \maketitle
 
 \begin{abstract}
@@ -1036,11 +1043,31 @@ The typed probabilistic FMC is not positive almost-surely terminating.
 
 The key to our type system is that it enforces a fixed probability of exiting or continuing for each iteration of a loop. Naturally, this limits expressiveness, as it prevents the typing of iteration with growing or shrinking probabilities, which might nevertheless be AST. Here, we explore how to express such algorithms in the untyped calculus, examine why they cannot be typed, and consider the prospects of lifting this restriction.
 
-Suppose we have a term $\term{M:p\top * (1`-p)\bot}$ representing an unfair coin toss (using the abbreviated notation for types). We can multiply $p$ by a fixed probability by $\term{[a]_q.a\,;\,\top -> M : pq\top * (1`-pq)\bot}$, or square it by $\term{M;\top ->M : p^1\top * (1`-p^2}\bot}$. To apply such a transformation between loop iterations, we need to store $\term M$ on the stack and update it with each iteration. For example, the following term squares the probability of choosing $\top$ at each iteration.
+Suppose we have a term $\term{M:\top *_p \bot}$ representing an unfair coin toss, using the further abbreviated notation $\type{\top *_p \bot}$ for the type $\type{\e=>\e.p\top * \e.(1`-p)\bot}$. We can multiply $p$ by a fixed probability $q$ as the first term below, or square it as the second term.
 \[
-	\term{[M]\,.\,( <x>.[x;\top -> x].x )^\bot}
+\begin{aligned}
+ 	\term{[a]_q.a\,;\,\top -> M} &~:~\type{\top *_{pq} \bot}
+&&&	\term{M;\top ->M}            &~:~\type{\top *_{p^2} \bot}
+\end{aligned}
 \]
-The first iteration evaluates $\term{M:$, and stores $\term{M;\top -> M}$ on the stack; the second iteration evaluates $\term{M;\top -> M}$
+However, the term inside a loop is fixed, and we cannot directly alter it to change probabilities between loop iterations. Instead we need to store $\term M$ on the stack and update it. For example, the following term squares the probability of choosing $\top$ at each iteration.
+\[
+	\term{[M]\,.\,( <x>.(x\,;\,\bot -> [x;\top -> x].* )^*}
+\]
+Each iteration of the loop takes an input $\term x$ from the stack; returns it's ``square'' $\term{x;\top->x}$ to the stack for the next iteration, and evaluates $\term x$. While Evaluation thus proceeds with:
+\[
+	   \term{M}
+\qquad \term{M;\top -> M}
+\qquad \term{(M;\top->M)\top->(M;\top->M)}
+\quad  \dots
+\]
+Each of these terms individually can be typed, as expected. The loop body can also be typed:
+\[
+	\term{<x>.[x;\top -> x].x~:~(p\top * (1`-p)\bot) => (p^2\top * (1`-p^2)\bot).p\top * (p^2\top * (1`-p^2)\bot).(1-p)\bot}
+\]
+This is perhaps more surprising, since it is a form of self-application. 
+
+evaluates $\term{M}$, but first stores $\term{M;\top -> M}$ on the stack for the next; the second iteration evaluates $\term{M;\top -> M}$
 
 
 The term  represents an unfair coin toss with probability $p$ for $\top$. Let us abbreviate its type by $\type{\top *_p \bot}$. 
