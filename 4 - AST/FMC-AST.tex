@@ -99,12 +99,6 @@
 %==================================================================================================== DOCUMENT
 \begin{document}
 
-\[
-\type{\top *_p \bot}
-\]
-
-\end{document}
-
 
 \maketitle
 
@@ -1043,7 +1037,7 @@ The typed probabilistic FMC is not positive almost-surely terminating.
 
 The key to our type system is that it enforces a fixed probability of exiting or continuing for each iteration of a loop. Naturally, this limits expressiveness, as it prevents the typing of iteration with growing or shrinking probabilities, which might nevertheless be AST. Here, we explore how to express such algorithms in the untyped calculus, examine why they cannot be typed, and consider the prospects of lifting this restriction.
 
-Consider an unfair coin toss $$\term{M:\top *_p \bot}$, using a (further) abbreviated notation $\type{\top *_p \bot}$ for the type $\type{\e=>\e.p\top * \e.(1`-p)\bot}$. We may construct terms with modified probabilities for example as follows.
+Consider an unfair coin toss $\term{M:\top *_p \bot}$, using a (further) abbreviated notation $\type{\top *_p \bot}$ for the type $\type{\e=>\e.p\top * \e.(1`-p)\bot}$. We may construct terms with modified probabilities for example as follows.
 \[
 \begin{aligned}
  	\term{[a]_q.a\,;\,\top -> M} &~:~\type{\top *_{pq} \bot}
