@@ -1046,13 +1046,13 @@ Consider an unfair coin toss $\term{M:\top *_p \bot}$, using a (further) abbrevi
 \]
 To alter the probability of exiting a loop during iteration, we make essential use of the higher-order nature of the calculus: we store the intended loop body on the stack, and modify it during iteration. Using the second construction above:
 \[
-	\term{[M]\,.\,( <x>.(x\,;\,\bot -> [x;\top -> x].*)^*}
+	\term{[M]\,.\,( <x>.(x\,;\,\bot -> [x;\top -> x].*)^\star}
 \]
-The term starts with $\term M$ on the stack; pops and evaluates it; on $\top$, it exits the loop; on $\bot$, it pushes $\term{M;\top ->M}$ to the stack and iterates. The probability to exit the loop squares at each iteration, from $p$ to $p^2$, $p^4$, $p^16$, etc. For $p=\frac12$, the probability of non-termination is $\sum_{n\in\mathbb N}(1-\frac1{2^n})$, which is non-zero: the term is not AST.
+The term starts with $\term M$ on the stack; pops and evaluates it; on $\top$, it exits the loop; on $\bot$, it pushes $\term{M;\top ->M}$ to the stack and iterates. The probability to exit the loop squares at each iteration, from $p$ to $p^2$, $p^4$, $p^{16}$, $p^{256}$, etc. The probability of non-termination is $\prod_{n\in\mathbb N}(1-p^{2^n})$, which is non-zero e.g.\ for $p=\frac12$: the term is not AST.
 
 The reason why the term cannot be typed is subtle: it is because the loop body changes the probability on the stack. The body itself can be typed, for any probability $q$:
 \[
-	\term{<x>.(x\,;\,\bot -> [x;\top -> x].*)~:~(\top *_q \bot) => \e.q\top * (\top *_{q^2} \bot).(1-q)\star }
+	\term{<x>.(x\,;\,\bot -> [x;\top -> x].*)~:~(\top *_q \bot) => \e.q\top * (\top *_{q^2} \bot).(1`-q)\star }
 \]
 But to type the loop requires the same input and output types on the stack, while $\type{\top *_q \bot}$ and $\type{\top *_{q^2} \bot}$ are distinct.
 
