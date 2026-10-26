@@ -1043,38 +1043,27 @@ The typed probabilistic FMC is not positive almost-surely terminating.
 
 The key to our type system is that it enforces a fixed probability of exiting or continuing for each iteration of a loop. Naturally, this limits expressiveness, as it prevents the typing of iteration with growing or shrinking probabilities, which might nevertheless be AST. Here, we explore how to express such algorithms in the untyped calculus, examine why they cannot be typed, and consider the prospects of lifting this restriction.
 
-Suppose we have a term $\term{M:\top *_p \bot}$ representing an unfair coin toss, using the further abbreviated notation $\type{\top *_p \bot}$ for the type $\type{\e=>\e.p\top * \e.(1`-p)\bot}$. We can multiply $p$ by a fixed probability $q$ as the first term below, or square it as the second term.
+Consider an unfair coin toss $$\term{M:\top *_p \bot}$, using a (further) abbreviated notation $\type{\top *_p \bot}$ for the type $\type{\e=>\e.p\top * \e.(1`-p)\bot}$. We may construct terms with modified probabilities for example as follows.
 \[
 \begin{aligned}
  	\term{[a]_q.a\,;\,\top -> M} &~:~\type{\top *_{pq} \bot}
 &&&	\term{M;\top ->M}            &~:~\type{\top *_{p^2} \bot}
 \end{aligned}
 \]
-However, the term inside a loop is fixed, and we cannot directly alter it to change probabilities between loop iterations. Instead we need to store $\term M$ on the stack and update it. For example, the following term squares the probability of choosing $\top$ at each iteration.
+To alter the probability of exiting a loop during iteration, we make essential use of the higher-order nature of the calculus: we store the intended loop body on the stack, and modify it during iteration. Using the second construction above:
 \[
-	\term{[M]\,.\,( <x>.(x\,;\,\bot -> [x;\top -> x].* )^*}
+	\term{[M]\,.\,( <x>.(x\,;\,\bot -> [x;\top -> x].*)^*}
 \]
-Each iteration of the loop takes an input $\term x$ from the stack; returns it's ``square'' $\term{x;\top->x}$ to the stack for the next iteration, and evaluates $\term x$. While Evaluation thus proceeds with:
+The term starts with $\term M$ on the stack; pops and evaluates it; on $\top$, it exits the loop; on $\bot$, it pushes $\term{M;\top ->M}$ to the stack and iterates. The probability to exit the loop squares at each iteration, from $p$ to $p^2$, $p^4$, $p^16$, etc. For $p=\frac12$, the probability of non-termination is $\sum_{n\in\mathbb N}(1-\frac1{2^n})$, which is non-zero: the term is not AST.
+
+The reason why the term cannot be typed is subtle: it is because the loop body changes the probability on the stack. The body itself can be typed, for any probability $q$:
 \[
-	   \term{M}
-\qquad \term{M;\top -> M}
-\qquad \term{(M;\top->M)\top->(M;\top->M)}
-\quad  \dots
+	\term{<x>.(x\,;\,\bot -> [x;\top -> x].*)~:~(\top *_q \bot) => \e.q\top * (\top *_{q^2} \bot).(1-q)\star }
 \]
-Each of these terms individually can be typed, as expected. The loop body can also be typed:
-\[
-	\term{<x>.[x;\top -> x].x~:~(p\top * (1`-p)\bot) => (p^2\top * (1`-p^2)\bot).p\top * (p^2\top * (1`-p^2)\bot).(1-p)\bot}
-\]
-This is perhaps more surprising, since it is a form of self-application. 
+But to type the loop requires the same input and output types on the stack, while $\type{\top *_q \bot}$ and $\type{\top *_{q^2} \bot}$ are distinct.
 
-evaluates $\term{M}$, but first stores $\term{M;\top -> M}$ on the stack for the next; the second iteration evaluates $\term{M;\top -> M}$
+This observation explains how the type system enforces fixed probabilities during iteration: the probabilities of all inputs---the stack---need to remain fixed. This remains a main limitation of the type system, as it also prevents typing similar terms to the above example that are AST, for example one that increases (rather than decreases) the probability of exiting the loop. Finally, the above considerations indicate how the type system might be extended to accommodate iteration with changing probability: by introducing variables for probabilities, and arithmetic functions over them, into the type system, approaching a form of dependent types.
 
-
-The term  represents an unfair coin toss with probability $p$ for $\top$. Let us abbreviate its type by $\type{\top *_p \bot}$. 
-
-\[
-	\term{<x>.[x;\bot->x].x : (\e => ) => (p^2).p}
-\]
 
 %----------------------------------------------------------------------------------------------------
 
@@ -1088,7 +1077,7 @@ As a direct probabilistic generalization of the FMC and typed iteration, we beli
 
 %The full \PFMC\ is then an orthogonal and conservative combination of the control extension with the $\lambda$-calculus and the probabilistic generator. Each fragment operates on an independent stack of the extended Krivine machine, simply by pushing and popping. The type system is a conservative extension of simple types for the $\lambda$-calculus, where each fragment contributes a natural component: the control fragment, a formal sum of return values indexed by \emph{choice} labels; the generator, a probability (sub-)distribution over these choice labels. The combination of probabilistic almost-sure termination and higher-order functions then gives the calculus expressive power beyond positive AST.
 
-In future work, we intend to further analyse the expressive power of the calculus and fragments of it. At present, being an extension of simple types, it is clear that the expressive power of the typed calculus for real algorithms is limited. Addressing this, we expect that the type system will generalize with polymorphism, dependent types, and intersection types along standard lines. %This is not idle speculation: the principle was already demonstrated for intersection types for higher-order store in the FMC~\cite{Heijltjes-2025-FSCD}. 
+In future work, we intend to further analyse the expressive power of the calculus and fragments of it. At present, being an extension of simple types with fixed probabilities of iteration, it is clear that the expressive power of the typed calculus for real algorithms is limited. Addressing this, we expect that the type system will generalize with polymorphism, dependent types, and intersection types along standard lines. %This is not idle speculation: the principle was already demonstrated for intersection types for higher-order store in the FMC~\cite{Heijltjes-2025-FSCD}. 
 A dependently typed generalisation would be akin to Hoare logic, and might facilitate reasoning about probabilistic termination in theorem provers and give natural ways to include termination evidence in typed imperative programming languages.
 
 %----------------------------------------------------------------------------------------------------
