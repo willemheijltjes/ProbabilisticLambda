@@ -21,16 +21,16 @@
 
 \newcommand\looppic[1]{
 \vcenter{\hbox{%
-\begin{tikzpicture}[thick,x=18pt,y=15pt,outer sep=0pt,inner sep=2pt]
+\begin{tikzpicture}[thick,x=20pt,y=12pt,outer sep=0pt,inner sep=2pt]
 	\coordinate (m) at (0,0);
 	
 	\node at (-0.3,-2) {$\dots$};
 	
 	\begin{scope}[->,>=stealth,anchor=north]
-		\draw (m)--node[pos=0.7,anchor=east]{$\termcolor\scriptstyle{i_1\,}$} (-1,-2) node {$\vphantom:\typecolor\scriptstyle{\ifx#11p_1\else\frac{p_1}{1-q}\fi}$};
+		\draw (m)--node[pos=0.7,anchor=east]{$\termcolor\scriptstyle{i_1~}$} (-1,-2) node {$\vphantom:\typecolor\scriptstyle{\ifx#11p_1\else\frac{p_1}{1-q}\fi}$};
 		\draw (m)--node[pos=0.7,anchor=east]{$\termcolor\scriptstyle{i_n\,}$} (.4,-2) node {$\vphantom:\typecolor\scriptstyle{\ifx#11p_n\else\frac{p_n}{1-q}\fi}$};
 	\ifx#11
-		\draw (m)--node[pos=0.7,anchor=west]{\,$\termcolor\scriptstyle{j}$}   ( 1,-2) node {$\vphantom:\typecolor\scriptstyle{q}$};
+		\draw (m)--node[pos=0.7,anchor=west]{\,$\termcolor\scriptstyle{~j}$}   ( 1,-2) node {$\vphantom:\typecolor\scriptstyle{q}$};
 	\fi
 	\end{scope}
 	
@@ -40,11 +40,11 @@
 	\coordinate (b) at (1.25,-1.6);% \node[gray,circle,draw,inner sep=0pt,minimum size=2pt] at (b) {};
 	
     	\ifx#10
-		\draw[rounded corners=5pt] (m) -- (.5,-1) .. controls (a) and (b) .. (1.25,-.75) --node[pos=0.3,anchor=west]{\,$\termcolor\scriptstyle{j}$} (1.25,1.5) -- (0,1.5) -- (0,1);
+		\draw[rounded corners=5pt] (m) -- (.5,-1) .. controls (a) and (b) .. (1.25,-.75) --node[pos=0.3,anchor=west]{\,$\termcolor\scriptstyle{j}$} (1.25,1.3) -- (0,1.3) -- (0,0.8);
     	\fi	
 	
 	\node[draw=red,fill=red!10,rounded corners,minimum size=16pt] (M) at (m) {$\term M$};
-	\draw[->,>=stealth] (0,2)--(M);	
+	\draw[->,>=stealth] (0,1.6)--(M);
 \end{tikzpicture}}}
 }
 
@@ -59,15 +59,18 @@
 
 \title{Probabilistic Simple Types for Almost-Sure Termination}
 
-%\author{Anonymous authors}{No affiliation}{}{}{}
+\author{Anonymous authors}{No affiliation}{}{}{}
 
-\author{Ugo {Dal Lago}}{University of Bologna, Italy \and INRIA Sophia Antipolis, France}{ugo.dallago@unibo.it}{https://orcid.org/0000-0001-9200-070X}{}
+%\author{Ugo {Dal Lago}}{University of Bologna, Italy \and INRIA Sophia Antipolis, France}{ugo.dallago@unibo.it}{https://orcid.org/0000-0001-9200-070X}{}
 
-\author{Willem Heijltjes}{University of Bath, United Kingdom \and \url{http://willem.heijltj.es}}{w.b.heijltjes@bath.ac.uk}{https://orcid.org/0009-0001-8941-1150}{}
+%\author{Willem Heijltjes}{University of Bath, United Kingdom \and \url{http://willem.heijltj.es}}{w.b.heijltjes@bath.ac.uk}{https://orcid.org/0009-0001-8941-1150}{}
 
-\authorrunning{U. Dal Lago and W. Heijltjes}
+\authorrunning{Anonymous authors}%\authorrunning{U. Dal Lago and W. Heijltjes}
 
-\Copyright{Ugo Dal Lago and Willem Heijltjes}
+
+%\Copyright{Ugo Dal Lago and Willem Heijltjes}
+
+
 
 \ccsdesc[500]{Theory of computation~Lambda calculus}
 \ccsdesc[500]{Theory of computation~Probabilistic computation}
@@ -118,8 +121,8 @@ Concretely, our type system assigns explicit probability distributions to termin
 
 We are interested in applying the toolset of the $\lambda$-calculus, in particular confluent reduction and type systems, to probabilistic computation.
 %
-%We build on \cite{DalLago-Guerrieri-Heijltjes-2020}, which restores confluence to a probabilistic $\lambda$-calculus, the \emph{probabilistic event $\lambda$-calculus} (PEL), by decomposing probabilistic choice into a \emph{sampling} construct and a \emph{conditional}. For this calculus,~\cite{Antonelli-DalLago-Pistone-2022} and~\cite{Heijltjes-Majury-2025} give essentially the same probabilistic type system for the PEL to give lower bounds on the probability of termination.
-In~\cite{DalLago-Guerrieri-Heijltjes-2020} we restored confluence to a probabilistic $\lambda$-calculus, the \emph{probabilistic event $\lambda$-calculus} (PEL), by decomposing probabilistic choice into a \emph{sampling} construct and a \emph{conditional}. Then in~\cite{Antonelli-DalLago-Pistone-2022} and~\cite{Heijltjes-Majury-2025}, from different inspirations we converged on essentially the same probabilistic type system for the PEL to give lower bounds on the probability of termination.
+We build on \cite{DalLago-Guerrieri-Heijltjes-2020}, which restores confluence to a probabilistic $\lambda$-calculus, the \emph{probabilistic event $\lambda$-calculus} (PEL), by decomposing probabilistic choice into a \emph{sampling} construct and a \emph{conditional}. For this calculus,~\cite{Antonelli-DalLago-Pistone-2022} and~\cite{Heijltjes-Majury-2025} give essentially the same probabilistic type system for the PEL to give lower bounds on the probability of termination.
+%In~\cite{DalLago-Guerrieri-Heijltjes-2020} we restored confluence to a probabilistic $\lambda$-calculus, the \emph{probabilistic event $\lambda$-calculus} (PEL), by decomposing probabilistic choice into a \emph{sampling} construct and a \emph{conditional}. Then in~\cite{Antonelli-DalLago-Pistone-2022} and~\cite{Heijltjes-Majury-2025}, from different inspirations we converged on essentially the same probabilistic type system for the PEL to give lower bounds on the probability of termination.
 %
 In this paper we further extend the calculus, and develop a type system for \emph{almost-sure termination} (AST): termination with probability one. In doing so, our objective differs from that of many existing works in this area, which aim to capture as many AST programs as possible~\cite{DalLago-Grellois-2019,DalLago-Faggian-Ronchi-2021}, or even to study the feasibility of capturing all such programs~\cite{Kobayashi-DalLago-Grellois-2020}. Instead, we seek to understand the extent to which almost-sure termination can be obtained and explained in a natural manner, possibly using well-established methods, and guaranteed by a minimal extension to simple types. More powerful methods such as dependent types and intersection types may later build on this along standard lines.
 
@@ -135,8 +138,8 @@ With the above rule, as with typed fixed-point combinators, typing no longer gua
 
 These considerations illustrate how probabilistic choice is connected to other imperative features such as sequentiality and iteration. 
 %
-Derived from the PEL, the second author has developed 
-%This brings us to 
+%Derived from the PEL, the second author has developed 
+This brings us to 
 %
 a new approach to unifying the $\lambda$-calculus with imperative computation and effects, the \emph{Functional Machine Calculus} (FMC)~\cite{Heijltjes-2023}. Its most recent instance~\cite{Heijltjes-2025-MFPS} features branching sequential computation and iteration, providing an ideal vehicle for our present study. In the FMC each branch of the computation is labelled with a \emph{choice} label $i,j,k,\dots$, which takes the r\^ole of a constant, an exception, a case label, or an exit status. For example, the boolean constants $\bot$ and $\top$ are choice labels. Iteration of a term $\term M$ is written $\term{M^i}$, which evaluates $\term M$ and repeats if $\term M$ chooses $i$, terminating for any other choice. The calculus encodes a fair probabilistic choice, which we write as $\term{M+N}$.
 
@@ -146,7 +149,7 @@ The term $\term{(\heads + (\tails + \,i))^i}$ chooses \emph{heads}, the choice $
 	\term{(\heads + (\tails + \,i))^i}
 \quad=\quad
 \vc{%
-\begin{tikzpicture}[thick,x=20pt,y=24pt,outer sep=0pt,inner sep=1pt,]
+\begin{tikzpicture}[thick,x=16pt,y=20pt,outer sep=0pt,inner sep=1pt,]
 	\node (x) at (1,2) {$\termcolor\oplus$};
 	\node (y) at (2,1) {$\termcolor\oplus$};
 
@@ -157,11 +160,11 @@ The term $\term{(\heads + (\tails + \,i))^i}$ chooses \emph{heads}, the choice $
 	
 	\draw (1,2.7)--(x);
 	\draw (x)--(y);
-	\draw (x) --node[pos=0.6,anchor=south east]{$\termcolor\scriptstyle{\heads}\,$} (0,1);
-	\draw (y) --node[pos=0.6,anchor=south east]{$\termcolor\scriptstyle{\tails}\,$} (1,0);
+	\draw (x) --node[pos=0.6,anchor=south east]{$\termcolor\scriptstyle{\heads}\,$} (0.2,1.2);
+	\draw (y) --node[pos=0.6,anchor=south east]{$\termcolor\scriptstyle{\tails}\,$} (1.2,0.2);
 	
 	\draw[rounded corners=5pt] (y) -- node[pos=0.6,anchor=north east]{$\,\termcolor\scriptstyle{i}$}  
-	  (2.5,0.5) .. controls (a) and (b) .. (3,0.7) -- (3,2.5) -- (1,2.5) -- (x);
+	  (2.5,0.5) .. controls (a) and (b) .. (3,0.7) -- (3,2.6) -- (1,2.6) -- (x);
 	\end{scope}
 \end{tikzpicture}}
 \]
@@ -436,7 +439,12 @@ After exploring related work in the next section, we will define the calculus (S
 \section{Related Work}
 \label{sec:related work}
 
-Our type system is a conservative extension of our previous systems in \cite{Antonelli-DalLago-Pistone-2022} and \cite{Heijltjes-Majury-2025} (see Remark~\ref{rem:probabilistic types embed}). While those systems already feature higher-order functions, they do not account for either iteration or recursion.
+Our type system is a conservative extension of 
+%
+%our previous
+the
+%
+systems in \cite{Antonelli-DalLago-Pistone-2022} and \cite{Heijltjes-Majury-2025} (see Remark~\ref{rem:probabilistic types embed}). While those systems already feature higher-order functions, they do not account for either iteration or recursion.
 
 The literature on semantics and termination properties of probabilistic computation is extensive and includes a wide range of techniques. We mention semantic domains~\cite{Dahlqvist-Kozen-2020,Kozen-1981,Vakar-Kammar-Staton-2019}, bisimulations and trace semantics~\cite{vanGlabbeek-Smolka-Steffen-1995,Silva-Sokolova-2011,Stark-Smolka-2000}, probabilistic automata~\cite{Esparza-Kucera-Mayr-2004,Etessami-Yannakakis-2009}, probabilistic coherence spaces~\cite{Crubille-Ehrhard-Pagani-Tasson-2017,Danos-Ehrhard-2011,Ehrhard-Tasson-2019}, program  logics~\cite{FerrerFioriti-Hermanns-2015,McIver-Morgan-Kaminski-Katoen-2018}, and separation logic~\cite{Barthe-Hsu-Liao-2020,Jereb-Simpson-2025}.
 
@@ -449,6 +457,7 @@ Secondly, there are several formal methodologies enforcing AST or PAST in probab
 Our approach sets itself apart in two ways. Firstly, from the FMC we inherit the combination of higher-order functions with \emph{iteration}, rather than \emph{recursion} (we comment on typing recursion in our system in Appendix~\ref{A:recursion}). Secondly, as a direct probabilistic generalisation of coproducts, our probabilistic types are a notion of \emph{simple types}. We are thus taking a ``bottom-up'' approach, consciously trading expressiveness for simplicity and extensibility: our simple types are highly restricted in the algorithms they may express, but they arise naturally from typed iteration, and we expect they will extend to more powerful type systems such as polymorphic types, intersection types, and dependent types along standard lines.
 
 It would be interesting to consider continuation-passing translations from our calculus into one with recursion. Generally, these require higher types; for instance, the simply-typed FMC, when translated this way into $\lambda$-calculus, requires System F types. With such a translation for the probabilistic FMC, it would then become possible to compare the expressive power of our system against the mentioned approaches above. This is however out of scope for the present publication.
+
 
 
 % In the present work, we deliberately choose \emph{iteration} rather than \emph{recursion} in order to keep the framework as simple as possible. Indeed, handling probabilistic recursion poses substantial technical challenges, as it typically requires probabilistic function variables at the type level, effectively leading to the use of dependent types.
@@ -747,8 +756,8 @@ Using this as an admissible typing rule, our running example is typed as follows
 \label{rem:probabilistic types embed}
 The type system is a conservative extension of 
 %
-those of our previous work on probabilistic termination
-%the probabilistic type systems 
+%those of our previous work on probabilistic termination
+the probabilistic type systems 
 %
 in~\cite{Antonelli-DalLago-Pistone-2022} and~\cite{Heijltjes-Majury-2025}. Using the notation of the latter,  these feature probabilistic simple types as simple types with the rationals between $0$ and $1$ as the set of base types, as below left. They embed as below right, where $\star$ is again the single available choice label.
 \[
@@ -805,7 +814,7 @@ If $\term{G |- M:t}$ and $\mu\in\SRUN{G}$ then $\term{\mu M}\in\RUN{t}$.
 \end{lemma}
 
 \begin{proof}
-See the Appendix.
+Omitted. %See Appendix~\ref{A:runnability}.
 \end{proof}
 % - - - - - - - - - - - - - - -
 
@@ -1172,6 +1181,129 @@ In Figure~\ref{fig:run} we give a successful run of the machine for our running 
 \end{figure}
 
 
+
+
+%----------------------------------------------------------------------------------------------------
+
+
+\section{Encoding Markov chains}
+\label{A:markov}
+
+We elaborate on Example~\ref{ex:markov}, encoding the following Markov chain $C$, where each arrow has probability $\frac13$.
+\[
+\vcenter{\hbox{
+\begin{tikzpicture}[inner sep=2pt,outer sep=0pt,thick]
+	\node[circle,draw] (a) at ( 90:1) {$a$} ;
+	\node[circle,draw] (b) at (210:1) {$b$} ;
+	\node[circle,draw] (c) at (330:1) {$c$} ;
+	\node (i) at ( 90:2) {$i$} ;
+	\node (j) at (210:2) {$j$} ;
+	\node (k) at (330:2) {$k$} ;
+	\begin{scope}[->,>=stealth]
+	\draw (a.240) to[bend right] (b.60) ;
+	\draw (b.0)   to[bend right] (c.180) ;
+	\draw (c.120) to[bend right] (a.300) ;
+	\draw (a.330) to[bend left]  (c.90) ;
+	\draw (b.90)  to[bend left]  (a.210) ;
+	\draw (c.210) to[bend left]  (b.330) ;
+	\draw (a)--(i);
+	\draw (b)--(j);
+	\draw (c)--(k);
+	\draw (120:2)--(a);
+	\end{scope}
+\end{tikzpicture}}}
+\qquad
+\begin{array}{l@{}l@{}l}
+	    S      &{}~=~{}& \{a,b,c,i,j,k\}
+\\[3pt]	s      &{}~=~{}& a
+\\[3pt]	F      &{}~=~{}& \{i,j,k\}
+\\[3pt]	\delta &{}~=~{}& a \mapsto \D{~/13b~,~/13c~,~/13i~}
+\\[3pt]               && b \mapsto \D{~/13a~,~/13c~,~/13j~}
+\\[3pt]               && c \mapsto \D{~/13a~,~/13b~,~/13k~}
+\end{array}
+\]
+The interpretation, in stages, is as follows, again writing $\term{M+N+P}$ for the term $\term{//13M+//13N+//13P}$.
+\[
+\begin{aligned}
+	\sem C &~=~ \term{({\sem{C(b)}}+{\sem{C(c)}}+i)^a}
+\\	       &~=~ \term{((a+{\sem{C(b)(c)}}+j)^b + (a+{\sem{C(c)(b)}}+k)^c+i)^a}
+\\         &~=~ \term{((a+(a+b+k)^c+j)^b + (a+(a+c+j)^b+k)^c+i)^a}
+\end{aligned}
+\]
+The type is built up as follows.
+\[
+\begin{aligned}
+	    \term{(a+b+k)^c}         &: \type{/13a * /13b * /13k}
+\\[5pt]	\term{ a+(a+b+k)^c+j}~~~ &: \type{/49a * /19b * /19k + /13j}
+\\[5pt] \term{(a+(a+b+k)^c+j)^b} &: \type{/12a * /18k * /38j}
+\\[5pt] \term{(a+(a+c+j)^b+k)^c} &: \type{/12a * /18j * /38k}
+\\[5pt] \term{ (a+(a+b+k)^c+j)^b + (a+(a+c+j)^b+k)^c+i}~~~ &: \type{/13a * /16k * /16j * /13i}
+\\[5pt] \term{((a+(a+b+k)^c+j)^b + (a+(a+c+j)^b+k)^c+i)^a} &: \type{/14k * /14j * /12i}
+\end{aligned}
+\]
+The interpretation may be illustrated as follows, where the solid edges represent the tree-shape of the probabilistic sums, while the dashed edges represent the loops.
+\[
+\vc{
+\begin{tikzpicture}[x=27pt,y=-27pt,inner sep=0.5pt,outer sep=0pt,thick]
+	\node[circle,draw] (a) at (1,0) {$\term M$};
+	\node[circle,draw] (b) at (0,1) {$\term N$};
+	\node[circle,draw] (c) at (2,1) {$\term P$};
+	\node[circle,draw] (d) at (0,2.4) {$\term Q$};
+	\node[circle,draw] (e) at (2,2.4) {$\term R$};
+	\node (i) at (1,-1)   {$\vphantom(i$};
+	\node (j) at (-1,1)   {$~j~$};
+	\node (k) at ( 3,1)   {$~k~$};
+	\node (l) at (-1,2.4) {$~k~$};
+	\node (m) at ( 3,2.4) {$~j~$};
+	\begin{scope}[->,>=stealth]
+	\draw (0,-1)--(a);
+	\draw (a) to[bend right] (b);
+	\draw (a) to[bend left]  (c);
+	\draw (a) -- (i);
+	\draw (b) -- (d);
+	\draw (c) -- (e);
+	\draw (b) -- (j);
+	\draw (c) -- (k);
+	\draw (d) -- (l);
+	\draw (e) -- (m);
+	\begin{scope}[dash pattern=on 3pt off 2pt]
+	\draw (b.120) to[bend left]     node[pos=0.5,anchor=south east]{$\scriptstyle a~$} (a.150);
+	\draw (c.60)  to[bend right]    node[pos=0.5,anchor=south west]{$~\scriptstyle a$} (a.30);
+	\draw (d.120) to[bend left]     node[pos=0.5,anchor=south east]{$\scriptstyle b~$} (b.240);
+	\draw (e.60)  to[bend right]    node[pos=0.5,anchor=south west]{$~\scriptstyle c$} (c.300);
+	\draw (d.60)  to[bend left=10]  node[pos=0.5,anchor=west]      {$~\scriptstyle a$} (a.240);
+	\draw (e.120) to[bend right=10] node[pos=0.5,anchor=east]      {$\scriptstyle a~$} (a.300);
+	\end{scope}
+	\end{scope}
+\end{tikzpicture}
+}
+\qquad
+\begin{array}{l@{}l}
+        \term M &{}~=~\term{(N + P + i)^a}
+\\[3pt] \term N &{}~=~\term{(a + Q + j)^b}
+\\[3pt] \term P &{}~=~\term{(a + R + k)^c}
+\\[3pt] \term Q &{}~=~\term{(a+b+k)^c}~=~\term{a+b+k}
+\\[3pt] \term R &{}~=~\term{(a+c+j)^b}~=~\term{a+c+j}
+\end{array}
+\]
+As the illustration suggests, the formalism may express any probabilistic tree with back-pointers. It may also express directed acyclic graphs, which yields a smaller interpretation of the Markov chain above, though still exponential, in the following term.
+\[
+	\term{ (b+c+i ; b -> a+c+j ; c -> (a+b+k ; b -> a+c+j)^c )^a }
+\]
+The types work out the same way.
+\[
+\begin{aligned}
+	    \term{ b+c+i }~~~             &: \type{/13b * /13c * /13i}
+\\[5pt] \term{ b+c+i ; b -> a+c+j}~~~ &: \type{/19a * /49c * /13i * /19j}
+\\[5pt] \term{(a+b+k ; b -> a+c+j)^c} &: \type{/12a * /18j * /38k}
+\\[5pt] \term{ b+c+i ; b -> a+c+j ; c -> (a+b+k ; b -> a+c+j)^c}     &: \type{/13a * /13i * /16j * /16k}
+\\[5pt] \term{(b+c+i ; b -> a+c+j ; c -> (a+b+k ; b -> a+c+j)^c )^a} &: \type{/12i * /14j * /14k}
+\end{aligned}
+\]
+
+\end{document}
+
+
 %----------------------------------------------------------------------------------------------------
 
 \section{Proving the runnability lemma}
@@ -1385,124 +1517,6 @@ For all $n\in\N^+$ we have $\DT_n\in\RUN{q_n.d + !s.p^ni}$ and hence $\DT_n\less
 It follows that $\DT\in\RUN{/1{1-p}.d}$ and hence $\term{\mu(M^i)}\in\RUN{!s => /1{1-p}.d}$.
 \end{itemize}
 \end{proof}
-
-
-\section{Encoding Markov chains}
-\label{A:markov}
-
-We elaborate on Example~\ref{ex:markov}, encoding the following Markov chain $C$, where each arrow has probability $\frac13$.
-\[
-\vcenter{\hbox{
-\begin{tikzpicture}[inner sep=2pt,outer sep=0pt,thick]
-	\node[circle,draw] (a) at ( 90:1) {$a$} ;
-	\node[circle,draw] (b) at (210:1) {$b$} ;
-	\node[circle,draw] (c) at (330:1) {$c$} ;
-	\node (i) at ( 90:2) {$i$} ;
-	\node (j) at (210:2) {$j$} ;
-	\node (k) at (330:2) {$k$} ;
-	\begin{scope}[->,>=stealth]
-	\draw (a.240) to[bend right] (b.60) ;
-	\draw (b.0)   to[bend right] (c.180) ;
-	\draw (c.120) to[bend right] (a.300) ;
-	\draw (a.330) to[bend left]  (c.90) ;
-	\draw (b.90)  to[bend left]  (a.210) ;
-	\draw (c.210) to[bend left]  (b.330) ;
-	\draw (a)--(i);
-	\draw (b)--(j);
-	\draw (c)--(k);
-	\draw (120:2)--(a);
-	\end{scope}
-\end{tikzpicture}}}
-\qquad
-\begin{array}{l@{}l@{}l}
-	    S      &{}~=~{}& \{a,b,c,i,j,k\}
-\\[3pt]	s      &{}~=~{}& a
-\\[3pt]	F      &{}~=~{}& \{i,j,k\}
-\\[3pt]	\delta &{}~=~{}& a \mapsto \D{~/13b~,~/13c~,~/13i~}
-\\[3pt]               && b \mapsto \D{~/13a~,~/13c~,~/13j~}
-\\[3pt]               && c \mapsto \D{~/13a~,~/13b~,~/13k~}
-\end{array}
-\]
-The interpretation, in stages, is as follows, again writing $\term{M+N+P}$ for the term $\term{//13M+//13N+//13P}$.
-\[
-\begin{aligned}
-	\sem C &~=~ \term{({\sem{C(b)}}+{\sem{C(c)}}+i)^a}
-\\	       &~=~ \term{((a+{\sem{C(b)(c)}}+j)^b + (a+{\sem{C(c)(b)}}+k)^c+i)^a}
-\\         &~=~ \term{((a+(a+b+k)^c+j)^b + (a+(a+c+j)^b+k)^c+i)^a}
-\end{aligned}
-\]
-The type is built up as follows.
-\[
-\begin{aligned}
-	    \term{(a+b+k)^c}         &: \type{/13a * /13b * /13k}
-\\[5pt]	\term{ a+(a+b+k)^c+j}~~~ &: \type{/49a * /19b * /19k + /13j}
-\\[5pt] \term{(a+(a+b+k)^c+j)^b} &: \type{/12a * /18k * /38j}
-\\[5pt] \term{(a+(a+c+j)^b+k)^c} &: \type{/12a * /18j * /38k}
-\\[5pt] \term{ (a+(a+b+k)^c+j)^b + (a+(a+c+j)^b+k)^c+i}~~~ &: \type{/13a * /16k * /16j * /13i}
-\\[5pt] \term{((a+(a+b+k)^c+j)^b + (a+(a+c+j)^b+k)^c+i)^a} &: \type{/14k * /14j * /12i}
-\end{aligned}
-\]
-The interpretation may be illustrated as follows, where the solid edges represent the tree-shape of the probabilistic sums, while the dashed edges represent the loops.
-\[
-\vc{
-\begin{tikzpicture}[x=27pt,y=-27pt,inner sep=0.5pt,outer sep=0pt,thick]
-	\node[circle,draw] (a) at (1,0) {$\term M$};
-	\node[circle,draw] (b) at (0,1) {$\term N$};
-	\node[circle,draw] (c) at (2,1) {$\term P$};
-	\node[circle,draw] (d) at (0,2.4) {$\term Q$};
-	\node[circle,draw] (e) at (2,2.4) {$\term R$};
-	\node (i) at (1,-1)   {$\vphantom(i$};
-	\node (j) at (-1,1)   {$~j~$};
-	\node (k) at ( 3,1)   {$~k~$};
-	\node (l) at (-1,2.4) {$~k~$};
-	\node (m) at ( 3,2.4) {$~j~$};
-	\begin{scope}[->,>=stealth]
-	\draw (0,-1)--(a);
-	\draw (a) to[bend right] (b);
-	\draw (a) to[bend left]  (c);
-	\draw (a) -- (i);
-	\draw (b) -- (d);
-	\draw (c) -- (e);
-	\draw (b) -- (j);
-	\draw (c) -- (k);
-	\draw (d) -- (l);
-	\draw (e) -- (m);
-	\begin{scope}[dash pattern=on 3pt off 2pt]
-	\draw (b.120) to[bend left]     node[pos=0.5,anchor=south east]{$\scriptstyle a~$} (a.150);
-	\draw (c.60)  to[bend right]    node[pos=0.5,anchor=south west]{$~\scriptstyle a$} (a.30);
-	\draw (d.120) to[bend left]     node[pos=0.5,anchor=south east]{$\scriptstyle b~$} (b.240);
-	\draw (e.60)  to[bend right]    node[pos=0.5,anchor=south west]{$~\scriptstyle c$} (c.300);
-	\draw (d.60)  to[bend left=10]  node[pos=0.5,anchor=west]      {$~\scriptstyle a$} (a.240);
-	\draw (e.120) to[bend right=10] node[pos=0.5,anchor=east]      {$\scriptstyle a~$} (a.300);
-	\end{scope}
-	\end{scope}
-\end{tikzpicture}
-}
-\qquad
-\begin{array}{l@{}l}
-        \term M &{}~=~\term{(N + P + i)^a}
-\\[3pt] \term N &{}~=~\term{(a + Q + j)^b}
-\\[3pt] \term P &{}~=~\term{(a + R + k)^c}
-\\[3pt] \term Q &{}~=~\term{(a+b+k)^c}~=~\term{a+b+k}
-\\[3pt] \term R &{}~=~\term{(a+c+j)^b}~=~\term{a+c+j}
-\end{array}
-\]
-As the illustration suggests, the formalism may express any probabilistic tree with back-pointers. It may also express directed acyclic graphs, which yields a smaller interpretation of the Markov chain above, though still exponential, in the following term.
-\[
-	\term{ (b+c+i ; b -> a+c+j ; c -> (a+b+k ; b -> a+c+j)^c )^a }
-\]
-The types work out the same way.
-\[
-\begin{aligned}
-	    \term{ b+c+i }~~~             &: \type{/13b * /13c * /13i}
-\\[5pt] \term{ b+c+i ; b -> a+c+j}~~~ &: \type{/19a * /49c * /13i * /19j}
-\\[5pt] \term{(a+b+k ; b -> a+c+j)^c} &: \type{/12a * /18j * /38k}
-\\[5pt] \term{ b+c+i ; b -> a+c+j ; c -> (a+b+k ; b -> a+c+j)^c}     &: \type{/13a * /13i * /16j * /16k}
-\\[5pt] \term{(b+c+i ; b -> a+c+j ; c -> (a+b+k ; b -> a+c+j)^c )^a} &: \type{/12i * /14j * /14k}
-\end{aligned}
-\]
-
-\end{document}
 
 
 %====================================================================================================
