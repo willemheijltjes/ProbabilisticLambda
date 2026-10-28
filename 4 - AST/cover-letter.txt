@@ -1,0 +1,53 @@
+
+
+We have addressed the revision instructions and other comments as follows.
+
+---
+1: Clarify how your work relates to the existing work mentioned in Review #64B. Providing some concrete programs that illustrate the differences would be helpful if it is possible.
+---
+
+The related works in Review B cannot be directly compared for the following two reasons:
+
+a) The calculi used have different fundamental constructs, in particular recursion where we have iteration. One would first need to study a translations between these, and agree that these preserve the nature of the computation, before the type systems can be compared. This is akin to asking whether a functional and an imperative programming language may express the same program: one first needs to establish what is understood by "the same".
+
+b) They use sophisticated type systems or other techniques with the aim of maximizing the number of programs captured, where we have a different aim: to explore the natural generalization of simple types for iteration to probabilistic simple types. If we find a mode of comparison viz. a) above, we expect other systems to be strictly more powerful at this point. However, we hope to extend our types to more sophisticated systems in future, and have reason to believe that such extensions may proceed along standard lines, as opposed to being ad-hoc.
+
+In the paper, we have addressed the comment as follows. We have added the mentioned papers to the "Related Work" section, among the other papers of a similar nature (many of which are in fact more closely related to our approach). At the end of the section we have explained that to compare more closely to these papers, a continuation translation is needed.
+
+
+---
+2: Is there a closed program M that is AST and satisfies \sup_{\delta} pr(\delta) < 1, where the supremum is taken over all \delta such that \vdash M\colon \epsilon => \delta? Make this point clearer.
+---
+
+Yes: the type system gives lower bounds. The main reason is that there are two modes of non-termination: iteration with probability 1 and higher-order fixed-point terms such as Omega = (\x.xx)(\x.xx). We wish to type terms such as "Omega (+) I" (where I=\x.x) and express that they terminate with probability one half. But simple types are an under-approximation of the terminating terms, and only intersection types may give exact types. So for any terminating but untypeable (with simple types) lambda-term M, we may only assign probability one half to "M (+) I", while the term is terminating (and hence AST).
+
+A second reason is that iteration with decreasing probability is AST, but the type system is by nature restricted to fixed probabilities.
+
+We have addressed both points in the paper. A new "Remark 25" (replacing the old one) explains the first, and a new section at the end ("Limitations and Prospects") discusses iteration with increasing or decreasing probability.
+
+---
+3: Address the question raised by Review #64C. Revising Remark 25 may work for this.
+---
+
+We are deeply grateful for Reviews A and C for pressing us to investigate Remark 25 in more detail: it turns out to be false.
+
+At the time of writing, we had thought the proof to be obvious. We had also tried to construct the very example suggested by Review C, and failed to do so. Now, however, the intended proof turned out to be "obvious" in two different, incompatible ways, and we were able to construct the example. 
+
+We have removed Remark 25 and added a new final section "Limitations and Prospect". In it, we discuss that the type system is limited to iteration with fixed probability because the probabilities on the stack need to remain constant, and the prospect of removing this limitation through richer type systems. We have further changed the title of the paper to reflect that we have "probabilistic simple types" and not "simple types" proper.
+
+This exercise has given us a deeper understanding of our type system and a clearer way forward, and we thank the referees for this.
+
+---
+Other changes
+---
+
+As suggested in Review A, we have added an explanation of the typing rules in Section 4.
+
+We have made minor simplifications and optimizations to the presentation and to the typing rules in response to the minor remarks in the reviews.
+
+For lack of space, we have chosen to remove Appendix C with the main proof, to be able to retain the other appendices. If accepted, we will post an "extended version" with all appendices on the arXiv.
+
+
+
+
+

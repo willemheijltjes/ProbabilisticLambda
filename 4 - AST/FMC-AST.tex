@@ -936,12 +936,14 @@ For $C=(S,s,F,\delta)$ and $t\in S\less\{s\}$ let $C(t)=(S,t,F\cup\{s\},\delta\l
 \qquad
     \term{pM+q_1N_1+..+q_nN_n}~=~\term{?a_p.a ; \top -> M; \bot -> (//{q_1}{1-p}N_1 + .. + //{q_n}{1-p}N_n) } 
 \]
-Then the interpretation of a Markov chain $C=(S,s,F,\delta)$ as a term is as follows (where $p_0$ is the probability of $s$ transitioning to itself; the summand $\termcolor{p_0s}$ may be omitted if $p_0=0$).
+Then the interpretation of a Markov chain $C=(S,s,F,\delta)$ as a term is as follows.
+% (where $p_0$ is the probability of $s$ transitioning to itself; the summand $\termcolor{p_0s}$ may be omitted if $p_0=0$).
 \[
 	\sem C~=~
 	\left\{\begin{array}{ll}
 		\term{s} & \text{if}~s~\in~F
-	\\	\termcolor{(p_0s\term+p_1\sem{C(t_1)}\term{+..+}p_n\sem{C(t_n)})^s} & \text{where}~\delta(s)=\D{p_0s,p_1t_1,..,p_nt_n}	
+	\\	\termcolor{(p_1\sem{C(t_1)}\term{+..+}p_n\sem{C(t_n)})^s} & \text{where}~\delta(s)=\D{p_1t_1,..,p_nt_n}	
+	%   \termcolor{(p_0s\term+p_1\sem{C(t_1)}\term{+..+}p_n\sem{C(t_n)})^s} & \text{where}~\delta(s)=\D{p_0s,p_1t_1,..,p_nt_n}	
 	\end{array}\right.
 \]
 
