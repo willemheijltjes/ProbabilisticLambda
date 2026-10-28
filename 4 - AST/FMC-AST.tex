@@ -936,12 +936,12 @@ For $C=(S,s,F,\delta)$ and $t\in S\less\{s\}$ let $C(t)=(S,t,F\cup\{s\},\delta\l
 \qquad
     \term{pM+q_1N_1+..+q_nN_n}~=~\term{?a_p.a ; \top -> M; \bot -> (//{q_1}{1-p}N_1 + .. + //{q_n}{1-p}N_n) } 
 \]
-Then the interpretation of a Markov chain $C=(S,s,F,\delta)$ as a term is as follows.
+Then the interpretation of a Markov chain $C=(S,s,F,\delta)$ as a term is as follows (where $p_0$ is the probability of $s$ transitioning to itself; the summand $\termcolor{p_0s}$ may be omitted if $p_0=0$).
 \[
 	\sem C~=~
 	\left\{\begin{array}{ll}
 		\term{s} & \text{if}~s~\in~F
-	\\	\termcolor{(p_1\sem{C(t_1)}\term{+..+}p_n\sem{C(t_n)})^s} & \text{where}~\delta(s)=\D{p_1t_1,..,p_nt_n}	
+	\\	\termcolor{(p_0s\term+p_1\sem{C(t_1)}\term{+..+}p_n\sem{C(t_n)})^s} & \text{where}~\delta(s)=\D{p_0s,p_1t_1,..,p_nt_n}	
 	\end{array}\right.
 \]
 
@@ -993,7 +993,7 @@ Markov chains are PAST if they are AST, i.e.\ if any path may eventually reach a
 
 \begin{proposition}
 \label{prop:PAST}
-Typed ground terms of the \PFMCT\ are PAST.
+Typed ground terms with sum probability $1$ of the \PFMCT\ are PAST.
 \end{proposition}
 
 \noindent
@@ -1013,7 +1013,7 @@ By construction.
 \section{Moving past PAST}
 \label{sec:NAST}
 
-Further exploring the expressive power of the calculus, in this section we demonstrate that typed terms in general are \emph{null AST} (NAST), i.e.\ AST, but not PAST. We will give an example term with infinite expected running time, despite terminating with probability one. Our example relies crucially on higher-order functions.
+Further exploring the expressive power of the calculus, in this section we demonstrate that typed terms in general might be \emph{null AST} (NAST), i.e.\ AST, but not PAST. We will give an example term with infinite expected running time, despite terminating with probability one. Our example relies crucially on higher-order functions.
 %
 Consider the following term, for a given $\term M$, using the default choice $\star$ as imperative \emph{skip} and its case as sequential composition, $\term{M;N}=\term{M;\star ->N}$. 
 \[
@@ -1041,7 +1041,7 @@ The typed probabilistic FMC is not positive almost-surely terminating.
 \end{proposition}
 
 %----------------------------------------------------------------------------------------------------
-\section{Limitations and prospects}
+\section{Limitations and Prospects}
 \label{sec:limits}
 
 The key to our type system is that it enforces a fixed probability of exiting or continuing for each iteration of a loop. Naturally, this limits expressiveness, as it prevents the typing of iteration with growing or shrinking probabilities, which might nevertheless be AST. Here, we explore how to express such algorithms in the untyped calculus, examine why they cannot be typed, and consider the prospects of lifting this restriction.
