@@ -930,7 +930,12 @@ For our running example term $\term M$ the translation is as follows.
 
 In the other direction, we give an interpretation $\sem C$ of a finite Markov chain as a ground term. The translation operates as follows, using states as choice labels. Given $C$ with starting state $s$ and transition $s\mapsto\{p_1t_1,\dots,p_nt_n\}\in\delta$, we remove this transition and consider the sub-chains $C(t_i)$ for $i\leq n$ with new starting state $t_i$, in which $s$ becomes a final state. These are translated inductively to $\term{M_i}$. Then $\sem C$ is given by a term $\term{M^s}$, iterating on $s$, where $\term M$ is a probabilistic sum that chooses $\term{M_i}$ with probability $p_i$. We formalize this below.
 
-For $C=(S,s,F,\delta)$ and $t\in S\less\{s\}$ let $C(t)=(S,t,F\cup\{s\},\delta\less\{s\})$ where $\delta\less X$ is the transition function $\delta$ restricted to the domain $\mathrm{dom}(\delta)\less X$. Write $\term{p_1M_1+..+p_nM_n}$ for the term that chooses $\term{M_i}$ with probability $p_i$, given inductively below; recall that $\term{?a_p}$ represents an unfair coin toss, given either as primitive or encoded with $\term{?a}$ and iteration.
+For $C=(S,s,F,\delta)$ and 
+%
+$t\in S$
+%$t\in S\less\{s\}$ 
+%
+let $C(t)=(S,t,F\cup\{s\},\delta\less\{s\})$ where $\delta\less X$ is the transition function $\delta$ restricted to the domain $\mathrm{dom}(\delta)\less X$. Write $\term{p_1M_1+..+p_nM_n}$ for the term that chooses $\term{M_i}$ with probability $p_i$, given inductively below; recall that $\term{?a_p}$ represents an unfair coin toss, given either as primitive or encoded with $\term{?a}$ and iteration.
 \[
 	\term{1M}~=~\term{M} 
 \qquad
