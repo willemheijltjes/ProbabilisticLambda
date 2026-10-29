@@ -8,7 +8,7 @@ We have addressed the revision instructions and other comments as follows.
 
 The related works in Review B cannot be directly compared for the following two reasons:
 
-a) The calculi used have different fundamental constructs, in particular recursion where we have iteration. One would first need to study a translations between these, and agree that these preserve the nature of the computation, before the type systems can be compared. This is akin to asking whether a functional and an imperative programming language may express the same program: one first needs to establish what is understood by "the same".
+a) The calculi used have different fundamental constructs, in particular recursion where we have iteration. One would first need to study translations between these, and agree that these preserve the nature of the computation, before the type systems can be compared. This is akin to asking whether a functional and an imperative programming language may express the same program: one first needs to establish what is understood by "the same".
 
 b) They use sophisticated type systems or other techniques with the aim of maximizing the number of programs captured, where we have a different aim: to explore the natural generalization of simple types for iteration to probabilistic simple types. If we find a mode of comparison viz. a) above, we expect other systems to be strictly more powerful at this point. However, we hope to extend our types to more sophisticated systems in future, and have reason to believe that such extensions may proceed along standard lines, as opposed to being ad-hoc.
 

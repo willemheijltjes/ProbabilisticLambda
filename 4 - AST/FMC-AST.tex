@@ -1,5 +1,12 @@
-
 \documentclass[a4paper,UKenglish,cleveref, autoref, thm-restate]{lipics-v2021}
+
+
+
+% Potential further improvements:
+%  - explain "merge" |_| via functions: (gamma |_| delta)(i) = gamma(i) + delta(i)
+%  - add labels to typing rules
+
+
 
 \usepackage{amsmath,amssymb,amsthm}
 \usepackage{stmaryrd}
@@ -222,7 +229,7 @@ These constructions generalise sequential computation, which uses a single choic
 \[
 	\mathsf{throw}~e~=~\term e \qquad\qquad \mathsf{try}~M~\mathsf{catch}~e~N~=~\term{M;e->N}
 \]
-Since cases are fall-through, they may be iterated to give a standard case switch. A conditional then encodes as below, where cases associate left, $\term{M; i->N ; j->P}=\term{(M; i->N) ; j-> P}$. We do need to keep constants $(\top,\bot)$ and exceptions $(e)$ apart: for the conditional below, if $\term M$ were to use $\bot$ as an exception, it would be caught by $\term N$. A while-loop, below that, is as follows: if $B$ returns $\bot$, then $M$ is skipped, the loop exited, and $\bot$ caught to return $\star$ (success); if $B$ returns $\top$, then $M$ is evaluated, iterating upon $\star$.
+Since cases are fall-through, they may be iterated to give a standard case switch. A conditional then encodes as below, where cases associate left, $\term{M; i->N ; j->P}=\term{(M; i->N) ; j-> P}$. We do need to keep constants $(\top,\bot)$ and exceptions $(e)$ apart: for the conditional below, if $\term M$ were to use $\bot$ as an exception, it would be caught by $\term N$. A while-loop, below that, is as follows: if $\term B$ returns $\bot$, then $\term M$ is skipped, the loop exited, and $\bot$ caught to return $\star$ (success); if $\term B$ returns $\top$, then $\term M$ is evaluated, iterating upon $\star$.
 \[
 \begin{array}{r@{}l}
 	\mathsf{if}~B~\mathsf{then}~M~\mathsf{else}~N & ~=~\term{B;\top->M;\bot->N}
@@ -637,7 +644,7 @@ Recall from the introduction that stack types on the left of an implication $\ty
 
 \begin{remark}
 \label{rem:simple types embed}
-Our types are a conservative extension of simple types for the $\lambda$-calculus, which embed as follows (see also~\cite{Heijltjes-2023,Heijltjes-2025-MFPS,Heijltjes-Majury-2025}). The base type $o$ becomes $\type{\e=>\e.1*}$, the type of the default choice $\term*$. The type arrow $\rho\to\tau$ becomes the operation of adding one further input type $\type r$ to the inputs of $\tau$; i.e.\ letting $\tau=\type{!s => d}$ then $\type{r \to (!s => d)}=\type{r\,!s => d}$. Together, we may view the embedding also as below. 
+Our types are a conservative extension of simple types for the $\lambda$-calculus, which embed as follows (see also~\cite{Heijltjes-2023,Heijltjes-2025-MFPS,Heijltjes-Majury-2025}). The base type $o$ becomes $\type{\e=>\e.1\star}$, the type of the default choice $\term*$. The type arrow $\rho\to\tau$ becomes the operation of adding one further input type $\type r$ to the inputs of $\tau$; i.e.\ letting $\tau=\type{!s => d}$ then $\type{r \to (!s => d)}=\type{r\,!s => d}$. Together, we may view the embedding also as below. 
 \[
 	\typ{t_1 \to \dots \to t_n \to o} \quad=\quad \type{t_1 \dots t_n => \e.1\star}
 \]
@@ -1051,7 +1058,7 @@ The typed probabilistic FMC is not positive almost-surely terminating.
 \section{Limitations and Prospects}
 \label{sec:limits}
 
-The key to our type system is that it enforces a fixed probability of exiting or continuing for each iteration of a loop. Naturally, this limits expressiveness, as it prevents the typing of iteration with growing or shrinking probabilities, which might nevertheless be AST. Here, we explore how to express such algorithms in the untyped calculus, examine why they cannot be typed, and consider the prospects of lifting this restriction.
+The key to our type system is that it enforces a fixed probability of exiting or continuing for each iteration of a loop. Naturally, this limits expressiveness, as it prevents the typing of iteration with growing or shrinking probabilities, which might nevertheless be AST. Here, we explore how to express such algorithms in the untyped calculus, examine why they cannot be typed, and consider the prospects of lifting this restriction. %\footnote{We are grateful to the anonymous referees for the comments leading to these observations.}
 
 Consider an unfair coin toss $\term{M:\top *_p \bot}$, using a (further) abbreviated notation $\type{\top *_p \bot}$ for the type $\type{\e=>\e.p\top * \e.(1`-p)\bot}$. We may construct terms with modified probabilities for example as follows.
 \[
