@@ -1,0 +1,1939 @@
+\documentclass{article}
+
+%============================================================ PACKAGES
+
+\usepackage[T1]{fontenc}
+\usepackage{charter}
+
+\usepackage[margin=2cm]{geometry}
+
+\usepackage{amssymb,amsthm,amsmath}
+\usepackage{accents}
+\usepackage{proof}
+\usepackage{xargs}
+\usepackage{xcolor}
+
+\usepackage{tikz}
+  \usetikzlibrary{arrows.meta}
+  \usetikzlibrary{shapes}
+
+%============================================================ MACROS
+
+\makeatletter
+
+%========== GENERAL LAYOUT
+
+% Theorems
+\theoremstyle{definition}
+\newtheorem{definition}{Definition}
+%%%
+\theoremstyle{plain}
+\newtheorem{conjecture} [definition]{Conjecture}
+\newtheorem{corollary}  [definition]{Corollary}
+\newtheorem{example}    [definition]{Example}
+\newtheorem{lemma}      [definition]{Lemma}
+\newtheorem{proposition}[definition]{Proposition}
+\newtheorem{theorem}    [definition]{Theorem}
+%%%
+%\newtheorem*{remark}{Remark}
+\newenvironment{thmenv}[1]{%
+	\let\innerthmenv\undefined%
+	\let\endinnerthmenv\undefined%
+	\newtheorem*{innerthmenv}{#1}%
+	\begin{innerthmenv}%
+}{
+	\end{innerthmenv}%
+}
+
+%========== COLOURS
+
+\newcommand\black{\color{black}}
+
+\colorlet{0}{black}
+\colorlet{1}{red!80!black}
+\colorlet{2}{blue!80!black}
+\colorlet{3}{orange!90!black}
+\colorlet{4}{green!50!black}
+\colorlet{5}{violet!80!black}
+\colorlet{6}{teal!90!white}
+
+\colorlet{term}{1}
+\colorlet{type}{2}
+
+\newcommand\termcolor{\color{term}}
+\newcommand\typecolor{\color{type}}
+
+\newcommand\colored{%
+  \let\color@term\termcolor%
+  \let\color@type\typecolor%
+}
+\newcommand\uncolored{%
+  \let\color@term\relax%
+  \let\color@type\relax%
+  \black
+}
+\uncolored
+
+%========== GENERAL TEXT & MATHS
+
+% vcenter
+\newcommand\vc[1]{\vcenter{\hbox{$#1$}}}
+
+%text
+\newcommand{\eg}{\textit{e.g.}}
+\newcommand{\ie}{\textit{i.e.}}
+\newcommand{\ih}{\textit{i.h.}}
+
+% Definitions
+\newcommand\defn[1]{\emph{#1}}
+\newcommand\defeq{\stackrel{\scriptscriptstyle\Delta}=}
+%\newcommand\coloneqq{\mathbin{{:}{:}{=}}}
+%\newcommand\coloneq{\mathbin{{:}{=}}}
+\newcommand*\coloneq{
+ \mathrel{%
+  \rlap{\raisebox{0.3ex}{$\m@th\cdot$}}%
+        \raisebox{-0.3ex}{$\m@th\cdot$}%
+ {=}}}
+\newcommand*\coloneqq{
+ \mathrel{%
+  \rlap{\raisebox{0.3ex}{$\m@th\cdot$}}%
+        \raisebox{-0.3ex}{$\m@th\cdot$}%
+  \rlap{\raisebox{0.3ex}{$\m@th\cdot$}}%
+        \raisebox{-0.3ex}{$\m@th\cdot$}%
+ {=}}}
+
+
+%========== Logic
+
+% connectives
+\newcommand\smallbin[1]{\mathchoice
+      {\mathbin{\raise.2ex \hbox{$\scriptstyle      #1$}}}%
+      {\mathbin{\raise.2ex \hbox{$\scriptstyle      #1$}}}%
+      {\mathbin{\raise.12ex\hbox{$\scriptscriptstyle#1$}}}%
+      {\mathbin{           \hbox{$\scriptscriptstyle#1$}}}}%
+
+\newcommand\To{\smallbin\Rightarrow}
+\newcommand\Bi{\smallbin\Leftrightarrow}
+\newcommand\Fr{\smallbin\Leftarrow}
+
+\newcommand\minus{\smallbin-}
+\newcommand\plus{\smallbin+}
+
+%\newcommand\Con{\wedge}
+%\newcommand\Imp{\rightarrow}
+%
+%\newcommand\con{\kern1pt{\smallbin\Con}\kern1pt}
+%\newcommand\imp{\kern1pt{\smallbin\Imp}\kern1pt}
+
+
+%========== Locations
+
+\newcommand\loc[1]{\mathsf{loc}(\term{#1})}
+
+\newcommand\A{A}
+\newcommand\B{B}
+
+%\newcommand\dualsign{\scalebox{0.5}[1.0]{$-$}}
+\newcommand\dual[1]{\dualsign #1}
+
+\newcommand\dualsign{\mathchoice%
+	{\tikz[baseline] \draw[cap=round,line width=.5pt] (0,.5ex)--(2.5pt,.5ex);\kern1pt}%
+	{\tikz[baseline] \draw[cap=round,line width=.5pt] (0,.5ex)--(2.5pt,.5ex);\kern1pt}%
+	{\tikz[baseline] \draw[cap=round,line width=.4pt] (0,.35ex)--(2pt,.35ex);\kern.8pt}%
+	{\tikz[baseline] \draw[cap=round,line width=.3pt] (0,.25ex)--(1.5pt,.25ex);\kern.5pt}%
+}
+
+%========== Free/bound variables
+
+\newcommand\bv[1]{\mathsf{bv}(\term{#1})}
+\newcommand\fv[1]{\mathsf{fv}(\term{#1})}
+\newcommand\fl[1]{\mathsf{fl}(\term{#1})}
+
+%========== Vectors
+
+\newcommand\rvecup[1]{\accentset{\rightharpoonup}{#1}}
+\newcommand\lvecup[1]{\accentset{\leftharpoonup}{#1}}
+
+\newcommand\Rvecup[1]{%
+\tikz[baseline=(n.base)]{\node[inner sep=0pt,outer sep=0pt](n){$#1\vphantom($};\draw[arrows={->[harpoon]}](n.north west)--(n.north east);}%
+}
+\newcommand\Lvecup[1]{%
+\tikz[baseline=(n.base)]{\node[inner sep=0pt,outer sep=0pt](n){$#1\vphantom($};\draw[arrows={->[harpoon,swap]}](n.north east)--(n.north west);}%
+}
+
+
+%========== Sequents
+
+\newcommand\seq@discard[1]{\seq@start}
+\newcommand\seq@comma{\@ifnextchar,{{\black,\dots,}~\seq@discard}{{\black,}~\seq@start}}
+
+
+%========== Types
+
+\newcommand\vec@space{\kern0.4pt}
+
+\newcommand\type[1]{{\colored\typ{#1}}}
+\newcommand\typ[1]{%
+  \vphantom)%
+  \let\seq@start\type@start%
+  \seq@start#1\@end%
+}
+\newcommand\type@start{\color@type\let\type@loop\type@next\type@loop}
+\newcommand\type@next[1]{%
+  \ifx#1\@end\let\type@loop\type@end\else%
+  \ifx#1`\let\type@loop\type@escape\else%
+  \ifx#1,\let\type@loop\seq@comma\else%
+  \ifx#1|\let\type@loop\type@bar\else%
+  %
+  \ifx#1_\let\type@loop\type@sub\else%
+  \ifx#1^\let\type@loop\type@sup\else%
+  \ifx#1!\let\type@loop\type@rvec\else%
+  \ifx#1?\let\type@loop\type@lvec\else%
+  %
+  \ifx#1.\let\type@loop\type@dot\else%
+  \ifx#1>{\kern1pt\smallbin\Rightarrow\kern1pt}\else%
+  \ifx#1-\dualsign\else%
+  %
+  \ifx#1A\!_A\else%
+  \ifx#1B\!_B\else%
+  %
+  \typevar{#1}%
+  %
+  \fi\fi\fi\fi%
+  \fi\fi\fi\fi%
+  \fi\fi\fi%
+  \fi\fi%
+  \type@loop%
+}
+\newcommand\type@sub[1]{_{#1}\type@start}
+\newcommand\type@sup[1]{^{{\type@sup@color #1}}\type@start}
+\newcommand\type@rvec[1]{\vec@space\rvecup{\typevar{#1}\vec@space}\type@start}
+\newcommand\type@lvec[1]{\vec@space\lvecup{\typevar{#1}\vec@space}\type@start}
+\newcommand\type@bar{\@ifnextchar-{~{\black\vdash}~\seq@discard}{|\type@start}}
+\newcommand\type@dot{\@ifnextchar.{{\dots}\type@gobble}{\kern1pt{\cdot}\kern1pt\type@start}}
+\newcommand\type@escape[1]{#1\type@start}
+\newcommand\type@gobble[1]{\color@type\let\type@loop\type@next\type@loop}
+\newcommand\type@end{\uncolored}
+
+%========== Type variables
+
+\newcommand\typevar[1]{\typevar@start#1\relax}
+\newcommand\typevar@start{\let\typevar@loop\typevar@next\typevar@loop}
+\newcommand\typevar@next[1]{%
+  \ifx#1\relax\let\typevar@loop\typevar@end\else%
+  \ifx#1p\pi\else%
+  \ifx#1q\varphi\else%
+  \ifx#1r\rho\else%
+  \ifx#1s\sigma\else%
+  \ifx#1t\tau\else%
+  \ifx#1u\upsilon\else%
+  \ifx#1w\omega\else%
+  #1%
+  \fi\fi\fi\fi\fi\fi\fi\fi%
+  \typevar@loop%
+}
+\newcommand\typevar@end{}
+
+%========== Terms
+
+\newcommand\term[1]{{\colored\trm{#1}}}
+\newcommand\trm[1]{%
+  \vphantom(%
+  \let\seq@start\term@start%
+  \seq@start#1\@end%
+}
+\newcommand\term@start{\color@term\let\term@loop=\term@next\term@loop}
+\newcommand\term@next[1]{%
+  \ifx#1\@end\let\term@loop\term@end\else%
+  \ifx#1`\let\term@loop\term@escape\else%
+  \ifx#1"\let\term@loop\term@color\else%
+  %
+  \ifx#1,\let\term@loop\seq@comma\else%
+  \ifx#1:\let\term@loop\term@colon\else%
+  \ifx#1|\let\term@loop\term@bar\else%
+  %
+  \ifx#1_\let\term@loop\term@sub\else%
+  \ifx#1^\let\term@loop\term@sup\else%
+  \ifx#1?\let\term@loop\term@lvec\else%
+  \ifx#1!\let\term@loop\term@rvec\else%
+  %
+  \ifx#1*\star\else%
+  \ifx#1l\lambda\else%
+  \ifx#1n\nu\else%
+  \ifx#1<\langle\else%
+  \ifx#1>\rangle\else%
+  \ifx#1..\,\else%
+  %
+  \ifx#1;\,{;}\,\else%
+  \ifx#1=\kern1pt{\smallbin=}\kern1pt\else%
+  \ifx#1G{{\black\Gamma}}\else%
+  \ifx#1D{{\black\Delta}}\else%
+  \ifx#1A{_A}\else%
+  \ifx#1B{_B}\else%
+  %
+  \ifx#1-{\dualsign}\else%
+  %
+  #1
+  \fi\fi\fi%
+  \fi\fi\fi%
+  \fi\fi\fi\fi%
+  \fi\fi\fi\fi\fi\fi%
+  \fi\fi\fi\fi\fi\fi%
+  \fi%
+  \term@loop%
+}
+\newcommand\term@end{\color{black}\uncolored}
+\newcommand\term@discard[1]{\term@start}
+\newcommand\term@escape[1]{#1\term@start}
+\newcommand\term@color[1]{\color{#1}\term@start}
+\newcommand\term@colon{\black\colon\type@start}
+% sub super
+\newcommand\term@sub[1]{_{#1}\term@start}
+\newcommand\term@sup[1]{^{#1}\term@start}
+% vectors
+\newcommand\term@rvec[1]{\rvecup{#1}\term@start}
+\newcommand\term@lvec[1]{\lvecup{#1}\term@start}
+% bar
+\newcommand\term@bar[1]{%
+  \ifx#1-~{\black\vdash}~\else%
+  \ifx#1|\,\|\,%
+  \fi\fi%
+  \term@start}
+
+
+%========== FMC PROGRAMMING
+
+\newcommand\rnd{\mathsf{rnd}}
+\newcommand\nd {\mathsf{nd}} 
+\newcommand\inp{\mathsf{in}} 
+\newcommand\out{\mathsf{out}}
+
+\newcommand\Z{\mathbb Z}
+
+\newcommand\get{\mathsf{get}~}
+\newcommand\set{\mathsf{set}~}
+\newcommand\print{\mathsf{print}}
+\newcommand\rand{\mathsf{rand}}
+\newcommand\rd{\mathsf{read}}
+
+%========== REDUCTION RULES
+
+\newcommand\pass{\mathsf p}
+
+
+
+%========== REWRITING
+
+\tikzstyle{rwhead}=[>/.tip={Triangle[open,length=2.5pt,width=4.5pt]},|/.tip={Rectangle[length=.5pt,width=4.5pt]}]
+
+\tikzstyle{rw} =[line width=.5pt,rwhead,->]
+\tikzstyle{rws}=[line width=.5pt,rwhead,->.>]
+\tikzstyle{rwn}=[line width=.5pt,rwhead,->.>|]
+\tikzstyle{rwp}=[line width=.5pt,rwhead,->,double]
+\tikzstyle{rwps}=[line width=.5pt,rwhead,->.>,double]
+
+\newcommand\rw  {\mathrel{\tikz\draw[rw]  (0,0)--(10pt,0pt);}}
+\newcommand\rws {\mathrel{\tikz\draw[rws] (0,0)--(10pt,0pt);}}
+\newcommand\rwn {\mathrel{\tikz\draw[rwn] (0,0)--(10pt,0pt);}}
+\newcommand\rwp {\mathrel{\tikz\draw[rwp] (0,0)--(10pt,0pt);}}
+\newcommand\rwps{\mathrel{\tikz\draw[rwps](0,0)--(10pt,0pt);}}
+
+\newcommand\rwl  [1][\relax]{\mathrel{_{#1}\tikz\draw[rw]  (10pt,0pt)--(0,0);}}
+\newcommand\rwls [1][\relax]{\mathrel{_{#1}\tikz\draw[rws] (10pt,0pt)--(0,0);}}
+\newcommand\rwln [1][\relax]{\mathrel{_{#1}\tikz\draw[rwn] (10pt,0pt)--(0,0);}}
+\newcommand\rwlp [1][\relax]{\mathrel{_{#1}\tikz\draw[rwp] (10pt,0pt)--(0,0);}}
+\newcommand\rwlps[1][\relax]{\mathrel{_{#1}\tikz\draw[rwps](10pt,0pt)--(0,0);}}
+
+
+%========== MACHINE
+
+\newcommand\hole{\{\}}
+\newcommand\e\varepsilon
+\newcommand\eval{{\Downarrow}}
+
+\newcommand\step[4]{%
+\begin{array}{@{(~}l@{~,~}r@{~)}}%
+#1 & \term {#2}%
+\\\hline%
+#3 & \term{#4}%
+\end{array}%
+}
+\newcommand\run{\@ifstar\run@text\run@math}
+\newcommand\run@text[4]{(#1,\term{#2})\eval(#3,\term{#4})}
+\newcommand\run@math[4]{%
+\begin{array}{@{(~}l@{~,~}r@{~)}}%
+#1 & \term {#2}%
+\\\hline\hline\rule[-5pt]{0pt}{15pt}%
+#3 & \term{#4}%
+\end{array}%
+}
+
+
+%========== TYPING RULE NAMES
+
+\newcommand\TR[1]{\!\scriptstyle{\tr{#1}\vphantom{pb}}}%
+\newcommand\tr[1]{%
+  \ifx#1*\mathsf{nil}\else%
+  \ifx#1x\mathsf{var}\else%
+  \ifx#1l\mathsf{abs}\else%
+  \ifx#1a\mathsf{app}\else%
+  \ifx#1s\mathsf{send}\else%
+  \ifx#1p\mathsf{par}\else%
+  \ifx#1n\mathsf{new}\else%
+  \fi\fi\fi\fi\fi\fi\fi%
+}
+
+
+
+%========== DIAGRAMS
+
+\newcommand\aritywires{\let\wire@label\relax}
+\newcommand\typewires{\let\wire@label\wire@label@type}
+
+\newcommand\wire@label\relax
+\newcommand\wire@label@type[1]{\type{#1}}
+
+\newdimen\base      \base    =16.5pt \advance\base     by -.5ex
+\newdimen\basefour  \basefour=22.0pt \advance\basefour by -.5ex
+\newdimen\basefive  \basefive=27.5pt \advance\basefive by -.5ex
+\newdimen\basesix   \basesix =33.0pt \advance\basesix  by -.5ex  
+
+\tikzstyle{wires}=[thick,x=12pt,y=11pt]
+
+\tikzstyle{TRleft}  = [isosceles triangle, isosceles triangle apex angle=60, shape border rotate=180]
+\tikzstyle{TRright} = [isosceles triangle, isosceles triangle apex angle=60] 
+\tikzstyle{TRinner} = [minimum size=4pt, outer sep=0pt,inner sep=0pt]
+\tikzstyle{TRouter} = [minimum size=5pt, outer sep=0pt,inner sep=0pt]
+
+\tikzstyle{push} = [TRright,TRouter,fill,draw]
+\tikzstyle{pop1} = [TRleft ,TRouter,fill=white,draw]
+\tikzstyle{pop2} = [TRleft ,TRinner,fill=white]
+\tikzstyle{send} = [TRleft ,TRouter,fill,draw]
+
+\makeatletter
+
+\newcounter{@wire}
+\newcounter{@wire@start}
+\newcounter{@wire@end}
+\newcounter{@wire@y}
+
+\newcommand\leftlabel[1]{\node[anchor=east] at (\the@wire,\the@wire@y) {$#1$};}
+\newcommand\rightlabel[1]{\node[anchor=west] at (\the@wire@end,\the@wire@y) {$#1$};}
+
+\newcommand\wire[1]{
+ \ifx#1.\let\wire@choice\@nowire\else%
+ \ifx#1-\let\wire@choice\@wire\else%
+ \ifx#1=\let\wire@choice\@wires\else%
+ \fi\fi\fi%
+ \wire@choice%
+}
+
+\newcommand\@nowire[3][0]{
+    \setcounter{@wire}{#1}%
+    \setcounter{@wire@y}{#2}%
+	\wire@start#3\@end%
+}
+
+% Single wire
+
+\newcommandx\@wire[5][1=0,3=\relax,5=\relax]{%
+    \setcounter{@wire}{#1}%
+    \setcounter{@wire@start}{#1}%
+    \setcounter{@wire@end}{#1}%
+    \setcounter{@wire@y}{#2}%
+    \wire@line@start#4\@end%
+    \ifx#3\relax\else\leftlabel{#3}\fi%
+    \ifx#5\relax\else\rightlabel{#5}\fi%
+	\wire@start#4\@end%
+}
+\newcommand\wire@next[1]{%
+  \ifx#1\@end\let\wire@loop\relax\else%
+  \ifx#1.\stepcounter{@wire}\else%
+  \ifx#1/\stepcounter{@wire}\else%
+  \ifx#1|\wire@bar\else%
+  \ifx#1>\let\wire@loop\wire@push\else%
+  \ifx#1<\let\wire@loop\wire@pop\else%
+  \ifx#1+\let\wire@loop\wire@send\else%
+  \ifx#1^\let\wire@loop\wire@sup\else%
+  \ifx#1_\let\wire@loop\wire@sub\else%
+  \fi\fi\fi\fi\fi\fi\fi\fi\fi%
+  \wire@loop%
+}
+\newcommand\wire@start{\let\wire@loop\wire@next\wire@loop}
+\newcommand\wire@gobble[1]{\let\wire@loop\wire@next\wire@loop}
+\newcommand\wire@line@start{\let\wire@line@loop\wire@line@next\wire@line@loop}
+\newcommand\wire@line@next[1]{%
+  \ifx#1\@end%
+    \draw(\the@wire@start,\the@wire@y) -- (\the@wire@end,\the@wire@y);%
+    \let\wire@line@loop\relax%
+  \else%
+  \ifx#1/\stepcounter{@wire@end}\stepcounter{@wire@start}\else%
+  \ifx#1.\stepcounter{@wire@end}\else%
+  \fi\fi\fi%
+  \wire@line@loop%
+}
+\newcommand\wire@bar{
+  \coordinate[yshift= 2pt] (a) at (\the@wire,\the@wire@y);
+  \coordinate[yshift=-2pt] (b) at (\the@wire,\the@wire@y);
+  \draw (a)--(b);}
+\newcommand\wire@push{\@ifnextchar>\wire@push@two\wire@push@one}
+\newcommand\wire@pop {\@ifnextchar<\wire@pop@two{\@ifnextchar+\wire@popsend\wire@pop@one}}
+\newcommand\wire@send{\@ifnextchar+\wire@send@two{\@ifnextchar<\wire@sendpop\wire@send@one}}
+\newcommand\wire@push@one{\node[push] at (\the@wire,\the@wire@y) {};\wire@start}
+\newcommand\wire@pop@one {\node[pop1] at (\the@wire,\the@wire@y) {};\wire@start}
+\newcommand\wire@send@one{\node[send] at (\the@wire,\the@wire@y) {};\wire@start}
+\newcommand\wire@push@two{
+    \node[push,xshift= 2pt] at (\the@wire,\the@wire@y) {};
+    \node[push,xshift=-2pt] at (\the@wire,\the@wire@y) {};
+    \wire@gobble}
+\newcommand\wire@pop@two {
+	\node[pop1,xshift= 2pt] at (\the@wire,\the@wire@y) {};
+	\node[pop1,xshift=-2pt] at (\the@wire,\the@wire@y) {}; 
+	\node[pop2,xshift= 2pt] at (\the@wire,\the@wire@y) {};
+	\wire@gobble}
+\newcommand\wire@send@two{
+    \node[send,xshift= 2pt] at (\the@wire,\the@wire@y) {};
+    \node[send,xshift=-2pt] at (\the@wire,\the@wire@y) {};
+    \wire@gobble}
+\newcommand\wire@sendpop{
+    \node[send,xshift=-2pt] at (\the@wire,\the@wire@y) {};
+    \node[pop1,xshift= 2pt] at (\the@wire,\the@wire@y) {};
+    \wire@gobble}
+\newcommand\wire@popsend{
+    \node[send,xshift= 2pt] at (\the@wire,\the@wire@y) {};
+    \node[pop1,xshift=-2pt] at (\the@wire,\the@wire@y) {};
+    \wire@gobble}
+\newcommand\wire@sup[1]{\node[yshift=  8pt,anchor=base] at (\the@wire,\the@wire@y) {$\wire@label{#1}$};\wire@start}
+\newcommand\wire@sub[1]{\node[yshift=-15pt,anchor=base] at (\the@wire,\the@wire@y) {$\wire@label{#1}$};\wire@start}
+
+% Double wires
+
+\newdimen\yup\yup=2.28pt
+\newdimen\ydn\ydn-2.28pt
+
+\newcommandx\@wires[5][1=0,3=\relax,5=\relax]{%
+    \setcounter{@wire}{#1}%
+    \setcounter{@wire@start}{#1}%
+    \setcounter{@wire@end}{#1}%
+    \setcounter{@wire@y}{#2}%
+    \wires@line@start#4\@end%
+    \ifx#3\relax\else\leftlabel{#3}\fi%
+    \ifx#5\relax\else\rightlabel{#5}\fi%
+	\wires@start#4\@end%
+}
+\newcommand\wires@next[1]{%
+  \ifx#1\@end\let\wires@loop\relax\else%
+  \ifx#1.\stepcounter{@wire}\else%
+  \ifx#1>\let\wires@loop\wires@push\else%
+  \ifx#1<\let\wires@loop\wires@pop\else%
+  \ifx#1+\let\wires@loop\wires@send\else%
+  \ifx#1^\let\wires@loop\wires@sup\else%
+  \ifx#1_\let\wires@loop\wires@sub\else%
+  \fi\fi\fi\fi\fi\fi\fi%
+  \wires@loop%
+}
+\newcommand\wires@start{\let\wires@loop\wires@next\wires@loop}
+\newcommand\wires@gobble[1]{\let\wires@loop\wires@next\wires@loop}
+\newcommand\wires@line@start{\let\wires@line@loop\wires@line@next\wires@line@loop}
+\newcommand\wires@line@next[1]{%
+  \ifx#1\@end%
+    \begin{scope}[yshift=\yup]%
+    \draw(\the@wire@start,\the@wire@y) -- (\the@wire@end,\the@wire@y);%
+    \end{scope}%
+    \begin{scope}[yshift=\ydn]%
+    \draw(\the@wire@start,\the@wire@y) -- (\the@wire@end,\the@wire@y);%
+    \end{scope}%
+    \let\wires@line@loop\relax%
+  \else%
+  \ifx#1.\stepcounter{@wire@end}\else%
+  \fi\fi%
+  \wires@line@loop%
+}
+\newcommand\wires@push{\@ifnextchar>\wires@push@two\wires@push@one}
+\newcommand\wires@pop {\@ifnextchar<\wires@pop@two{\@ifnextchar+\wires@popsend\wires@pop@one}}
+\newcommand\wires@send{\@ifnextchar+\wires@send@two{\@ifnextchar<\wires@sendpop\wires@send@one}}
+\newcommand\wires@push@one{
+	\foreach \y in {\yup,\ydn} {
+	    \node[push,yshift=\y] at (\the@wire,\the@wire@y) {}; }
+    \wires@start}
+\newcommand\wires@pop@one {
+	\foreach \y in {\yup,\ydn} {
+	    \node[pop1,yshift=\y] at (\the@wire,\the@wire@y) {}; }
+    \foreach \y in {\yup,\ydn} {
+	    \node[pop2,yshift=\y] at (\the@wire,\the@wire@y) {}; }
+    \wires@start}
+\newcommand\wires@send@one{
+	\foreach \y in {\yup,\ydn} {
+	    \node[send,yshift=\y] at (\the@wire,\the@wire@y) {}; }
+    \wires@start}
+\newcommand\wires@push@two{
+	\foreach \y in {\yup,\ydn} {
+	  \foreach \x in {2pt,-2pt}  {
+	    \node[push,xshift=\x,yshift=\y] at (\the@wire,\the@wire@y) {}; }}
+    \wires@gobble}
+\newcommand\wires@pop@two {
+	\foreach \y in {\yup,\ydn} {
+	  \foreach \x in {2pt,-2pt}  {
+	    \node[pop1,xshift=\x,yshift=\y] at (\the@wire,\the@wire@y) {}; }}
+    \foreach \y in {\yup,\ydn} {
+	  \foreach \x in {2pt,-2pt}  {
+	    \node[pop2,xshift=\x,yshift=\y] at (\the@wire,\the@wire@y) {}; }}
+	\wires@gobble}
+\newcommand\wires@send@two{
+	\foreach \y in {\yup,\ydn} {
+	  \foreach \x in {2pt,-2pt}  {
+	    \node[send,xshift=\x,yshift=\y] at (\the@wire,\the@wire@y) {}; }}
+    \wires@gobble}
+\newcommand\wires@sendpop{
+	\foreach \y in {\yup,\ydn} {
+	    \node[send,xshift=-2pt,yshift=\y] at (\the@wire,\the@wire@y) {}; }
+	\foreach \y in {\yup,\ydn} {
+	    \node[pop1,xshift= 2pt,yshift=\y] at (\the@wire,\the@wire@y) {}; }
+	\foreach \y in {\yup,\ydn} {
+	    \node[pop2,xshift= 2pt,yshift=\y] at (\the@wire,\the@wire@y) {}; }
+    \wires@gobble}
+\newcommand\wires@popsend{
+	\foreach \y in {\yup,\ydn} {
+	    \node[send,xshift= 2pt,yshift=\y] at (\the@wire,\the@wire@y) {}; }
+	\foreach \y in {\yup,\ydn} {
+	    \node[pop1,xshift=-2pt,yshift=\y] at (\the@wire,\the@wire@y) {}; }
+	\foreach \y in {\yup,\ydn} {
+	    \node[pop2,xshift=-2pt,yshift=\y] at (\the@wire,\the@wire@y) {}; }
+    \wires@gobble}
+\newcommand\wires@popsendx{
+	\foreach \y/\x/\i in {\yup/2pt/send,\ydn/-2pt/send,\ydn/2pt/pop1,\yup/-2pt/pop1} {
+	    \node[\i,xshift=\x,yshift=\y] at (\the@wire,\the@wire@y) {}; }
+    \wires@gobble}
+\newcommand\wires@sendpopx{
+	\foreach \y/\x/\i in {\yup/-2pt/send,\ydn/2pt/send,\ydn/-2pt/pop1,\yup/2pt/pop1} {
+	    \node[\i,xshift=\x,yshift=\y] at (\the@wire,\the@wire@y) {}; }
+    \wires@gobble}
+\newcommand\wires@sup[1]{\node[yshift=  8pt,yshift=\yup,anchor=base] at (\the@wire,\the@wire@y) {$\wire@label{#1}$};\wires@start}
+\newcommand\wires@sub[1]{\node[yshift=-13pt,yshift=\ydn,anchor=base] at (\the@wire,\the@wire@y) {$\wire@label{#1}$};\wires@start}
+
+\newcommand\termbox[5][term]{
+	\colorlet{thiscolor}{#1}
+	\coordinate[xshift= 2pt,yshift= 2pt] (bottomleft)  at (#2,#4);
+	\coordinate[xshift= 2pt,yshift=-2pt] (topleft)     at (#2,#5);
+	\coordinate[xshift=-2pt,yshift= 2pt] (bottomright) at (#3,#4);
+	\coordinate[xshift=-2pt,yshift=-2pt] (topright)    at (#3,#5);
+	\draw[thiscolor,fill=thiscolor!05,rounded corners] (bottomleft) rectangle (topright);
+	\termbox@label
+}
+\newcommand\termbox@label{\@ifnextchar^\termbox@label@up{\@ifnextchar_\termbox@label@down\relax}}
+\newcommand\termbox@label@up  [2]{\path (topleft)    --node[inner sep=0pt,outer sep=2pt,anchor=south,thiscolor]{$\trm{#2}$} (topright);}
+\newcommand\termbox@label@down[2]{\path (bottomleft) --node[inner sep=0pt,outer sep=2pt,anchor=north,thiscolor]{$\trm{#2}$} (bottomright);}
+
+
+\makeatother
+
+%============================================================ DOCUMENT
+
+\title{The Communicating Functional Machine Calculus}
+
+\author{Ugo Dal Lago and Willem Heijltjes}
+
+\begin{document}
+
+\maketitle
+
+% Problem:
+%   new a . a<x> . -a[x] 
+% EITHER:
+%   duality on locations is global and restricts parallel composition
+%   typed composition is a combination  new a b . N || M
+
+
+% LOOK AT THE "ACTOR MODEL"
+
+
+% COMMUNICATING SEQUENTIAL PROCESSES
+%
+% Process names:   a,b,c
+% Variables:       x,y,z
+% Base values:     v,w
+% Expressions:     e  ::=  v  |  CONS (e,..,e)
+% Patterns:        p  ::=  x  |  CONS (p,..,p)
+% Integer values:  i  ::=  x  |  v
+% Ranges:          r  ::=  x : i .. j
+% Simple commands:
+%   X  ::=   *     null command
+%       |  p := e  assignment (pattern-matching)
+%       |   a?p    input
+%       |   a!e    output
+% Commands:
+%   M  ::=  X           simple command
+%       |  [A[]..[]A]   alternative command
+%       | *[A[]..[]A]   repetitive command
+%       |  [P||..||P]   parallel processes
+% Processes:
+%   P  ::=  a_(r,..,r) (M;..;M)
+% Alternatives:
+%   A  ::=  (r,..,r) G -> (M;..;M)
+%   G  ::=  ???????
+
+
+
+%\maketitle
+
+\section{Introduction}
+
+The Functional Machine Calculus (FMC) is a new model of higher-order computation with effects~\cite{}, consisting of two independent modifications to the $\lambda$-calculus. One, \emph{sequencing}, introduces a natural notion of \emph{sequentiality} into the $\lambda$-calculus, so that terms can be viewed as higher-order sequential processes operating on a single stack for input and output. The other, \emph{locations}, generalizes to many stacks for input and output, which can then be used to model the effects of higher-order mutable store, interactive input/output, probabilities, and non-determinism. This approach of generalizing the $\lambda$-calculus (as opposed to introducing new primitives to capture effects and sequential composition) means the FMC preserves several key features of the $\lambda$-calculus: it is confluent, and it can be simply typed to give strong normalization.
+
+Here, we consider how to extend the FMC to concurrent processes. This is a natural question for two reasons: firstly, since FMC terms represent sequential processes, it is natural to consider their parallel composition; secondly, since the stacks of the FMC can model interactive input/output, it is natural to consider how to connect the stacks of different processes to serve as communication channels, as featured in process calculi.
+
+[[OBJECTIVES AND RESULTS]]
+
+\subsection*{Sequentiality}
+
+First, we consider the design ideas that gave rise to the concurrent functional machine calculus in an informal technical introduction. For this, we will view FMC-terms abstractly as sequential processes that consume input and produce output. Processes are composed sequentially, and interact when the output of the first is consumed as input by the second. We will depict output and input graphically as black and white triangles on a wire, directed so that triangles facing each other interact. 
+\[
+	\text{output:}~~
+    \begin{tikzpicture}[wires,baseline=-.5ex]
+    	\wire-0{ . > .}
+    \end{tikzpicture}
+\qquad
+	\text{input:}~~
+    \begin{tikzpicture}[wires,baseline=-.5ex]
+    	\wire-0{ . < .}
+    \end{tikzpicture}
+\qquad
+	\text{interaction:}~~
+    \begin{tikzpicture}[wires,baseline=-.5ex]
+    	\wire-0{ . > .. < .}
+    \end{tikzpicture}
+~~=~~
+    \begin{tikzpicture}[wires,baseline=-.5ex]
+    	\wire-0{...}
+    \end{tikzpicture}
+\]
+A process can have multiple inputs and outputs, represented by double triangles with the number printed along. A process $\term M$ taking $n$ inputs and producing $m$ outputs is visualised by adding a (red) box around the wire. The diagrams give just the \emph{arity} of a process: the number of inputs consumed and outputs produced; they ignore the contents of input and output and the results of their interaction. 
+\[
+	\text{multiple outputs:}~~
+    \begin{tikzpicture}[wires,baseline=-.5ex]
+    	\wire-0{. >>^3 .}
+    \end{tikzpicture}
+    ~=~
+    \begin{tikzpicture}[wires,baseline=-.5ex]
+    	\wire-0{. > . > . > .}
+    \end{tikzpicture}
+\qquad
+\qquad
+	\text{a process:}~~
+    \begin{tikzpicture}[wires,baseline=\base]
+    	\termbox0303^M
+    	\wire-1{ . << ^n . >> ^m .}
+    \end{tikzpicture}
+\]
+The sequential composition $\term{M;N}$ of two processes may take two forms: all output of $\term M$ is consumed by $\term N$ (but $\term N$ may consume further input as well), or all input of $\term N$ is produced by $\term M$ (but $\term M$ may produce further output as well). These are depicted respectively below. The two forms coincide when $\term N$ consumes exactly the output of $\term M$.
+\[
+\text{composition:}~~
+\begin{tikzpicture}[wires,baseline=\base]
+	\termbox0303^M
+	\termbox3703^N
+	\wire-1{ . << ^j . >> ^k .. <<^k . <<^m . >>^n .}
+\end{tikzpicture}
+~=~
+\begin{tikzpicture}[wires,baseline=\base]
+	\termbox0403^{M;N}
+	\wire-1{ . << ^j . << ^m . >>^n .}
+\end{tikzpicture}
+\qquad\qquad
+\begin{tikzpicture}[wires,baseline=\base]
+	\termbox0403^M
+	\termbox4703^N
+	\wire-1{ . << ^j . >> ^k . >>^m .. <<^m . >>^n .}
+\end{tikzpicture}
+~=~
+\begin{tikzpicture}[wires,baseline=\base]
+	\termbox0403^{M;N}
+	\wire-1{ . << ^j . >> ^k . >>^n .}
+\end{tikzpicture}
+\]
+FMC-terms are processes that take input from and produce output to multiple sources, indicated abstractly as \emph{locations} $a,b,c,\dots$, which may represent memory cells, input and output streams, and probabilistic and non-deterministic generators (given also as input streams). We illustrate different locations by separate wires, to visualize that actions on different locations are independent. Consider the following example from~\cite{FMC}:
+\[
+	\term{(f~=~\rand~;~\set c~;~\get c)~;~f~;~f~;~+~;~\print}
+\]
+The term operates on four locations: a random generator $\rnd$, a memory cell $c$, an output stream $\out$, and a \emph{main} location $\lambda$ where primitive operations interact. The defined processes are as follows: $\term\rand$ takes a random number and outputs it on $\lambda$; $\term{\set c}$ inputs a value from $\lambda$ and updates the memory cell $c$ with it (removing the old value by taking it as input, and replacing it with the new value as output); $\term{\get c}$ looks up the value at $c$ (by taking it as input and restoring it as output) and outputs it at $\lambda$; $\term +$ takes two numbers from $\lambda$ and outputs their sum; and $\term\print$ takes a value from $\lambda$ and sends it to the output stream $\out$. The example process then first defines $\term f$ as the composition $\term{\rand~;~\set c~;~\get c}$, which takes a random value, updates $c$ with it, and returns it.
+\[
+\begin{tikzpicture}[wires,baseline=\basefour]
+	\termbox0304^\rand
+	\termbox3604^{\set c}
+	\termbox6904^{\get c}
+	\wire-3   [\rnd]{.<. .. . .. . .}[\rnd]
+	\wire-2      [c]{. . ..<.>..<.>.}[c]
+	\wire-1[\lambda]{. .>..<. .. .>.}[\lambda]
+\end{tikzpicture}
+~=~
+\begin{tikzpicture}[wires,baseline=\basefour]
+	\termbox0304^f
+	\wire-3   [\rnd]{.<. .}[\rnd]
+	\wire-2      [c]{.<.>.}[c]
+	\wire-1[\lambda]{. .>.}[\lambda]
+\end{tikzpicture}
+\]
+The remainder of the example process calls $\term f$ twice, sums their outputs, and sends the result to $\out$. The overall process then takes two random values, updates $c$ with the second, and outputs their sum.
+\[
+\begin{tikzpicture}[wires,baseline=\basefive]
+	\termbox0305^f
+	\termbox3605^f
+	\termbox6{10}05^+
+	\termbox{10}{13}05^\print
+	\wire-4   [\rnd]{.<. ..<. .. . . .. . .}[\rnd]
+	\wire-3      [c]{.<.>..<.>.. . . .. . .}[c]
+	\wire-2[\lambda]{. .>.. .>..<.<.>..<. .}[\lambda]
+	\wire-1   [\out]{. . .. . .. . . .. .>.}[\out]
+\end{tikzpicture}
+~=~
+\begin{tikzpicture}[wires,baseline=\basefive]
+	\termbox0405
+	\wire-4   [\rnd]{.<.<. .}[\rnd]
+	\wire-3      [c]{. .<.>.}[c]
+	\wire-2[\lambda]{. . . .}[\lambda]
+	\wire-1   [\out]{. . .>.}[\out]
+\end{tikzpicture}
+\]
+In our diagrams, we will depict a bundle of multiple wires for a set of locations $A,B,C,\dots$ as a double wire. Inputs and outputs on a bundle for $A$ are given as two double triangles, annotated with a function $f:A\to\mathbb N$ that gives the arity $f(a)$ for each location $a\in A$.
+\[
+	\text{a process on multiple locations:}~~
+    \begin{tikzpicture}[wires,baseline=\base]
+    	\termbox0303^M
+    	\wire=1[A]{ . << ^f . >> ^g .}[A]
+    \end{tikzpicture}
+\]
+For the locations on which a process has no input or output actions, one may choose to consider them part of the process or not.
+\[
+	\text{locations without actions:}~~
+	\begin{tikzpicture}[wires,baseline=\basefour]
+    	\termbox0324
+    	\wire=3[A]{ . << . >> .}[A]
+		\wire=1[B]{ ... } [B]
+    \end{tikzpicture}
+    ~=~
+	\begin{tikzpicture}[wires,baseline=\basefour]
+    	\termbox0304
+    	\wire=3[A]{ . << . >> .}[A]
+		\wire=1[B]{ ... } [B]
+    \end{tikzpicture}
+\]
+Sequential composition $\term{M;N}$ with multiple locations proceeds by composing for each location independently. Since there are two forms of composition, locations divide in two classes depending on which is greater: the output arity in $\term M$ or the input arity in $\term N$.
+\[
+	\text{sequential composition:}~~
+    \begin{tikzpicture}[wires,baseline=\basesix]
+    	\termbox0406^M
+    	\termbox4806^N
+    	\wire=4[A]{ . << ^f . >> ^g . >>^h ... <<^h . >>^k .}[A]
+    	\wire=2[B]{ . << _{f'} . >> _{g'} ... <<_{g'} . <<_{h'} . >>_{k'} .}[B]
+    \end{tikzpicture}
+    ~=~
+    \begin{tikzpicture}[wires,baseline=\basesix]
+    	\termbox0406^{M;N}
+    	\wire=4[A]{ . <<^f . >>^g . >>^k . }[A]
+    	\wire=2[B]{ . <<_{f'} . <<_{h'} . >>_{k'} . }[B]
+    \end{tikzpicture}
+\]
+The above exposition shows the FMC as a language of (higher-order) sequential processes, and how it uses multiple locations to capture the effects of state, I/O, and random input. We now turn to the subject matter of the present work: how to naturally expand the FMC to include concurrency.
+
+\subsection*{Concurrency}
+
+We may visualize the parallel composition $\term{M || N}$ of two processes as follows.
+\[
+\text{parallel composition:}~~
+\begin{tikzpicture}[wires,baseline=\basefour]
+	\termbox 0324^M
+	\termbox 0302_N
+	\wire=3[A]{ . << . >> . }[A]
+	\wire=1[B]{ . << . >> . }[B]
+\end{tikzpicture}
+~=~
+\begin{tikzpicture}[wires,baseline=\basefour]
+	\termbox 0304^{M||N}
+	\wire=3[A]{ . << . >> . }[A]
+	\wire=1[B]{ . << . >> . }[B]
+\end{tikzpicture}
+\]
+Our main consideration here is how these concurrent processes would interact. If the sets of locations for both processes ($A$ and $B$ in the above illustration) are disjoint, then they are independent, with no interaction. If they do overlap, then we are seeing \emph{shared-memory concurrency}: both processes may output to and input from a common store, represented by a joint location. But this mode of concurrency is notoriously non-confluent: the actions of both processes on the common location are arbitrarily interleaved, at least in principle. Consider the processes $\trm{"3M}$ and $\trm{"4N}$ on the joint location $a$, where $\trm{"3M}$ has two actions labelled $\trm{"31}$ and $\trm{"32}$ that may interact, and $\trm{"4N}$ has actions $\trm{"43}$ and $\trm{"44}$.
+\[
+\newcommand\1{{\color{3}_1}}
+\newcommand\2{{\color{3}_2}}
+\newcommand\3{{\color{4}^3}}
+\newcommand\4{{\color{4}^4}}
+\text{two processes:}~~
+\vc{\begin{tikzpicture}[wires]
+	\termbox[3]033{5.5}^M
+	\termbox[4]03{0.5}3_N
+	\begin{scope} \wire-4[a]{ ... }[a]\end{scope}
+	\begin{scope} \wire-2[a]{ ... }[a]\end{scope}
+	\begin{scope}[3]\wire.4{ . >^\1 . <^\2 .}\end{scope}
+	\begin{scope}[4]\wire.2{ . <_\3 . >_\4 .}\end{scope}
+\end{tikzpicture}}
+~=~
+\vc{\begin{tikzpicture}[wires]
+	\termbox[3]033{5.5}^M
+	\termbox[4]03{0.5}3_N
+	\begin{scope} \wire-4[a]{ ... }[a]\end{scope}
+	\begin{scope} \wire-2[a]{ ... }[a]\end{scope}
+	\begin{scope}[4]\wire.2{ . <_\3 . >_\4 .}\end{scope}
+\end{tikzpicture}}
+\]
+Below we illustrate four of the six possible interleavings in the composition $\trm{"3M"0||"4N}$. 
+\[
+\text{some of their interleavings:}~~
+\newcommand\1{{\color{3}_1}}
+\newcommand\2{{\color{3}_2}}
+\newcommand\3{{\color{4}_3}}
+\newcommand\4{{\color{4}_4}}
+\newcommand\exampleleftdiagram[2]{
+    \begin{tikzpicture}[wires,baseline=-.5ex]
+    	%\termbox[gray]005{2.5}
+    	\begin{scope} \wire-0[a]{ ..... }[a]\end{scope}
+    	\begin{scope}[3]\wire.0{#1}\end{scope}
+    	\begin{scope}[4]\wire.0{#2}\end{scope}
+    \end{tikzpicture}
+}
+\newcommand\examplerightdiagram[2]{
+    \begin{tikzpicture}[wires,baseline=-.5ex]
+    	%\termbox[gray]003{2.5}
+    	\begin{scope}\wire-0[a]{...}[a]\end{scope}
+    	\begin{scope}[3]\wire.0{#1}\end{scope}
+    	\begin{scope}[4]\wire.0{#2}\end{scope}
+    \end{tikzpicture}
+}
+\begin{array}{ccc}
+			%\trm{"3M"0||"4N} && \trm{"3M"0||"4N}
+   \exampleleftdiagram { . >^\1 . <^\2 ...}{ ... <^\3 . >^\4 .} & ~=~ & \examplerightdiagram{}{ . <^\3 . >^\4 .}
+\\ \exampleleftdiagram { . >^\1 .. <^\2 ..}{ .. <^\3 .. >^\4 .} & ~=~ & \examplerightdiagram{ . <^\2 ..}{ .. >^\4 .}
+\\ \exampleleftdiagram { . >^\1 ... <^\2 .}{ .. <^\3 . >^\4 ..} & ~=~ & \examplerightdiagram{}{}
+\\ \exampleleftdiagram { .. >^\1 .. <^\2 .}{ . <^\3 .. >^\4 ..} & ~=~ & \examplerightdiagram{ .. >^\1 .}{ . <^\3 ..}
+\end{array}
+\]
+This presents a first design choice. In the FMC, what locations are used by a process is not visible at the term level, but only at the type level. Thus, we either need to accept that the untyped calculus is non-confluent (but the typed calclus may still be), or we need to add location information to the terms.
+
+[[AND??]]
+
+%The illustration highlights a number of problems, which are generally familiar as \emph{races}. Observe for instance that the difference between the first and second is a race: both $\trm{"32}$ and $\trm{"43}$ compete to interact with $\trm{"31}$. This highlights the first problem: the four interleavings all give different behaviour. Secondly, in the traditional interpretation, a concurrent process requiring input waits until it is available. This rules out the fourth interleaving, since $\trm{"43}$  would wait for $\trm{"31}$, and also the second, since $\trm{"32}$ would wait for $\trm{"34}$. Unless, that is, there is a previous output on $a$ that $\trm{"43}$  and $\trm{"32}$ may interact with: then all four interleavings are available. The behaviour of these processes is thus not only non-confluent, but also context-dependent; that is, not compositional. Finally, note that not just the behaviour differs between the four interleavings, but even the arity; and that this bears no clear relation to the arities of $\trm{"3M"}$ and $\trm{"4N}$ (after the interaction in $\trm{"3M"}$). This has the following important consequence: since arity is akin to (and an essential part of) typing information, these problems are likely to arise even at the type level in a typed calculus.
+
+An alternative to shared-memory concurrency is \emph{message passing}, where concurrent processes exchange information through a dedicated \emph{channel}. To create such a channel, we will connect two locations, one from each process, as illustrated below. 
+\[
+\text{creating a channel:}~~
+\vc{\begin{tikzpicture}[wires]
+	\termbox 0336^M
+	\termbox 0303_N
+	\wire=5[A]{ . << . >> . }[A]
+	\wire-4[a]{ . << . >> . }[a]
+	\wire-2[b]{ . << . >> . }[b]
+	\wire=1[B]{ . << . >> . }[B]
+	\draw[dashed,dash pattern = on 1pt off 1.5pt on 1pt,rounded corners] (-1,2) -| (-2,3) |- (-1,4) ; 
+\end{tikzpicture}}
+\]
+To create interaction along a channel, we introduce a \emph{send} construct: like output, but in the opposite direction along a wire. This may then interact across a channel with a standard \emph{input} construct; or equivalently, it may travel along the channel and interact in the previous manner.
+\[
+    \text{interaction:}~~
+    \vc{\begin{tikzpicture}[wires]
+    	\draw[rounded corners] (1,1) -| (0,2) |- (1,3) ; 
+    	\wire-3{ /<. }
+    	\wire-1{ /+. }
+    \end{tikzpicture}}
+    ~=~
+    \vc{\begin{tikzpicture}[wires]
+    	\wire-3{ /. }
+    	\wire-1{ /. }
+    	\draw[rounded corners] (1,1) -| (0,2) |- (1,3) ; 
+    \end{tikzpicture}}
+\qquad
+\qquad
+    \text{or travel:}~~
+    \vc{\begin{tikzpicture}[wires]
+    	\draw[rounded corners] (1,1) -| (0,2) |- (1,3) ; 
+    	\wire-3{ / . }
+    	\wire-1{ /+. }
+    \end{tikzpicture}}
+    ~=~
+    \vc{\begin{tikzpicture}[wires]
+    	\wire-3{ />. }
+    	\wire-1{ /. }
+    	\draw[rounded corners] (1,1) -| (0,2) |- (1,3) ; 
+    \end{tikzpicture}}
+\]
+Two connect two locations by a channel (and guarantee correct interaction), the \emph{send} and \emph{receive} actions on one channel must be matched by the opposite actions (\emph{receive} respectively \emph{send}) on the other, as illustrated below left. The input arity is then no longer a number, but a vector $\typ{!p}$ of \emph{polarities} $p\in\{1,\dual 1\}$. We illustrate this graphically by two connected white and black triangles (in either order), and use $(\dual)$ to dualize polarities and their vectors, and also to create a duality between locations $a$ and $\dual a$ to indicate their connection by a channel. Interaction is then as below centre and right.
+\[
+\text{interactions:}~~
+\vc{\begin{tikzpicture}[wires]
+	\draw[rounded corners] (1,1) -| (0,2) |- (1,3) ; 
+	\wire-3[a]{ /<^1. +^{\dual 1} . <^1 . }
+	\wire-1[\dual a]{ /+_{\dual 1} . <_1 . +_{\dual 1} . }
+\end{tikzpicture}}
+~=~
+\vc{\begin{tikzpicture}[wires]
+	\wire-3[a]{ /. }
+	\wire-1[\dual a]{ /. }
+	\draw[rounded corners] (1,1) -| (0,2) |- (1,3) ; 
+\end{tikzpicture}}
+\qquad
+\vc{\begin{tikzpicture}[wires]
+	\draw[rounded corners] (1,1) -| (0,2) |- (1,3) ; 
+	\wire-3[a]{ / <+^{\typ{!p}} . ++ .}
+	\wire-1[\dual a]{ / +<_{\dual{\typ{!p}}} .. }
+\end{tikzpicture}}
+~=~
+\vc{\begin{tikzpicture}[wires]
+	\wire-3[a]{ /. }
+	\wire-1[\dual a]{ / >> . }
+	\draw[rounded corners] (1,1) -| (0,2) |- (1,3) ; 
+\end{tikzpicture}}
+\qquad
+\vc{\begin{tikzpicture}[wires]
+	\draw[rounded corners] (1,1) -| (0,2) |- (1,3) ; 
+	\wire-3[a]{ / <+^{\typ{!p}} ..}
+	\wire-1[\dual a]{ / +<_{\dual{\typ{!p}}} . ++ . }
+\end{tikzpicture}}
+~=~
+\vc{\begin{tikzpicture}[wires]
+	\wire-3[a]{ / >> . }
+	\wire-1[\dual a]{ /    . }
+	\draw[rounded corners] (1,1) -| (0,2) |- (1,3) ; 
+\end{tikzpicture}}
+\]
+We may then visualize message-passing parallel composition as below left. Formalizing this idea will be the aim of the typed calculus. A secondary aim will be to start exploring the connection with linear logic: note the similarity between the channel construction on the left and the cut-rule of classical sequent calculus on the right.
+\[
+\text{a channel:}~~
+    \vc{\begin{tikzpicture}[wires]
+    	\termbox 1436^M
+    	\termbox 1403_N
+    	\wire=5[A]{ .. <+ . >> . }[A]
+    	\wire-4[a]{ /. <+ . >> . }[a]
+    	\wire-2[\dual a]{ /. +< . >> . }[\dual a]
+    	\wire=1[B]{ .. +< . >> . }[B]
+    	\draw[rounded corners] (1,2) -| (0,3) |- (1,4) ;
+    \end{tikzpicture}}
+\qquad
+\qquad
+	\text{the cut rule:}~~
+	\vc{\infer{\Gamma,\Delta}{\Gamma,A && \neg A,\Delta}}
+\]
+
+%\subsection*{The sequential $\lambda$-calculus}
+%
+%The first generalization to the $\lambda$-calculus takes the perspective of $\lambda$-terms as instruction sequences for a simple stack machine, where application $\term{M\,N}$ \emph{pushes} the value $\term N$ to the stack, and abstraction $\term{lx.M}$ \emph{pops} the top value from the stack and binds it to $\term x$. It is then natural to introduce the empty sequence $\term *$ and sequential composition $\term{M;N}$. This idea is implemented in the \emph{sequential $\lambda$-calculus}, given by the following grammars for \emph{terms} $\term{M,N}$ and \emph{instructions} $\term{I,J}$.
+%\[
+%	\term{M,N}~\coloneqq~\term*~\mid~\term{I.M}
+%\qquad	
+%	\term{I,J}~\coloneqq~\term{x}~\mid~\term{<x>}~\mid~\term{[N]}
+%\]
+%Terms are sequences of instructions (the trailing $\term{.*}$ will be omitted), where $\term x$ is a \emph{variable}, $\term{[N]}$ is push, and $\term{<x>}$ is \emph{pop} where $\term{<x>.M}$ binds $\term x$ in $\term M$. The latter two constructs give a different notation for abstraction and application to emphasizes the stack actions, where the traditional notation can be retained as ``sugar'': $\term{lx.M}\defeq\term{<x>.M}$ and $\term{M\,N}\defeq\term{[N].M}$. The $\lambda$-calculus then embeds as the fragment where variables and nil must occur together, as $\term{x.*}$. Sequential composition $\term{M;N}$ is by $\term{*;N}=\term N$ and $\term{(I.M);N}=\term{I.(M;N)}$, where the case $\term I=\term{<x>}$ is \emph{capture-avoiding}: $\term x$ must not be free in $\term N$ (which can be guaranteed by $\alpha$-conversion). Capture-avoiding substitution $\term{\{N/x\}M}$ uses composition for the variable case, $\term{\{N/x\}x.M}=\term{N;\{N/x\}M}$, and is otherwise as expected; then $\beta$-reduction is standard, as follows.
+%\[
+%	\term{[N].<x>.M}~\rw~\term{\{N/x\}M}
+%\]
+%
+%Simple types for the sequential $\lambda$-calculus consist of a vector of input types and a vector of output types:
+%\[
+%	\type{r,s,t,u}~\coloneqq~\type{!s>!t}
+%\qquad
+%	\type{!t}~\coloneq~\type{t_1..t_n}
+%\]
+%A type describes the input/output behaviour of the stack machine: a term of type $\type{s_1..s_m>t_1..t_n}$ will consume $m$  elements of the types $\type{s_i}$ from the stack and return $n$ elements of types $\type{t_i}$ to the stack. Since stacks are first-in-first-out, we render input vectors in reverse: if $\type{!t}=\type{t_1..t_n}$ then $\type{?t}=\type{t_n..t_1}$.
+
+
+\section{Related work}
+
+CSP \cite{Hoare-1978}
+
+CCS \cite{Milner-1980}
+
+Pi-calculus \cite{Milner-Parrow-Walker-1992}
+
+CHOCS \cite{Thomsen-1993}
+
+Session types \cite{Honda-1993,Caires-Pfenning-2010}
+
+Concurrent Haskell \cite{Jones-Hudak-1993}
+
+FMC \cite{Heijltjes-2023}
+
+% ----------------------------------------
+
+\section{The Functional Machine Calculus}
+
+The Functional Machine Calculus (FMC) is a calculus of sequential processes on multiple locations, which model memory cells, input and output streams, random generators, and the passing of arguments to functions (primitive or defined). Our presentation will differ slightly from the original~\cite{FMC} in anticipation of the introduction of concurrency.
+
+\begin{definition}
+\emph{FMC-terms} $\term{M,N,P,Q}$ are given by the following grammar.
+\[
+	\term{M,N,P,Q}~\coloneqq~\term*~\mid~\term{x.M}~\mid~\term{a<x>.M}~\mid~\term{[N]a.M}
+\]
+Here, $a,b,c,\dots$ range over \emph{locations} and $\dots,\term{x,y,z}$ over variables; $\term *$ is the empty sequence or \emph{nil}; $\term{a<x>.M}$ is an \emph{abstraction} on location $a$ that binds $\term x$ in $\term M$; and $\term{[N]a.M}$ is an \emph{application} on location $a$. We consider terms modulo $\alpha$-equivalence.
+\end{definition}
+
+\emph{Sequential composition} $\term{M;N}$ is capture-avoiding, and is defined as follows---note that the free variable condition may always be satisfied by $\alpha$-conversion.
+\[
+\begin{array}{r@{~}c@{~}l}
+	\term{*;P}     &=& \term P 
+\\	\term{(x.M);P} &=& \term{x.(M;P)}
+\end{array}
+\qquad
+\begin{array}{r@{~}c@{~}l}
+	\term{(a<x>.M);P} &=& \term{a<x>.(M;P)} \qquad (\term x\notin\fv P)
+\\	\term{([N]a.M);P} &=& \term{[N]a.(M;P)}
+\end{array}
+\]
+\emph{Substitution} $\term{\{P/y\}M}$ is also capture-avoiding and is defined as follows, where $\term x\neq\term y$.
+\[
+\begin{array}{l@{~}c@{~}l}
+	\term{\{P/y\}*}   &=& \term*
+\\	\term{\{P/y\}x.M} &=& \term{x.\{P/y\}M}
+\\	\term{\{P/y\}y.M} &=& \term{P;\{P/y\}M}
+\end{array}
+\qquad
+\begin{array}{l@{~}c@{~}l}
+	\term{\{P/y\}a<x>.M} &=& \term{a<x>.\{P/y\}M} \qquad (\term x\notin\fv P)
+\\	\term{\{P/y\}a<y>.M} &=& \term{a<y>.M}
+\\	\term{\{P/y\}[N]a.M} &=& \term{[\{P/y\}N]a.\{P/y\}M}
+\end{array}
+\]
+\emph{Reduction} $\rw$ is the union of the  $\beta$-reduction and \emph{passage} relations $\rw_\beta$ and $\rw_\pass$, generated by the contextual closure of the following rules (the free-variable condition may again be satisfied by $\alpha$-conversion).
+\[
+\begin{array}{l@{~}c@{~}l}
+	\term{[N]a.a<x>.M} &\rw_\beta& \term{\{N/x\}M}
+\\	\term{[N]b.a<x>.M} &\rw_\pass& \term{a<x>.[N]b.M}
+\quad(a\neq b,~\term x\notin\fv N)
+\end{array}
+\]
+Normal forms are the terms $\term{N_0}$ given by the below grammars.
+\[
+\begin{array}{l@{~\coloneqq~}r@{~\mid~}l}
+	\term{N_0} & \term{a<x>.N_0}   & \term{N_1} \\ 
+	\term{N_1} & \term{[N_0]a.N_1} & \term{N_2} \\
+	\term{N_2} & \term{x.N_0}      & \term*     
+\end{array}
+\]
+
+The operational perspective on the FMC is of a simple stack machine with a separate stack for each location. A \emph{state} of the machine is a pair $(S_A,\term M)$ where $\term M$ is a term and $S_A$ is a \emph{memory}, a family of stacks in a set of locations $A$. Stacks $S,T$ and memories are defined as follows, and we write $S_A;S_a$ (where $a\notin A$) for the memory $S_{A\cup\{a\}}=S_A\cup\{S_a\}$.
+\[
+	S,T~\coloneqq~ \e ~\mid~ S\,\term{M}
+\qquad\qquad
+	S_A~\coloneqq~\{ S_a\mid a\in A \}
+\]
+The transition rules of the machine are given by the top-to-bottom rules given below left and centre. An instance is called a \emph{step} of the machine, and a sequence of steps is a \emph{run}, depicted with a double line as below right, and as $\run*{S_A}M{T_A}N$ in text. A run is \emph{successful} if it ends in a state $(T,\term*)$.
+\[
+	\step{S_A ; S_a\,\term N}{a<x>.M}{S_A ; S_a}{\{N/x\}M}
+\qquad
+	\step{S_A ; S_a}{[N]a.M}{S_A ; S_a\,\term N}{M}
+\qquad
+\qquad
+	\run{S_A}M{T_A}N
+\]
+
+% - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - Types figure
+
+\begin{figure}
+\[
+\begin{array}{c@{\qquad}c}
+	\infer[\TR *]{\term{G |- *:?tA>!tA}}{}
+&
+ 	\infer[\TR a]
+	  {\term{G |- [N]a.M: ?sA>!tA}}
+	  {\term{G |- N:r} &&
+	   \term{G |- M:a(r)\,?sA>!tA}
+	  }
+\\ \\
+	\infer[\TR x]
+	 {\term{G , x:?rA>!sA |- x.M:?rA\,?tA>!uA}}
+	 {\term{G , x:?rA>!sA |- {\phantom{x.}}M:?sA\,?tA>!uA}}
+&
+	\infer[\TR l]
+	  {\term{G |- a<x>.M : a(r)\,?sA>!tA}}
+	  {\term{G , x:r |- M:?sA>!tA}}
+\end{array}
+\]
+\caption{Typing rules for the Functional Machine Calculus}
+\label{fig:FMC-types}
+\end{figure}
+
+%\begin{figure}
+%\[
+%\begin{array}{c@{\qquad}c}
+%	\infer[\TR *]{\term{G |- *:?tA>!tA}}{}
+%&
+% 	\infer[\TR a]
+%	  {\term{G |- [N]a.M: ( > a(s) ) \cdot t}}
+%	  {\term{G |- N:s} &&
+%	   \term{G |- M: t}
+%	  }
+%\\ \\
+%	\infer[\TR x]
+%	 {\term{G , x:s |- x.M: s.t }}
+%	 {\term{G , x:s |-   M: t }}
+%&
+%	\infer[\TR l]
+%	  {\term{G |- a<x>.M : (a(s) >) . t}}
+%	  {\term{G , x:s |- M: t}}
+%\end{array}
+%\]
+%\caption{Typing rules for the Functional Machine Calculus}
+%\label{fig:FMC-types}
+%\end{figure}
+
+% - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+Simple types for the FMC characterize the input/output behaviour of a term: the number of inputs and outputs of a term, and their types. FMC types assume a fixed set of locations $A$; this will be relaxed for concurrency.
+
+\begin{definition}
+\emph{Simple FMC-types} are given by the following grammars.
+\[
+	\type{r,s,t,u}~\coloneqq~\type{!sA>!tA}
+\qquad
+	\type{!tA}~\coloneqq~\{\type{!t_a}\mid a\in A\}
+\qquad
+	\type{!t}~\coloneqq~\type{t_1..t_n}
+\]
+\end{definition}
+
+The three categories are: \emph{types} for terms $\term{M:t}$, \emph{memory types} for memories $T_A:\type{!t_A}$, and \emph{type vectors} for stacks $T:\type{!t}$. We use the following additional notation: the \emph{reverse} of a vector $\type{!t}=\type{t_1..t_n}$ is $\type{?t}=\type{t_n..t_1}$; the \emph{singleton} memory type $\type{a(!t)}$ is the family in $A$ that has $\type{!t}$ at location $a$ and the empty vector at any other location; \emph{concatenation} of vectors is juxtaposition $\type{!s!t}$, and concatenation of memory types is point-wise $\type{!sA!tA}=\{\type{!s_a!t_a}\mid a\in A\}$. The typing rules are given in Figure~\ref{fig:FMC-types}.
+
+Observe that the length of type vectors in the input and output memory types of a term are exactly the arities of the term at each location, as used in the illustrations in the introduction. More strongly, types can be seen as a higher-order version of arity: they give not just the number of inputs and outputs, but also their types, i.e.\ their higher-order arity (but at a lower order). We re-purpose our arity diagrams from the introduction as typing diagrams, annotating them with types instead of arities. The typing rules are illustrated as follows.
+\typewires
+\[
+\begin{array}{lr@{~}c@{~}l@{\qquad\qquad}lr@{~}c@{~}l}
+	\tr *:
+	&&&
+    \begin{tikzpicture}[wires,baseline=\base]
+    	\termbox0303^*
+    	\wire=1{ . << ^{?tA} . >> ^{!tA} .}
+    \end{tikzpicture}
+&
+	\tr a:
+	&
+    \begin{tikzpicture}[wires,baseline=\basefour]
+    	\termbox2604^M
+    	\wire-2[a]{ . >^r .. <^r . << ^{?sA} . >> ^{!tA} . }[a]
+    	\wire=1   { .     ..     . <<        . >>        . }
+    \end{tikzpicture}
+    &=&
+    \begin{tikzpicture}[wires,baseline=\basefour]
+    	\termbox0304^{[N]a.M}
+    	\wire-2[a]{ . << ^{?sA} . >> ^{!tA} . }[a]
+    	\wire=1   { . <<        . >>        . }
+    \end{tikzpicture}
+\\ \\
+	\tr x:
+	&
+    \begin{tikzpicture}[wires,baseline=\base]
+    	\termbox0303^x
+    	\termbox3703^M
+    	\wire=1{ . << ^{?rA} . >> ^{!sA} .. <<^{?sA} . <<^{?tA} . >>^{!uA} .}
+    \end{tikzpicture}
+    &=&
+    \begin{tikzpicture}[wires,baseline=\base]
+    	\termbox0403^{x.M}
+    	\wire=1{ . << ^{?rA} . <<^{?tA} . >>^{!uA} .}
+    \end{tikzpicture}
+&
+	\tr l:
+	&
+	\begin{tikzpicture}[wires,baseline=\basefour]
+    	\termbox2504^M
+    	\wire-2[a]{ . <^r .. << ^{?sA} . >> ^{!tA} . }[a]
+    	\wire=1   { .     .. <<        . >>        . }
+    \end{tikzpicture}
+    &=&
+    \begin{tikzpicture}[wires,baseline=\basefour]
+    	\termbox0404^{a<x>.M}
+    	\wire-2[a]{ . <^r . << ^{?sA} . >> ^{!tA} . }[a]
+    	\wire=1   { .     . <<        . >>        . }
+    \end{tikzpicture}
+\end{array}
+\]
+
+%
+%\[
+%\text{composition:}
+%\qquad
+%\begin{tikzpicture}[wires,baseline=\base]
+%	\termbox0303
+%	\termbox3703
+%	\wire-1{ . << ^{?r} . >> ^{!s} .. <<^{?s} . <<^{?t} . >>^{!u} .}
+%\end{tikzpicture}
+%~=~
+%\begin{tikzpicture}[wires,baseline=\base]
+%	\termbox0403
+%	\wire-1{ . << ^{?r} . << ^{?t} . >>^{!u} .}
+%\end{tikzpicture}
+%\qquad
+%\qquad
+%\begin{tikzpicture}[wires,baseline=\base]
+%	\termbox0403
+%	\termbox4703
+%	\wire-1{ . << ^{?r} . >> ^{!s} . >>^{?t} .. <<^{?t} . >>^{!u} .}
+%\end{tikzpicture}
+%~=~
+%\begin{tikzpicture}[wires,baseline=\base]
+%	\termbox0403
+%	\wire-1{ . << ^{?r} . >> ^{?s} . >>^{!u} .}
+%\end{tikzpicture}
+%\]
+
+% a \emph{slice} of a type $\type{(!sA>!tA)|_a}=\type{!s_a>!t_a}$ are the input and output vectors at a single location; and \emph{composition} is a partial operation defined slice-wise $\type{s.t}=\{ \type{s|_a . t|_a} \mid a\in A \}$ where composition of slices is in the following two ways, and otherwise undefined. 
+%\[
+%\begin{aligned}
+%	\type{(?r>!s)~.~(?s\,?t>!u)} &~~=~~\type{(?r\,?t>!u)}
+%\\[2pt]
+%	\type{(?r>!s\,!t)~.~(?t>!u)} &~~=~~\type{(?r>!s\,!u)}
+%\end{aligned}
+%\]
+
+
+%the \emph{sum} of two memory types $\type{!tA+!tB}$ is defined when the locations are disjoint $A\cap B=\varnothing$, and is the union of the two families; 
+
+%the empty type vector is $\type\e$ and a memory of empty vectors is $\type{\e A}$;
+
+%We concatenate memory types over different locations by expanding the families with empty vectors as needed: $\type{!sA!tB}=\type{!sC!tC}$ where $C=A\cup B$ and $\type{!sC}=\type{!sA+e_{B-A}}$ and $\type{!tC}=\type{!tB+e_{A-B}}$. A \emph{slice} 
+%$\type{!tA|_a}=\type{!t_a}$ of a memory type is the type vector at the given location $a$, and a slice 
+
+\section{The Communicating Functional Machine Calculus}
+
+We equip the set of locations $\A$ with a \emph{duality} $\dual a$, where $\dual{\dual a}=a$. For convenience we factor the definition of terms as sequences of \emph{instructions}. 
+
+\begin{definition}
+CFMC-\emph{terms} and \emph{instructions} are given by the following grammars.
+\[
+	\term{M,N}  ~\coloneqq~
+	\term*      ~\mid~
+	\term{I.M}
+\qquad
+	\term{I,J}  ~\coloneqq~
+	\term{x}    ~\mid~
+	\term{a<x>} ~\mid~
+	\term{[M]a} ~\mid~
+	\term{a[M]} ~\mid~
+	\term{M||N} ~\mid~
+	\term{na}
+\]
+The additional constructions are a \emph{send} instruction $\term{a[M]}$ on location $a$; \emph{parallel composition} $\term{M||N}$; and a \emph{new channel} $\term{na}$ connecting the locations $a$ and $\dual a$, where $\term{na.M}$ binds $a$ and $\dual a$ in $\term M$. Terms are considered modulo $\alpha$-equivalence on bound variables and bound locations.
+\end{definition}
+
+We denote the \emph{free locations} of a term by $\fl M$. \emph{Sequential composition} is given by
+\[
+	\term{*;N}=\term N \qquad \term{(I.M);N}=\term{I.(M;N)}
+\]
+where $\term I$ may not capture in $\term N$, i.e.\ if $\term I=\term{a<x>}$ then $\term{x}\notin\fv N$, and if $\term I=\term{na}$ then $a,\dual a\notin\fl N$. \emph{Substitution} is as for the FMC, with the additional constructs given by
+\[
+\begin{array}{l@{}ll}
+	\term{\{Q/x\}a[N].M}  &~=~\term{a[\{Q/x\}N].\{Q/x\}M}
+\\	\term{\{Q/x\}(P||N).M}&~=~\term{(\{Q/x\}P||\{Q/x\}N).\{Q/x\}M}
+\\	\term{\{Q/x\}na.M}    &~=~\term{na.\{Q/x\}M} &(a,\dual a\notin\fl Q)
+\end{array}
+\]
+
+\subsection*{Shared-Memory Abstract Machine}
+
+%A \emph{term tree} is inductively defined as follows.
+%\[
+%	\term{X} ~\coloneqq~\term M ~\mid~\term{(X || Y) . M}
+%\]
+%We write $\term{\{Y\}X}$ for a tree with a distinguished subtree $\term Y$, which we may then replace. 
+
+A \emph{tree context} is inductively defined as follows.
+\[
+	\term X ~\coloneqq~ \term{\hole} ~\mid~ \term{(X || N) . M} ~\mid~ \term{(N || X) . M}
+\]
+We write $\term{\{M\}X}$ for the term given by replacing the hole $\term\hole$ in $\term X$ by $\term M$. A \emph{state} is a pair $(S_A,\term M)$ of a memory $S_A$ and a term $\term M$. The \emph{transitions} are the following.
+\[
+\begin{array}{@{(\,}l@{~,~}r@{~)}}
+	\strut S_A; S_a \, \term N     & \term{\{a<x>.M\}X}
+\\\hline
+	\strut S_A; S_a                & \term{\{\{N/x\}M\}X}
+\\[16pt]
+	\strut S_A; S_a                & \term{\{[N]a.M\}X}
+\\\hline
+	\strut S_A; S_a \, \term N     & \term{\{M\}X}
+\\[16pt]
+	\strut S_A; \e_a ;\phantom N \, S_{\dual a}  & \term{\{a[N].M\}X}
+\\\hline
+	\strut S_A; \e_a ;   \term N \, S_{\dual a}  & \term{\{M\}X}
+\\[16pt]
+	\strut S_A                     & \term{\{na.M\}X}
+\\\hline
+	\strut S_A; \e_a; \e_{\dual a} & \term{\{M\}X}
+\\[16pt]
+	\strut S_A                     & \term{\{(* || *).M\}X}
+\\\hline
+	\strut S_A                     & \term{\{M\}X}
+\end{array}
+\]
+Note that in the transition for $\term{na}$ we require that $a,\dual a\notin A$, which can always be satisfied by $\alpha$-conversion.
+
+
+\subsection*{Reduction rules}
+
+\newcommand\perm{\mathsf p}
+\newcommand\turn{\mathsf t}
+\newcommand\sync{\mathsf s}
+\newcommand\unit{\mathsf u}
+
+Reduction rules can be viewed as arguments $\term{[M]a}$ and $\term{a[M]}$ propagating through a sequential term, in search of a matching abstraction $\term{a<x>}$ and initializer $\term{na}$, respectively.
+\[
+\begin{aligned}
+	\term{[N]a.a<x>.M} & ~\rw_\beta~ \term{\{N/x\}M}
+\\[5pt]
+	\term{na.a[N].M}  & ~\rw_\turn~ \term{na.[N]-a.M}
+\\	\term{na.-a[N].M} & ~\rw_\turn~ \term{na.[N]a.M}
+\\[5pt]
+	\term{(*||N).M} &~\rw_\unit~ \term{N;M}
+\\	\term{(N||*).M} &~\rw_\unit~ \term{N;M}
+\\[5pt]
+	\term{[N]b.a<x>.M} & ~\rw_\perm~ \term{a<x>.[N]b.M} && (a\neq b, \term x\notin\fv N)
+\\	\term{[N]b.a[P].M} & ~\rw_\perm~ \term{a[P].[N]b.M} && (a\neq b)
+%\\	\term{b<x>.a[P].M} & ~\rw_\perm~ \term{a[P].b<x>.M} && (a\neq b, a\neq\dual b, \term x\notin\fv P)
+\\	\term{nb.a<x>.M}  & ~\rw_\perm~ \term{a<x>.nb.M} && (a\neq b, a\neq\dual b)
+\\	\term{nb.a[P].M}  & ~\rw_\perm~ \term{a[P].nb.M} && (a\neq b, a\neq\dual b)
+\\[5pt]
+	\term{(a[N].P || Q).M} & ~\rw_\sync~ \term{a[N].(P||Q).M}
+\\	\term{(P || a[N].Q).M} & ~\rw_\sync~ \term{a[N].(P||Q).M}	
+%\\	\term{(a<x>.P || Q).M} & ~\rw_\sync~ \term{a<x>.(P||Q).M} && (x\notin\fv{Q}\cup\fv{M})
+% This is wrong because (a<x>.P || -a[N].Q) should interact.
+\end{aligned}
+\]
+
+\noindent
+We consider other potential rules for inclusion or exclusion. The main issue is to solve the basic interaction of two parallel processes:
+\[
+	\term{na.(-a[N].P || a<x>.Q)} ~\rws~ \term{na.(P || \{N/x\}Q)}
+\]
+
+\begin{itemize}
+	\item
+Additional serialization rules for abstraction:
+\[
+\begin{aligned}
+	\term{(a<x>.P || Q).M} & ~\rw_\sync~ \term{a<x>.(P||Q).M} && (x\notin\fv{Q}\cup\fv{M})
+\\	\term{(P || a<x>.Q).M} & ~\rw_\sync~ \term{a<x>.(P||Q).M} && (x\notin\fv{P}\cup\fv{M})
+\end{aligned}
+\]
+These rules seem a natural complement to the other serialization rules. But they create incorrect (as well as correct) reductions.
+\[
+	\term{na.(-a[N].P || a<x>.Q)} ~\rw_\sync~ \term{na.a<x>.(-a[N].P || Q)} ~\rw_\sync~ \term{na.a<x>.-a[N].(P||Q)}
+\]
+
+	\item
+Prioritisation of send over receive:
+\[
+	\term{a<x>.b[N].M} ~\rw_\sync~ \term{b[N].a<x>.M} \quad ( a\neq b, x\notin\fv{N} )
+\]
+This would solve the interaction problem, but at the cost that abstractions can no longer be used as guards or semaphores, since they no longer block a process from sending. Arguably this is not a major issue if we are aiming for confluence, when blocking is not a necessary or desirable feature.
+
+	\item
+Propagation rules into a parallel construct:
+\[
+\begin{aligned}
+	\term{[N]a.(P || Q).M} & ~\rw_\sync~ \term{([N]a.P||Q).M}
+\\	\term{[N]a.(P || Q).M} & ~\rw_\sync~ \term{(P||[N]a.Q).M}
+\end{aligned}
+\]
+These rules naturally fit the pattern of arguments $\term{[N]a}$ propagating to find a matching abstraction $\term{a<x>}$. But they are non-deterministic and create incorrect as well as correct reductions. Types would rule out the incorrect reductions, as would a location-annotated parallel construct $\term{A\!||\!B}$.
+
+
+\end{itemize}
+
+
+
+
+
+Normal forms (unfinished and hard)
+
+\[
+\begin{aligned}
+	\term{N_0} & ~\coloneqq~ \term{N_1} ~\mid~ \term{a<x>.N_0} ~\mid~ \term{na.N_0}
+\\	\term{N_1} & ~\coloneqq~ \term{N_2} ~\mid~ \term{[N_0]}	
+\end{aligned}
+\]
+
+
+
+\subsection*{Simple types}
+
+\begin{definition}
+\emph{Simple CFMC-types} are built over four categories, given by the following grammars: \emph{types} $\type{r,s,t}$, \emph{polarized types} $\type{p,q}$, \emph{type vectors} $\type{!p,!t}$, and \emph{memory types} $\type{!pA,!tA}$.
+\[
+\begin{array}{r@{}l}
+	\type{s,t,u} & ~\coloneqq~ \type{!pA>!tB}
+\\[5pt]
+	\type{p,q}   & ~\coloneqq~ \type{t}~\mid~\type{-t}
+\\[5pt]	
+	\type{!p}    & ~\coloneqq~ \type{p_1\dotso p_n}
+\\[5pt]
+	\type{!pA}   & ~\coloneqq~ \{\type{!p_a}\mid a\in\A\}
+\end{array}
+\]
+\emph{Duality} $\type{-t}$ extends as an operation to polarized types by $\type{--t}=\type t$ and to vectors and memory types element-wise.
+\end{definition}
+
+
+\[
+\begin{array}{c}
+	\infer[\TR *]{\term{G |- *: ?tA>!tA}}{}
+\\ \\
+	\infer[\TR x]{\term{G , x: ?pA>!sA |- x.M : ?pA\,?qA > !tA}}{\term{G , x: ?pA>!sA |- M : ?sA\,?qA > !tA}}
+\\ \\
+	\infer[\TR l]{\term{G |- a<x>.M : a(s) \, ?pA > !tA}}{\term{G , x:s |- M : ?pA > !tA}}
+\\ \\
+	\infer[\TR a]{\term{G |- [N]a.M : ?pA > !tA}}{\term{G |- N:s} && \term{G |- M : a(s) \, ?pA> !tA}}
+\\ \\
+	\infer[\TR s]{\term{G |- a[N].M : a(-s) \, ?pA > !tA}}{\term{G |- N:s} && \term{G |- M : ?pA > !tA}}
+\\ \\
+	\infer[\TR p]{\term{G |- M || N : ?pA\,?pB > !tA\,!tB}}{\term{G |- M : ?pA > !tA} && \term{G |- N : ?pB > !tB}}
+\\ \\
+	\infer[\TR n]{\term{G |- na.M : ?pA > !tA }}{\term{G |- M : a(?q)\,-a(-?q)\,?pA > !tA}}
+\end{array}
+\]
+
+The typing rules may be illustrated by typing diagrams as follows.
+\[
+\begin{array}{lr@{~}c@{~}l@{\qquad\qquad}lr@{~}c@{~}l}
+	\tr *:
+	&&&
+    \begin{tikzpicture}[wires,baseline=\base]
+    	\termbox0303^*
+    	\wire=1{ . << ^{?tA} . >> ^{!tA} .}
+    \end{tikzpicture}
+&
+	\tr a:
+	&
+    \begin{tikzpicture}[wires,baseline=\basefour]
+    	\termbox2604^M
+    	\wire-2[a]{ . >^s .. <^s . <+ ^{?pA} . >> ^{!tA} . }[a]
+    	\wire=1   { .     ..     . <+        . >>        . }
+    \end{tikzpicture}
+    &=&
+    \begin{tikzpicture}[wires,baseline=\basefour]
+    	\termbox0304^{[N]a.M}
+    	\wire-2[a]{ . <+ ^{?pA} . >> ^{!tA} . }[a]
+    	\wire=1   { . <+        . >>        . }
+    \end{tikzpicture}
+\\ \\
+	\tr x:
+	&
+    \begin{tikzpicture}[wires,baseline=\base]
+    	\termbox0303^x
+    	\termbox3703^M
+    	\wire=1{ . <+ ^{?pA} . >> ^{!sA} .. <<^{?sA} . <+^{?qA} . >>^{!tA} .}
+    \end{tikzpicture}
+    &=&
+    \begin{tikzpicture}[wires,baseline=\base]
+    	\termbox0403^{x.M}
+    	\wire=1{ . <+ ^{?pA} . <+^{?sA} . >>^{!tA} .}
+    \end{tikzpicture}
+&
+	\tr l:
+	&
+	\begin{tikzpicture}[wires,baseline=\basefour]
+    	\termbox2504^M
+    	\wire-2[a]{ . <^s .. <+ ^{?pA} . >> ^{!tA} . }[a]
+    	\wire=1   { .     .. <+        . >>        . }
+    \end{tikzpicture}
+    &=&
+    \begin{tikzpicture}[wires,baseline=\basefour]
+    	\termbox0404^{a<x>.M}
+    	\wire-2[a]{ . <^s . <+ ^{?pA} . >> ^{!tA} . }[a]
+    	\wire=1   { .     . <+        . >>        . }
+    \end{tikzpicture}
+\\ \\
+&&&&
+	\tr s:
+	&
+	\begin{tikzpicture}[wires,baseline=\basefour]
+    	\termbox2504^M
+    	\wire-2[a]{ . +^{-s} .. <+ ^{?pA} . >> ^{!tA} . }[a]
+    	\wire=1   { .        .. <+        . >>        . }
+    \end{tikzpicture}
+    &=&
+    \begin{tikzpicture}[wires,baseline=\basefour]
+    	\termbox0404^{a[N].M}
+    	\wire-2[a]{ . +^{-s} . <+ ^{?pA} . >> ^{!tA} . }[a]
+    	\wire=1   { .        . <+        . >>        . }
+    \end{tikzpicture}
+\\ \\
+	\tr p:
+	&
+    \begin{tikzpicture}[wires,baseline=\basesix]
+    	\termbox 0336^M
+    	\termbox 0303_N
+    	\wire=4[A]{ . <+^{?pA} . >>^{!tA} . }[A]
+    	\wire=2[B]{ . <+_{?pB} . >>_{!tB} . }[B]
+    \end{tikzpicture}
+    &=&
+    \begin{tikzpicture}[wires,baseline=\basesix]
+    	\termbox 0306^{M||N}
+    	\wire=4[A]{ . <+^{?pA} . >>^{!tA} . }[A]
+    	\wire=2[B]{ . <+_{?pB} . >>_{!tB} . }[B]
+    \end{tikzpicture}
+&
+	\tr n:
+	&
+	\begin{tikzpicture}[wires,baseline=\basesix]
+    	\termbox1407^M
+    	\draw[rounded corners] (1,3) -| (0,4) |- (1,5) ;
+    	\wire-5      [a]{ /. <+ ^{?q}  .          . }[a]
+		\wire-3[\dual a]{ /. <+ ^{-?q} .          . }[\dual a] 
+    	\wire=1      [A]{ .. <+ ^{?pA} . >>^{!tA} . }[A]
+    \end{tikzpicture}
+    &=&
+	\begin{tikzpicture}[wires,baseline=\basesix]
+    	\termbox0303^{na.M}
+    	\wire=1      [A]{ . <+ ^{?pA} . >>^{!tA} . }[A]
+    \end{tikzpicture}
+\end{array}
+\]
+
+
+\end{document}
+
+\newpage
+
+\section{Obsolete draft materials}
+
+\subsection*{Communicating Abstract Machine}
+
+The shared-memory calculus is irredeemably non-confluent. As a first remedy, we annotate the parallel composition with the locations used on either side, and require that they are disjoint.
+\[
+	{\color1(N\, _A\kern-1pt{\|}\kern-1pt_B\,P).\,M}\quad (A\cap B=\varnothing) 
+\]
+This gives a \emph{communicating} calculus, where shared memory is ruled out, and channels unambiguously connect two processes (or one process to itself). We may give a reasonable reduction relation:
+
+\[
+\begin{array}{r@{~}l@{~}ll}
+	\term{[N]a.a<x>.M} &\rw_\beta& \term{\{N/x\}M}
+\\[5pt]	\term{[N]b.a<x>.M} &\rw_\pass& \term{a<x>.[N]b.M}	& (a\neq b,~\term x\notin\fv N)
+\\[5pt]	\term{[N]b.a[P].M} &\rw_\pass& \term{a[P].[N]b.M}	& (a\neq b)
+\\[5pt]	\term{[N]a.(P A\!||\!B\, Q).M} &\rw_\pass &\term{([N]a.P A\!||\!B\, Q).M} & (a\in A)
+\\[5pt]	\term{(a[N].P A\!||\!B\, Q).M} &\rw_\pass &\term{a[N].(P A\!||\!B\, Q).M} & (a\in A)
+%\\[5pt]	\term{(I.P A\!||\!B\, Q).M} &\rw_\pass &\term{I.(P A\!||\!B\, Q).M} & (I\in\{\term{a<x>,[N]a,a[N]}\mid a\in A, x\notin\fv Q\cup\fv M\})
+%\\[5pt]	\term{(P A\!||\!B\, I.Q).M} &\rw_\pass &\term{I.(P A\!||\!B\, Q).M} & (I\in\{\term{a<x>,[N]a,a[N]}\mid a\in B, x\notin\fv P\cup\fv M\})
+\\[5pt] \term{(*A\!||\!B\,*).M} &\rw_\pass& \term M
+\\[5pt]	\term{na.a[N].M}   &\rw_\pass& \term{na.[N]-a.M}
+\\[5pt]	\term{na.-a[N].M}  &\rw_\pass& \term{na.[N]a.M}
+\\[5pt]	\term{na.b[N].M}   &\rw_\pass& \term{b[N].na.M}     & (a\neq b) 
+\end{array}
+\]
+
+
+Normal forms are the terms $\term{N_0}$ given by the below grammars.
+\[
+\begin{array}{l@{~\coloneqq~}r@{~\mid~}r@{~\mid~}r}
+	\term{N_0} & \term{N_1} & \term{a<x>.N_0}   & \term{a[N_0].N_0}  \\ 
+	\term{N_1} & \term{N_2} & \term{[N_0]a.N_1} \\
+	\term{N_2} & \term*     & \term{x.N_0}          
+\end{array}
+\]
+
+A \emph{process tree} is given by
+\[
+	X ~\coloneqq~ (S_A,\term M) ~\mid~ (X|Y).\term M
+\]
+where we write $\{Y\}X$ respectively $\{Y\}\{Z\}X$ for a process tree with distinguished subtree $Y$, respectively subtrees $Y$ and $Z$.
+\[
+\begin{array}{@{\{}l@{~,~}r@{\}X}}
+	\strut S_A; S_a \, \term N     & \term{a<x>.M}
+\\\hline
+	\strut S_A; S_a                & \term{\{N/x\}M}
+\\[16pt]
+	\strut S_A; S_a                & \term{[N]a.M}
+\\\hline
+	\strut S_A; S_a \, \term N     & \term M
+\\[16pt]
+	\strut S_A                     & \term{na.M}
+\\\hline
+	\strut S_A; \e_a; \e_{\dual a} & \term{M}
+\\[16pt]
+	\strut S_A; \e_a; \phantom N \, S_{\dual a} & \term{a[N].M}
+\\\hline
+	\strut S_A; \e_a;    \term N \, S_{\dual a} & \term{M}
+\end{array}
+\]
+
+\[
+\begin{array}{@{\{}l@{~,~}r@{\}\{}l@{~,~}r@{\}X}}
+	\strut S_B; \phantom N \, S_{\dual a} & \term P & S_A ; \e_a & \term{a[N].M}
+\\\hline
+	\strut S_B;    \term N \, S_{\dual a} & \term P & S_A ; \e_a & \term M
+\end{array}
+\]
+
+\[
+\begin{array}{@{\{}c@{\}X}}
+	\strut S_A; S_B ~,~ {\color1(N\, _A\kern-1pt{\|}\kern-1pt_B\,P).\,M}
+\\\hline
+	\strut ((S_A,\term N) ~|~ (S_B,\term P)).\,\term M
+\\[16pt]
+	\strut ((S_A,\term *) ~|~ (S_B,\term *)).\,\term M
+\\\hline
+	\strut (S_A; S_B ~,~ \term M)
+\end{array}
+\]
+
+
+
+%	\strut S_A; S_B                & \term{\{(* || *).M\}X}
+%\\\hline
+%	\strut S_A                     & \term{\{M\}X}
+
+
+
+
+
+
+
+
+\subsection*{Message-passing concurrency}
+
+\[
+\begin{array}{c}
+	\infer{\term{L |- * :: A}}{}
+\\ \\
+	\infer{\term{L , x :: A |- x.M : A}}{\term{L , x :: A |- M :: A }}
+\\ \\
+	\infer{\term{L |- [N]a.M :: A}}{\term{L |- N :: A} && \term{G |- M :: A}}
+\\ \\
+	\infer{\term{L |- a<x>.M :: A}}{\term{L , x :: A |- M :: A}}
+\\ \\
+	\infer{\term{L |- a[N].M :: A}}{\term{L |- N:r} && \term{L |- M :: A}}
+\\ \\
+	\infer{\term{L |- M || N :: A+B}}{\term{L |- M :: A} && \term{L |- N :: B}}
+\end{array}
+\]
+
+%   a[N_A].M_B  --  -a -> A
+%   [N_A]a.M_B  --   a -> A
+%   
+
+
+
+
+
+
+\emph{Head contexts} are given by
+\[
+	\term{H}      ~\coloneqq~
+	\term{\{\}}   ~\mid~
+	\term{[M]a.H} ~\mid~
+	\term{a<x>.H} ~\mid~
+	\term{a[M].H} ~\mid~
+	\term{(H||M).N}~\mid~
+	\term{(H\{*\}||H\{*\}).H}
+\]
+where $\term{H\{M\}}$ ($\term H$ with its hole filled by $\term M$, capturing in $\term M$) is written $\term{H.M}$. The \emph{locations} $\loc H$ and \emph{binding variables} $\bv H$ of $\term H$ are those of its instructions. \emph{Parallel contexts} are given by
+\[
+	\term{P,Q} ~\coloneqq~
+	\term{\{\}}   ~\mid~
+	\term{H.P}      ~\mid~
+	\term{(P||M).N} ~\mid~
+	\term{(M||P).N}
+\]
+where the locations $\loc P$ and binding variables $\bv P$ are those of its head contexts $\term{H}$. \emph{Reduction} is by the following rewrite rules, which are closed under all contexts.
+\[
+\begin{array}{r@{}l@{\qquad}l}
+	\term{[N]a.H.a<x>.M} 		 &~\rw~ \term{H.\{N/x\}M} & a\notin\loc H,~\bv H\cap\fv N=\varnothing
+\\ \\
+	\term{P\{-a[N].M\} || Q\{a<x>.M'\}} &~\rw~ \term{P\{M\} || Q\{ \{N/x\}M'\} } & a\notin\loc P\cup\loc Q,~\bv Q\cap\fv N=\varnothing
+\end{array}
+\]
+
+\[
+	\term{H^n}      ~\coloneqq~
+	\term{\{\}}~~(n=1) ~\mid~
+	\term{[M]a.H^n} ~\mid~
+	\term{a<x>.H^n} ~\mid~
+	\term{a[M].H^n} ~\mid~
+	\term{(H^i||H^j).N}~~(n=i+j)~\mid~
+	\term{(H^1\{*\}||H^1\{*\}).H}
+\]
+\[
+	\term{P^n}~\coloneqq~
+	\term{M}~~(n=0)~~\mid
+	\term{\{\}}~~(n=1)~~\mid~
+	\term{H.P^n}~\mid~
+	\term{(P^i||P^j)}
+\]
+
+\subsection*{Types}
+
+\begin{definition}
+\emph{Types} are given by the following grammars, where $\type o\in\{\type{+,-,*}\}$.
+\[
+\begin{array}{r@{}l}
+	\type{s,t,u} & ~\coloneqq~ \type{(*?sA>+!tA)}
+\\[5pt]
+	\type{o!tA}  & ~\coloneqq~ \{\type{o!t_a}\mid a\in\A\}
+\\[5pt]	
+	\type{o!t}    & ~\coloneqq~ \type{o t_n\dotso t_1}
+\\[5pt]
+	\type{*t}   & ~\coloneqq~ \type {+t}~\mid~\type{-t}
+\end{array}
+\]
+We may omit the $\type+$ when writing a positive type. The following notation is further added: 
+\begin{itemize}
+	\item \emph{reversal:}
+$\type{*?t}=\type{*t_1\dots *t_n}$ if $\type{*!t}=\type{*t_n\dots*t_n}$,
+	\item \emph{duality:}
+$\type{-(-t)}=\type{+t}$ and $\type{-(+t)}=\type{-t}$, lifted by $\type{-(*t_n\dots *t_1)}=\type{-(*t_n)\dots -(*t_1)}$ and $\type{-(*!tA)}=\{\type{-(*!t_a)}\mid a\in\A\}$,
+	\item \emph{concatenation:}
+$\type{*!sA*!tA}~=~\{\type{*!s_a*!t_a}\mid a\in\A\}$,
+	\item \emph{injection:}
+$\type{a(*!t)}$ for a vector of types $\type{*!t}$ is given by: $\type{a(*!t)_a}=\type{*!t}$ and $\type{a(*!t)_b}$ with $a\neq b$ is the empty type vector,
+	\item \emph{selection:}
+$\type{t_a}=\type{*?r_a>+!s_a}$ if $\type t=\type{*?sA>+!tA}$.
+\end{itemize}
+\end{definition}
+
+
+\newpage
+
+The typing rules are
+\[
+\begin{array}{c}
+	\infer{\term{G |- *: +?tA>+!tA}}{}
+\\ \\
+	\infer{\term{G , x: *?rA>+!sA |- x.M : *?rA*?tA>+!uA}}{\term{G , x: *?rA>+!sA |- M : -?sA*?tA>+!uA}}
+\\ \\
+	\infer{\term{G |- [N]a.M : *?sA>+!tA}}{\term{G |- N:r} && \term{G |- M : a(+r)*?sA>+!tA}}
+\\ \\
+	\infer{\term{G |- a<x>.M : a(+r)*?sA>+!tA}}{\term{G , x:r |- M : *?sA>+!tA}}
+\\ \\
+	\infer{\term{G |- a[N].M : a(-r)*?sA>+!tA}}{\term{G |- N:r} && \term{G |- M : *?sA>+!tA}}
+\\ \\
+	\infer{\term{G |- M a|b N : *?sA*?uB>+!tA+?wB}}{\term{G |- M : a(-(*r))*?sA>!tA} && \term{G |- N : b(*r)*?uB>+?wB}}
+\end{array}
+\]
+where in the last rule $\{a\}$, $\{b\}$, $\A$, and $\B$ are disjoint. Note that this rule has been simplified to omit the sequential composition.
+
+
+
+\end{document}
+
+Terms and types are parameterized in a family of \emph{locations} $\A$ and a family of \emph{channels} $\C$.
+
+\begin{definition}
+\emph{Terms} are given by the following grammar.
+\[
+	\term{M,N,P}~\coloneqq~
+	\term*~\mid~
+	\term{x.N}~\mid~
+	\term{[M]a.N}~\mid~
+	\term{a<x>.N}~\mid~
+	\term{c[M].N}~\mid~
+	\term{c<x>.N}~\mid~
+	\term{(M|cP).N}
+\]
+\emph{Reduction} is by the following rewrite rules, which are closed under all contexts.
+\[
+\term{[M]a.A_1\dots A_n.a<x>.N} ~\rw~\term{A_1\dots A_n.\{M/x\}N}
+\]
+\[
+\term{A_1\dots A_n.c[M].N |c B_1\dots B_m.c<x>.P} ~\rw~ \term{A_1\dots A_n.N |c B_1\dots B_m.\{M/x\}P}
+\]
+In the first, each $A_i$ is an action \emph{not} on $a$, and in the second, each $A_i$ and $B_i$ is an action not along $c$, and no $A_i$ binds in $M$.
+\end{definition}
+
+
+
+\begin{definition}
+\emph{Types} are given by the following grammars.
+\[
+\begin{array}{r@{}l}
+	\type{s,t,u} & ~\coloneqq~ \type{(?pC|?sA>!tA)}
+\\[5pt]
+	\type{!tA}   & ~\coloneqq~ \{\type{!t_a}\mid a\in\A\}
+\\[5pt]	
+	\type{!t}  & ~\coloneqq~ \type{t_1\dots t_n}
+\\[5pt]
+	\type{p,r}   & ~\coloneqq~ \type {<t}~\mid~\type{>t}
+\end{array}
+\]
+The following notation is further added: 
+\begin{itemize}
+	\item \emph{reversal:}
+$\type{?t}=\type{t_n\dots t_1}$ if $\type{!t}=\type{t_1\dots t_n}$,
+	\item \emph{duality:}
+$\type{(<t)-}=\type{>t}$ and $\type{(>t)-}=\type{<t}$, lifted by $\type{(?p_c)-}=\type{p-_n\dots p-_1}$ if $\type{?p_c}=\type{p_n\dots p_1}$, and $\type{?p-C}=\{\type{?p-_c}\mid c\in\C\}$,
+	\item \emph{concatenation:}
+$\type{!sA !tA}~=~\{\type{!s_a!t_a}\mid a\in\A\}$,
+	\item \emph{injection:}
+$\type{`a(!t)}$ for a vector of types $\type{!t}$ is given by: $\type{`a(!t)_a}=\type{!t}$ and $\type{`a(!t)_b}$ with $a\neq b$ is the empty type vector,
+	\item \emph{selection:}
+$\type{t_a}=\type{?r_a>!s_a}$ and $\type{t_c}=\type{?p_c}$ if $\type t=\type{?pC|?sA>!tA}$.
+\end{itemize}
+\end{definition}
+
+
+
+\begin{figure}
+\[
+\begin{array}{c}
+	\infer{\term{G |- *: | ?tA>!tA}}{}
+\\ \\
+	\infer{\term{G , x: ?pC | ?sA>!uA |- x : ?pC | ?sA?tA>!tA!uA}}{}
+\\ \\
+	\infer{\term{G |- N.[M]a : ?pC | ?sA>!tAa(u)}}{\term{G |- N : ?pC | ?sA>!tA} && \term{G |- M:u}}
+\\ \\
+	\infer{\term{G |- a<x>.N : ?pC | a(u)?sA>!tA}}{\term{G , x:u |- N : ?pC | ?sA>!tA}}
+\\ \\
+	\infer{\term{G |- c[M].N : c(u)?pC | ?sA>!tA}}{\term{G |- M:u} && \term{G |- N : ?pC | ?sA>!tA}}
+\\ \\
+	\infer{\term{G |- c<x>.N : c(u-)?pC | ?sA>!tA}}{\term{G , x:u |- N : ?pC | ?sA>!tA}}
+\\ \\
+	\infer{\term{G |- M.N : ?pC?rC | ?sA>!uA }}{\term{G |- M : ?pC | ?sA>!tA } && \term{G |- M.N : ?rC | ?tA>!uA }}
+\\ \\
+	\infer{\term{G |- N|cM : ?pC?r_{\mathcal D} | ?sA?u_{\mathcal B}>!tA?w_{\mathcal B}}}{\term{G |- N : c(!p)?pC | ?sA>!tA} && \term{G |- M : c(!p-)?r_{\mathcal D} | ?u_{\mathcal B}>?w_{\mathcal B}}}
+\\ \\
+\text{where }c\notin\C\cup\mathcal D\text{ and }\A\cap\mathcal B=\varnothing,~\C\cup\mathcal D=\varnothing
+\end{array}
+\]
+\end{figure}
+
+
+\subsection*{Communicating Abstract Machine}
+A \emph{term tree} is inductively defined by
+\[
+	\term{X} ~\coloneqq~\term N ~\mid~\term{(X\,\|\,Y) . N}~.
+\]
+We write $\term{\{Y\}X}$ for a tree with a distinguished subtree $\term Y$, which we may then replace. A \emph{state} is a tuple
+\[
+	(~\term{S_\A}~,~\term{Q_\C}~,~\term X ~)%\term{N_1}\,\|\dots\|\,\term{N_n}~)
+\]
+consisting of: a family of \emph{stacks} $\term{S_\A}$, a family of \emph{queues} $\term{Q_\C}$, and a term tree $\term{X}$. The \emph{transitions} are the following.
+\[
+\begin{array}{@{(\,}l@{~,~}l@{~,~}r@{~)}}
+	\strut\term{S_\A;S_a} & \term{Q_\C} & \term{\{[M]a.N\}X}
+\\\hline
+	\strut\term{S_\A;S_a\cdot M} & \term{Q_\C} & \term{\{N\}X}
+\\[16pt]
+	\term{S_\A;S_a\cdot M} & \term{Q_\C} & \term{\{a<x>.N\}X}
+\\\hline
+	\term{S_\A;S_a} & \term{Q_\C} & \term{\{\{M/x\}N\}X}
+\\[16pt]
+	\term{S_\A} & \term{Q_\C ; }\phantom{M\cdot{}}\term{Q_c} & \term{\{c[M].N\}X}
+\\\hline
+	\term{S_\A} & \term{Q_\C ; M\cdot Q_c} & \term{\{N\}X}
+\\[16pt]
+	\term{S_\A} & \term{Q_\C ; Q_c\cdot M} & \term{\{c<x>.N\}X}
+\\\hline
+	\term{S_\A} & \term{Q_\C ; Q_c} & \term{\{M/x\}N\}X}
+\\[16pt]
+	\term{S_\A} & \term{Q_\C} & \term{\{(M|cP).N\}X}
+\\\hline
+	\term{S_\A} & \term{Q_\C} & \term{\{(M\,|\,P).N\}X}
+\\[16pt]
+	\term{S_\A} & \term{Q_\C} & \term{\{(*\,\|\,*).N\}X}
+\\\hline
+	\term{S_\A} & \term{Q_\C} & \term{\{N\}X}
+\end{array}
+\]
+
+
+
+\end{document}
+
+
+%============================================================ END
+
+
+
