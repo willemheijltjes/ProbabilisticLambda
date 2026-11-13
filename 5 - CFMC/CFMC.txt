@@ -201,3 +201,14 @@ Tentative to-do list
 * Related formalisms. A) Higher-order CCS (CHOCS) is closely related, but I recall thinking that we have an extra duality that allows typing to work out. B) We don't have channels as first-class objects like pi-calculus does, but can we encode it using higher order? C) How do we compare to session types? They have problems; do we already solve some of them? We could ask Jorge Perez, who was interested and positive when I presented the calculus (now three years ago...).
 
 
+Outline of the theory:
+
+* Annotated calculus (M A||B N) should be confluent
+* Typed calculus is terminating
+  - Proof via WH-normalization
+  - Need to connect WH to machine
+
+
+
+
+
