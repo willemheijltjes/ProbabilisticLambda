@@ -9,3 +9,5 @@ pl.pdf
 *.thm
 *.vtc
 4 - AST/FMC-AST.pdf
+.DS_Store
+5 - CFMC/CFMC.pdf

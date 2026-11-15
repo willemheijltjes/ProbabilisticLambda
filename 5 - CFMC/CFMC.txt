@@ -1,0 +1,214 @@
+We want to explore the design space extending FMC with concurrency. We have two key design principles:
+* We use locations {a,b,c,...} to model both shared state and channels.
+* We want the typed setting to correspond to MLL.
+
+The basic calculus is the poly-lambda-calculus:
+
+  M,N  ::=  x  |  a<x>.M  |  [N]a.M
+
+Operational semantics:
+
+  Stacks:  S,T  ::=  t1 ... tn 
+  Memory:  S_A  ::=  S1_a1 ... Sn_an
+  States:  (S_A,M)
+  Transitions:
+
+  ( S_A   S_a    , [N]a.M )
+  -------------------------
+  ( S_A  (S N)_a ,      M )
+
+
+  ( S_A  (S N)_a , a<x>.M )
+  -------------------------
+  ( S_A   S_a    , {N/x}M )
+
+To model shared state concurrency, we introduce parallel composition M || N  and a unit  o , "end". We initially want to keep the unit separate from "skip" (*), the unit for sequential composition, and then ask the question if they should be identified or not.   
+
+The concurrent poly-lambda-calculus:
+
+  M,N  ::=  x  |  a<x>.M  |  [N]a.M  |  o  |  M || N
+
+  Thread pools: M*  ::=  M1 | ... | Mn  (associative & commutative)
+  States:       (S_A,M*)
+  Transitions:
+
+
+  ( S_A   S_a    , [N]a.M | M*)
+  -----------------------------
+  ( S_A  (S N)_a ,      M | M*)
+
+
+  ( S_A  (S N)_a , a<x>.M | M*)
+  -----------------------------
+  ( S_A   S_a    , {N/x}M | M*)
+
+
+  ( S_A , o | M*)
+  ---------------
+  ( S_A ,     M*)
+
+Note in particular that the machine is non-deterministic: a pool may hold multiple terms that access the same location, e.g. a<x>.M and a<y>.N, and these are in a race condition.
+
+For message-passing concurrency, we use locations as channels. This requires the following.
+* A "connection" constructor  nab.M  which connects the locations a and b as a channel.
+* A "send" constructor  a[N].M  similar to "push".
+
+  M,N  ::=  x  |  a<x>.M  |  a[N].M  |  o  |  M || N  |  nab.M
+
+Channel connections are symmetric: nab.M = nba.M. The key difference between "send" and "push" is the interaction: push reacts with pop in a beta-step,
+
+  [N]a.a<x>.M  ->  {N/x}M
+
+while "send" must first traverse a channel before becoming available for interaction:
+
+  nab.a[N].M  ->  nab.[N]b.M
+
+There are two options for the machine: global memory, as in the previous case, or local memory, where each process has its own memory. We do the latter first, where "e_a" means an empty stack at location a.
+
+Local memory machine:
+
+  Processes:     X   ::=  (S_A , M)
+  Process pools: X*  ::=  X1 | ... | Xn    (associative & commutative)
+  Connections:   ab* ::=  a1-b1 ... an-bn  (associative, commutative & symmetric a-b = b-a)
+  States:        (ab* , X*)
+  Transitions:
+
+  ( ab* , (S_A  (S N)_a , a<x>.M) | X* )
+  --------------------------------------
+  ( ab* , (S_A   S_a    , {N/x}M) | X* )
+ 
+
+  ( ab* a-b , (S_A  e_a     S_b  , a[N].M) | X* )
+  -----------------------------------------------
+  ( ab* a-b , (S_A  e_a  (N S)_b ,      M) | X* )
+
+ 
+  ( ab* , (S_A , o) | X*)
+  -----------------------
+  ( ab* ,             X*)
+
+
+Global memory machine:
+
+  Thread pools:  M*  ::=  M1 | ... | Mn    (associative & commutative)
+  Connections:   ab* ::=  a1-b1 ... an-bn  (associative, commutative & symmetric a-b = b-a)
+  States:        (ab* , S_A , M*)
+  Transitions:
+
+
+  ( ab* , S_A  (S N)_a , a<x>.M | M* )
+  -------------------------------------
+  ( ab* , S_A   S_a    , {N/x}M | M* )
+ 
+
+  ( ab* a-b , S_A  e_a     S_b  , a[N].M | M* )
+  ---------------------------------------------
+  ( ab* a-b , S_A  e_a  (N S)_b ,      M | M* )
+
+
+  ( ab* , S_A , o | M*)
+  ---------------------
+  ( ab* , S_A ,     M*)
+
+Without "push", the difference between the global and local machine is minimal, but they are not equivalent (I think). With push, of course the global machine has shared memory as well as message passing, but the local machine doesn't.
+
+For reduction, we need to expand the calculus with "push":
+  
+  M,N  ::=  x  |  a<x>.M  |  a[N].M  |  [N]a.M  |  o  |  M || N  |  nab.M
+
+The idea for reduction is that a "send" or "push" travels through the term in search of a "pop" to interact with. This is obvious in most cases, except when a push meets a parallel composition:
+
+  [N]a.(M || P)
+
+We need to know whether [N]a will meet a matching pop a<x> in M, in P, or in both. We may of course reduce non-deterministically into either branch, but this would abandon close correspondence with the machine. Instead, let us define a notion of "parallel context" and try to find the right interaction.
+
+  PC  ::=  {}  |  PC || M  |  M || PC
+
+Reduction, where a =/= b,b1,..,bn :
+
+  [N]a.[N1]b1..[Nn]bn. PC{ a<x>.M }  -> [N1]b1..[Nn]bn. PC{ {N/x}M }
+
+  a[N].M || P ->  a[N].(M || P)
+
+  [P]b.a[N].M ->  a[N].[P]b.M
+
+  nab.a[N].M  ->  nab.[N]b.M
+
+I think this is right: the pushes [N]a.[N1]b1..[Nn]bn  represent the memory and the parallel context the thread pool.
+
+The next step is to reinstate sequential composition (or even control), but we may have enough to say without it. Anyway:
+
+  M,N  ::=  x  |  a<x>.M  |  a[N].M  |  [N]a.M  |  *  |  M;N  |  o  |  M || N  |  nab.M
+
+There is an immediate question: should * and o be identified? 
+
+For the machine, we need a parallel/sequential tree, and a context for such trees:
+
+  K  ::=  M  |  K|K  |  K>M
+
+  K{}  ::=  {}  |  K{}|K  |  K|K{}  |  K{}>M
+
+  Connections:   ab* ::=  a1-b1 ... an-bn  (associative, commutative & symmetric a-b = b-a)
+  States:        (ab* , S_A , K)
+  Transitions:
+
+
+  ( ab* , S_A  (S N)_a , K{ a<x>.M } )
+  ------------------------------------
+  ( ab* , S_A   S_a    , K{ {N/x}M } )
+ 
+
+  ( ab* a-b , S_A  e_a     S_b  , K{ a[N].M } )
+  ---------------------------------------------
+  ( ab* a-b , S_A  e_a  (N S)_b , K{      M } )
+
+
+  ( ab* , S_A , K{ M || N} )
+  --------------------------
+  ( ab* , S_A , K{ M | N } )
+
+
+  ( ab* , S_A , K{ M ; N } )
+  --------------------------
+  ( ab* , S_A , K{ M > N } )
+
+
+  ( ab* , S_A , K{ o | K'} )
+  --------------------------
+  ( ab* , S_A , K{     K'} )
+
+
+  ( ab* , S_A , K{ K'| o } )
+  --------------------------
+  ( ab* , S_A , K{ K'    } )
+
+  
+  ( ab* , S_A , K{ * > M } )
+  --------------------------
+  ( ab* , S_A , K{     M } )
+
+
+Tentative to-do list
+
+* The untyped calculus with the global memory machine. This would not feature a reduction relation, due to the problem of not knowing where to send, but it captures both shared-memory and message-passing concurrency.
+
+* The calculus with annotated parallel composition  M A||B N  where  M listens on channels A={a1,..,an} and N listens on B. This has a  local reduction relation. If we enforce A and B disjoint, we can use the local memory machine, and reduction should become confluent. The annotated composition should amount to Church-style typing for the concurrent part only, and allow type inference if we restrict to first-order.
+
+* The typed higher-order calculus. Strictly stronger than the annotated calculus, we should inherit confluence, and I have a draft termination proof.
+
+* MLL as a type system. Sets of channels A,B are the base types, with tensor and par two forms of parallel composition. We should have MIX. The termination proof should readily extend to this, and it proves deadlock-freeness as expected. MLL types cover only the network connections, and the send/receive aspect is orthogonal. Each formula has an underlying set of channels, projecting onto which looks like the relational semantics. MELL is a step too far at this point.
+
+* Related formalisms. A) Higher-order CCS (CHOCS) is closely related, but I recall thinking that we have an extra duality that allows typing to work out. B) We don't have channels as first-class objects like pi-calculus does, but can we encode it using higher order? C) How do we compare to session types? They have problems; do we already solve some of them? We could ask Jorge Perez, who was interested and positive when I presented the calculus (now three years ago...).
+
+
+Outline of the theory:
+
+* Annotated calculus (M A||B N) should be confluent
+* Typed calculus is terminating
+  - Proof via WH-normalization
+  - Need to connect WH to machine
+
+
+
+
+

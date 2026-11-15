@@ -1,0 +1,53 @@
+\documentclass{article}
+
+\usepackage[T1]{fontenc}
+\usepackage{charter}
+
+\usepackage[margin=2cm]{geometry}
+
+\usepackage{amssymb,amsthm,amsmath}
+\usepackage{accents}
+\usepackage{proof}
+\usepackage{xargs}
+\usepackage{xcolor}
+
+\usepackage{CFMC}
+
+\begin{document}
+
+Untyped:
+\[
+	\term{M,N} ~\coloneqq~ 
+	\term x       ~\mid~
+	\term{a<x>.M} ~\mid~ 
+	\term{a[N].M} ~\mid~
+	\term{[N]a.M} ~\mid~
+	\term{M || N} ~\mid~
+	\term{o}      ~\mid~
+	\term{nab.M}
+\]
+
+Annotated:
+\[
+	\term{M,N} ~\coloneqq~ 
+	\term x       ~\mid~
+	\term{a<x>.M} ~\mid~ 
+	\term{a[N].M} ~\mid~
+	\term{[N]a.M} ~\mid~
+	\term{M A||B N} ~\mid~
+	\term{o}      ~\mid~
+	\term{nab.M}
+\]
+
+Types:
+\[
+\begin{aligned}
+	\type{s,t}  &~\coloneqq~\type{!p_A}
+\\	\type{!p_A} &~\coloneqq~\{\type{!p_a} \mid a\in A\}
+\\  \type{!p}   &~\coloneqq~\type{p_1..p_n}
+\\  \type{p}    &~\colondqq~\type{+t} \mid \type{-t}
+\end{aligned}
+\]
+
+
+\end{document}
