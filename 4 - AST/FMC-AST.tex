@@ -1,6 +1,9 @@
 \documentclass[a4paper,UKenglish,cleveref, autoref, thm-restate]{lipics-v2021}
 
 
+\newif\ifLongVersion
+\LongVersionfalse
+%\LongVersiontrue
 
 % Potential further improvements:
 %  - explain "merge" |_| via functions: (gamma |_| delta)(i) = gamma(i) + delta(i)
@@ -43,8 +46,8 @@
 	
 	\node (x) at (0,-3) {};
 	
-	\coordinate (a) at ( .85,-1.7);% \node[gray,circle,draw,inner sep=0pt,minimum size=2pt] at (a) {};
-	\coordinate (b) at (1.25,-1.6);% \node[gray,circle,draw,inner sep=0pt,minimum size=2pt] at (b) {};
+	\coordinate (a) at ( .85,-1.7);
+	\coordinate (b) at (1.25,-1.6);
 	
     	\ifx#10
 		\draw[rounded corners=5pt] (m) -- (.5,-1) .. controls (a) and (b) .. (1.25,-.75) --node[pos=0.3,anchor=west]{\,$\termcolor\scriptstyle{j}$} (1.25,1.3) -- (0,1.3) -- (0,0.8);
@@ -66,16 +69,13 @@
 
 \title{Probabilistic Simple Types for Almost-Sure Termination}
 
-\author{Anonymous authors}{No affiliation}{}{}{}
+\author{Ugo {Dal Lago}}{University of Bologna, Italy \and INRIA Sophia Antipolis, France}{ugo.dallago@unibo.it}{https://orcid.org/0000-0001-9200-070X}{}
 
-%\author{Ugo {Dal Lago}}{University of Bologna, Italy \and INRIA Sophia Antipolis, France}{ugo.dallago@unibo.it}{https://orcid.org/0000-0001-9200-070X}{}
+\author{Willem Heijltjes}{University of Bath, United Kingdom \and \url{http://willem.heijltj.es}}{w.b.heijltjes@bath.ac.uk}{https://orcid.org/0009-0001-8941-1150}{}
 
-%\author{Willem Heijltjes}{University of Bath, United Kingdom \and \url{http://willem.heijltj.es}}{w.b.heijltjes@bath.ac.uk}{https://orcid.org/0009-0001-8941-1150}{}
+\authorrunning{U. Dal Lago and W. Heijltjes}
 
-\authorrunning{Anonymous authors}%\authorrunning{U. Dal Lago and W. Heijltjes}
-
-
-%\Copyright{Ugo Dal Lago and Willem Heijltjes}
+\Copyright{Ugo Dal Lago and Willem Heijltjes}
 
 
 
@@ -86,23 +86,23 @@
 
 %\relatedversion{}
 
-%\acknowledgements{Georgina Majury?}
+\acknowledgements{We thank Georgina Majury for her efforts on a precursor to this work, and the anonymous referees for their comments, in particular those leading to the observations in Section 8.}
 
-%\nolinenumbers
+\nolinenumbers
 
-\hideLIPIcs
+%\hideLIPIcs
 
-\EventEditors{}
-\EventNoEds{0}
-\EventLongTitle{}
-\EventShortTitle{}
-\EventAcronym{}
-\EventYear{}
-\EventDate{}
-\EventLocation{}
+\EventEditors{Corina C\^{\i}rstea and Yannick Forster}
+\EventNoEds{2}
+\EventLongTitle{35th EACSL Annual Conference on Computer Science Logic (CSL 2027)}
+\EventShortTitle{CSL 2027}
+\EventAcronym{CSL}
+\EventYear{2027}
+\EventDate{January 26--29, 2027}
+\EventLocation{Brighton, UK}
 \EventLogo{}
-\SeriesVolume{}
-\ArticleNo{}
+\SeriesVolume{403}
+\ArticleNo{38}
 
 \newcommand{\UDL}[1]{\textcolor{brown}{Ugo: #1}}
 
@@ -116,8 +116,6 @@
 We present a type system for almost-sure termination (AST) in higher-order probabilistic computation. Our vehicle is the recent Functional Machine Calculus (FMC), which combines the lambda-calculus with effectful imperative computation. Importantly for our purpose, it models branching and looping computation with sum types and a typed iterator construct. Our key observation is that by replacing sum types with probability distributions, types ensure that iteration has a non-zero chance of exiting, which then gives AST in a simple and natural way. 
 
 Concretely, our type system assigns explicit probability distributions to termination outcomes, allowing probabilistic behaviour to be tracked compositionally at the type level. Types then soundly guarantee almost-sure termination, even in the presence of higher-order functions. The fragment of ground terms, which consists purely of the branching and iteration constructs with probabilistic sampling, is equivalent to finite Markov chains and is positively AST (expected evaluation time is finite). The full calculus is more expressive, which we demonstrate through an example term with infinite expected evaluation time.
-
-%We exploit this insight by shifting attention from recursion to typed iteration, allowing probabilistic behaviour to be tracked compositionally at the type level. For this purpose we introduce a novel probabilistic type system that assigns explicit probability distributions to termination outcomes, and we show that these types soundly guarantee almost-sure termination, even in the presence of higher-order functions. We study the expressive power of the introduced system through an embedding of Markov chains, and prove that \emph{positive} almost-sure termination does not hold at higher-order, in general.
 \end{abstract}
 
 
@@ -126,14 +124,9 @@ Concretely, our type system assigns explicit probability distributions to termin
 
 \section{Introduction}
 
-We are interested in applying the toolset of the $\lambda$-calculus, in particular confluent reduction and type systems, to probabilistic computation.
-%
-We build on \cite{DalLago-Guerrieri-Heijltjes-2020}, which restores confluence to a probabilistic $\lambda$-calculus, the \emph{probabilistic event $\lambda$-calculus} (PEL), by decomposing probabilistic choice into a \emph{sampling} construct and a \emph{conditional}. For this calculus,~\cite{Antonelli-DalLago-Pistone-2022} and~\cite{Heijltjes-Majury-2025} give essentially the same probabilistic type system to give lower bounds on the probability of termination.
-%In~\cite{DalLago-Guerrieri-Heijltjes-2020} we restored confluence to a probabilistic $\lambda$-calculus, the \emph{probabilistic event $\lambda$-calculus} (PEL), by decomposing probabilistic choice into a \emph{sampling} construct and a \emph{conditional}. Then in~\cite{Antonelli-DalLago-Pistone-2022} and~\cite{Heijltjes-Majury-2025}, from different inspirations we converged on essentially the same probabilistic type system for the PEL to give lower bounds on the probability of termination.
-%
-In this paper we further extend the calculus, and develop a type system for \emph{almost-sure termination} (AST): termination with probability one. In doing so, our objective differs from that of many existing works in this area, which aim to capture as many AST programs as possible~\cite{DalLago-Grellois-2019,DalLago-Faggian-Ronchi-2021}, or even to study the feasibility of capturing all such programs~\cite{Kobayashi-DalLago-Grellois-2020}. Instead, we seek to understand the extent to which almost-sure termination can be obtained and explained in a natural manner, possibly using well-established methods, and guaranteed by a minimal extension to simple types. More powerful methods such as dependent types and intersection types may later build on this along standard lines.
+We are interested in applying the toolset of the $\lambda$-calculus, in particular confluent reduction and type systems, to probabilistic computation. In~\cite{DalLago-Guerrieri-Heijltjes-2020} we restored confluence to a probabilistic $\lambda$-calculus, the \emph{probabilistic event $\lambda$-calculus} (PEL), by decomposing probabilistic choice into a \emph{sampling} construct and a \emph{conditional}. Then in~\cite{Antonelli-DalLago-Pistone-2022} and~\cite{Heijltjes-Majury-2025}, from different inspirations we converged on essentially the same probabilistic type system for the PEL to give lower bounds on the probability of termination. In this paper we further extend the calculus, and develop a type system for \emph{almost-sure termination} (AST): termination with probability one. In doing so, our objective differs from that of many existing works in this area, which aim to capture as many AST programs as possible~\cite{DalLago-Grellois-2019,DalLago-Faggian-Ronchi-2021}, or even to study the feasibility of capturing all such programs~\cite{Kobayashi-DalLago-Grellois-2020}. Instead, we seek to understand the extent to which almost-sure termination can be obtained and explained in a natural manner, possibly using well-established methods, and guaranteed by a minimal extension to simple types. More powerful methods such as dependent types and intersection types may later build on this along standard lines.
 
-We start from the following observation. \emph{Iteration}, generally represented by while-loops, repeats a given function $f$ until a condition is fulfilled. In the typed case, illustrated  below, the function $f$ is required to return a sum $B+A$, where the choice between returning a value $A$ or $B$ represents the condition. Then $\mathsf{iter}\,f$ evaluates $f$, exits on $B$, and repeats on $A$.
+We start from the following observation. \emph{Iteration}, generally represented by while-loops, repeats a given function $f$ until a condition is fulfilled. In the typed case, illustrated  below, the function $f$ is required to return a sum $B+A$, where the choice between returning a value $A$ or $B$ represents the condition. Then $\mathsf{iter}\,f$ evaluates $f$, exits on $B$, and repeats on $A$~\cite{Bloom-Esik-1993}.
 \[
 \begin{array}{@{}r@{}l@{}}
 	f &{}: A \to B+A
@@ -143,15 +136,10 @@ We start from the following observation. \emph{Iteration}, generally represented
 \]
 With the above rule, as with typed fixed-point combinators, typing no longer guarantees termination. However, we observe that if we replace $B+A$ by a probabilistic sum $B \oplus_p A$ with a fixed probability $p\in (0,1]$, i.e.\ the probability of choosing $B$ is non-zero and does not depend on the input, then $\mathsf{iter}\,f$ is \emph{almost-surely terminating} (provided of course that $f$ is itself terminating). This opens a way to approach almost-sure termination via type systems. A crucial question arises: how can we handle a type constructor such as $B\oplus_p A$ within a $\lambda$-calculus with probabilistic choice in a compositional and elegant manner?
 
-These considerations illustrate how probabilistic choice is connected to other imperative features such as sequentiality and iteration. 
-%
-%Derived from the PEL, the second author has developed 
-This brings us to 
-%
-a new approach to unifying the $\lambda$-calculus with imperative computation and effects, the \emph{Functional Machine Calculus} (FMC)~\cite{Heijltjes-2023}. Its most recent instance~\cite{Heijltjes-2025-MFPS} features branching sequential computation and iteration, providing an ideal vehicle for our present study. In the FMC each branch of the computation is labelled with a \emph{choice} label $i,j,k,\dots$, which takes the r\^ole of a constant, an exception, a case label, or an exit status. For example, the boolean constants $\bot$ and $\top$ are choice labels. Iteration of a term $\term M$ is written $\term{M^i}$, which evaluates $\term M$ and repeats if $\term M$ chooses $i$, terminating for any other choice. The calculus encodes a fair probabilistic choice, which we write as $\term{M+N}$.
+These considerations illustrate how probabilistic choice is connected to other imperative features such as sequentiality and iteration. Derived from the PEL, the second author has developed a new approach to unifying the $\lambda$-calculus with imperative computation and effects, the \emph{Functional Machine Calculus} (FMC)~\cite{Heijltjes-2023}. Its most recent instance~\cite{Heijltjes-2025-MFPS} features branching sequential computation and iteration, providing an ideal vehicle for our present study. In the FMC each branch of the computation is labelled with a \emph{choice} label $i,j,k,\dots$, which takes the r\^ole of a constant, an exception, a case label, or an exit status. For example, the boolean constants $\bot$ and $\top$ are choice labels. Iteration of a term $\term M$ is written $\term{M^i}$, which evaluates $\term M$ and repeats if $\term M$ chooses $i$, terminating for any other choice. The calculus encodes a fair probabilistic choice, which we write as $\term{M+N}$.
 
 \begin{example}[Bernoulli Factory]
-The term $\term{(\heads + (\tails + \,i))^i}$ chooses \emph{heads}, the choice $\heads$, with probability $\frac12$, \emph{tails} $\tails$ with probability $\frac14$, and iterates with probability $\frac14$, to give an overall probability of $\frac 23$ for $\heads$ and $\frac 13$ for $\tails$. We illustrate it as follows; it will remain a running example. %throughout the paper.
+The term $\term{(\heads + (\tails + \,i))^i}$ chooses \emph{heads}, the choice $\heads$, with probability $\frac12$, \emph{tails} $\tails$ with probability $\frac14$, and iterates with probability $\frac14$, to give an overall probability of $\frac 23$ for $\heads$ and $\frac 13$ for $\tails$. We illustrate it as follows; it will remain a running example.
 \[
 	\term{(\heads + (\tails + \,i))^i}
 \quad=\quad
@@ -160,8 +148,8 @@ The term $\term{(\heads + (\tails + \,i))^i}$ chooses \emph{heads}, the choice $
 	\node (x) at (1,2) {$\termcolor\oplus$};
 	\node (y) at (2,1) {$\termcolor\oplus$};
 
-	\coordinate (a) at (2.75,0.25); %\node[gray,circle,draw,inner sep=0pt,minimum size=2pt] at (a) {};
-	\coordinate (b) at (3   ,0.3);  %\node[gray,circle,draw,inner sep=0pt,minimum size=2pt] at (b) {};
+	\coordinate (a) at (2.75,0.25);
+	\coordinate (b) at (3   ,0.3);
 	
 	\begin{scope}[->,>=stealth,anchor=north]
 	
@@ -261,7 +249,6 @@ We now turn to types. Deterministic types for the control constructs record the 
             \infer{\term{i:i+I}}{} 
 \qquad\quad	\infer{\term{M;i->N : I\cup J}}{\term{M:I+i} && \term{N:J}}
 \qquad\quad \infer{\term{M^i : I}}{\term{M:I+i}}
-%\qquad\quad \infer{\term{M:I\cup J}}{\term{M:I}}
 \]
 As in the previous, in the probabilistic setting types become (sub-)distributions $\type{p_I}=\type{p_1i_1 * \cdots * p_ni_n}$ over a set $I$ of choices. Ground terms are then typed by the rules in Figure~\ref{fig:ground types}, where we write $\type{p_I+q_I}$ for the pointwise addition of two distributions over $I$ and $\type{p.q_I}$ for the multiplication of each probability in $\type{q_I}$ by $\type p$. A type $\type{p_I}$ implicitly assigns probability zero to any choice not in $I$, corresponding to the weakened $\type I$ in the first rule above. Observe that the probabilistic type system is a direct generalization of the deterministic one.
 
@@ -312,8 +299,8 @@ As in the previous, in the probabilistic setting types become (sub-)distribution
 	
 	\draw[double,->,>=stealth] (m)--(I.north) ;
 	
-	\coordinate (a) at (0.85,-1.7);% \node[gray,circle,draw,inner sep=0pt,minimum size=2pt] at (a) {};
-	\coordinate (b) at (1.25,-1.6);% \node[gray,circle,draw,inner sep=0pt,minimum size=2pt] at (b) {};
+	\coordinate (a) at (0.85,-1.7);
+	\coordinate (b) at (1.25,-1.6);
 	
     \draw[rounded corners=5pt] (m) 
        -- (0.5,-1) .. controls (a) and (b) .. (1.25,-.75) 
@@ -345,8 +332,6 @@ As in the previous, in the probabilistic setting types become (sub-)distribution
 
 In Section~\ref{sec:ground terms} we will return to ground terms and prove a \emph{Kleene theorem} for them: ground terms are equivalent to finite Markov chains, given as probabilistic automata, where states correspond to choices. Then types compute the return distribution of an encoded Markov chain, while type inference is decidable, and terms typed with total distributions are positive AST.
 
-%We contend that our ground terms provide a simple and natural account of probabilistic computation: because they admit a system of simple types that is a direct generalization of deterministic branching and iteration; because of their equivalence with finite Markov chains; and because they combine seamlessly with the $\lambda$-calculus to give an account of higher-order probabilistic computation, as we will explore next.
-
 % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 \subsubsection*{The Probabilistic FMC}
@@ -371,7 +356,7 @@ It takes a (fair or unfair) coin from the stack as $\term x$, such as our $\frac
 \label{rem:CBPV}
 The notion of sequencing in the FMC is fundamentally the same as that of Moggi's computational metalanguage~\cite{Moggi-1991} and Levy's call--by--push--value~\cite{Levy-2003}: 
 \[
-	M\bind N ~=~ \term{M;N} %\quad=\quad \term{M;*->N}
+	M\bind N ~=~ \term{M;N}
 \]
 The difference is that the latter return a single value, while the FMC returns the whole stack: $\mathsf{return}~M~=~\term{[M].*}$. This notion of sequencing further allows the encoding of call--by--value behaviour, both in a deterministic and probabilistic setting; see~\cite{Heijltjes-2023}, respectively~\cite{Heijltjes-Majury-2025}.
 \end{remark}
@@ -432,26 +417,12 @@ The Functional Machine Calculus as presented in~\cite{Heijltjes-2023,Heijltjes-2
 
 After exploring related work in the next section, we will define the calculus (Section~\ref{sec:PFMC}) and the type system (Section~\ref{sec:types}), and give our main result, Theorem~\ref{thm:termination}: the probability given by the type of a term is a lower bound on the probability of termination, which implies almost-sure termination if that probability is one (Section~\ref{sec:AST}). The final sections explore the expressiveness of the calculus, demonstrating that ground terms are equivalent to finite Markov chains and thus positive AST (Section~\ref{sec:ground terms}), and that the full calculus is \emph{null AST}: while the probability of termination is one, expected runtime is infinite (Section~\ref{sec:NAST}).
 
-%In this paper, we explore this idea in the context of the FMC, introducing the \emph{probabilistic FMC} (\PFMC). This combines several key computational notions in a single cohesive package: higher-order functions through the $\lambda$-calculus, which conservatively embeds as a fragment; branching and iteration via choice labels, as introduced in the FMC~\cite{Heijltjes-2025-MFPS}; and the decomposition of probabilistic choice of the probabilistic event $\lambda$-calculus~\cite{DalLago-Guerrieri-Heijltjes-2020}. The main contribution is the typed calculus, the \PFMCT, a probabilistic variant of the typed FMC, with the main result that it guarantees almost-sure termination.
-
-%An overview of the features of the calculus, in order of appearance in the paper, is as follows. We introduce the untyped \PFMC\ as a fragment of the FMC in Section~\ref{sec:PFMC} via its operational semantics, a simple stack machine that naturally extends the Krivine machine~\cite{Krivine-2007}. The calculus inherits confluent reduction from the FMC~\cite{Heijltjes-2025-MFPS}; while a notable feature, we omit it here as it plays no crucial r\^ole. The typed calculus \PFMCT, introduced in Section~\ref{sec:types}, conservatively extends simple types for the $\lambda$-calculus (Remark~\ref{rem:simple types embed}) and our previous probabilistic types for the PEL~\cite{Antonelli-DalLago-Pistone-2022,Heijltjes-Majury-2025} (Remark~\ref{rem:probabilistic types embed}). The main result, Theorem~\ref{thm:termination}, is that the probability given by the type of a term is a lower bound on the probability of termination, which implies almost-sure termination if that probability is one.
-
-%In the remainder of the paper we then consider two aspects of the expressive power of the calculus. Section~\ref{sec:ground terms} considers \emph{ground terms}, the fragment of the calculus that combines branching and iteration with probabilistic choice, omitting the $\lambda$-calculus; essentially the fragment we have been using in this introduction. We observe that ground terms are equivalent to finite Markov chains (Proposition~\ref{prop:ground is markov}), and that typing, which is decidable, computes the return distribution of an encoded Markov chain (Proposition~\ref{prop:markov return}). This fragment is \emph{positive} AST (PAST): the expected runtime for a probabilistic term on the machine is finite. The full \PFMCT, being higher-order, is more expressive, and in Section~\ref{sec:NAST} we give an example term that is \emph{null} AST (NAST): while the probability of termination is one, expected runtime is infinite. The mechanism is standard: by probabilistically generating a series of terms $\term{M_n}$ as below, with exponentially decreasing probability but exponentially increasing runtime, i.e.\ $\term{M_{n+1}}$ takes double the time of $\term{M_n}$.
-%\[
-%	\fraction12\term{M_1}~,~\fraction14\term{M_2}~,~\fraction18\term{M_3},~\dots
-%\]
-
 %---------------------------------------------------------------------------------------------------- RELATED WORK
 
 \section{Related Work}
 \label{sec:related work}
 
-Our type system is a conservative extension of 
-%
-%our previous
-the
-%
-systems in \cite{Antonelli-DalLago-Pistone-2022} and \cite{Heijltjes-Majury-2025} (see Remark~\ref{rem:probabilistic types embed}). While those systems already feature higher-order functions, they do not account for either iteration or recursion.
+Our type system is a conservative extension of our previous systems in \cite{Antonelli-DalLago-Pistone-2022} and \cite{Heijltjes-Majury-2025} (see Remark~\ref{rem:probabilistic types embed}). While those systems already feature higher-order functions, they do not account for either iteration or recursion.
 
 The literature on semantics and termination properties of probabilistic computation is extensive and includes a wide range of techniques. We mention semantic domains~\cite{Dahlqvist-Kozen-2020,Kozen-1981,Vakar-Kammar-Staton-2019}, bisimulations and trace semantics~\cite{vanGlabbeek-Smolka-Steffen-1995,Silva-Sokolova-2011,Stark-Smolka-2000}, probabilistic automata~\cite{Esparza-Kucera-Mayr-2004,Etessami-Yannakakis-2009}, probabilistic coherence spaces~\cite{Crubille-Ehrhard-Pagani-Tasson-2017,Danos-Ehrhard-2011,Ehrhard-Tasson-2019}, program  logics~\cite{FerrerFioriti-Hermanns-2015,McIver-Morgan-Kaminski-Katoen-2018}, and separation logic~\cite{Barthe-Hsu-Liao-2020,Jereb-Simpson-2025}.
 
@@ -459,21 +430,9 @@ Type systems for probabilistic calculi are numerous and diverse as well. We dist
 
 Secondly, there are several formal methodologies enforcing AST or PAST in probabilistic $\lambda$-calculi with recursion. These are generally highly expressive, but complex, using involved techniques such as refinement types~\cite{Avanzini-DalLago-Ghyselen-2019,Kura-Unno-2024}, size types~\cite{DalLago-Grellois-2019}, non well founded type systems~\cite{DalLago-Padovani-2024,Das-Wang-Hoffmann-2023}, intersection types~\cite{Beutner-Ong-2021,DalLago-Faggian-Ronchi-2021}, guarded refinements~\cite{Gregersen-Aguirre-Haselwarter-Tassarotti-Birkedal-2024}, or CPS transformations~\cite{Avanzini-Barthe-DalLago-2021}. Such complexity is largely unavoidable: unlike in the deterministic case, probabilistic termination is undecidable even for higher-order programs operating over finite datatypes~\cite{Kobayashi-DalLago-Grellois-2020}, as exemplified by probabilistic variants of the $\lambda Y$-calculus and higher-order recursion schemes. Expressiveness thus comes at the expense of simplicity; here, we prioritize simplicity, obtaining a system that constitutes a minimal extension of simple types.
 
-% \cite{Aman-Ciobanu-2019} - session types
-
 Our approach sets itself apart in two ways. Firstly, from the FMC we inherit the combination of higher-order functions with \emph{iteration}, rather than \emph{recursion} (we comment on typing recursion in our system in Appendix~\ref{A:recursion}). Secondly, as a direct probabilistic generalisation of coproducts, our probabilistic types are a notion of \emph{simple types}. We are thus taking a ``bottom-up'' approach, consciously trading expressiveness for simplicity and extensibility: our simple types are highly restricted in the algorithms they may express, but they arise naturally from typed iteration, and we expect they will extend to more powerful type systems such as polymorphic types, intersection types, and dependent types along standard lines.
 
 It would be interesting to consider continuation-passing translations from our calculus into one with recursion. Generally, these require higher types; for instance, the simply-typed FMC, when translated this way into $\lambda$-calculus, requires System F types. With such a translation for the probabilistic FMC, it would then become possible to compare the expressive power of our system against the approaches  mentioned above. This is however out of scope for the present publication.
-
-
-
-% In the present work, we deliberately choose \emph{iteration} rather than \emph{recursion} in order to keep the framework as simple as possible. Indeed, handling probabilistic recursion poses substantial technical challenges, as it typically requires probabilistic function variables at the type level, effectively leading to the use of dependent types.
-
-%Several other works \cite{Avanzini-DalLago-Ghyselen-2019,DalLago-Grellois-2019,DalLago-Padovani-2024,Das-Wang-Hoffmann-2023} introduce type systems that guarantee almost-sure termination (AST) or positive almost-sure termination (PAST) for probabilistic $\lambda$-calculi equipped with recursion. However, these approaches generally prioritise expressive power, often at the expense of conceptual and technical simplicity. A notable exception is the work of the first author with Breuvart and Herrou on AST for extensions of G\"odel's $\mathbb{T}$~\cite{Breuvart-DalLago-Herrou-2021}. In that setting, however, one endows the underlying calculus either with recursion or with sampling from infinite distributions, rather than with iteration. In contrast, iteration is a fundamentally new ingredient of our approach and plays a central r\^ole in preserving simplicity while still capturing nontrivial probabilistic behaviour.
-
-%Another related line of research concerns the use of intersection types to characterise AST and PAST properties~\cite{DalLago-Faggian-Ronchi-2021}. Although such characterisations are indeed possible, they come at a significant cost: not only is type inference undecidable, but the resulting type structures are also highly complex. Yet another body of work focuses on the underlying verification problem. Unlike the deterministic case, probabilistic termination is undecidable even for higher-order programs operating over finite datatypes~\cite{Kobayashi-DalLago-Grellois-2020}, e.g., in probabilistic variants of the $\lambda Y$-calculus and higher-order recursion schemes. Our emphasis differs from these approaches, as we deliberately trade expressive power for a simpler and more tractable framework.
-
-%Finally, we acknowledge that the calculus introduced here currently has limited expressive power for practical algorithm design. This limitation stems both from the restriction to simple types and from the nature of exit probabilities in the iteration typing rule, which are fixed. A natural direction for future work would be a dependently typed generalisation, reminiscent of Hoare logic. Such an extension could facilitate reasoning about probabilistic termination in interactive theorem proving environments. From this perspective, the extensive body of work on sound verification of almost-sure termination in imperative programs~\cite{FerrerFioriti-Hermanns-2015,McIver-Morgan-Kaminski-Katoen-2018} and probabilistic automata~\cite{Etessami-Yannakakis-2009,Esparza-Kucera-Mayr-2004} also deserves mention. Although motivated by expressiveness and thus fundamentally different in spirit from the present work, this line of research offers many valuable ideas that could potentially be incorporated into the introduced framework.
 
 %---------------------------------------------------------------------------------------------------- PROBABILISTIC FMC
 
@@ -648,7 +607,6 @@ Our types are a conservative extension of simple types for the $\lambda$-calculu
 \[
 	\typ{t_1 \to \dots \to t_n \to o} \quad=\quad \type{t_1 \dots t_n => \e.1\star}
 \]
-%Expanding on Remark~\ref{rem:CBPV} that the notion sequentiality of the FMC coincides with that of the computational metalanguage and call--by--push--value, the 
 \end{remark}
 
 We introduce the following notation to work with distribution types. The \emph{basis} $\floor{\type d}$ of a distribution type $\type d$ is the set of choices $\floor{\type d}=I$ over which it is defined. To recover the informal notation of the introduction, we define the following: the \emph{singleton} distribution type $\type{!t.pi}=\type{\{(!t,p)_i\}}$, the \emph{empty} distribution type $\type{0}$ with $\floor{\type 0}=\varnothing$, and the (disjoint) \emph{sum} $\type{g*d}=\type{g\cup d}$ of two distribution types $\type g$ and $\type d$ with no choice in common, $\floor{\type g}\cap\floor{\type d}=\varnothing$. The \emph{probability} $\pr{\type d}$ of a distribution type is the sum over its probabilities $p_i$. Below left, the notation $\type{!s\,d}$ prefixes the type vector $\type{!s}$ to each $\type{!t}$ in $\type d$, and $\type{q.d}$ multiplies each probability $p_i$ in $\type d$ by the probability $q$. Below right, $\type{d|I}$ restricts $\type d$ to the choices in $I$, and $\type{d-I}$ removes them.
@@ -761,12 +719,7 @@ Using this as an admissible typing rule, our running example is typed as follows
 
 \begin{remark}
 \label{rem:probabilistic types embed}
-The type system is a conservative extension of 
-%
-%those of our previous work on probabilistic termination
-the probabilistic type systems 
-%
-in~\cite{Antonelli-DalLago-Pistone-2022} and~\cite{Heijltjes-Majury-2025}. Using the notation of the latter,  these feature probabilistic simple types as simple types with the rationals between $0$ and $1$ as the set of base types, as below left. They embed as below right, where $\star$ is again the single available choice label.
+The type system is a conservative extension of those of our previous work on probabilistic termination in~\cite{Antonelli-DalLago-Pistone-2022} and~\cite{Heijltjes-Majury-2025}. Using the notation of the latter,  these feature probabilistic simple types as simple types with the rationals between $0$ and $1$ as the set of base types, as below left. They embed as below right, where $\star$ is again the single available choice label.
 \[
 	 \typ{s,t} ~\coloneqq~ p~\mid~\typ{s\to t}
 \qquad\qquad
@@ -781,11 +734,6 @@ The \emph{sequential probabilistic types} of~\cite{Heijltjes-Majury-2025} are th
 \begin{remark}
 An element $\type{!t.pi}$ of a distribution type gives a lower bound $p$ on the probability of terminating with branch $i$. Since our types are a probabilistic form of simple types, which cannot type all normalizing $\lambda$-terms, the bound is necessarily not exact. Consider a term $\term M$ which is terminating but not typeable, for example $\term{[<y>.[y].*].<x>.[x].x}$, a variant of $\Omega=(\lambda x.xx)(\lambda y.yy)$ that replaces the function $y$ with $\term*$. Then $\term M$ terminates with probability $1$, but can only be typed by the zero-rule as $\term{M:\e=>0}$, giving a sum probability of zero. The zero-rule allows such terms to be combined with others, and express for instance that $\term{M+*}$ terminates with probability at least $\frac 12$. To obtain exact bounds, one would need a type system that can type all terminating $\lambda$-terms, such as intersection types.
 \end{remark}
-
-%\begin{remark}
-%For almost-sure termination, where the probabilities for a distribution type sum to one, types may be further simplified by omitting probabilities altogether, $\type{t}~\coloneqq~\type{!s => !t_1.i_1 ~*~ .. ~*~ !t_n.i_n}$. The return type then records only that each given choice has a non-zero probability. To guarantee this, it is sufficient to omit the $\mathsf{zero}$ typing rule, and restrict the implicit expansion of distribution types with zero-weighted elements. It can be observed that the remaining typing rules preserve the property that all return probabilities are non-zero. For the $\mathsf{iterate}$ rule with a premise $\term{M:!s => d * !s.pi}$, the condition $p\neq 1$, that the chance to iterate is less than one, is then automatically fulfilled if $\type d$ is non-empty.
-%\end{remark}
-
 
 %---------------------------------------------------------------------------------------------------- AST
 \section{Almost-Sure Termination}
@@ -821,7 +769,11 @@ If $\term{G |- M:t}$ and $\mu\in\SRUN{G}$ then $\term{\mu M}\in\RUN{t}$.
 \end{lemma}
 
 \begin{proof}
-Omitted. %See Appendix~\ref{A:runnability}.
+\ifLongVersion
+See Appendix~\ref{A:runnability}.
+\else
+See the extended version~\cite{DalLago-Heijltjes-2027-long}.
+\fi
 \end{proof}
 % - - - - - - - - - - - - - - -
 
@@ -859,7 +811,6 @@ Since ground terms are closed, the typing rules may further omit contexts. Thus 
 \qquad \infer{\term{M;i->N : g ++ (p . d)}}{\term{M: g * pi} & \term{N: d}}
 \qquad \infer{\term{M^i : /1{1-p} . d}}{\term{M: d * pi} & (p\neq 1)}
 \qquad \infer{\term{?a.a : /12\top * /12\bot}}{}
-%\qquad \infer{\term{M : 0.d}}{}
 \]
 
 \begin{proposition}
@@ -937,25 +888,18 @@ For our running example term $\term M$ the translation is as follows.
 
 In the other direction, we give an interpretation $\sem C$ of a finite Markov chain as a ground term. The translation operates as follows, using states as choice labels. Given $C$ with starting state $s$ and transition $s\mapsto\{p_1t_1,\dots,p_nt_n\}\in\delta$, we remove this transition and consider the sub-chains $C(t_i)$ for $i\leq n$ with new starting state $t_i$, in which $s$ becomes a final state. These are translated inductively to $\term{M_i}$. Then $\sem C$ is given by a term $\term{M^s}$, iterating on $s$, where $\term M$ is a probabilistic sum that chooses $\term{M_i}$ with probability $p_i$. We formalize this below.
 
-For $C=(S,s,F,\delta)$ and 
-%
-$t\in S$
-%$t\in S\less\{s\}$ 
-%
-let $C(t)=(S,t,F\cup\{s\},\delta\less\{s\})$ where $\delta\less X$ is the transition function $\delta$ restricted to the domain $\mathrm{dom}(\delta)\less X$. Write $\term{p_1M_1+..+p_nM_n}$ for the term that chooses $\term{M_i}$ with probability $p_i$, given inductively below; recall that $\term{?a_p}$ represents an unfair coin toss, given either as primitive or encoded with $\term{?a}$ and iteration.
+For $C=(S,s,F,\delta)$ and $t\in S$ let $C(t)=(S,t,F\cup\{s\},\delta\less\{s\})$ where $\delta\less X$ is the transition function $\delta$ restricted to the domain $\mathrm{dom}(\delta)\less X$. Write $\term{p_1M_1+..+p_nM_n}$ for the term that chooses $\term{M_i}$ with probability $p_i$, given inductively below; recall that $\term{?a_p}$ represents an unfair coin toss, given either as primitive or encoded with $\term{?a}$ and iteration.
 \[
 	\term{1M}~=~\term{M} 
 \qquad
     \term{pM+q_1N_1+..+q_nN_n}~=~\term{?a_p.a ; \top -> M; \bot -> (//{q_1}{1-p}N_1 + .. + //{q_n}{1-p}N_n) } 
 \]
 Then the interpretation of a Markov chain $C=(S,s,F,\delta)$ as a term is as follows.
-% (where $p_0$ is the probability of $s$ transitioning to itself; the summand $\termcolor{p_0s}$ may be omitted if $p_0=0$).
 \[
 	\sem C~=~
 	\left\{\begin{array}{ll}
 		\term{s} & \text{if}~s~\in~F
-	\\	\termcolor{(p_1\sem{C(t_1)}\term{+..+}p_n\sem{C(t_n)})^s} & \text{where}~\delta(s)=\D{p_1t_1,..,p_nt_n}	
-	%   \termcolor{(p_0s\term+p_1\sem{C(t_1)}\term{+..+}p_n\sem{C(t_n)})^s} & \text{where}~\delta(s)=\D{p_0s,p_1t_1,..,p_nt_n}	
+	\\	\termcolor{(p_1\sem{C(t_1)}\term{+..+}p_n\sem{C(t_n)})^s} & \text{where}~\delta(s)=\D{p_1t_1,..,p_nt_n}
 	\end{array}\right.
 \]
 
@@ -985,9 +929,9 @@ Consider the following Markov chain $C$, where each arrow has probability $\frac
 	\end{scope}
 \end{tikzpicture}}}
 \qquad
-\begin{array}{@{}r@{}l}
+\begin{array}{@{}r@{}l@{}}
 	    C ~=~{}& (~\{a,b,c,i,j,k\},~a,~\{i,j,k\},~
-\\[3pt]	       & ~~ a \mapsto \D{/13b,/13c,/13i}~b \mapsto \D{/13a,/13c,/13j}~c \mapsto \D{/13a,/13b,/13k}~)
+\\[3pt]	       & ~~ a \mapsto \D{/13b,/13c,/13i}~~b \mapsto \D{/13a,/13c,/13j}~~c \mapsto \D{/13a,/13b,/13k}~)
 \\[10pt]
    \sem C ~=~{}& \term{((a+(a+b+k)^c+j)^b + (a+(a+c+j)^b+k)^c+i)^a}: \type{/12i * /14j * /14k}
 \end{array}
@@ -1058,7 +1002,7 @@ The typed probabilistic FMC is not positive almost-surely terminating.
 \section{Limitations and Prospects}
 \label{sec:limits}
 
-The key to our type system is that it enforces a fixed probability of exiting or continuing for each iteration of a loop. Naturally, this limits expressiveness, as it prevents the typing of iteration with growing or shrinking probabilities, which might nevertheless be AST. Here, we explore how to express such algorithms in the untyped calculus, examine why they cannot be typed, and consider the prospects of lifting this restriction. %\footnote{We are grateful to the anonymous referees for the comments leading to these observations.}
+The key to our type system is that it enforces a fixed probability of exiting or continuing for each iteration of a loop. Naturally, this limits expressiveness, as it prevents the typing of iteration with growing or shrinking probabilities, which might nevertheless be AST. Here, we explore how to express such algorithms in the untyped calculus, examine why they cannot be typed, and consider the prospects of lifting this restriction. 
 
 Consider an unfair coin toss $\term{M:\top *_p \bot}$, using a (further) abbreviated notation $\type{\top *_p \bot}$ for the type $\type{\e=>\e.p\top * \e.(1`-p)\bot}$. We may construct terms with modified probabilities for example as follows.
 \[
@@ -1086,19 +1030,14 @@ This observation explains how the type system enforces fixed probabilities durin
 
 \section{Conclusion}
 
-We have demonstrated a type system for almost-sure termination in a probabilistic $\lambda$-calculus with iteration, the \PFMCT. 
-%We have demonstrated a probabilistic interpretation of the branching and iteration in the FMC to give a type system for almost-sure termination, the \PFMCT. 
-As a direct probabilistic generalization of the FMC and typed iteration, we believe this to be a natural account of AST. %almost-sure termination for the following reasons.
+We have demonstrated a type system for almost-sure termination in a probabilistic $\lambda$-calculus with iteration, the \PFMCT. As a direct probabilistic generalization of the FMC and typed iteration, we believe this to be a natural account of AST.
+essive power beyond positive AST.
 
-%The central idea, with which we started the introduction, is to take the familiar typed iterator $\mathsf{iter}\,f$ and make it probabilistic. Immediately, this gives an account of typed almost-sure termination. We explored the consequences of this idea within the \emph{control} extension of the FMC, consisting of the \emph{choice}, \emph{case}, and \emph{loop} constructs. In itself, this forms a minimal basis for imperative control flow, modelling conditionals, constants, case switches, exception handling, and iteration, all on simple abstract machine with a single continuation stack, both typed and untyped---unlike the iterator $\mathsf{iter}\,f$, which must be typed. Combined with our probabilistic generator, the control constructs form the \emph{ground terms} of the \PFMC, which we showed to be equivalent to finite Markov chains, where typing computes the return distribution of the chain.
-
-%The full \PFMC\ is then an orthogonal and conservative combination of the control extension with the $\lambda$-calculus and the probabilistic generator. Each fragment operates on an independent stack of the extended Krivine machine, simply by pushing and popping. The type system is a conservative extension of simple types for the $\lambda$-calculus, where each fragment contributes a natural component: the control fragment, a formal sum of return values indexed by \emph{choice} labels; the generator, a probability (sub-)distribution over these choice labels. The combination of probabilistic almost-sure termination and higher-order functions then gives the calculus expressive power beyond positive AST.
-
-In future work, we intend to further analyse the expressive power of the calculus and fragments of it. At present, being an extension of simple types with fixed probabilities of iteration, it is clear that the expressive power of the typed calculus for real algorithms is limited. Addressing this, we expect that the type system will generalize with polymorphism, dependent types, and intersection types along standard lines. %This is not idle speculation: the principle was already demonstrated for intersection types for higher-order store in the FMC~\cite{Heijltjes-2025-FSCD}. 
-A dependently typed generalisation would be akin to Hoare logic, and might facilitate reasoning about probabilistic termination in theorem provers and give natural ways to include termination evidence in typed imperative programming languages.
+In future work, we intend to further analyse the expressive power of the calculus and fragments of it. At present, being an extension of simple types with fixed probabilities of iteration, it is clear that the expressive power of the typed calculus for real algorithms is limited. Addressing this, we expect that the type system will generalize with polymorphism, dependent types, and intersection types along standard lines. A dependently typed generalisation would be akin to Hoare logic, and might facilitate reasoning about probabilistic termination in theorem provers and give natural ways to include termination evidence in typed imperative programming languages.
 
 %----------------------------------------------------------------------------------------------------
 
+\bibstyle{plainurl}
 \bibliography{FMC-AST}
 
 \newpage
@@ -1132,8 +1071,7 @@ While these are all reasonable ideas, they are not as simple and natural as our 
 	\term{f:t=>t./12\star} \qquad \text{and}\qquad \term{f;f : t => t./14\star}
 \]
 
-Turning to recursion, consider the following two recursive terms $f$ and $g$, where $1:\type 1$ is a terminating constant %(we may use $\lambda x.x:\type{1\to 1}$ instead) 
-and $\Omega=(\lambda x.xx)(\lambda x.xx):\type 0$ diverges.
+Turning to recursion, consider the following two recursive terms $f$ and $g$, where $1:\type 1$ is a terminating constant and $\Omega=(\lambda x.xx)(\lambda x.xx):\type 0$ diverges.
 \[
 	f~=~1 \oplus (\Omega\oplus f) \qquad\qquad g~=~g\oplus g
 \]
@@ -1167,6 +1105,7 @@ In Figure~\ref{fig:run} we give a successful run of the machine for our running 
 
 \begin{figure}
 \[
+\scalebox{0.975}{$
 \begin{array}{@{(\,}r@{\,,\,}l@{\,,\,}l@{\,,\,}r@{\,)}}
              \bot\,\bot\,\top & \e &         \term{(?a.a ; \top->\heads ; \bot->(?b.b ; \top->\tails ; \bot -> i))^i} & \e
 \\\hline     \bot\,\bot\,\top & \e & \phantom(\term{?a.a ; \top->\heads ; \bot->(?b.b ; \top->\tails ; \bot -> i)} & \term{(i -> M)}
@@ -1188,7 +1127,7 @@ In Figure~\ref{fig:run} we give a successful run of the machine for our running 
 \\\hline                   \e & \e & \phantom(\term{\heads} &              \term{(\bot->(?b.b ; \top->\tails ; \bot -> i))~(i -> M)}
 \\\hline                   \e & \e & \phantom(\term{\heads} &                                                        \term{(i -> M)}
 \\\hline                   \e & \e & \phantom(\term{\heads} & \e
-\end{array}
+\end{array}$}
 \]
 \caption{A complete run of the machine}
 \label{fig:run}
@@ -1236,7 +1175,7 @@ We elaborate on Example~\ref{ex:markov}, encoding the following Markov chain $C$
 \\[3pt]               && c \mapsto \D{~/13a~,~/13b~,~/13k~}
 \end{array}
 \]
-The interpretation, in stages, is as follows, again writing $\term{M+N+P}$ for the term $\term{//13M+//13N+//13P}$.
+The interpretation, in stages, is as follows, again writing $\term{M+N+P}$ for $\term{//13M+//13N+//13P}$.
 \[
 \begin{aligned}
 	\sem C &~=~ \term{({\sem{C(b)}}+{\sem{C(c)}}+i)^a}
@@ -1315,10 +1254,9 @@ The types work out the same way.
 \end{aligned}
 \]
 
-\end{document}
-
-
 %----------------------------------------------------------------------------------------------------
+
+\ifLongVersion
 
 \section{Proving the runnability lemma}
 \label{A:runnability}
@@ -1532,5 +1470,8 @@ It follows that $\DT\in\RUN{/1{1-p}.d}$ and hence $\term{\mu(M^i)}\in\RUN{!s => 
 \end{itemize}
 \end{proof}
 
+\fi
+
+\end{document}
 
 %====================================================================================================
