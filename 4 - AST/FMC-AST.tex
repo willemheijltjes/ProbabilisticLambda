@@ -67,7 +67,7 @@
 
 %==================================================================================================== FRONTMATTER
 
-\title{Probabilistic Simple Types for Almost-Sure Termination (Extended Version)}
+\title{Probabilistic Simple Types for Almost-Sure Termination\ifLongVersion (Extended Version) \fi}
 
 \author{Ugo {Dal Lago}}{University of Bologna, Italy \and INRIA Sophia Antipolis, France}{ugo.dallago@unibo.it}{https://orcid.org/0000-0001-9200-070X}{}
 
@@ -84,7 +84,9 @@
 
 \keywords{probabilistic lambda-calculus, type systems, almost-sure termination}
 
-%\relatedversion{}
+\ifLongVersion\else
+\relatedversion{An extended version~\cite{DalLago-Heijltjes-2026} is at \url{https://arxiv.org/abs/2611.23003}}
+\fi
 
 \acknowledgements{We thank Georgina Majury for her efforts on a precursor to this work, and the anonymous referees for their comments, in particular those leading to the observations in Section 8.}
 
@@ -772,7 +774,7 @@ If $\term{G |- M:t}$ and $\mu\in\SRUN{G}$ then $\term{\mu M}\in\RUN{t}$.
 \ifLongVersion
 See Appendix~\ref{A:runnability}.
 \else
-See the extended version~\cite{DalLago-Heijltjes-2027-long}.
+See the extended version~\cite{DalLago-Heijltjes-2026}.
 \fi
 \end{proof}
 % - - - - - - - - - - - - - - -
