@@ -3,7 +3,7 @@
 
 \newif\ifLongVersion
 \LongVersionfalse
-\LongVersiontrue
+%\LongVersiontrue
 
 % Potential further improvements:
 %  - explain "merge" |_| via functions: (gamma |_| delta)(i) = gamma(i) + delta(i)
@@ -115,7 +115,7 @@
 \begin{abstract}
 We present a type system for almost-sure termination (AST) in higher-order probabilistic computation. Our vehicle is the recent Functional Machine Calculus (FMC), which combines the lambda-calculus with effectful imperative computation. Importantly for our purpose, it models branching and looping computation with sum types and a typed iterator construct. Our key observation is that by replacing sum types with probability distributions, types ensure that iteration has a non-zero chance of exiting, which then gives AST in a simple and natural way. 
 
-Concretely, our type system assigns explicit probability distributions to termination outcomes, allowing probabilistic behaviour to be tracked compositionally at the type level. Types then soundly guarantee almost-sure termination, even in the presence of higher-order functions. The fragment of ground terms, which consists purely of the branching and iteration constructs with probabilistic sampling, is equivalent to finite Markov chains and is positively AST (expected evaluation time is finite). The full calculus is more expressive, which we demonstrate through an example term with infinite expected evaluation time.
+Concretely, our type system assigns explicit probability distributions to termination outcomes, allowing probabilistic behaviour to be tracked compositionally at the type level. Types then soundly guarantee almost-sure termination, even in the presence of higher-order functions. The fragment of ground terms, which consists purely of the branching and iteration constructs with probabilistic sampling, is equivalent to finite Markov chains and has finite expected evaluation time. The full calculus is more expressive, which we demonstrate through an example term with infinite expected evaluation time.
 \end{abstract}
 
 
@@ -126,7 +126,7 @@ Concretely, our type system assigns explicit probability distributions to termin
 
 We are interested in applying the toolset of the $\lambda$-calculus, in particular confluent reduction and type systems, to probabilistic computation. In~\cite{DalLago-Guerrieri-Heijltjes-2020} we restored confluence to a probabilistic $\lambda$-calculus, the \emph{probabilistic event $\lambda$-calculus} (PEL), by decomposing probabilistic choice into a \emph{sampling} construct and a \emph{conditional}. Then in~\cite{Antonelli-DalLago-Pistone-2022} and~\cite{Heijltjes-Majury-2025}, from different inspirations we converged on essentially the same probabilistic type system for the PEL to give lower bounds on the probability of termination. In this paper we further extend the calculus, and develop a type system for \emph{almost-sure termination} (AST): termination with probability one. In doing so, our objective differs from that of many existing works in this area, which aim to capture as many AST programs as possible~\cite{DalLago-Grellois-2019,DalLago-Faggian-Ronchi-2021}, or even to study the feasibility of capturing all such programs~\cite{Kobayashi-DalLago-Grellois-2020}. Instead, we seek to understand the extent to which almost-sure termination can be obtained and explained in a natural manner, possibly using well-established methods, and guaranteed by a minimal extension to simple types. More powerful methods such as dependent types and intersection types may later build on this along standard lines.
 
-We start from the following observation. \emph{Iteration}, generally represented by while-loops, repeats a given function $f$ until a condition is fulfilled. In the typed case, illustrated  below, the function $f$ is required to return a sum $B+A$, where the choice between returning a value $A$ or $B$ represents the condition. Then $\mathsf{iter}\,f$ evaluates $f$, exits on $B$, and repeats on $A$~\cite{Bloom-Esik-1993}.
+We start from the following observation. \emph{Iteration}, generally represented by while-loops, repeats a given function $f$ until a condition is fulfilled. In the typed case (see~\cite{Bloom-Esik-1993}), illustrated  below, the function $f$ is required to return a sum $B+A$, where the choice between returning an $A$-value or $B$-value represents the condition. Then $\mathsf{iter}\,f$ evaluates $f$, exits on $B$, and repeats on $A$.
 \[
 \begin{array}{@{}r@{}l@{}}
 	f &{}: A \to B+A
@@ -250,7 +250,7 @@ We now turn to types. Deterministic types for the control constructs record the 
 \qquad\quad	\infer{\term{M;i->N : I\cup J}}{\term{M:I+i} && \term{N:J}}
 \qquad\quad \infer{\term{M^i : I}}{\term{M:I+i}}
 \]
-As in the previous, in the probabilistic setting types become (sub-)distributions $\type{p_I}=\type{p_1i_1 * \cdots * p_ni_n}$ over a set $I$ of choices. Ground terms are then typed by the rules in Figure~\ref{fig:ground types}, where we write $\type{p_I+q_I}$ for the pointwise addition of two distributions over $I$ and $\type{p.q_I}$ for the multiplication of each probability in $\type{q_I}$ by $\type p$. A type $\type{p_I}$ implicitly assigns probability zero to any choice not in $I$, corresponding to the weakened $\type I$ in the first rule above. Observe that the probabilistic type system is a direct generalization of the deterministic one.
+As above, in the probabilistic setting types become (sub-)distributions $\type{p_I}=\type{p_1i_1 * \cdots * p_ni_n}$ over a set $I$ of choices. Ground terms are then typed by the rules in Figure~\ref{fig:ground types}, where we write $\type{p_I+q_I}$ for the pointwise addition of two distributions over $I$ and $\type{p.q_I}$ for the multiplication of each probability in $\type{q_I}$ by $\type p$. A type $\type{p_I}$ implicitly assigns probability zero to any choice not in $I$, corresponding to the weakened $\type I$ in the first rule above. Observe that the probabilistic type system is a direct generalization of the deterministic one.
 
 \begin{figure}
 \[
@@ -349,7 +349,7 @@ Consider the following example term.
 \[
 	\term{<x>.x~;~\heads -> <y>.* ~;~ \tails -> <y>.[y].[y].*}
 \]
-It takes a (fair or unfair) coin from the stack as $\term x$, such as our $\frac13$ probability running example term, and tosses it. On heads, it deletes the top element on the stack; on tails, it duplicates it. Both branches return with the default choice $\term *$ (``skip'').
+As input on the stack it expects a ``coin toss'', a term that chooses $\heads$ or $\tails$ when executed, such as $\term{\heads+\tails}$ or our running example term $\term{(\heads+(\tails+\,i))^i}$. It takes this from the stack as $\term x$ and executes it, and on heads, it deletes the top element on the stack; on tails, it duplicates it. Both branches return with the default choice $\term *$ (``skip'').
 \end{example}
 
 \begin{remark}
@@ -358,10 +358,10 @@ The notion of sequencing in the FMC is fundamentally the same as that of Moggi's
 \[
 	M\bind N ~=~ \term{M;N}
 \]
-The difference is that the latter return a single value, while the FMC returns the whole stack: $\mathsf{return}~M~=~\term{[M].*}$. This notion of sequencing further allows the encoding of call--by--value behaviour, both in a deterministic and probabilistic setting; see~\cite{Heijltjes-2023}, respectively~\cite{Heijltjes-Majury-2025}.
+The difference is that the aforementioned calculi return a single value, while the FMC returns the whole stack: $\mathsf{return}~M~=~\term{[M].*}$. This notion of sequencing further allows the encoding of call--by--value behaviour, both in a deterministic and probabilistic setting; see~\cite{Heijltjes-2023}, respectively~\cite{Heijltjes-Majury-2025}.
 \end{remark}
 
-For the full calculus, the distribution types of ground terms are extended with types for the input stack and for the return stack of each branch. Types (or \emph{computation types}) $\type{t}$ and stack types $\type{!t}$ are given below; the latter are vectors giving a type for each term, and the former an implication from an input stack type $\type{!s}$ to a formal sum of triples $\type{!t.pi}$ of an output stack type $\type{!t}$, a probability $p$, and a choice $i$, where the restriction to $\type{pi}$ forms a (sub-)distribution.
+For the full calculus, the distribution types of ground terms are extended with types for the input stack and for the return stack of each branch. Types (or \emph{computation types}) $\type{t}$ and stack types $\type{!t}$ are given below. A stack type $\type{!t}$ is a vector of types, one for each term on the stack. A computation type is an implication from an input stack type $\type{!s}$ to a formal sum of triples $\type{!t.pi}$, each with an output stack type $\type{!t}$, a probability $p$, and a choice $i$. As before, the choices $i$ should be distinct, and the probabilities $p$ should sum to at most one.
 \[
 \begin{array}{l@{\qquad}r@{}l}
         \text{\emph{Types:}}	    & \type{s,t}~\coloneqq~{} & \type{!s ~=>~ !t_1.p_1i_1 * \cdots * !t_n.p_ni_n}
@@ -405,14 +405,14 @@ As the example demonstrates, the type system is quite restrictive: probabilities
 
 \begin{remark}
 \label{rem:monads}
-Our distribution types $\type{!t_1.p_1i_1 * \cdots * !t_n.p_ni_n}$ are a fundamentally different construct than a \emph{probability monad} $P(A)$~\cite{Giry-1982}: the former features probability distributions at the \emph{type level}, the latter at the \emph{term level}. Since sampling is a basic construct, terms in the probabilistic FMC are inherently probabilistic in the way of a probability monad; for example, assuming a base type $\type\Z$ of integers, the following term returns $2$ or $3$ with equal probability, despite having only a trivial probability at the type level.
+Our distribution types $\type{!t_1.p_1i_1 * \cdots * !t_n.p_ni_n}$ are fundamentally different from a \emph{probability monad} $P(A)$~\cite{Giry-1982}: the former features probability distributions at the \emph{type level}, the latter at the \emph{term level}. Since sampling is a basic construct, terms in the probabilistic FMC are inherently probabilistic in the way of a probability monad; for example, assuming a base type $\type\Z$ of integers, the following term returns $2$ or $3$ with equal probability, despite having only a trivial probability at the type level.
 \[
 	\term{?a.a~;~\top -> [2].*~;~\bot -> [3].*~:~\e => \Z.1\star} 
 \]
 \end{remark}
 
 \begin{remark}
-The Functional Machine Calculus as presented in~\cite{Heijltjes-2023,Heijltjes-2025-MFPS} allows not just one, but multiple argument stacks, which model various state-like effects: mutable store (as a stack of depth one), input/output (as dedicated input-only and output-only stacks), and probabilistic choice (as a probabilistically-generated input stack); see op.cit.\ for a detailed exposition. The probabilistic FMC is a proper fragment with two stacks: one for the $\lambda$-calculus, and a probabilistic one, viewing the generator construct $\term{?a.M}$ as popping a value from this stack as $a$. The same technique, sampling from a random stream on the Krivine machine, is used by Ehrhard~\cite{Ehrhard-2019}.
+The Functional Machine Calculus as presented in~\cite{Heijltjes-2023,Heijltjes-2025-MFPS} allows not just one, but multiple argument stacks, which model various state-like effects: mutable store (as a stack of depth one), input/output (as dedicated input-only and output-only stacks), and probabilistic choice (as a probabilistically generated input stack); see op.cit.\ for a detailed exposition. The probabilistic FMC is a proper fragment with two stacks: one for the $\lambda$-calculus, and a probabilistic one, viewing the generator construct $\term{?a.M}$ as popping a value from this stack as $a$. The same technique, sampling from a random stream on the Krivine machine, is used by Ehrhard~\cite{Ehrhard-2019}.
 \end{remark}
 
 After exploring related work in the next section, we will define the calculus (Section~\ref{sec:PFMC}) and the type system (Section~\ref{sec:types}), and give our main result, Theorem~\ref{thm:termination}: the probability given by the type of a term is a lower bound on the probability of termination, which implies almost-sure termination if that probability is one (Section~\ref{sec:AST}). The final sections explore the expressiveness of the calculus, demonstrating that ground terms are equivalent to finite Markov chains and thus positive AST (Section~\ref{sec:ground terms}), and that the full calculus is \emph{null AST}: while the probability of termination is one, expected runtime is infinite (Section~\ref{sec:NAST}).
@@ -446,7 +446,7 @@ The \emph{terms} of the \PFMC\ are given by the following grammar.
 \[
 \term{M,N} ~\coloneqq~ \term{x} ~\mid~ \term{<x>.M} ~\mid~ \term{[N].M} ~\mid~ \term{i} ~\mid~ \term{M;i->N} ~\mid~ \term{M^i} ~\mid~ \term{?a.M}
 \]
-The constructs are: a \emph{variable} $\term x$; a \emph{pop} $\term{<x>.M}$ that binds $\term x$ in $\term M$; a \emph{push} $\term{[N].M}$; a \emph{choice} $\term i$; a \emph{case} $\term{M;i->N}$; a \emph{loop} $\term{M^i}$; and a \emph{generator} $\term{?a.M}$ which binds the variable $\term a$ in $\term M$.
+Here, $x,y,z$ and $a,b,c$ range over variables, and $i,j,k$ over choices. The constructs are: a \emph{variable} $\term x$; a \emph{pop} $\term{<x>.M}$ that binds $\term x$ in $\term M$; a \emph{push} $\term{[N].M}$; a \emph{choice} $\term i$; a \emph{case} $\term{M;i->N}$; a \emph{loop} $\term{M^i}$; and a \emph{generator} $\term{?a.M}$ which binds the term variable $\term a$ in $\term M$.
 \end{definition}
 
 % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - Abstract machine
@@ -488,7 +488,7 @@ Appendix~\ref{A:run} demonstrates a successful run of the machine for our runnin
 \end{figure}
 % - - - - - - - - - - 
 
-In addition to the machine we give a big-step operational semantics, in the form of an inductively defined evaluation relation $(\evalarrow)$ that describes the successful runs of the machine directly. Where the machine implements branching computation via the contination stack, the big-step semantics gives a more abstract view as conditional sequential composition.
+In addition to the machine we give a big-step operational semantics, in the form of an inductively defined evaluation relation $(\evalarrow)$ that describes the successful runs of the machine directly. Where the machine implements branching computation via the continuation stack, the big-step semantics gives a more abstract view as conditional sequential composition.
 
 \begin{definition}
 The \emph{evaluation} relation has statements $\eval tSM Ti$ and is defined inductively by the following rules.
@@ -519,10 +519,10 @@ Evaluation characterizes successful machine termination:
 
 % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - Probabilistic evaluation
 
-The calculus as defined above is deterministic: it externalises the probabilistic component of evaluation to the input trace $t$. To give a probabilistic semantics, we will define an evaluation relation $\Eval SM\DT$ which takes a stack $S$ and a term $\term M$ to a certain kind of distribution $\DT$, a \emph{return family}. This is a set of traces with for each $t$ an associated pair 
+The calculus as defined above is deterministic: it externalises the probabilistic component of evaluation to the input trace $t$. To give a probabilistic semantics, we will define an evaluation relation $\Eval SM\DT$ which takes a stack $S$ and a term $\term M$ to a certain kind of distribution $\DT$, a \emph{return family}. This is a set of traces, each with an associated pair 
 $(T,i)$ of a return stack and choice such that $\eval tSMTi$ (effectively, we are only shifting where the trace $t$ is considered as a parameter, on the machine versus in the return distribution). Since the probability of a trace $t$ is $\frac12^n$ where $n$ is the length of $t$, a return family readily gives rise to a probability (sub-)distribution.
 
-A return family collects evaluation results for distinct probabilistic choices, not further evaluation along the same trace: if it has $t$, it should not have any prefix of $t$, nor any trace extending $t$. A return family will therefore be defined over a \emph{frontier} $F$: a (possibly infinite) set of traces such that no element in $F$ is a prefix of another. The \emph{probability} $\pr F$ of a frontier $F$ is the sum probability of its traces; observe that by definition, $\pr F\leq 1$.
+A return family collects evaluation results for distinct probabilistic choices, not further evaluation along the same trace: if it has $t$, it should not have any prefix of $t$, nor any trace extending $t$. A return family will therefore be defined over a \emph{frontier} $F$: a (possibly infinite) set of traces such that no element in $F$ is a prefix of another. The \emph{probability} $\pr F$ of a frontier $F$ is the sum of the probabilities of its traces; observe that by definition, $\pr F\leq 1$.
 \[
 \begin{array}{l@{}l}
 	    \pr t &~=~ (\frac12)^{|t|} \quad\text{where $|t|$ is the length of $t$}
@@ -825,7 +825,7 @@ Immediate by induction on the term.
 We will define Markov chains as probabilistic automata, as follows. We write $\DD X$ for the set of probability distributions over a set $X$, and write a distribution over $X=\{x_1,x_2,\dots\}$ as $\{p_1x_1,p_2x_2,\dots\}$.
 
 \begin{definition}
-A \emph{Markov chain} $C=(S,s,F,\delta)$ is given by a set of \emph{states} $S$, a \emph{starting state} $s\in S$, a set of \emph{final states} $F\subseteq S$, and a stochastic \emph{transition} function $\delta:S\less F\to\DD{S}$ from non-final states to states.
+A \emph{Markov chain} $C=(S,s,F,\delta)$ is given by a set of \emph{states} $S$, a \emph{starting state} $s\in S$, a set of \emph{final states} $F\subseteq S$, and a stochastic \emph{transition} function $\delta:S\less F\to\DD{S}$ from non-final states to states (with rational probabilities).
 \end{definition}
 
 The translation $\markov M$ from ground terms to Markov chains will take $\term M$ to a chain
@@ -853,10 +853,10 @@ For our running example term $\term M$ the translation is as follows.
 \[
 \begin{array}{r@{~}l}
           \term{M}~= & \term{(?a.a ; \top->\heads ; \bot->(?b.b ; \top->\tails ; \bot -> i))^i}
-\\[8pt] \markov{M}~= & (~\{a,b,r,s,u,\heads,\tails\}~,~r~,~\{\heads,\tails\}~,~
+\\[8pt] \markov{M}~= & (~\{a,b,r,s,u,\heads,\tails\}~,~a~,~\{\heads,\tails\}~,~
 \\[3pt]              & ~~a\mapsto\D{/12r,/12b}~~r\mapsto\D{1\heads}
 \\[3pt]              & ~~b\mapsto\D{/12s,/12u}~~s\mapsto\D{1\tails}
-\\[3pt]              & ~~u\mapsto\D{1r}~)
+\\[3pt]              & ~~u\mapsto\D{1a}~)
 \end{array}
 \qquad\qquad
 	\vc{
@@ -1021,17 +1021,16 @@ The reason why the term cannot be typed is subtle: it is because the loop body c
 \[
 	\term{<x>.(x\,;\,\bot -> [x;\top -> x].*)~:~(\top *_q \bot) => \e.q\top * (\top *_{q^2} \bot).(1`-q)\star }
 \]
-But to type the loop requires the same input and output types on the stack, while $\type{\top *_q \bot}$ and $\type{\top *_{q^2} \bot}$ are distinct.
+But to type the loop itself requires the same input and output types on the stack, while $\type{\top *_q \bot}$ and $\type{\top *_{q^2} \bot}$ are distinct.
 
-This observation explains how the type system enforces fixed probabilities during iteration: the probabilities of all inputs---the stack---need to remain fixed. This remains a main limitation of the type system, as it also prevents typing similar terms to the above example that are AST, for example one that increases (rather than decreases) the probability of exiting the loop. Finally, the above considerations indicate how the type system might be extended to accommodate iteration with changing probability: by introducing variables for probabilities, and arithmetic functions over them, into the type system, approaching a form of dependent types.
+This observation explains how the type system enforces fixed probabilities during iteration: the probabilities of all inputs---the stack---need to remain fixed. This is a main limitation of the type system, as it also prevents typing similar terms to the above example that are AST, for example one that increases (rather than decreases) the probability of exiting the loop. Finally, the above considerations indicate how types might be extended to accommodate iteration with changing probability: by introducing variables for probabilities, and arithmetic functions over them, into the type system, approaching a form of dependent types.
 
 
 %----------------------------------------------------------------------------------------------------
 
 \section{Conclusion}
 
-We have demonstrated a type system for almost-sure termination in a probabilistic $\lambda$-calculus with iteration, the \PFMCT. As a direct probabilistic generalization of the FMC and typed iteration, we believe this to be a natural account of AST.
-essive power beyond positive AST.
+We have demonstrated a type system for almost-sure termination in a probabilistic $\lambda$-calculus with iteration, the \PFMCT. As a direct probabilistic generalization of the FMC and typed iteration, we believe this to be a natural account of AST, while the calculus also admits almost-surely terminating terms with infinite expected running time.
 
 In future work, we intend to further analyse the expressive power of the calculus and fragments of it. At present, being an extension of simple types with fixed probabilities of iteration, it is clear that the expressive power of the typed calculus for real algorithms is limited. Addressing this, we expect that the type system will generalize with polymorphism, dependent types, and intersection types along standard lines. A dependently typed generalisation would be akin to Hoare logic, and might facilitate reasoning about probabilistic termination in theorem provers and give natural ways to include termination evidence in typed imperative programming languages.
 
